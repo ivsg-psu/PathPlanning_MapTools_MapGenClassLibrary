@@ -1,6 +1,6 @@
 function [trim_polytopes] = fcn_polytope_editing_remove_edge_polytopes(polytopes,xlow,xhigh,ylow,yhigh)
 % FCN_POLYTOPE_EDITING_REMOVE_EDGE_POLYTOPES removes polytopes that extend 
-% beyond the boundaries specified
+% beyond the rectangular boundaries specified
 %
 % [TRIM_POLYTOPES]=FCN_POLYTOPE_EDITING_REMOVE_EDGE_POLYTOPES(POLYTOPES,XLOW,XHIGH,YLOW,YHIGH)
 % returns:
@@ -35,6 +35,7 @@ function [trim_polytopes] = fcn_polytope_editing_remove_edge_polytopes(polytopes
 %   fcn_plot_polytopes(trim_polytopes,fig,'g',2,[0 1 0 1]);
 %
 % This function was written on 2019_06_13 by Seth Tau
+% Comments added on 2021_02_23 by Seth Tau
 % Questions or comments? sat5340@psu.edu 
 %
 
@@ -43,9 +44,11 @@ trim_polytopes(1) = struct('vertices',[],'xv',[],'yv',[],'distances',[],'mean',[
 for poly = 1:size(polytopes,2) % check each polytope within polytopes
     xv = polytopes(poly).xv;
     yv = polytopes(poly).yv;
-    if sum((xv<xlow)+(xv>xhigh)+(yv<ylow)+(yv>yhigh))==0 % if the x or y vertices are inside of the bounds
-        keep = keep + 1;
+    if sum((xv<xlow)+(xv>xhigh)+(yv<ylow)+(yv>yhigh))==0 % if the x and y coordinates are all inside of the bounds
+        keep = keep + 1; % keep this polytope
         trim_polytopes(keep) = polytopes(poly);
+    %else one or more of the vertices are outside the rectangular boundary 
+        %the polytope is not added to trim_polytopes
     end
 end
 

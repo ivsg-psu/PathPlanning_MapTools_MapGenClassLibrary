@@ -48,7 +48,6 @@ function [fig] = fcn_plot_polytopes(polytopes,fig_num,line_spec,line_width,varar
 %
 % Examples:
 %      
-%      % BASIC example
 %      cur_path = pwd;
 %      main_folder = '!Voronoi Tiling Obstacles - Organized';
 %      parent_dir = cur_path(1:strfind(cur_path,main_folder)-2);
@@ -72,6 +71,7 @@ function [fig] = fcn_plot_polytopes(polytopes,fig_num,line_spec,line_width,varar
 %       
 % 
 % This function was written on 2018_12_10 by Seth Tau
+% Added commens on 2021_02_23 by Seth Tau
 % Questions or comments? sat5340@psu.edu 
 %
 
@@ -89,77 +89,46 @@ end
 hold on % allow multiple plot calls
 
 %% determine color and axis values
-plots = 1; % basic plot
+plots = 1; % basic plot with only polytopes, figure, line_spec, and line_width
 color = []; axis_limits = []; axis_style = []; fill_info = [0 0 0 0 0]; % initialize empty values    
-if nargin > 4
-    for arg = 1:nargin-4
+if nargin > 4 % variable arguments used
+    for arg = 1:nargin-4 % check each variable argument
         argument = varargin{arg};
         arg_size = length(argument);
-        if ischar(argument)
+        if ischar(argument) % if the argument is a character string
             axis_style = argument; % axis style (ie square or equal)
-        elseif arg_size == 3
+        elseif arg_size == 3 % if the argument is a 3 value array
             color = argument; % color to plot polytopes
             plots = 2; % specific color plot
-        elseif arg_size == 4
+        elseif arg_size == 4 % if the argument is a 4 value array
             axis_limits = argument; % limits of x and y axes
-        elseif arg_size == 5
+        elseif arg_size == 5 % if the argument is a 5 value array
             fill_info = argument; % all the fill information [Y/N R G B alpha]
-        else
+        else % if the argument does not fall within one of these categories
             warning('Invalid argument. Argument ignored.')
         end
     end
 end
             
 
-% if nargin == 4
-%     plots = 1; % basic plot
-% else % nargin > 4
-%     if length(varargin{1}) == 3 % first optional argument is color
-%         color = varargin{1}; % color to plot polytopes
-%         plots = 2; % plot polytopes with special color
-%         if nargin == 8 % color, limits, limit style, and fill info specified
-%             axis_limits = varargin{2}; % limits of x and y axes
-%             axis_style = varargin{3}; % axis style (ie square or equal)
-%             fill_info = varargin{4}; % all the fill information [Y/N R G B alpha]
-%         elseif nargin == 7 % color, limits, and limit style or fill info
-%             axis_limits = varargin{2}; % limits of x and y axes
-%             if ischar(varargin{3}) % limit style specified
-%                 axis_style = varargin{3}; % axis style (ie square or equal)
-%             else % fill info specified
-%                 fill_info = varargin{3}; % all the fill information [Y/N R G B alpha]
-%             end
-%         elseif nargin == 6 % only color and limits specified
-%             if length(varargin{2}
-%             axis_limits = varargin{2}; % limits of x and y axes
-%         end
-%     elseif length(varargin{1}) == 4 % first optional argument is axis limits
-%         plots = 1; % basic plot
-%         axis_limits = varargin{1}; % limits of x and y axes
-%         if nargin == 6 % only color and limits specified
-%             axis_style = varargin{2}; % axis style (ie square or equal)
-%         end
-%     else % first optional argument is fill info
-%         
-%     end
-% end
-
 %% plot polytopes
-if fill_info(1) == 1
-    for polys = 1:size(polytopes,2)
+if fill_info(1) == 1 % if fill is specified 
+    for polys = 1:size(polytopes,2) % fill each polytope with the specified color and transparence
         filler = fill(polytopes(polys).vertices(:,1)',polytopes(polys).vertices(:,2)',fill_info(2:4));
         filler.FaceAlpha = fill_info(5);
     end
 end
-if plots == 1 % basic plot
+if plots == 1 % basic plot with only polytopes, figure, line_spec, and line_width
     for polys = 1:size(polytopes,2) % plot each polytope
         plot(polytopes(polys).vertices(:,1),polytopes(polys).vertices(:,2),line_spec,'linewidth',line_width)
     end
-else
+else % plot with the specific color
     for polys = 1:size(polytopes,2) % plot each polytope
         plot(polytopes(polys).vertices(:,1),polytopes(polys).vertices(:,2),line_spec,'Color',color,'linewidth',line_width)
     end
 end
 
+%% Change axis if specified
 axis(axis_limits);
 axis(axis_style);
 

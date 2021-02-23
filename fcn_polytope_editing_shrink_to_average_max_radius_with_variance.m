@@ -1,6 +1,7 @@
 function [shrunk_polytopes,mu_final,sigma_final] = fcn_polytope_editing_shrink_to_average_max_radius_with_variance(polytopes,des_radius,sigma_radius,min_rad)
 % FCN_POLYTOPE_EDITING_SHRINK_TO_AVERAGE_MAX_RADIUS_WITH_VARIANCE shrinks the 
-% polytopes to achieve the desired lookout limit with specified variance
+% polytopes to achieve the desired average radius with specified standard
+% deviation in radius
 %
 % [SHRUNK_POLYTOPES,MU_FINAL,SIGMA_FINAL]=FCN_POLYTOPE_EDITING_SHRINK_TO_AVERAGE_MAX_RADIUS_WITH_VARIANCE(POLYTOPES,DES_RADIUS,SIGMA_RADIUS,MIN_RAD)
 % returns:
@@ -16,18 +17,18 @@ function [shrunk_polytopes,mu_final,sigma_final] = fcn_polytope_editing_shrink_t
 %   area: area of the polytope
 %   max_radius: distance from the mean to the farthest vertex
 % MU_FINAL: final average maximum radius achieved
-% SIGMA_FINAL: final variance achieved
+% SIGMA_FINAL: final standard deviation in radius achieved
 %
 % with inputs:
 % POLYTOPES: original polytopes with same fields as shrunk_polytopes
 % DES_RAD: desired average max radius   
-% SIGMA_RADIUS: desired variance in the radii 
+% SIGMA_RADIUS: desired standard deviation in the radii 
 % MIN_RAD: minimum acceptable radius
 %
 % Examples:
 %
 % cur_path = pwd;
-% main_folder = '!Voronoi Tiling Obstacles - Organized';
+% main_folder = '!Voronoi Tiling Obstacles - Organized'; % may need to adjust this for current folder
 % parent_dir = cur_path(1:strfind(cur_path,main_folder)-2);
 % addpath([parent_dir '\' main_folder '\Plotting'])
 % addpath([parent_dir '\' main_folder '\General_Calculation'])
@@ -50,6 +51,7 @@ function [shrunk_polytopes,mu_final,sigma_final] = fcn_polytope_editing_shrink_t
 % fcn_plot_polytopes(shrunk_polytopes2,[],'b',2,[0 1 0 1]);
 %   
 % This function was written on 2019_08_29 by Seth Tau
+% Comments added on 2021_02_23 by Seth Tau
 % Questions or comments? sat5340@psu.edu 
 %
 
@@ -65,14 +67,14 @@ radii = [polytopes.max_radius];
 % r_sigma = std(radii);
 %%%
 
-r_mu = mean(radii);
-r_size = length(radii);
+r_mu = mean(radii); % average radius
+r_size = length(radii); % number of radii (i.e., obstacles)
 
-if r_mu < des_radius
+if r_mu < des_radius % average radius is already smaller than the desired radius
     error('cannot achieve the desired radius')
 end
 
-%% determine desired distribution
+%% determine desired random normal distribution
 r_dist = normrnd(des_radius,sigma_radius,[r_size,1]);
 
 %%% troubleshoooting
@@ -83,19 +85,19 @@ r_dist = normrnd(des_radius,sigma_radius,[r_size,1]);
 r_dist = r_dist + (des_radius-mean(r_dist)); % adjust to ensure the mean value is mu
 max_r_dist = max(radii); % largest possible radius
 min_r_dist = min_rad; % smallest possible radius
-if sum((r_dist>max_r_dist)+(r_dist<min_r_dist)) > 0
+if sum((r_dist>max_r_dist)+(r_dist<min_r_dist)) > 0 % exact standard deviaiton cannot be achieved
     warning('standard deviation skewed due to truncated distribution')
 end
 r_dist(r_dist>max_r_dist) = max_r_dist; % truncate any values that are too large
 r_dist(r_dist<min_r_dist) = min_r_dist; % truncate any values that are too small
-while abs(mean(r_dist) - des_radius) > 1e-10
+while abs(mean(r_dist) - des_radius) > 1e-10 % consitnue adjusting mean value to create feasible average
     r_dist = r_dist + (des_radius-mean(r_dist));
     r_dist(r_dist>max_r_dist) = max_r_dist;
     r_dist(r_dist<min_r_dist) = min_r_dist;
 end
 
-mu_final = mean(r_dist);
-sigma_final = std(r_dist);
+mu_final = mean(r_dist); % final average of the distribution
+sigma_final = std(r_dist); % final standard deviation of the distribution
 
 %%% troubleshoooting
 % figure
@@ -103,13 +105,13 @@ sigma_final = std(r_dist);
 %%%
 
 %% shrink polytopes to achieve the distribution
-[new_rads,ob_ind] = sort(r_dist);
-if sum((sort(radii)'-sort(r_dist))>=-2*min_rad) < r_size
+[new_rads,ob_ind] = sort(r_dist); % sort obstacles by size
+if sum((sort(radii)'-sort(r_dist))>=-2*min_rad) < r_size % if the distribution is unachievable with the given map
     error('distribution is unachievable with generated map')
 end
 
-shrunk_polytopes = polytopes;
-for idx = 1:length(new_rads)
+shrunk_polytopes = polytopes; % initialize polytopes
+for idx = 1:length(new_rads) % iterate through the new radii
     shrinker = polytopes(ob_ind(idx)); % obstacle to be shrunk
     
     % pull values
@@ -135,24 +137,19 @@ for idx = 1:length(new_rads)
             new_vert = [centroid; centroid; centroid];
         end
         
-        % check for shapes with almost zero size
-%         if isempty(new_vert) % no size to the shape
-%             % remove the essentially non-existent shape
-%             shrunk_polytopes(ob_ind(idx)) = [];
-%         else % shape has some size
-            % adjust polytopes
-            shrinker.vertices = [new_vert; new_vert(1,:)];
-            shrinker.xv = new_vert(:,1)';
-            shrinker.yv = new_vert(:,2)';
-            shrinker.distances = fcn_general_calculation_euclidean_point_to_point_distance(new_vert,[new_vert(2:end,:); new_vert(1,:)]);
-            shrinker.area = shrinker.area*scale^2;
-            shrinker.max_radius = shrinker.max_radius*scale;
-            
-            % assign to shrunk_polytopes
-            shrunk_polytopes(ob_ind(idx)) = shrinker;
-        end
+
+        % adjust polytopes
+        shrinker.vertices = [new_vert; new_vert(1,:)];
+        shrinker.xv = new_vert(:,1)';
+        shrinker.yv = new_vert(:,2)';
+        shrinker.distances = fcn_general_calculation_euclidean_point_to_point_distance(new_vert,[new_vert(2:end,:); new_vert(1,:)]);
+        shrinker.area = shrinker.area*scale^2;
+        shrinker.max_radius = shrinker.max_radius*scale;
+
+        % assign to shrunk_polytopes
+        shrunk_polytopes(ob_ind(idx)) = shrinker;
     end
-    
 end
+
 
 

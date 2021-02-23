@@ -26,8 +26,10 @@ function [Cx,Cy,Area] = fcn_polytope_calculation_centroid_and_area(x,y)
 % plot(Cx,Cy,'kx','linewidth',1)
 %
 % This function was written on 2019_04_02 by Seth Tau
+% Added comments on 2021_02_23 by Seth Tau
 % Questions or comments? sat5340@psu.edu 
 %
+% Centroid & Area equations https://en.wikipedia.org/wiki/Centroid
 
 
 % % troubleshooting

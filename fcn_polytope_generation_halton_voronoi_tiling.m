@@ -35,30 +35,31 @@ function [polytopes] = fcn_polytope_generation_halton_voronoi_tiling(low_pt,high
 %   fcn_plot_polytopes(polytopes,[],'b',2,[0 1000 -250 750],'square');
 % 
 % This function was written on 2019_06_13 by Seth Tau
-% Example modification to remove addpath 2020_07_16
+% Example modification to remove addpath 2020_07_16 by Seth Tau
+% Added comments on 2021_02_23 by Seth Tau
 % Questions or comments? sat5340@psu.edu 
 % 
 
 %% check variable argument
-if nargin == 3
+if nargin == 3 % if stretch is specified
     stretch = varargin{1};
-else
+else % no stretch
     stretch = [1 1];
 end
 
 %% pull halton set
-p = haltonset(2);
+p = haltonset(2);  % pull a 2 dimensional halton sequence of points
 ps = scramble(p,'RR2'); % scramble values
 
 %% pick values from halton set
 X = ps(low_pt:high_pt,:);
-X = X.*stretch;
+X = X.*stretch; % stretch the values if specified
 
-%% generate Voronoi diagram
+%% generate Voronoi diagram based on the Halton set
 [V,C] = voronoin(X);
 
 %% create tiling
-num_poly = size(X,1);
+num_poly = size(X,1); % number of polytopes created is equal to the number of Halton set points
 polytopes(num_poly) = struct('vertices',[],'xv',[],'yv',[],'distances',[],'mean',[],'area',[],'max_radius',[]);
 
 %     %%%%%%%%%% trouble shooting
@@ -66,23 +67,24 @@ polytopes(num_poly) = struct('vertices',[],'xv',[],'yv',[],'distances',[],'mean'
 %     hold on
 %     %%%%%%%%%%%%%%%%%%%%%%%%%%
 
-remove = 0; % keep track of how many cells needed removed
+remove = 0; % keep track of how many cells needed removed for having 2 or fewer points
 for poly = 1:num_poly % pull each cell from the voronoi diagram
     % x and y values from this cell
     xv = V(C{poly},1)'; 
     yv = V(C{poly},2)';
 
     % change infinite values to be finite
-    change = (xv>(2*stretch(1)))+(xv<(-1*stretch(1)))+(yv>(2*stretch(2)))+(yv<(-1*stretch(2)));
-    xv(change>0) = (2*stretch(1))*sign(mean(xv(change==0)));
-    yv(change>0) = (2*stretch(2))*sign(mean(yv(change==0)));
+    change = (xv>(2*stretch(1)))+(xv<(-1*stretch(1)))+(yv>(2*stretch(2)))+(yv<(-1*stretch(2))); % find values more that extend beyond the strectch value
+    xv(change>0) = (2*stretch(1))*sign(mean(xv(change==0))); % set value to twice stretch (removed in trim polytopes function)
+    yv(change>0) = (2*stretch(2))*sign(mean(yv(change==0))); % set value to twice stretch (removed in trim polytopes function)
     
-    if length(xv)>2 % at least 3 points
-        % make sure cw
+    if length(xv)>2 % at least 3 points in cell
+        % make sure points are clockwise
         vec1 = [xv(2)-xv(1),yv(2)-yv(1),0]; % vector leading into point
         vec2 = [xv(3)-xv(2),yv(3)-yv(2),0]; % vector leading out of point
         xing = cross(vec1,vec2); % cross product of two vectors
         if sign(xing(3)) == -1 % points ordered in wrong direction
+            % flip point order
             xv = fliplr(xv);
             yv = fliplr(yv);
         end
@@ -107,7 +109,7 @@ for poly = 1:num_poly % pull each cell from the voronoi diagram
     end
 end
 
-%% remove extra empty polytopes
+%% remove extra empty polytopes from structure
 for polys = 1:remove
     polytopes(num_poly+1-remove) = [];
 end
