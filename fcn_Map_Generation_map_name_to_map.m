@@ -74,6 +74,7 @@ function [polytopes,fig]=fcn_Map_Generation_map_name_to_map(map_name,plot_flag,d
 % Questions or comments? sat5340@psu.edu 
 % 
 
+%% Input Checking
 %  not enough   plotting but not enough   too many
 if (nargin<3)||((nargin>3)&&(nargin<6))||(nargin>10)
     error('Incorrect number of arguments.')
