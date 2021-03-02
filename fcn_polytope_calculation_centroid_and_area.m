@@ -14,10 +14,6 @@ function [Cx,Cy,Area] = fcn_polytope_calculation_centroid_and_area(x,y)
 % The function outputs:
 %
 % Example:
-% cur_path = pwd;
-% main_folder = '!Voronoi Tiling Obstacles - Organized';
-% parent_dir = cur_path(1:strfind(cur_path,main_folder)-2);
-% addpath([parent_dir '\' main_folder '\Map_Generation\polytope_calculation'])
 % x = [3; 4; 2; -1; -2; -3; -4; -2; 1; 2; 3];
 % y = [1; 2; 2; 3; 2; -1; -2; -3; -3; -2; 1];
 % [Cx,Cy,Area] = fcn_polytope_calculation_centroid_and_area(x,y)
@@ -27,6 +23,7 @@ function [Cx,Cy,Area] = fcn_polytope_calculation_centroid_and_area(x,y)
 %
 % This function was written on 2019_04_02 by Seth Tau
 % Added comments on 2021_02_23 by Seth Tau
+% Removed old add path stuff on 2021_03_02 by Seth Tau
 % Questions or comments? sat5340@psu.edu 
 %
 % Centroid & Area equations https://en.wikipedia.org/wiki/Centroid
