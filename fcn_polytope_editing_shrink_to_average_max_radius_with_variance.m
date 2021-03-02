@@ -27,14 +27,6 @@ function [shrunk_polytopes,mu_final,sigma_final] = fcn_polytope_editing_shrink_t
 %
 % Examples:
 %
-% cur_path = pwd;
-% main_folder = '!Voronoi Tiling Obstacles - Organized'; % may need to adjust this for current folder
-% parent_dir = cur_path(1:strfind(cur_path,main_folder)-2);
-% addpath([parent_dir '\' main_folder '\Plotting'])
-% addpath([parent_dir '\' main_folder '\General_Calculation'])
-% addpath([parent_dir '\' main_folder '\Map_Generation\polytope_generation'])
-% addpath([parent_dir '\' main_folder '\Map_Generation\polytope_editing'])
-% addpath([parent_dir '\' main_folder '\Map_Generation\polytope_calculation'])
 % low_pt = 1; high_pt = 100;
 % polytopes = fcn_polytope_generation_halton_voronoi_tiling(low_pt,high_pt);
 % xlow = 0; xhigh = 1; ylow = 0; yhigh = 1;
@@ -52,6 +44,7 @@ function [shrunk_polytopes,mu_final,sigma_final] = fcn_polytope_editing_shrink_t
 %   
 % This function was written on 2019_08_29 by Seth Tau
 % Comments added on 2021_02_23 by Seth Tau
+% Removed old add path stuff on 2021_03_02 by Seth Tau
 % Questions or comments? sat5340@psu.edu 
 %
 
