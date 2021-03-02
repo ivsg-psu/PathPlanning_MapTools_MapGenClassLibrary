@@ -23,19 +23,14 @@ function [trim_polytopes] = fcn_polytope_editing_remove_edge_polytopes(polytopes
 % YHIGH: upper y boundary
 %
 % Examples:
-%   cur_path = pwd;
-%   main_folder = '!Voronoi Tiling Obstacles - Organized';
-%   parent_dir = cur_path(1:strfind(cur_path,main_folder)-2);
-%   addpath([parent_dir '\' main_folder '\Plotting'])
-%   addpath([parent_dir '\' main_folder '\Map_Generation\polytope_generation'])
-%   addpath([parent_dir '\' main_folder '\Map_Generation\polytope_editing'])
-%   polytopes = fcn_polytope_generation_halton_voronoi_tiling_obstacles(1,1000);
+%   polytopes = fcn_polytope_generation_halton_voronoi_tiling(1,100);
 %   fig = fcn_plot_polytopes(polytopes,[],'b',2,[0 1 0 1]);
 %   trim_polytopes = fcn_polytope_editing_remove_edge_polytopes(polytopes,0,1,0,1);
 %   fcn_plot_polytopes(trim_polytopes,fig,'g',2,[0 1 0 1]);
 %
 % This function was written on 2019_06_13 by Seth Tau
 % Comments added on 2021_02_23 by Seth Tau
+% Removed old add path info from example on 2021_03_02 by Seth Tau
 % Questions or comments? sat5340@psu.edu 
 %
 
