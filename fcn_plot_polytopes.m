@@ -48,10 +48,6 @@ function [fig] = fcn_plot_polytopes(polytopes,fig_num,line_spec,line_width,varar
 %
 % Examples:
 %      
-%      cur_path = pwd;
-%      main_folder = '!Voronoi Tiling Obstacles - Organized';
-%      parent_dir = cur_path(1:strfind(cur_path,main_folder)-2);
-%      addpath([parent_dir '\' main_folder '\Map_Generation\polytope_generation'])
 %      mapx = 1;
 %      mapy = 1;
 %      low_pt = 1;
@@ -61,17 +57,12 @@ function [fig] = fcn_plot_polytopes(polytopes,fig_num,line_spec,line_width,varar
 %      fig2 = fcn_plot_polytopes(polytopes,998,'-',2,[0 0 0.5],[0 mapx 0 mapy]);
 %      fig3 = fcn_plot_polytopes(polytopes,999,'-',2,[0 0.5 0],[0 mapx 0 mapy],'square');
 %      fig4 = fcn_plot_polytopes(polytopes,1000,'-',2,[0 0 0],[0 mapx 0 mapy],'square',[1 0 0 0 0.5]);
-%      low_pt = 101;
-%      high_pt = 200;
-%      [polytopes2] = fcn_polytope_generation_halton_voronoi_tiling(low_pt,high_pt);
-%      fcn_plot_polytopes(polytopes2,fig1,'r-',2)
-%      fcn_plot_polytopes(polytopes2,fig2,'b--',2,[0 mapx 0 mapy])
-%      fcn_plot_polytopes(polytopes2,fig3,'g-',3,[0 mapx 0 mapy],'square')
-%      fcn_plot_polytopes(polytopes2,fig4,'k-',3,[0 mapx 0 mapy],'square',[1 0 0 0 0.5])
-%       
+%      fig5 = fcn_plot_polytopes(polytopes([7 10 35]),123,'m--',2,[0 mapx 0 mapy],'square');
+%      fig5 = fcn_plot_polytopes(polytopes([5 20 83]),fig5,'k-',2,[1 0.5 0.5 0.5 0.5]);
 % 
 % This function was written on 2018_12_10 by Seth Tau
-% Added commens on 2021_02_23 by Seth Tau
+% Added comments on 2021_02_23 by Seth Tau
+% Removed old add path stuff and adjusted example on 2021_03_05 by Seth Tau
 % Questions or comments? sat5340@psu.edu 
 %
 
