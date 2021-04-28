@@ -24,14 +24,6 @@ function [exp_polytopes] = fcn_polytope_editing_expand_polytopes_evenly(polytope
 %
 % Examples:
 %      
-%      % BASIC example
-%      cur_path = pwd;
-%      main_folder = '!Voronoi Tiling Obstacles - Organized';
-%      parent_dir = cur_path(1:strfind(cur_path,main_folder)-2);
-%      addpath([parent_dir '\' main_folder '\General_Calculation'])
-%      addpath([parent_dir '\' main_folder '\Plotting'])
-%      addpath([parent_dir '\' main_folder '\Map_Generation\polytope_calculation'])
-%      addpath([parent_dir '\' main_folder '\Map_Generation\polytope_editing'])
 %      xv = [-2 -1 1 2 2 1 -1 -2];
 %      yv = [-1 -2 -2 -1 1 2 2 1];
 %      polytopes.vertices = [[xv xv(1)]' [yv yv(1)]'];
@@ -45,11 +37,14 @@ function [exp_polytopes] = fcn_polytope_editing_expand_polytopes_evenly(polytope
 %      exp_dist = 1;
 %      exp_polytopes=fcn_polytope_editing_expand_polytopes_evenly(polytopes,delta,exp_dist);
 %      fcn_plot_polytopes(polytopes,99,'r-',2);
-%      fcn_plot_polytopes(exp_polytopes,99,'b-',2,[],'square');
+%      fcn_plot_polytopes(exp_polytopes,99,'b-',2,[-4 4 -4 4],'square');
 %      legend('Original','Expanded')
+%      box on
+%      xlabel('X Position')
+%      ylabel('Y Position')
 %
-% 
 % This function was written on 2018_11_17 by Seth Tau
+% Adjusted example code on 2021_04_28 by Seth Tau
 % Questions or comments? sat5340@psu.edu 
 %
 
