@@ -3,7 +3,7 @@ function [sensing_polytopes] = fcn_polytope_editing_expand_polytopes_for_sensing
 % cutting off corners where radii would be to get a conservative estimate 
 % of when a polytope would be sensed
 %
-% [SENSING_POLYTOPES]=FCN_POLYTOPE_EDITING_EXPAND_POLYTOPES_EVENLY(POLYTOPES,DELTA,EXP_DIST)
+% [SENSING_POLYTOPES]=FCN_POLYTOPE_EDITING_EXPAND_POLYTOPES_FOR_SENSING(POLYTOPES,DELTA,EXP_DIST)
 % returns:
 % SENSING_POLYTOPES: a 1-by-n seven field structure of sensing polytopes, 
 %   where n <= NUM_POLY, with fields:
