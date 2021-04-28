@@ -38,8 +38,9 @@ function [sensing_polytopes] = fcn_polytope_editing_expand_polytopes_for_sensing
 %      exp_dist = 1;
 %      sensing_polytopes=fcn_polytope_editing_expand_polytopes_for_sensing(polytopes,delta,exp_dist);
 %      fcn_plot_polytopes(polytopes,99,'r-',2);
-%      fcn_plot_polytopes(sensing_polytopes,99,'b-',2,[-4 4 -4 4],'square');
-%      legend('Original','Expanded')
+%      fcn_plot_polytopes(sensing_polytopes,99,'b-',2,[-4 5 -4 5],'square');
+%      plot(sensing_polytopes.xv,sensing_polytopes.yv,'kx','linewidth',1)
+%      legend('Original','Expanded','Expanded Vertices')
 %      box on
 %      xlabel('X Position')
 %      ylabel('Y Position')
