@@ -138,7 +138,7 @@ rng(shrink_seed) % set the random number generator with the shrink seed
     fcn_MapGen_polytopeShrinkToRadius(trimmed_polytopes,...
     des_radius,sigma_radius,min_rad);
 
-% gather data on all the points
+% gather data on all the points by looping through the polytopes
 point_tot = length([map_polytopes.xv]); % total number of vertices in the polytopes
 beg_end = zeros(1,point_tot); % is the point the start/end of an obstacle
 curpt = 0;

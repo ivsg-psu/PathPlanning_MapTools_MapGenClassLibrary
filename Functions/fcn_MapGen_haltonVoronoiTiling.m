@@ -323,23 +323,23 @@ end
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-if flag_check_inputs    
-    % Are there the right number of inputs?    
-    if nargin < 2 || nargin > 3
-        error('Incorrect number of input arguments')
-    end
-    
-    % Check the points1 input
-    fcn_geometry_checkInputsToFunctions(...
-        points1, '2or3column_of_numbers');
-    
-    % Use number of rows in points1 to calculate Npoints
-    Npoints = length(points1(:,1));
-    
-    % Check the points2 input, forcing length to match points1
-    fcn_geometry_checkInputsToFunctions(...
-        points2, '2or3column_of_numbers',Npoints);       
-end
+% if flag_check_inputs    
+%     % Are there the right number of inputs?    
+%     if nargin < 2 || nargin > 3
+%         error('Incorrect number of input arguments')
+%     end
+%     
+%     % Check the points1 input
+%     fcn_geometry_checkInputsToFunctions(...
+%         points1, '2or3column_of_numbers');
+%     
+%     % Use number of rows in points1 to calculate Npoints
+%     Npoints = length(points1(:,1));
+%     
+%     % Check the points2 input, forcing length to match points1
+%     fcn_geometry_checkInputsToFunctions(...
+%         points2, '2or3column_of_numbers',Npoints);       
+% end
     
 
 % Does user want to show the plots?

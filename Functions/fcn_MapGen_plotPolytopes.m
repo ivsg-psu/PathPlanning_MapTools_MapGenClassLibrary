@@ -50,28 +50,23 @@ function [fig] = fcn_MapGen_plotPolytopes(polytopes,fig_num,line_spec,line_width
 % Examples:
 %      
 %      % BASIC example
-%      cur_path = pwd;
-%      main_folder = '!Voronoi Tiling Obstacles - Organized';
-%      parent_dir = cur_path(1:strfind(cur_path,main_folder)-2);
-%      addpath([parent_dir '\' main_folder '\Map_Generation\polytope_generation'])
 %      mapx = 1;
 %      mapy = 1;
-%      low_pt = 1;
-%      high_pt = 100;
-%      [polytopes] = fcn_polytope_generation_halton_voronoi_tiling(low_pt,high_pt);
+%      halton_range = [1 100]; % Sets the indices to use from halton set
+%      [polytopes] = fcn_MapGen_haltonVoronoiTiling(halton_range);
 %      fig1 = fcn_MapGen_plotPolytopes(polytopes,[],'-',2,[0.5 0 0]);
 %      fig2 = fcn_MapGen_plotPolytopes(polytopes,998,'-',2,[0 0 0.5],[0 mapx 0 mapy]);
 %      fig3 = fcn_MapGen_plotPolytopes(polytopes,999,'-',2,[0 0.5 0],[0 mapx 0 mapy],'square');
 %      fig4 = fcn_MapGen_plotPolytopes(polytopes,1000,'-',2,[0 0 0],[0 mapx 0 mapy],'square',[1 0 0 0 0.5]);
-%      low_pt = 101;
-%      high_pt = 200;
-%      [polytopes2] = fcn_polytope_generation_halton_voronoi_tiling(low_pt,high_pt);
+%      halton_range = [101 200]; % Sets the indices to use from halton set
+%      [polytopes2] = fcn_MapGen_haltonVoronoiTiling(halton_range);
 %      fcn_MapGen_plotPolytopes(polytopes2,fig1,'r-',2)
 %      fcn_MapGen_plotPolytopes(polytopes2,fig2,'b--',2,[0 mapx 0 mapy])
 %      fcn_MapGen_plotPolytopes(polytopes2,fig3,'g-',3,[0 mapx 0 mapy],'square')
 %      fcn_MapGen_plotPolytopes(polytopes2,fig4,'k-',3,[0 mapx 0 mapy],'square',[1 0 0 0 0.5])
 %       
-% 
+% For more examples, see: script_test_fcn_MapGen_plotPolytopes.m
+%
 % This function was written on 2018_12_10 by Seth Tau
 % Questions or comments? sat5340@psu.edu 
 %
@@ -81,6 +76,9 @@ function [fig] = fcn_MapGen_plotPolytopes(polytopes,fig_num,line_spec,line_width
 % 2021_06_06 - S.Brennan
 % -- revised from fcn_plot_polytopes
 % -- added revisions to prep for MapGen library
+% 2021_06_07 - S.Brennan
+% -- updated examples in header
+% -- added test script for function
 
 %% chec input arguments
 if nargin < 4 || nargin > 8
