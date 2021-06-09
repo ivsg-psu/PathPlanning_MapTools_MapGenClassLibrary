@@ -1,84 +1,174 @@
-function [shrunk_polytopes,mu_final,sigma_final] = fcn_MapGen_polytopeShrinkToRadius(polytopes,des_radius,sigma_radius,min_rad)
-% FCN_POLYTOPE_EDITING_SHRINK_TO_AVERAGE_MAX_RADIUS_WITH_VARIANCE shrinks the 
-% polytopes to achieve the desired lookout limit with specified variance
+function [shrunk_polytopes,mu_final,sigma_final] = ...
+    fcn_MapGen_polytopeShrinkToRadius(...
+    polytopes,...
+    des_radius,...
+    sigma_radius,...
+    min_rad,...
+    varargin)
+% fcn_MapGen_polytopeShrinkToRadius shrinks the polytopes to achieve the
+% desired mean radius and specified variance
 %
-% [SHRUNK_POLYTOPES,MU_FINAL,SIGMA_FINAL]=FCN_POLYTOPE_EDITING_SHRINK_TO_AVERAGE_MAX_RADIUS_WITH_VARIANCE(POLYTOPES,DES_RADIUS,SIGMA_RADIUS,MIN_RAD)
-% returns:
-% SHRUNK_POLYTOPES: a 1-by-n seven field structure of shrunken polytopes, 
-% where n <= number of polytopes with fields:
-%   vertices: a m+1-by-2 matrix of xy points with row1 = rowm+1, where m is
-%     the number of the individual polytope vertices
-%   xv: a 1-by-m vector of vertice x-coordinates
-%   yv: a 1-by-m vector of vertice y-coordinates
-%   distances: a 1-by-m vector of perimeter distances from one point to the
-%     next point, distances(i) = distance from vertices(i) to vertices(i+1)
-%   mean: centroid xy coordinate of the polytope
-%   area: area of the polytope
-%   max_radius: distance from the mean to the farthest vertex
-% MU_FINAL: final average maximum radius achieved
-% SIGMA_FINAL: final variance achieved
+% FORMAT:
+% 
+% [shrunk_polytopes,mu_final,sigma_final] = ...
+%     fcn_MapGen_polytopeShrinkToRadius(...
+%     polytopes,...
+%     des_radius,...
+%     sigma_radius,...
+%     min_rad,...
+%     (fig_num))
 %
-% with inputs:
-% POLYTOPES: original polytopes with same fields as shrunk_polytopes
-% DES_RAD: desired average max radius   
-% SIGMA_RADIUS: desired variance in the radii 
-% MIN_RAD: minimum acceptable radius
+% INPUTS:
 %
-% Examples:
+%     POLYTOPES: original polytopes with same fields as shrunk_polytopes
 %
-% cur_path = pwd;
-% main_folder = '!Voronoi Tiling Obstacles - Organized';
-% parent_dir = cur_path(1:strfind(cur_path,main_folder)-2);
-% addpath([parent_dir '\' main_folder '\Plotting'])
-% addpath([parent_dir '\' main_folder '\General_Calculation'])
-% addpath([parent_dir '\' main_folder '\Map_Generation\polytope_generation'])
-% addpath([parent_dir '\' main_folder '\Map_Generation\polytope_editing'])
-% addpath([parent_dir '\' main_folder '\Map_Generation\polytope_calculation'])
-% low_pt = 1; high_pt = 100;
-% polytopes = fcn_polytope_generation_halton_voronoi_tiling(low_pt,high_pt);
-% xlow = 0; xhigh = 1; ylow = 0; yhigh = 1;
-% trim_polytopes = fcn_polytope_editing_remove_edge_polytopes(polytopes,xlow,xhigh,ylow,yhigh);
-% fcn_plot_polytopes(trim_polytopes,[],'b',2,[0 1 0 1]);
-% % uniform shrinking
-% des_rad = 0.05; sigma_radius = 0; min_rad = 0.001;
-% shrunk_polytopes1=fcn_polytope_editing_shrink_to_average_max_radius_with_variance(trim_polytopes,des_rad,sigma_radius,min_rad);
-% fcn_plot_polytopes(shrunk_polytopes1,[],'b',2,[0 1 0 1]);
-% % non-uniform shrinking
-% scale = ones(1,size(trim_polytopes,2));
-% des_rad = 0.05; sigma_radius = 0.01; min_rad = 0.001;
-% shrunk_polytopes2=fcn_polytope_editing_shrink_to_average_max_radius_with_variance(trim_polytopes,des_rad,sigma_radius,min_rad);
-% fcn_plot_polytopes(shrunk_polytopes2,[],'b',2,[0 1 0 1]);
+%     DES_RAD: desired average max radius   
+%
+%     SIGMA_RADIUS: desired variance in the radii 
+%
+%     MIN_RAD: minimum acceptable radius
+%
+%
+% OUTPUTS:
+%
+%     SHRUNK_POLYTOPES: a 1-by-n seven field structure of shrunken polytopes, 
+%     where n <= number of polytopes with fields:
+%       vertices: a m+1-by-2 matrix of xy points with row1 = rowm+1, where m is
+%         the number of the individual polytope vertices
+%       xv: a 1-by-m vector of vertice x-coordinates
+%       yv: a 1-by-m vector of vertice y-coordinates
+%       distances: a 1-by-m vector of perimeter distances from one point to the
+%         next point, distances(i) = distance from vertices(i) to vertices(i+1)
+%       mean: centroid xy coordinate of the polytope
+%       area: area of the polytope
+%       max_radius: distance from the mean to the farthest vertex
+%
+%     MU_FINAL: final average maximum radius achieved
+%
+%     SIGMA_FINAL: final variance achieved
 %   
+% EXAMPLES:
+%      
+
+%
+% For additional examples, see: script_test_fcn_MapGen_polytopeShrinkToRadius
+%
 % This function was written on 2019_08_29 by Seth Tau
 % Questions or comments? sat5340@psu.edu 
 %
+
+% Revision History:
+% 2021-06-08 - S. Brennan
+% -- revised function to prep for MapGen class 
+% -- added plotting option
+% -- added comments, added debugging option
+
+% TO DO
+% -- Vectorize the for loop if possible
+% -- check inputs are positive numbers where appropriate (e.g. make a
+% "positive number" check
+
+%% Debugging and Input checks
+flag_check_inputs = 1; % Set equal to 1 to check the input arguments
+flag_do_plot = 0;      % Set equal to 1 for plotting
+flag_do_debug = 0;     % Set equal to 1 for debugging
+
+if flag_do_debug
+    fig_for_debug = 9453;
+    st = dbstack; %#ok<*UNRCH>
+    fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+end
+
+%% check input arguments?
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   _____                   _
+%  |_   _|                 | |
+%    | |  _ __  _ __  _   _| |_ ___
+%    | | | '_ \| '_ \| | | | __/ __|
+%   _| |_| | | | |_) | |_| | |_\__ \
+%  |_____|_| |_| .__/ \__,_|\__|___/
+%              | |
+%              |_|
+% See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+if flag_check_inputs
+    % Are there the right number of inputs?
+    if nargin < 4 || nargin > 5
+        error('Incorrect number of input arguments')
+    end
+    
+    % Check the polytopes input
+    fcn_MapGen_checkInputsToFunctions(...
+        polytopes, 'polytopes');
+    
+    % Check the des_radius input
+    fcn_MapGen_checkInputsToFunctions(...
+        des_radius, 'column_of_numbers',1);
+    
+    % Check the sigma_radius input
+    fcn_MapGen_checkInputsToFunctions(...
+        sigma_radius, 'column_of_numbers',1);
+ 
+    % Check the min_rad input
+    fcn_MapGen_checkInputsToFunctions(...
+        min_rad, 'column_of_numbers',1);
+    
+    
+end
+    
+
+% Does user want to show the plots?
+if  5== nargin
+    fig_num = varargin{end};
+    figure(fig_num);
+    flag_do_plot = 1;
+else
+    if flag_do_debug
+        fig = figure;
+        fig_for_debug = fig.Number;
+        flag_do_plot = 1;
+    end
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   __  __       _
+%  |  \/  |     (_)
+%  | \  / | __ _ _ _ __
+%  | |\/| |/ _` | | '_ \
+%  | |  | | (_| | | | | |
+%  |_|  |_|\__,_|_|_| |_|
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 %% find current distribution
 radii = [polytopes.max_radius];
 
-%%% trouble shooting
-% fcn_plot_polytopes(polytopes,[],'b',2);
-% 
-% figure
-% histogram(radii,20)
-% r_sigma = std(radii);
-%%%
+if flag_do_debug
+    fcn_MapGen_plotPolytopes(polytopes,fig_for_debug,'b',2);
+    
+    figure(fig_for_debug+1);
+    histogram(radii,20)
+    title('Histogram of input radii');
+    r_sigma = std(radii);
+    fprintf(1,'Standard deviation in r is: %.2f \n', r_sigma);
+end
 
 r_mu = mean(radii);
 r_size = length(radii);
 
 if r_mu < des_radius
-    error('cannot achieve the desired radius')
+    error('cannot achieve the desired radius by shrinking because average radius is already smaller than desired radius')
 end
 
 %% determine desired distribution
 r_dist = normrnd(des_radius,sigma_radius,[r_size,1]);
 
-%%% troubleshoooting
-% figure
-% histogram(r_dist,20)
-%%%
+if flag_do_debug
+   figure(fig_for_debug+2);  
+   histogram(r_dist,20)
+end
 
 r_dist = r_dist + (des_radius-mean(r_dist)); % adjust to ensure the mean value is mu
 max_r_dist = max(radii); % largest possible radius
@@ -97,10 +187,11 @@ end
 mu_final = mean(r_dist);
 sigma_final = std(r_dist);
 
-%%% troubleshoooting
-% figure
-% histogram(r_dist,20)
-%%%
+
+if flag_do_debug
+   figure(fig_for_debug+2);  
+   histogram(r_dist,20)
+end
 
 %% shrink polytopes to achieve the distribution
 [new_rads,ob_ind] = sort(r_dist);
@@ -136,7 +227,48 @@ for idx = 1:length(new_rads)
     % assign to shrunk_polytopes
     shrunk_polytopes(ob_ind(idx)) = shrinker;
 end
+
+%% Plot results?
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   _____       _                 
+%  |  __ \     | |                
+%  | |  | | ___| |__  _   _  __ _ 
+%  | |  | |/ _ \ '_ \| | | |/ _` |
+%  | |__| |  __/ |_) | |_| | (_| |
+%  |_____/ \___|_.__/ \__,_|\__, |
+%                            __/ |
+%                           |___/ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+if flag_do_plot
+    figure(fig_num);
+    hold on
+    
+    % Plot the input polytopes in red
+    fcn_MapGen_plotPolytopes(polytopes,fig_num,'r',2,[0 1 0 1]);
+    
+    % plot the shrunk in blue
+    fcn_MapGen_plotPolytopes(shrunk_polytopes,fig_num,'b',2,[0 1 0 1]);
+
+end
+
+if flag_do_debug
+    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file); 
+end
+
 end % Ends function
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   ______                _   _                 
+%  |  ____|              | | (_)                
+%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___ 
+%  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
+%  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
+%  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
+%                                               
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                                               
 
 
 function [dist] = ...
@@ -195,7 +327,7 @@ function [dist] = ...
 
 
 %% Debugging and Input checks
-flag_check_inputs = 1; % Set equal to 1 to check the input arguments
+flag_check_inputs = 0; % Set equal to 1 to check the input arguments
 flag_do_plot = 0;      % Set equal to 1 for plotting
 flag_do_debug = 0;     % Set equal to 1 for debugging
 
@@ -217,24 +349,28 @@ end
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% if flag_check_inputs    
-%     % Are there the right number of inputs?    
-%     if nargin < 2 || nargin > 3
-%         error('Incorrect number of input arguments')
-%     end
-%     
-%     % Check the points1 input
-%     fcn_geometry_checkInputsToFunctions(...
-%         points1, '2or3column_of_numbers');
-%     
-%     % Use number of rows in points1 to calculate Npoints
-%     Npoints = length(points1(:,1));
-%     
-%     % Check the points2 input, forcing length to match points1
-%     fcn_geometry_checkInputsToFunctions(...
-%         points2, '2or3column_of_numbers',Npoints);       
-% end
+if flag_check_inputs    
+    % Are there the right number of inputs?    
+    if nargin < 2 || nargin > 3
+        error('Incorrect number of input arguments')
+    end
     
+    % Check the points1 input
+    fcn_geometry_checkInputsToFunctions(...
+        points1, '2or3column_of_numbers');
+end
+
+% Use number of rows in points1 to calculate Npoints
+Npoints = length(points1(:,1));
+
+if flag_check_inputs
+    
+    % Check the points2 input, forcing length to match points1
+    fcn_geometry_checkInputsToFunctions(...
+        points2, '2or3column_of_numbers',Npoints);
+    
+end
+
 
 % Does user want to show the plots?
 if 3 == nargin

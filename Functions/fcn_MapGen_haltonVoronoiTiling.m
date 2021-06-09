@@ -35,7 +35,13 @@ function [polytopes] = ...
 %     next point, distances(i) = distance from vertices(i) to vertices(i+1)
 %   mean: centroid xy coordinate of the polytope
 %   area: area of the polytope
-%   
+%
+% DEPENDENCIES:
+%
+%      fcn_MapGen_checkInputsToFunctions
+%      fcn_MapGen_polytopeCentroidAndArea
+%      fcn_MapGen_plotPolytopes
+%
 % EXAMPLES:
 %      
 % See the script: script_test_fcn_MapGen_haltonVoronoiTiling
@@ -189,7 +195,8 @@ for poly = 1:num_poly % pull each cell from the voronoi diagram
         polytopes(poly-remove).xv = xv;
         polytopes(poly-remove).yv = yv;
         polytopes(poly-remove).vertices = [[xv xv(1)]' [yv yv(1)]']; % repeat first vertice for easy plotting
-        [Cx,Cy,polytopes(poly-remove).area] = fcn_polytope_calculation_centroid_and_area([xv xv(1)]',[yv yv(1)]');
+        [Cx,Cy,polytopes(poly-remove).area] = ...
+            fcn_MapGen_polytopeCentroidAndArea([xv xv(1)]',[yv yv(1)]');
         polytopes(poly-remove).mean = [Cx, Cy]; % enter polytope centroid
         % calculate perimeter distances around the polytope
         polytopes(poly-remove).distances = INTERNAL_fcn_geometry_euclideanPointsToPointsDistance(polytopes(poly-remove).vertices(1:end-1,:),polytopes(poly-remove).vertices(2:end,:));

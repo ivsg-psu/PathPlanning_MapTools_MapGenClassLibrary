@@ -8,9 +8,13 @@
 % starter
 
 % TO-DO:
-% -- Reformat fcn_MapGen_polytopeShrinkToRadius
-% -- Finish header in fcn_MapGen_polytopeMapGen
+% -- Add positive input checking to fcn_MapGen_polytopeShrinkToRadius
+% -- Add ability to extend halton set to right (e.g. "scrolling" map)
+% -- Add other types of point generators
 
+
+
+close all
 
 %% Set up workspace
 clear flag_was_run_before  % Force init to always run?
@@ -55,17 +59,30 @@ trimmed_polytopes = ...
     fcn_MapGen_polytopeCropEdges(tiled_polytopes,bounding_box,fig_num);
 
 %% Shrink to radius
+fig_num = 4;
+des_rad = 0.05; sigma_radius = 0.01; min_rad = 0.001;
+shrunk_polytopes2=fcn_MapGen_polytopeShrinkToRadius(...
+    trimmed_polytopes,des_rad,sigma_radius,min_rad,fig_num);
 
-%% shink the polytopes so that they are no longer tiled
+%% Generate plots (all above steps) in just one function call
 des_radius = 0.03; % desired average maximum radius
 sigma_radius = 0.002; % desired standard deviation in maximum radii
 min_rad = 0.0001; % minimum possible maximum radius for any obstacle
 shrink_seed = 1111; % seed used for randomizing the shrinking process
-fig_num = 1;
+fig_num = 5;
 
 [map_polytopes,all_pts] = ...
     fcn_MapGen_polytopeMapGen(...
     Halton_range,bounding_box,...
     des_radius,sigma_radius,min_rad,shrink_seed,fig_num);
 
+%% Generate a map from a name
+map_name = "HST 30 450 SQT 0 1 0 1 SMV 0.02 0.005 1e-6 1234";
+plot_flag = 1; disp_name = [1, 0.05 -0.05, 0.5 0.5 0.5, 10];
+line_style = '-'; line_width = 2; color = [0 0 1];
+axis_limits = [0 1 -0.1 1]; axis_style = 'square';
+fill_info = [1 1 0 1 0.5];
+fig_num = 7; 
+
+[polytopes,fig]=fcn_MapGen_nameToMap(map_name,plot_flag,disp_name,fig_num,line_style,line_width,color,axis_limits,axis_style,fill_info);
 
