@@ -65,6 +65,13 @@ Rand_range = [1 1000]; % range of Halton points to use to generate the tiling
 tiled_polytopes = fcn_MapGen_randVoronoiTiling(Rand_range,[1 1],fig_num);
 
 
+%% Generate a set of polytopes from the Random Normal set
+fig_num = 15;
+Rand_range = [1 1000]; % range of Halton points to use to generate the tiling
+tiled_polytopes = fcn_MapGen_randomNormalVoronoiTiling(Rand_range,[1 1],fig_num);
+
+
+
 %% Plot the polytopes
 fig_num = 2;
 line_width = 2;
