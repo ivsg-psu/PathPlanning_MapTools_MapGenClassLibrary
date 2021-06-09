@@ -80,7 +80,7 @@ function [polytopes,fig]=fcn_MapGen_nameToMap(...
 % 
 % %% List of Map Characteristics:
 % %%% Generation:
-%       HST: Halton set tiling
+%       HST: Halton set voronoi tiling
 %           requires: minimum value and maximum value of Halton set
 %           example: HST 1 1000
 % %%% Trimming

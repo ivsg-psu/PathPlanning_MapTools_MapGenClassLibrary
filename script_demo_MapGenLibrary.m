@@ -40,10 +40,30 @@ end
 Twocolumn_of_numbers_test = [4 1; 3 0; 2 5];
 fcn_MapGen_checkInputsToFunctions(Twocolumn_of_numbers_test, '2column_of_numbers');
 
+
+%% Generate a set of polytopes from the Sobol set
+fig_num = 11;
+Sobol_range = [1 1000]; % range of Sobol points to use to generate the tiling
+tiled_polytopes = fcn_MapGen_sobolVoronoiTiling(Sobol_range,[1 1],fig_num);
+
+
 %% Generate a set of polytopes from the Halton set
-fig_num = 1;
-Halton_range = [1 200]; % range of Halton points to use to generate the tiling
+fig_num = 12;
+Halton_range = [1 1000]; % range of Halton points to use to generate the tiling
 tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
+
+
+%% Generate a set of polytopes from the Latin Hypercube set
+fig_num = 13;
+Latin_range = [1 1000]; % range of Halton points to use to generate the tiling
+tiled_polytopes = fcn_MapGen_latinVoronoiTiling(Latin_range,[1 1],fig_num);
+
+
+%% Generate a set of polytopes from the Random set
+fig_num = 14;
+Rand_range = [1 1000]; % range of Halton points to use to generate the tiling
+tiled_polytopes = fcn_MapGen_randVoronoiTiling(Rand_range,[1 1],fig_num);
+
 
 %% Plot the polytopes
 fig_num = 2;
