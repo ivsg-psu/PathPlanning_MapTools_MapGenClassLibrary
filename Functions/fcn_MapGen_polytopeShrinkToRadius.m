@@ -1,33 +1,34 @@
-function [shrunk_polytopes,mu_final,sigma_final] = ...
+function [shrunk_polytope] = ...
     fcn_MapGen_polytopeShrinkToRadius(...
-    polytopes,...
-    des_radius,...
-    sigma_radius,...
-    min_rad,...
+    shrinker,...
+    new_radius,...
+    tolerance,...
     varargin)
-% fcn_MapGen_polytopeShrinkToRadius shrinks the polytopes to achieve the
+% fcn_MapGen_polytopesShrinkToRadius shrinks the polytopes to achieve the
 % desired mean radius and specified variance
 %
 % FORMAT:
 % 
 % [shrunk_polytopes,mu_final,sigma_final] = ...
-%     fcn_MapGen_polytopeShrinkToRadius(...
-%     polytopes,...
-%     des_radius,...
-%     sigma_radius,...
-%     min_rad,...
+%     fcn_MapGen_polytopesShrinkToRadius(...
+%     shrinker,...
+%     new_radius,...
+%     tolerance,...
 %     (fig_num))
 %
 % INPUTS:
 %
-%     POLYTOPES: original polytopes with same fields as shrunk_polytopes
+%     shrinker: original polytope with same fields as shrunk_polytopes
+%     below
 %
-%     DES_RAD: desired average max radius   
+%     new_radius: desired polytope radius
 %
-%     SIGMA_RADIUS: desired variance in the radii 
+%     tolerance: distance tolerance below which points of a polytope are
+%     merged together
+%     
+%    (OPTIONAL INPUTS)
 %
-%     MIN_RAD: minimum acceptable radius
-%
+%     fig_num: a figure number to plot results.
 %
 % OUTPUTS:
 %
@@ -42,14 +43,9 @@ function [shrunk_polytopes,mu_final,sigma_final] = ...
 %       mean: centroid xy coordinate of the polytope
 %       area: area of the polytope
 %       max_radius: distance from the mean to the farthest vertex
-%
-%     MU_FINAL: final average maximum radius achieved
-%
-%     SIGMA_FINAL: final variance achieved
 %   
 % EXAMPLES:
 %      
-
 %
 % For additional examples, see: script_test_fcn_MapGen_polytopeShrinkToRadius
 %
@@ -94,32 +90,27 @@ end
     
 if flag_check_inputs
     % Are there the right number of inputs?
-    if nargin < 4 || nargin > 5
+    if nargin < 3 || nargin > 4
         error('Incorrect number of input arguments')
     end
     
-    % Check the polytopes input
+    % Check the shrinker input
     fcn_MapGen_checkInputsToFunctions(...
-        polytopes, 'polytopes');
+        shrinker, 'polytopes');
     
-    % Check the des_radius input
+    % Check the new_radius input
     fcn_MapGen_checkInputsToFunctions(...
-        des_radius, 'column_of_numbers',1);
+        new_radius, 'column_of_numbers',1);
     
-    % Check the sigma_radius input
+    % Check the tolerance input
     fcn_MapGen_checkInputsToFunctions(...
-        sigma_radius, 'column_of_numbers',1);
- 
-    % Check the min_rad input
-    fcn_MapGen_checkInputsToFunctions(...
-        min_rad, 'column_of_numbers',1);
-    
+        tolerance, 'column_of_numbers',1);  
     
 end
     
 
 % Does user want to show the plots?
-if  5== nargin
+if  4== nargin
     fig_num = varargin{end};
     figure(fig_num);
     flag_do_plot = 1;
@@ -141,92 +132,63 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Initialize the result:
+shrunk_polytope = shrinker;
 
-%% find current distribution
-radii = [polytopes.max_radius];
+% pull values
+vertices = shrinker.vertices;
+centroid = shrinker.mean;
+rad = shrinker.max_radius;
 
-if flag_do_debug
-    fcn_MapGen_plotPolytopes(polytopes,fig_for_debug,'b',2);
+% determine scale factor
+scale = new_radius/rad;
+
+if scale < 1 % calculation error can sometimes make this greater than 1
+    % find new vertices
+    new_vert = centroid + scale*(vertices-centroid);
     
-    figure(fig_for_debug+1);
-    histogram(radii,20)
-    title('Histogram of input radii');
-    r_sigma = std(radii);
-    fprintf(1,'Standard deviation in r is: %.2f \n', r_sigma);
-end
-
-r_mu = mean(radii);
-r_size = length(radii);
-
-if r_mu < des_radius
-    error('cannot achieve the desired radius by shrinking because average radius is already smaller than desired radius')
-end
-
-%% determine desired distribution
-r_dist = normrnd(des_radius,sigma_radius,[r_size,1]);
-
-if flag_do_debug
-   figure(fig_for_debug+2);  
-   histogram(r_dist,20)
-end
-
-r_dist = r_dist + (des_radius-mean(r_dist)); % adjust to ensure the mean value is mu
-max_r_dist = max(radii); % largest possible radius
-min_r_dist = min_rad; % smallest possible radius
-if sum((r_dist>max_r_dist)+(r_dist<min_r_dist)) > 0
-    warning('standard deviation skewed due to truncated distribution')
-end
-r_dist(r_dist>max_r_dist) = max_r_dist; % truncate any values that are too large
-r_dist(r_dist<min_r_dist) = min_r_dist; % truncate any values that are too small
-while abs(mean(r_dist) - des_radius) > 1e-10
-    r_dist = r_dist + (des_radius-mean(r_dist));
-    r_dist(r_dist>max_r_dist) = max_r_dist;
-    r_dist(r_dist<min_r_dist) = min_r_dist;
-end
-
-mu_final = mean(r_dist);
-sigma_final = std(r_dist);
-
-
-if flag_do_debug
-   figure(fig_for_debug+2);  
-   histogram(r_dist,20)
-end
-
-%% shrink polytopes to achieve the distribution
-[new_rads,ob_ind] = sort(r_dist);
-if sum((sort(radii)'-sort(r_dist))>=-2*min_rad) < r_size
-    error('distribution is unachievable with generated map')
-end
-
-shrunk_polytopes = polytopes;
-for idx = 1:length(new_rads)
-    shrinker = polytopes(ob_ind(idx)); % obstacle to be shrunk
+    % Sometimes, when shrinking, the new verticies are particularly
+    % close to each other to where an edge "disappears". To prevent
+    % this, we get rid of one of any vertices that are too close to
+    % each other. This is set by a tolerance.
+    tol_squared = tolerance.^2;
     
-    % pull values
-    vertices = shrinker.vertices;
-    centroid = shrinker.mean;
-    rad = shrinker.max_radius;
+    % find all vertices that are larger away from next one, relative to
+    % tolerance
+    good_ind = ...
+        sum((new_vert(1:end-1,:)-new_vert(2:end,:)).^2,2)>(tol_squared);
     
-    % determine scale factor
-    scale = new_rads(idx)/rad;
-    
-    if scale < 1 % calculation error can sometimes make this greater than 1
-        % find new vertices
-        new_vert = centroid + scale*(vertices-centroid);
-
-        % adjust polytopes
-        shrinker.vertices = new_vert;
-        shrinker.xv = new_vert(1:end-1,1)';
-        shrinker.yv = new_vert(1:end-1,2)';
-        shrinker.distances = INTERNAL_fcn_geometry_euclideanPointsToPointsDistance(new_vert(1:end-1,:),new_vert(2:end,:));
-        shrinker.area = shrinker.area*scale^2;
-        shrinker.max_radius = shrinker.max_radius*scale;
+    % Check how many are good. If only 2 points are left, then the
+    % result is just a line. If 1 or zero, then result is just a point.
+    if sum(good_ind)>2 % sufficient good points to make a shape
+        new_vert = new_vert(good_ind,:);
+    elseif sum(good_ind)==2 % line shape
+        new_vert = new_vert(good_ind,:);
+        
+        % The line may not go through the centroid, which is odd. We force
+        % this by removing the point closest to the centroid
+        distances_to_centroid = sum((new_vert-centroid).^2,2).^0.5;        
+        if distances_to_centroid(1,1)>distances_to_centroid(2,1)
+            new_vert(2,:)=centroid;
+        else
+            new_vert(1,:)=centroid;
+        end
+        
+        new_vert = [new_vert; flipud(new_vert)];
+    else % singular shape (i.e. point) or no shape
+        new_vert = [centroid; centroid; centroid];
     end
     
-    % assign to shrunk_polytopes
-    shrunk_polytopes(ob_ind(idx)) = shrinker;
+    % adjust polytopes
+    shrunk_polytope.vertices = [new_vert; new_vert(1,:)];
+    shrunk_polytope.xv = new_vert(:,1)';
+    shrunk_polytope.yv = new_vert(:,2)';
+    shrunk_polytope.distances = INTERNAL_fcn_geometry_euclideanPointsToPointsDistance(new_vert(1:end-1,:),new_vert(2:end,:));
+    shrunk_polytope.area = shrinker.area*scale^2;
+    shrunk_polytope.max_radius = shrinker.max_radius*scale;
 end
+    
+
 
 %% Plot results?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -243,12 +205,12 @@ end
 if flag_do_plot
     figure(fig_num);
     hold on
+       
+    % Plot the input shrinker in red
+    fcn_MapGen_plotPolytopes(shrinker,fig_num,'r',2);
     
-    % Plot the input polytopes in red
-    fcn_MapGen_plotPolytopes(polytopes,fig_num,'r',2,[0 1 0 1]);
-    
-    % plot the shrunk in blue
-    fcn_MapGen_plotPolytopes(shrunk_polytopes,fig_num,'b',2,[0 1 0 1]);
+    % plot the output polytope in blue
+    fcn_MapGen_plotPolytopes(shrunk_polytope,fig_num,'b',2);
 
 end
 

@@ -47,6 +47,14 @@ function [map_polytopes,all_pts,mu_rad_final,sigma_rad_final] = ...
 %     mu_rad_final:
 %
 %     sigma_rad_final
+%
+% DEPENDENCIES:
+%
+%      fcn_MapGen_checkInputsToFunctions
+%      fcn_MapGen_haltonVoronoiTiling
+%      fcn_MapGen_polytopeCropEdges
+%      fcn_MapGen_polytopesShrinkToRadius
+%      fcn_MapGen_plotPolytopes
 %   
 % EXAMPLES:
 %      
@@ -135,7 +143,7 @@ trimmed_polytopes = ...
 % shink the polytopes so that they are no longer tiled
 rng(shrink_seed) % set the random number generator with the shrink seed
 [map_polytopes,mu_rad_final,sigma_rad_final] = ...
-    fcn_MapGen_polytopeShrinkToRadius(trimmed_polytopes,...
+    fcn_MapGen_polytopesShrinkToRadius(trimmed_polytopes,...
     des_radius,sigma_radius,min_rad);
 
 % gather data on all the points by looping through the polytopes

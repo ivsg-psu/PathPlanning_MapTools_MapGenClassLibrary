@@ -6,11 +6,13 @@
 % 2021_06_07:
 % -- First write of the function, using the "Vis" library demo script as
 % starter
+% 2021_06_09
+% -- Added other types of point generators
 
 % TO-DO:
-% -- Add positive input checking to fcn_MapGen_polytopeShrinkToRadius
+% -- Add positive input checking to fcn_MapGen_polytopesShrinkToRadius
 % -- Add ability to extend halton set to right (e.g. "scrolling" map)
-% -- Add other types of point generators
+
 
 
 
@@ -41,55 +43,84 @@ Twocolumn_of_numbers_test = [4 1; 3 0; 2 5];
 fcn_MapGen_checkInputsToFunctions(Twocolumn_of_numbers_test, '2column_of_numbers');
 
 
-%% Generate a set of polytopes from the Sobol set
+%% Generate a set of polytopes from various pseudo-random sources
+close all;
+
+% Generate a set of polytopes from the Sobol set
 fig_num = 11;
 Sobol_range = [1 1000]; % range of Sobol points to use to generate the tiling
 tiled_polytopes = fcn_MapGen_sobolVoronoiTiling(Sobol_range,[1 1],fig_num);
+title('Sobel set');
 
 
-%% Generate a set of polytopes from the Halton set
+% Generate a set of polytopes from the Halton set
 fig_num = 12;
 Halton_range = [1 1000]; % range of Halton points to use to generate the tiling
 tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
+title('Halton set');
 
-
-%% Generate a set of polytopes from the Latin Hypercube set
+% Generate a set of polytopes from the Latin Hypercube set
 fig_num = 13;
 Latin_range = [1 1000]; % range of Halton points to use to generate the tiling
 tiled_polytopes = fcn_MapGen_latinVoronoiTiling(Latin_range,[1 1],fig_num);
+title('Latin Hypercube set');
 
 
-%% Generate a set of polytopes from the Random set
+% Generate a set of polytopes from the Random set
 fig_num = 14;
 Rand_range = [1 1000]; % range of Halton points to use to generate the tiling
 tiled_polytopes = fcn_MapGen_randVoronoiTiling(Rand_range,[1 1],fig_num);
+title('Uniform random set');
 
-
-%% Generate a set of polytopes from the Random Normal set
+% Generate a set of polytopes from the Random Normal set
 fig_num = 15;
 Rand_range = [1 1000]; % range of Halton points to use to generate the tiling
 tiled_polytopes = fcn_MapGen_randomNormalVoronoiTiling(Rand_range,[1 1],fig_num);
+title('Random normally distributed set');
 
+%% Show how the maps can be trimmed, shrunk, etc
+% Generate a set of polytopes from the Halton set
+fig_num = 21;
+Halton_range = [1 200]; % range of Halton points to use to generate the tiling
+tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
 
-
-%% Plot the polytopes
-fig_num = 2;
+% Plot the polytopes
+fig_num = 22;
 line_width = 2;
 axis_limits = [0 1 0 1];
 fcn_MapGen_plotPolytopes(tiled_polytopes,fig_num,'r',line_width,axis_limits);
 
-%% remove the edge polytopes that extend past the high and low points
-fig_num = 3;
+% remove the edge polytopes that extend past the high and low points
+fig_num = 23;
 xlow = 0; xhigh = 1; ylow = 0; yhigh = 1;
 bounding_box = [xlow ylow; xhigh yhigh];
 trimmed_polytopes = ...
     fcn_MapGen_polytopeCropEdges(tiled_polytopes,bounding_box,fig_num);
 
-%% Shrink to radius
-fig_num = 4;
-des_rad = 0.05; sigma_radius = 0.01; min_rad = 0.001;
-shrunk_polytopes2=fcn_MapGen_polytopeShrinkToRadius(...
+% Shrink to radius
+fig_num = 24;
+des_rad = 0.03; sigma_radius = 0; min_rad = 0.001;
+shrunk_polytopes2=fcn_MapGen_polytopesShrinkToRadius(...
     trimmed_polytopes,des_rad,sigma_radius,min_rad,fig_num);
+
+%% Show how we can shrink one polytope
+Npolys = length(trim_polytopes);
+rand_poly = 1+floor(rand*Npolys);
+shrinker = trimmed_polytopes(rand_poly);
+
+fig_num = 31;
+orig_radius = shrinker.max_radius;
+ratios = (0.99:-0.05:0);
+
+for ith_ratio = 1:length(ratios)
+    des_rad = orig_radius*ratios(ith_ratio);
+    tolerance = 1e-5; % This is the edge distance below which vertices are merged together in the polytope
+    shrunk_polytope =...
+        fcn_MapGen_polytopeShrinkToRadius(...
+        shrinker,des_rad,tolerance,fig_num);
+    pause(0.01);
+end
+
 
 %% Generate plots (all above steps) in just one function call
 des_radius = 0.03; % desired average maximum radius
@@ -111,5 +142,15 @@ axis_limits = [0 1 -0.1 1]; axis_style = 'square';
 fill_info = [1 1 0 1 0.5];
 fig_num = 7; 
 
-[polytopes,fig]=fcn_MapGen_nameToMap(map_name,plot_flag,disp_name,fig_num,line_style,line_width,color,axis_limits,axis_style,fill_info);
+[polytopes,fig]=fcn_MapGen_nameToMap(...
+    map_name,...
+    plot_flag,...
+    disp_name,...
+    fig_num,...
+    line_style,...
+    line_width,....
+    color,...
+    axis_limits,...
+    axis_style,...
+    fill_info);
 

@@ -10,11 +10,15 @@ function [trim_polytopes] = ...
 %
 % INPUTS:
 %
-%     POLYTOPES: the original polytopes with the same fields as trim_polytopes
+%     polytopes: the original polytopes with the same fields as trim_polytopes
 % 
 %     bounding_box: a 2 x 2 matrix of [xlow ylow; xhigh yhigh] in which all
 %     the polytopes must exist, e.g. the corner coordinates of the
 %     axis-aligned bounding box.
+%     
+%    (OPTIONAL INPUTS)
+%
+%     fig_num: a figure number to plot results.
 %
 %
 % OUTPUTS:
@@ -50,6 +54,8 @@ function [trim_polytopes] = ...
 % 2021-06-06
 % -- rewrote function from fc_polytope_editing_remove_edge_polytopes
 % -- added a test script
+% 2021-06-10
+% -- updated comments
 
 % TO DO
 % -- Vectorize the for loop if possible
