@@ -143,20 +143,20 @@ end
 
 
 %% find current distribution
-radii = [polytopes.max_radius];
+old_radii = [polytopes.max_radius];
 
 if flag_do_debug
     fcn_MapGen_plotPolytopes(polytopes,fig_for_debug,'b',2);
     
     figure(fig_for_debug+1);
-    histogram(radii,20)
+    histogram(old_radii,20)
     title('Histogram of input radii');
-    r_sigma = std(radii);
+    r_sigma = std(old_radii);
     fprintf(1,'Standard deviation in r is: %.2f \n', r_sigma);
 end
 
-r_mu = mean(radii);
-r_size = length(radii);
+r_mu = mean(old_radii);
+r_size = length(old_radii);
 
 if r_mu < des_radius
     error('cannot achieve the desired radius by shrinking because average radius is already smaller than desired radius')
@@ -170,12 +170,16 @@ if flag_do_debug
    histogram(r_dist,20)
 end
 
+% Check to see if truncation will occur
 r_dist = r_dist + (des_radius-mean(r_dist)); % adjust to ensure the mean value is mu
-max_r_dist = max(radii); % largest possible radius
+max_r_dist = max(old_radii); % largest possible radius
 min_r_dist = min_rad; % smallest possible radius
 if sum((r_dist>max_r_dist)+(r_dist<min_r_dist)) > 0
     warning('standard deviation skewed due to truncated distribution')
 end
+
+
+
 r_dist(r_dist>max_r_dist) = max_r_dist; % truncate any values that are too large
 r_dist(r_dist<min_r_dist) = min_r_dist; % truncate any values that are too small
 while abs(mean(r_dist) - des_radius) > 1e-10
@@ -195,7 +199,7 @@ end
 
 %% shrink polytopes to achieve the distribution
 [new_rads,ob_ind] = sort(r_dist);
-if sum((sort(radii)'-sort(r_dist))>=-2*min_rad) < r_size
+if sum((sort(old_radii)'-sort(r_dist))>=-2*min_rad) < r_size
     error('distribution is unachievable with generated map')
 end
 
