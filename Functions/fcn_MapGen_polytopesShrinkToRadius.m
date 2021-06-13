@@ -62,6 +62,11 @@ function [shrunk_polytopes,mu_final,sigma_final] = ...
 % -- revised function to prep for MapGen class 
 % -- added plotting option
 % -- added comments, added debugging option
+% 2021-06-12
+% -- added minimum radius check on inputs, throws warning if min radius
+% less than zero.
+% -- made warnings more clear on the truncations.
+
 
 % TO DO
 % -- Vectorize the for loop if possible
@@ -70,8 +75,8 @@ function [shrunk_polytopes,mu_final,sigma_final] = ...
 
 %% Debugging and Input checks
 flag_check_inputs = 1; % Set equal to 1 to check the input arguments
-flag_do_plot = 0;      % Set equal to 1 for plotting
-flag_do_debug = 0;     % Set equal to 1 for debugging
+flag_do_plot = 0;      %#ok<NASGU> % Set equal to 1 for plotting
+flag_do_debug = 1;     % Set equal to 1 for debugging
 
 if flag_do_debug
     fig_for_debug = 9453;
@@ -113,8 +118,10 @@ if flag_check_inputs
     % Check the min_rad input
     fcn_MapGen_checkInputsToFunctions(...
         min_rad, 'column_of_numbers',1);
-    
-    
+    if min_rad<0
+        st = dbstack;
+        warning('In function: %s, in file: %s\n\tA minimum radius less than zero was given for the shrinking range: min_rad input was %f \n\tForcing minimum radius, min_rad, to be zero.\n',st(1).name,st(1).file,min_rad);
+    end
 end
     
 
@@ -143,78 +150,168 @@ end
 
 
 %% find current distribution
-old_radii = [polytopes.max_radius];
+old_max_radii = [polytopes.max_radius]';
+Nradii = length(old_max_radii);
+old_r_mu = mean(old_max_radii);
+old_r_sigma = std(old_max_radii);
 
 if flag_do_debug
+    fprintf(1,'Target distrubution statistics:\n');
+    fprintf(1,'\tMean: %.4f\n',des_radius);
+    fprintf(1,'\tStd dev: %.4f\n',sigma_radius);
+    
+    fprintf(1,'Input distrubution statistics:\n');
+    fprintf(1,'\tMean: %.4f\n',old_r_mu);
+    fprintf(1,'\tStd dev: %.4f\n',old_r_sigma);
+    
     fcn_MapGen_plotPolytopes(polytopes,fig_for_debug,'b',2);
     
     figure(fig_for_debug+1);
-    histogram(old_radii,20)
-    title('Histogram of input radii');
-    r_sigma = std(old_radii);
-    fprintf(1,'Standard deviation in r is: %.2f \n', r_sigma);
+    histogram(old_max_radii,20)
+    title(sprintf('Histogram of input radii. Mean: %.4f, Std-dev: %.4f. Targets are: %.4f and %.4f',...
+        old_r_mu,old_r_sigma,...
+        des_radius,...
+        sigma_radius));
 end
 
-r_mu = mean(old_radii);
-r_size = length(old_radii);
 
-if r_mu < des_radius
+if old_r_mu < des_radius
     error('cannot achieve the desired radius by shrinking because average radius is already smaller than desired radius')
 end
 
 %% determine desired distribution
-r_dist = normrnd(des_radius,sigma_radius,[r_size,1]);
+new_r_dist = normrnd(des_radius,sigma_radius,[Nradii,1]);
+
+% adjust to ensure the mean value is mu. SETH: is this necessary?
+new_r_dist = new_r_dist + (des_radius-mean(new_r_dist)); 
+new_r_mu = mean(new_r_dist);
+new_r_sigma = std(new_r_dist);
 
 if flag_do_debug
+    
+    fprintf(1,'Ideal distrubution statistics:\n');
+    fprintf(1,'\tMean: %.4f\n',new_r_mu);
+    fprintf(1,'\tStd dev: %.4f\n',new_r_sigma);
+
    figure(fig_for_debug+2);  
-   histogram(r_dist,20)
+   histogram(new_r_dist,20)
+   title(sprintf('Histogram of target radii. Mean: %.4f, Std-dev: %.4f. Targets are: %.4f and %.4f',...
+       new_r_mu,new_r_sigma,...
+       des_radius,...
+       sigma_radius));
+   
 end
 
-% Check to see if truncation will occur
-r_dist = r_dist + (des_radius-mean(r_dist)); % adjust to ensure the mean value is mu
-max_r_dist = max(old_radii); % largest possible radius
+% Check to see if truncation will occur. THis is checked by using the
+% definition of the maximum radius and minimum radius, and checking how
+% many points fall outside of this range. If there are truncations, warn
+% the user.
+
+% % OLD: uses a single maximum for all polytopes
+% max_r_dist = max(old_max_radii); % largest possible radius
+% NEW: uses a each polytope's maximum. SETH: the above code gives wrong
+% answers if there's a few polytopes that have very large initial radii,
+% when other polytopes have small initial radii.
+
+max_r_dist = old_max_radii; % largest possible radius for each polytope
 min_r_dist = min_rad; % smallest possible radius
-if sum((r_dist>max_r_dist)+(r_dist<min_r_dist)) > 0
-    warning('standard deviation skewed due to truncated distribution')
+Ntruncations = sum((new_r_dist>max_r_dist)+(new_r_dist<min_r_dist));
+
+% Warn the user:
+if  Ntruncations> 0
+    st = dbstack;
+    warning('In function: %s, in file: %s\n\tThe standard deviation will skewed due to truncated distribution.\n\tThe number of truncations per total population of polytopes is: %.0d out of %.0d',...
+        st(1).name,st(1).file,Ntruncations,Nradii);
 end
 
+% Force the tails of the distribution that stick out of the truncation
+% limits, to the truncation limits. So we can re-check how much this
+% truncation affects the mean. Specifically: Truncating the edges will
+% cause mean to shift. So move the mean around slightly, but each motion
+% may require truncation again. Essentially, this piles all the tails of
+% the distribution back onto the edges. (not very normal, btw). NOTE: if a
+% single-valued max value is used for all polytopes (not just the max for
+% EACH polytope), then the code below only works if max radius on all
+% polytopes is about the same. If there are a few polytopes with large
+% radii, while others are small, then this calculation will still give
+% wrong answers.
 
-
-r_dist(r_dist>max_r_dist) = max_r_dist; % truncate any values that are too large
-r_dist(r_dist<min_r_dist) = min_r_dist; % truncate any values that are too small
-while abs(mean(r_dist) - des_radius) > 1e-10
-    r_dist = r_dist + (des_radius-mean(r_dist));
-    r_dist(r_dist>max_r_dist) = max_r_dist;
-    r_dist(r_dist<min_r_dist) = min_r_dist;
+new_r_dist(new_r_dist>max_r_dist) = max_r_dist(new_r_dist>max_r_dist); % truncate any values that are too large
+new_r_dist(new_r_dist<min_r_dist) = min_r_dist; % truncate any values that are too small
+while abs(mean(new_r_dist) - des_radius) > 1e-10
+    new_r_dist = new_r_dist + (des_radius-mean(new_r_dist));
+    new_r_dist(new_r_dist>max_r_dist) = max_r_dist(new_r_dist>max_r_dist);
+    new_r_dist(new_r_dist<min_r_dist) = min_r_dist;
 end
 
-mu_final = mean(r_dist);
-sigma_final = std(r_dist);
+% SETH: shouldn't this calculation be done after the radii transformation
+% from shrunk polytopes loop? (I went ahead and did it in BOTH places - the
+% results are slightly different, so not sure why this calculation is done
+% here ???)
+mu_final = mean(new_r_dist);
+sigma_final = std(new_r_dist);
 
 
 if flag_do_debug
+    fprintf(1,'Target distrubution statistics:\n');
+    fprintf(1,'\tMean: %.4f\n',mu_final);
+    fprintf(1,'\tStd dev: %.4f\n',sigma_final);
+
    figure(fig_for_debug+2);  
-   histogram(r_dist,20)
+   hold on;
+   histogram(new_r_dist,20)
+   title(sprintf('Histogram of bounded target radii. Mean: %.4f, Std-dev: %.4f. Targets are: %.4f and %.4f',...
+       mu_final,sigma_final,...
+       des_radius,...
+       sigma_radius));
+
 end
 
 %% shrink polytopes to achieve the distribution
-[new_rads,ob_ind] = sort(r_dist);
-if sum((sort(old_radii)'-sort(r_dist))>=-2*min_rad) < r_size
+% Sort the radii changes by size. Effectively, this randomizes the changes
+% against the old polytopes, since the size of the new radii were
+% determined randomly.
+% SETH: The following "sort" line seems unnecessary. Why is sorting added?
+%[new_radii_sorted,ob_index] = sort(new_r_dist);
+% The following lines effectively forces the "sorted" radii and indices to
+% match the new_r_dist. So this isn't needed except in case this breaks the
+% code. Need to check with Seth why sorting was used in the first place -
+% doesn't seem to be needed.
+new_radii_sorted = new_r_dist;
+ob_index = find(new_r_dist>=0);
+
+% Not sure what the following does! Seth???
+if sum((sort(old_max_radii)'-sort(new_r_dist))>=-2*min_rad) < Nradii
     error('distribution is unachievable with generated map')
 end
 
+% Initialize the shrunk polytopes structure array, and tolerance for
+% distance between vertices, below which vertices are merged into one.
 shrunk_polytopes = polytopes;
-tolerance = 1e-5;
+tolerance = 1e-5; % Units are (implied) kilometers
 
-for idx = 1:length(new_rads)
-    shrinker = polytopes(ob_ind(idx)); % obstacle to be shrunk
-    des_rad = new_rads(idx);
+% Loop through each polytope, shrinking it to the reference size
+for ith_radii = 1:length(new_radii_sorted)
+    shrinker = polytopes(ob_index(ith_radii)); % obstacle to be shrunk
+    des_rad = new_radii_sorted(ith_radii);
         
     % assign to shrunk_polytopes
-    shrunk_polytopes(ob_ind(idx)) = ...
+    shrunk_polytopes(ob_index(ith_radii)) = ...
         fcn_MapGen_polytopeShrinkToRadius(...
         shrinker,des_rad,tolerance);
 end
+
+% Fill in mu and sigma values from final result
+final_max_radii = [shrunk_polytopes.max_radius]';
+mu_final = mean(final_max_radii);
+sigma_final = std(final_max_radii);
+
+if flag_do_debug
+    fprintf(1,'Final distrubution statistics:\n');
+    fprintf(1,'\tMean: %.4f\n',mu_final);
+    fprintf(1,'\tStd dev: %.4f\n',sigma_final);
+end
+
 
 %% Plot results?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -258,184 +355,4 @@ end % Ends function
 %                                               
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                                               
 
-
-function [dist] = ...
-    INTERNAL_fcn_geometry_euclideanPointsToPointsDistance(...
-    points1,...
-    points2,...
-    varargin)
-% fcn_geometry_euclideanPointsToPointsDistance calculates the 
-% distance(s) between a vector of points, POINTS1, and another vector of
-% points, POINTS2.
-%
-% FORMAT:
-%
-% [DIST] = fcn_geometry_euclideanPointsToPointsDistance(POINTS1,POINTS2,(fig_num))
-%
-% INPUTS:
-%
-%      POINTS1: an Nx2 or Nx3 series of xy or xyz points 
-%      in the form: [x1 y1 z1; x2 y2 z2; ... ; xn yn zn]
-%
-%      POINTS2: an Nx2 or Nx3 series of xy or xyz points 
-%      in the form: [x1 y1 z1; x2 y2 z2; ... ; xn yn zn]
-%
-%      (OPTIONAL INPUTS)
-%
-%      fig_num: a figure number to plot results.
-%
-% OUTPUTS:
-%
-%      DIST: an N x  1 vector of distances [d1; d2; ... ; dn], where N is
-%      the number of point sets
-%
-% DEPENDENCIES:
-%
-%      fcn_geometry_checkInputsToFunctions
-%
-% EXAMPLES:
-%
-%         pt1 = [1 1 5; 5 3 64; 7 2 -2];
-%         pt2 = [0 -3 -6; 34 1 17; 18 7 0];
-%         dist=fcn_geometry_euclideanPointsToPointsDistance(pt1,pt2);
-%
-% See the script: script_test_fcn_geometry_euclideanPointsToPointsDistance
-% for a full test suite.
-%
-% This function was written on 2018_11_17 by Seth Tau
-% Questions or comments? sat5340@psu.edu 
-
-% Revision History:
-% 2021-05-28 - S. Brennan
-% -- revised function to prep for geometry class 
-% -- rewrote function to use vector sum
-% -- added plotting option
-% 2021-06-05
-% -- fixed comments, added debugging option
-
-
-%% Debugging and Input checks
-flag_check_inputs = 0; % Set equal to 1 to check the input arguments
-flag_do_plot = 0;      % Set equal to 1 for plotting
-flag_do_debug = 0;     % Set equal to 1 for debugging
-
-if flag_do_debug
-    st = dbstack; %#ok<*UNRCH>
-    fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-end
-
-%% check input arguments?
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____                   _
-%  |_   _|                 | |
-%    | |  _ __  _ __  _   _| |_ ___
-%    | | | '_ \| '_ \| | | | __/ __|
-%   _| |_| | | | |_) | |_| | |_\__ \
-%  |_____|_| |_| .__/ \__,_|\__|___/
-%              | |
-%              |_|
-% See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-if flag_check_inputs    
-    % Are there the right number of inputs?    
-    if nargin < 2 || nargin > 3
-        error('Incorrect number of input arguments')
-    end
-    
-    % Check the points1 input
-    fcn_geometry_checkInputsToFunctions(...
-        points1, '2or3column_of_numbers');
-end
-
-% Use number of rows in points1 to calculate Npoints
-Npoints = length(points1(:,1));
-
-if flag_check_inputs
-    
-    % Check the points2 input, forcing length to match points1
-    fcn_geometry_checkInputsToFunctions(...
-        points2, '2or3column_of_numbers',Npoints);
-    
-end
-
-
-% Does user want to show the plots?
-if 3 == nargin
-    fig_num = varargin{end};
-    figure(fig_num);
-    flag_do_plot = 1;
-else
-    if flag_do_debug
-        fig = figure;
-        fig_num = fig.Number;
-        flag_do_plot = 1;
-    end
-end
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   __  __       _
-%  |  \/  |     (_)
-%  | \  / | __ _ _ _ __
-%  | |\/| |/ _` | | '_ \
-%  | |  | | (_| | | | | |
-%  |_|  |_|\__,_|_|_| |_|
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-dist = sum((points1-points2).^2,2).^0.5;
-
-%% Plot results?
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____       _                 
-%  |  __ \     | |                
-%  | |  | | ___| |__  _   _  __ _ 
-%  | |  | |/ _ \ '_ \| | | |/ _` |
-%  | |__| |  __/ |_) | |_| | (_| |
-%  |_____/ \___|_.__/ \__,_|\__, |
-%                            __/ |
-%                           |___/ 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-if flag_do_plot
-    % Set up the figure
-    figure(fig_num);
-    clf
-    hold on;
-    grid on; grid minor;
-        
-    midpoints = (points1+points2)/2;
-    for ith_point=1:Npoints
-        % 2D plot?
-        if length(midpoints(1,:))==2
-            % Plot the points
-            xdata = [points1(ith_point,1) points2(ith_point,1)];
-            ydata = [points1(ith_point,2) points2(ith_point,2)];
-            plot(xdata,ydata,'.-','Linewidth',3,'Markersize',20);
-            
-            % Label the midpoints
-            text(midpoints(ith_point,1),midpoints(ith_point,2),sprintf('d - %.1f',dist(ith_point,1)));
-        else
-            % Plot the points
-            xdata = [points1(ith_point,1) points2(ith_point,1)];
-            ydata = [points1(ith_point,2) points2(ith_point,2)];
-            zdata = [points1(ith_point,3) points2(ith_point,3)];
-            plot3(xdata,ydata,zdata,'.-','Linewidth',3,'Markersize',20);
-
-            % Label the midpoints
-            text(midpoints(ith_point,1),midpoints(ith_point,2),midpoints(ith_point,3),sprintf('d - %.1f',dist(ith_point,1)));
-            
-            % Set to 3D view
-            view(3);
-        end
-        
-    end
-end
-
-if flag_do_debug
-    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file); 
-end
-
-
-end % Ends the function
 

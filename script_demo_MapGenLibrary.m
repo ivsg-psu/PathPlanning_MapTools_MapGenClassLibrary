@@ -104,7 +104,7 @@ shrunk_polytopes2=fcn_MapGen_polytopesShrinkToRadius(...
     trimmed_polytopes,des_rad,sigma_radius,min_rad,fig_num);
 
 %% Show how we can shrink one polytope
-Npolys = length(trim_polytopes);
+Npolys = length(trimmed_polytopes);
 rand_poly = 1+floor(rand*Npolys);
 shrinker = trimmed_polytopes(rand_poly);
 
