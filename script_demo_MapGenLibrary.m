@@ -12,8 +12,10 @@
 % TO-DO:
 % -- Add positive input checking to fcn_MapGen_polytopesShrinkToRadius
 % -- Add ability to extend halton set to right (e.g. "scrolling" map)
-
-
+% -- finish the growth of polytopes functions, e.g. get these working with the library
+% -- add Nick's sensor code 
+% -- add functions that, given a map, give core statistics (look out limit, linear density, etc - basically make functions to calculate all the pi-values and interpretations we might need)
+% -- add prior work on grid-based map generation
 
 
 close all

@@ -48,8 +48,6 @@ function [shrunk_polytopes,mu_final,sigma_final] = ...
 %     SIGMA_FINAL: final variance achieved
 %   
 % EXAMPLES:
-%      
-
 %
 % For additional examples, see: script_test_fcn_MapGen_polytopesShrinkToRadius
 %
@@ -66,6 +64,8 @@ function [shrunk_polytopes,mu_final,sigma_final] = ...
 % -- added minimum radius check on inputs, throws warning if min radius
 % less than zero.
 % -- made warnings more clear on the truncations.
+% 2021-06-16
+% -- added more comments via Seth's inputs
 
 
 % TO DO
@@ -244,18 +244,9 @@ while abs(mean(new_r_dist) - des_radius) > 1e-10
     new_r_dist(new_r_dist<min_r_dist) = min_r_dist;
 end
 
-% SETH: shouldn't this calculation be done after the radii transformation
-% from shrunk polytopes loop? (I went ahead and did it in BOTH places - the
-% results are slightly different, so not sure why this calculation is done
-% here ???)
-% DR B: You can do this either before or after. The shrinker will shrink
-% the obstacles to these exact radii as long as the input obstacle is equal
-% or larger in size, so it shouldn't change after shrinking.
-mu_final = mean(new_r_dist);
-sigma_final = std(new_r_dist);
-
-
 if flag_do_debug
+    mu_final = mean(new_r_dist);
+    sigma_final = std(new_r_dist);
     fprintf(1,'Target distrubution statistics:\n');
     fprintf(1,'\tMean: %.4f\n',mu_final);
     fprintf(1,'\tStd dev: %.4f\n',sigma_final);
@@ -274,25 +265,28 @@ end
 % Sort the radii changes by size. Effectively, this randomizes the changes
 % against the old polytopes, since the size of the new radii were
 % determined randomly.
-% SETH: The following "sort" line seems unnecessary. Why is sorting added?
-%[new_radii_sorted,ob_index] = sort(new_r_dist);
 % The following lines effectively forces the "sorted" radii and indices to
-% match the new_r_dist. So this isn't needed except in case this breaks the
-% code. Need to check with Seth why sorting was used in the first place -
-% doesn't seem to be needed.
-% DR B: Sorting was used so that I could ensure the biggest old polytope
-% would become the biggest new polytope. This was an easy way to ensure
-% there was always a large enough polytope to shrink for each new polytope.
-% Othewise, you might have to grow some obstacles to achieve the
+% match the new_r_dist.
+%
+% Sorting was used to ensure the biggest old polytope
+% becomes the biggest new polytope. This is an easy way to ensure
+% there is usually a large enough polytope to shrink for each new polytope.
+% Othewise, we might have to grow some obstacles to achieve the
 % distribution and this could cause overlapping since the original
 % polytopes are tiled together.
-new_radii_sorted = new_r_dist;
-ob_index = find(new_r_dist>=0);
 
-% Not sure what the following does! Seth???
-% DR B: This checks that the old polytopes are large enough to shrink and 
-% achieve the new radius distribution.
-if sum((sort(old_max_radii)'-sort(new_r_dist))>=-2*min_rad) < Nradii
+[new_radii_sorted,ob_index] = sort(new_r_dist);
+% % Uncomment to skip sorting:
+% new_radii_sorted = new_r_dist;
+% ob_index = find(new_r_dist>=0);
+
+% Check that the old polytopes are large enough to shrink and 
+% achieve the new radius distribution. Want all the changes to be smaller
+% than -2 times the minimum radius, to ensure we do not get singular
+% polytopes.
+change_in_radii = sort(old_max_radii)'-sort(new_r_dist);
+Num_goal_polys_smaller_than_start = sum(change_in_radii>=-2*min_rad);
+if  Num_goal_polys_smaller_than_start < Nradii
     error('distribution is unachievable with generated map')
 end
 
