@@ -143,76 +143,8 @@ seed_points = seed_points.*stretch;
 [V,C] = voronoin(seed_points);
 % V = V.*stretch;
 
-%% create tiling
-num_poly = size(seed_points,1);
-polytopes(num_poly) = ...
-    struct(...
-    'vertices',[],...
-    'xv',[],...
-    'yv',[],...
-    'distances',[],...
-    'mean',[],...
-    'area',[],...
-    'max_radius',[]);
-
-
-remove = 0; % keep track of how many cells to be removed
-for poly = 1:num_poly % pull each cell from the voronoi diagram
-    % x and y values from this cell
-    xv = V(C{poly},1)'; 
-    yv = V(C{poly},2)';
-
-    %     % change infinite values to be finite
-    %     change = (xv>(2*stretch(1)))+(xv<(-1*stretch(1)))+(yv>(2*stretch(2)))+(yv<(-1*stretch(2)));
-    %     xv(change>0) = (2*stretch(1))*sign(mean(xv(change==0)));
-    %     yv(change>0) = (2*stretch(2))*sign(mean(yv(change==0)));
-    
-    
-    if length(xv)>2 && all(~isinf(xv)) && all(~isinf(yv)) % at least 3 points
-        
-        % change infinite values to be finite
-        xv(xv>(2*stretch(1)))  =  2*stretch(1);
-        xv(xv<(-2*stretch(1))) = -2*stretch(1);
-        yv(yv>(2*stretch(2)))  =  2*stretch(2);
-        yv(yv<(-2*stretch(2))) = -2*stretch(2);
-    
-        %         xv(xv>1) = 1;
-        %         xv(xv<0) = 0;
-        %         yv(yv>1) = 1;
-        %         yv(yv<0) = 0;
-        
-    
-        % make sure cw
-        vec1 = [xv(2)-xv(1),yv(2)-yv(1),0]; % vector leading into point
-        vec2 = [xv(3)-xv(2),yv(3)-yv(2),0]; % vector leading out of point
-        xing = cross(vec1,vec2); % cross product of two vectors
-        if sign(xing(3)) == -1 % points ordered in wrong direction
-            xv = fliplr(xv);
-            yv = fliplr(yv);
-        end
-        
-        % enter info into polytope structure
-        polytopes(poly-remove).xv = xv;
-        polytopes(poly-remove).yv = yv;
-        polytopes(poly-remove).vertices = [[xv xv(1)]' [yv yv(1)]']; % repeat first vertice for easy plotting
-        [Cx,Cy,polytopes(poly-remove).area] = ...
-            fcn_MapGen_polytopeCentroidAndArea([xv xv(1)]',[yv yv(1)]');
-        polytopes(poly-remove).mean = [Cx, Cy]; % enter polytope centroid
-        % calculate perimeter distances around the polytope
-        polytopes(poly-remove).distances = INTERNAL_fcn_geometry_euclideanPointsToPointsDistance(polytopes(poly-remove).vertices(1:end-1,:),polytopes(poly-remove).vertices(2:end,:));
-        % calculate the maximum distance from center to a vertex
-        polytopes(poly-remove).max_radius = max(INTERNAL_fcn_geometry_euclideanPointsToPointsDistance(polytopes(poly-remove).vertices(1:end-1,:),ones(length(xv),1)*polytopes(poly-remove).mean));
-
-
-    else % if 2 or less points in cell 
-        remove = remove+1; % skip cell and remove later
-    end
-end
-
-%% remove extra empty polytopes
-for polys = 1:remove
-    polytopes(num_poly+1-remove) = [];
-end
+%% fill polytopes from tiling
+polytopes = INTERNAL_fcn_MapGen_createPolysFromTiling(seed_points,V,C);
 
 
 %% Plot results?
@@ -237,8 +169,6 @@ if flag_do_plot
 
     % plot the seed points
     plot(seed_points(:,1),seed_points(:,2),'r.','Markersize',10);
-
-    
     
 end
 
@@ -250,6 +180,139 @@ end
 end % Ends the function
 
 
+function polytopes = INTERNAL_fcn_MapGen_createPolysFromTiling(seed_points,V,C)
+%% create tiling
+num_poly = size(seed_points,1);
+polytopes(num_poly) = ...
+    struct(...
+    'vertices',[],...
+    'xv',[],...
+    'yv',[],...
+    'distances',[],...
+    'mean',[],...
+    'area',[],...
+    'max_radius',[]);
+
+
+remove = 0; % keep track of how many cells to be removed
+for poly = 1:num_poly % pull each cell from the voronoi diagram
+    % x and y values from this cell
+    xv = V(C{poly},1)'; 
+    yv = V(C{poly},2)';
+    
+    verticies = V(C{poly},:);
+    interior_point = seed_points(poly,:);
+    
+    %     if interior_point(1,1)>0.97851 && interior_point(1,1)<0.97852
+    %         disp('Stop here')
+    %     end
+    
+    % FOR DEBUGGING
+    %         plotting_vertices = [vertices; vertices(1,:)];
+    %         figure(999);
+    %         hold on;
+    %         plot(interior_point(1,1),interior_point(1,2),'r.');
+    %         plot(plotting_vertices(:,1),plotting_vertices(:,2),'g-');
+
+    % Are any vertices outside the range?
+    if any(xv>1) || any(yv>1) || any(xv<0) || any(yv<0)
+        
+        % Are any verticies infinite? If so, we need to replace the
+        % infinite terms with real data. A way to do this is to fill the
+        % infinite point with "snapped" points created by projecting the
+        % adjacent vertices to the infinite one toward the nearest wall.
+        if any(isinf(verticies),'all')
+            Npoints = length(xv);            
+            bad_indices = find(any(isinf(verticies),2));
+            if length(bad_indices)>1
+                warning('More than 2 infinities found in one vector. Code may break');
+            end
+            for ith_index = 1:length(bad_indices)
+                bad_index = bad_indices(ith_index);
+
+                % Grab prior and next indices, being careful to check for
+                % situations where the infinite index is at start or end.
+                prior_index = bad_index-1;
+                next_index  = bad_index+1;
+                if bad_index == 1
+                    prior_index = Npoints;
+                    start_data = [];
+                else
+                    start_data = verticies(1:prior_index,:);
+                end
+                if bad_index == Npoints
+                    next_index = 1;
+                    end_data = [];
+                else
+                    end_data = verticies(next_index:end,:);                    
+                end
+                
+                % snap prior to closest wall
+                snap_prior = round(verticies(prior_index,:));
+                differences = (verticies(prior_index,:)-snap_prior).^2;
+                if differences(1,1)<differences(1,2)
+                    new_prior = [snap_prior(1,1) verticies(prior_index,2)];
+                else
+                    new_prior = [verticies(prior_index,1) snap_prior(1,2)];
+                end
+                
+                % snap next to closest wall
+                snap_next = round(verticies(next_index,:));
+                differences = (verticies(next_index,:)-snap_next).^2;
+                if differences(1,1)<differences(1,2)
+                    new_next = [snap_next(1,1) verticies(next_index,2)];
+                else
+                    new_next = [verticies(next_index,1) snap_next(1,2)];
+                end
+                
+                % Substitute data in
+                verticies = [start_data; new_prior; new_next; end_data];                
+  
+            end
+        end
+            
+        %verticies = verticies(flag_is_finite>0,:);
+
+        [cropped_vertices] = fcn_MapGen_cropPolytopeToRange(verticies, interior_point);
+        xv = cropped_vertices(:,1)';
+        yv = cropped_vertices(:,2)';        
+    end
+
+    % Are polytopes not trivial in length?
+    if length(xv)>2                
+    
+        % make sure cw
+        vec1 = [xv(2)-xv(1),yv(2)-yv(1),0]; % vector leading into point
+        vec2 = [xv(3)-xv(2),yv(3)-yv(2),0]; % vector leading out of point
+        xing = cross(vec1,vec2); % cross product of two vectors
+        if sign(xing(3)) == -1 % points ordered in wrong direction
+            xv = fliplr(xv);
+            yv = fliplr(yv);
+        end
+        
+        % enter info into polytope structure
+        polytopes(poly-remove).xv = xv;
+        polytopes(poly-remove).yv = yv;
+        polytopes(poly-remove).vertices = [[xv xv(1)]' [yv yv(1)]']; % repeat first vertice for easy plotting
+        
+        [Cx,Cy,polytopes(poly-remove).area] = ...
+            fcn_MapGen_polytopeCentroidAndArea([xv xv(1)]',[yv yv(1)]');
+        
+        polytopes(poly-remove).mean = [Cx, Cy]; % enter polytope centroid
+        % calculate perimeter distances around the polytope
+        polytopes(poly-remove).distances = INTERNAL_fcn_geometry_euclideanPointsToPointsDistance(polytopes(poly-remove).vertices(1:end-1,:),polytopes(poly-remove).vertices(2:end,:));
+        % calculate the maximum distance from center to a vertex
+        polytopes(poly-remove).max_radius = max(INTERNAL_fcn_geometry_euclideanPointsToPointsDistance(polytopes(poly-remove).vertices(1:end-1,:),ones(length(xv),1)*polytopes(poly-remove).mean));
+
+
+    else % if 2 or less points in cell 
+        remove = remove+1; % skip cell and remove later
+    end
+end
+
+%% remove extra empty polytopes
+polytopes = polytopes(1:num_poly);
+end
 
 
 function [dist] = ...
