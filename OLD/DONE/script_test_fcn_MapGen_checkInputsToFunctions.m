@@ -1,15 +1,9 @@
-% script_test_fcn_MapGen_checkInputsToFunctions
-% Tests: fcn_MapGen_checkInputsToFunctions
+% script_test_fcn_MapGen_checkInputsToFunctions.m
+% Tests fcn_MapGen_checkInputsToFunctions
 
-% 
-% REVISION HISTORY:
-% 
-% 2021_06_20 by S. Brennan
-% -- first write of script
-%%%%%%%%%%%%%%§
-
-
-
+% Revision history:
+%      2021_06_06:
+%      -- first write of the code copying functionality from fcn_FastestTraversal_checkInputsToFunctions
 
 %% column_of_numbers
 %             _                               __                       _
@@ -317,4 +311,3 @@ if 1==0
     fcn_MapGen_checkInputsToFunctions(Twocolumn_of_integers_test, '2column_of_integers',[2 2]);
 
 end
-

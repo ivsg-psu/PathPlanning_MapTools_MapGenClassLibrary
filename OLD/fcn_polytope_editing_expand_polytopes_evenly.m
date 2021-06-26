@@ -1,6 +1,5 @@
 function [exp_polytopes] = fcn_polytope_editing_expand_polytopes_evenly(polytopes,delta,exp_dist)
-% FCN_POLYTOPE_EDITING_EXPAND_POLYTOPES_EVENLY  expands an obstacle out by exp_dist on all 
-% sides
+% FCN_POLYTOPE_EDITING_EXPAND_POLYTOPES_EVENLY  expands an obstacle out by exp_dist on all sides
 %
 % [EXP_POLYTOPES]=FCN_POLYTOPE_EDITING_EXPAND_POLYTOPES_EVENLY(POLYTOPES,DELTA,EXP_DIST)
 % returns:
@@ -53,7 +52,8 @@ if nargin ~= 3
     error('Incorrect number of arguments');
 end
 
-%% main code
+%% main code §
+
 exp_polytopes = polytopes; % both structures will be the same size
 for polys = 1:size(polytopes,2) % check each obstacle
     %% pull values
@@ -104,8 +104,13 @@ for polys = 1:size(polytopes,2) % check each obstacle
     exp_polytopes(polys).vertices = [[xv xv(1)]' [yv yv(1)]'];
     exp_polytopes(polys).xv = xv;
     exp_polytopes(polys).yv = yv;
-    exp_polytopes(polys).distances = fcn_general_calculation_euclidean_point_to_point_distance(exp_polytopes(polys).vertices(1:end-1,:),exp_polytopes(polys).vertices(2:end,:));
-    [Cx,Cy,exp_polytopes(polys).area] = fcn_polytope_calculation_centroid_and_area([xv xv(1)]', [yv yv(1)]');
+    exp_polytopes(polys).distances = sum((exp_polytopes(polys).vertices(1:end-1,:)-exp_polytopes(polys).vertices(2:end,:)).^2,2).^0.5;
+    [Cx,Cy,exp_polytopes(polys).area] = fcn_MapGen_polytopeCentroidAndArea([xv xv(1)]', [yv yv(1)]');
     exp_polytopes(polys).mean = [Cx, Cy];        
-    exp_polytopes(polys).max_radius = max(fcn_general_calculation_euclidean_point_to_point_distance(exp_polytopes(polys).vertices(1:end-1,:),ones(length(xv),1)*exp_polytopes(polys).mean));
+    exp_polytopes(polys).max_radius = max(sum((exp_polytopes(polys).vertices(1:end-1,:)-ones(length(xv),1)*exp_polytopes(polys).mean).^2,2).^0.5);
 end
+
+% §
+% Debug
+%
+% Functions §

@@ -1,130 +1,106 @@
-function fcn_MapGen_checkInputsToFunctions(...
-    variable,variable_type_string,varargin)
-
+function [ ...
+varargout...
+] = ...
+fcn_MapGen_checkInputsToFunctions( ...
+variable, ...
+variable_type_string, ...
+varargin...
+)
 % fcn_MapGen_checkInputsToFunctions
-% Checks the variable types commonly used in the MapGen codes to
-% ensure they are correctly formed.
-%
-% This function is typically called at the top of most functions. The input
-% is a variable and a string defining the "type" of the variable. This
-% function checks to see that they are compatible. For example, say there
-% 'column_vector' type of variables used in the function that is always a N
-% x 1 array; if someone had a variable called "test_example", they could
-% check that this fit the 'column_vector' type by calling
-% fcn_MapGen_checkInputsToFunctions(test_example,'column_vector').
-% This function would then check that the array was N x 1, and if it was
-% not, it would send out an error warning.
-%
+% Checks the variable types commonly used in the FuncE codes to ensure 
+% they are correctly formed.
+% 
+% This is a template function which is built for each class of functions. 
+% It is typically called at the top of most functions in a particular 
+% class. The input is a variable and a string defining the "type" of the 
+% variable. This function checks to see that they are compatible. For 
+% example, say there is a 'column_vector' type of variables used in the 
+% function that is always a N x 1 array; if someone had a variable called 
+% "test_example", one could check that this fit the 'column_vector' type 
+% by calling 
+% fcn_MapGen_checkInputsToFunctions(test_example,'column_vector'). This 
+% function would then check that the array was N x 1, and if it was not, 
+% it would send out an error warning.
+% 
 % FORMAT:
-%
-%      fcn_MapGen_checkInputsToFunctions(...
-%      variable,variable_type_string,(optional_arguments))
-%
+% 
+%    [ ...
+%    (AllowableInputs) ...
+%    ] = ...
+%    fcn_MapGen_checkInputsToFunctions( ...
+%    variable, ...
+%    variable_type_string, ...
+%    (required_length), ...
+%    (fig_num) ...
+%    )
+% 
 % INPUTS:
+% 
+%     variable: the variable to check
+% 
+%     variable_type_string: a string representing the variable type to 
+%     check. Call the function with any figure number to see allowable 
+%     options.
+% 
+%     (optional inputs)
 %
-%      variable: the variable to check
-%
-%      variable_type_string: a string representing the variable type to
-%      check. The current strings include:
-%
-%            'column_of_numbers' - checks that the input type is N x 1 and
-%            is a number. Optional input: an integer forcing the value
-%            of N, giving an error if the input variable does not have
-%            length N.
-%
-%            '2column_of_numbers' - checks that the input type is N x 2 and
-%            is a number. Optional input: an integer forcing the value
-%            of N, giving an error if the input variable does not have
-%            length N. Another optional input is a rwo vector [A B] where,
-%            if B is greater than A, then the vector must be A or longer.
-%            If B is less than A, then the vector must be A or shorter. If
-%            B = A, then the vector must be length A, and no shorter or
-%            greater.
-%
-%            '4column_of_numbers' - checks that the input type is N x 4 and
-%            is a number. Optional input: an integer forcing the value
-%            of N, giving an error if the input variable does not have
-%            length N. Another optional input is a rwo vector [A B] where,
-%            if B is greater than A, then the vector must be A or longer.
-%            If B is less than A, then the vector must be A or shorter. If
-%            B = A, then the vector must be length A, and no shorter or
-%            greater.
-%
-%            '2or3column_of_numbers'  - checks that the input type is N x 2
-%            or N x 3 and is a number. Optional input: an integer forcing
-%            the value of N, giving an error if the input variable does not
-%            have length N. Another optional input is a rwo vector [A B]
-%            where, if B is greater than A, then the vector must be A or
-%            longer. If B is less than A, then the vector must be A or
-%            shorter. If B = A, then the vector must be length A, and no
-%            shorter or greater.
-%
-%            '2column_of_integers' - checks that the input type is N x 2
-%            and is an integer. Optional input: an integer forcing the
-%            value of N, giving an error if the input variable does not
-%            have length N. Another optional input is a rwo vector [A B]
-%            where, if B is greater than A, then the vector must be A or
-%            longer. If B is less than A, then the vector must be A or
-%            shorter. If B = A, then the vector must be length A, and no
-%            shorter or greater.
-%
-%             'polytopes' - a 1-by-n seven field structure of polytopes
-%             within the boundaries, where n <= number of polytopes with
-%             fields: 
-%             vertices: a m+1-by-2 matrix of xy points with row1 =
-%             rowm+1, where m is the number of the individual polytope
-%             vertices 
-%             xv: a 1-by-m vector of vertice x-coordinates 
-%             yv: a 1-by-m vector of vertice y-coordinates 
-%             distances: a 1-by-m vector of perimeter distances from one
-%             point to the next point, distances(i) = distance from
-%             vertices(i) to vertices(i+1)
-%             mean: centroid xy coordinate of the polytope
-%             area: area of the polytope
-%             max_radius: the largest distance from the centroid to any
-%             vertex
-%
-%
-%      Note that the variable_type_string is not case sensitive: for
-%      example, 'station' and 'Station' or 'STAtion' all give the same
-%      result.
-%
+%     required_length: an integer forcing the value of N, giving an error 
+%     if the input variable does not have length N. Another optional input 
+%     is a rwo vector [A B] where, if B is greater than A, then the vector 
+%     must be A or longer. If B is less than A, then the vector must be A 
+%     or shorter. If B = A, then the vector must be length A, and no 
+%     shorter or greater.
+% 
+%     fig_num: any number that acts somewhat like a figure number output. 
+%     If given, this forces the variable types to be displayed as output 
+%     and as well makes the input check process verbose.
+% 
+% 
 % OUTPUTS:
+% 
+%     (optional outputs)
 %
-%      No explicit outputs, but produces MATLAB error outputs if conditions
-%      not met, with explanation within the error outputs of the problem.
-%
+%     AllowableInputs: This is a structure output that lists all the 
+%     allowable types, and a description of each. As well, if the output 
+%     argument is given, the same information is printed within the 
+%     workspace.
+% 
+% 
+% DEPENDENCIES:
+% 
+%    (none)
+% 
 % EXAMPLES:
-%
+% 
 % See the script: script_test_fcn_MapGen_checkInputsToFunctions
 % for a full test suite.
-%
-% DEPENDENCIES:
-%
-%      Uses MATLABs dbstack feature to trace dependencies 
-%
-% This function was written on 2021_01_06 by S. Brennan
-% Questions or comments? sbrennan@psu.edu
+% 
+% This function was written on 2021_06_20 by S. Brennan
+% Questions or comments? contact sbrennan@psu.edu
 
-% Revision history:
-%      2021_06_06:
-%      -- first write of the code copying functionality from fcn_Path_checkInputsToFunctions
+% 
+% REVISION HISTORY:
+% 
+% 2021_06_20 by S. Brennan
+% -- first write of function
 
-% TO-DO:
-% -- finish polytope checks for completeness
-% -- add polytopes and 4column_of_numbers to test script
+% 
+% TO DO:
+% 
+% -- fill in to-do items here.
 
-flag_do_debug = 0; % Flag to debug the results
-flag_do_plot = 0; % Flag to plot the results
-flag_check_inputs = 1; % Flag to perform input checking
+%% Debugging and Input checks
+flag_check_inputs = 1; % Set equal to 1 to check the input arguments 
+flag_do_plot = 0;      % Set equal to 1 for plotting 
+flag_do_debug = 0;     % Set equal to 1 for debugging 
 
 if flag_do_debug
+    fig_for_debug = 159;
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-end
+end 
 
-
-%% check input arguments
+%% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   _____                   _
 %  |_   _|                 | |
@@ -137,17 +113,19 @@ end
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-if flag_check_inputs == 1   
+
+if 1 == flag_check_inputs
+
     % Are there the right number of inputs?
-    if nargin < 2 || nargin > 3
+    if nargin < 2 || nargin > 4
         error('Incorrect number of input arguments')
     end
-    
-    % Check the string input, make sure it is characters
+
+    % Check the variable_type_string input, make sure it is characters
     if ~ischar(variable_type_string)
-        error('The variable_type_string input must be a string type, for example: ''Path'' ');
+       error('The variable_type_string input must be a string type, for example: ''Path'' ');
     end
-    
+ 
 end
 
 %% Start of main code
@@ -160,241 +138,38 @@ end
 %  |_|  |_|\__,_|_|_| |_|
 %
 %See: http://patorjk.com/software/taag/#p=display&f=Big&t=Main
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
+
+
+
+
 
 % Grab the variable name
 variable_name = inputname(1);
 
-
-%% column_of_numbers
-if strcmpi(variable_type_string,'column_of_numbers')
-    % Check the station input
-    if (length(variable(1,:))~=1) || ~isnumeric(variable)
-        error('The %s input must be a column vector type, namely an N x 1 vector with N>=1',variable_name);
-    end
-    
-    if any(isnan(variable),'all')
-        error('The %s input must be a column vector type, namely an N x 1 vector that has no NaN values.',variable_name);
-    end
-    
-    if nargin == 3
-        required_length = varargin{1};
-        if length(variable(:,1))~=required_length
-            error('The %s input must be a column vector (N x 1) with N == %.0d',variable_name,required_length);
-        end
-    end
+% Check to see if output argument given
+if nargout>0
+    varargout{1}= INTERNAL_fcn_showPossibleFields;
+    return
 end
 
-%% 2column_of_numbers
-if strcmpi(variable_type_string,'2column_of_numbers')
-    % Check the station input
-    if (length(variable(1,:))~=2) || ~isnumeric(variable)
-        error('The %s input must be a 2column_of_numbers type, namely an N x 2 vector with N>=1',variable_name);
-    end
-    
-    if any(isnan(variable),'all')
-        error('The %s input must be a 2column_of_numbers type, namely an N x 2 vector that has no NaN values.',variable_name);
-    end
-    
-    if nargin == 3
-        required_length = varargin{1};
-        if length(required_length(1,:))==1
-            if length(variable(:,1))~=required_length
-                error('The %s input must be a 2column_of_numbers, namely (N x 2) with N == %.0d',variable_name,required_length);
-            end
-        else
-            if required_length(1,2)>required_length(1,1)
-                min_length = required_length(1,1);
-                if length(variable(:,1))<min_length
-                    error('The %s input must be a 2column_of_numbers, namely (N x 2) with N >= %.0d',variable_name,min_length);
-                end
-            elseif required_length(1,2)<required_length(1,1)
-                max_length = required_length(1,1);
-                if length(variable(:,1))>max_length
-                    error('The %s input must be a 2column_of_numbers, namely (N x 2) with N <= %.0d',variable_name,max_length);
-                end
-            else % It has to be equal
-                required_length = required_length(1,1);
-                if length(variable(:,1))~=required_length
-                    error('The %s input must be a 2column_of_numbers, namely (N x 2) with N = %.0d',variable_name,required_length);
-                end
-            end
-        end
-    end
+% Set default flags all to "off" mode
+flags = INTERNAL_fcn_setDefaultFlagsToOff;
+
+% See if special inputs:
+if nargin == 3
+    flags.check_requiredRowLength = 1;     % Must check for required length
+    flags.rowLengthRangeRequired = varargin{1}; % Set to [x y]. Variable must be x or greater if y>x, =x if y=x, x or less if y<x
 end
 
-%% 4column_of_numbers
-if strcmpi(variable_type_string,'4column_of_numbers')
-    % Check the length of input
-    if (length(variable(1,:))~=4) || ~isnumeric(variable)
-        error('The %s input must be a 4column_of_numbers type, namely an N x 4 vector with N>=1',variable_name);
-    end
-    
-    if any(isnan(variable),'all')
-        error('The %s input must be a 4column_of_numbers type, namely an N x 4 vector that has no NaN values.',variable_name);
-    end
-    
-    if nargin == 3
-        required_length = varargin{1};
-        if length(required_length(1,:))==1
-            if length(variable(:,1))~=required_length
-                error('The %s input must be a 4column_of_numbers, namely (N x 4) with N == %.0d',variable_name,required_length);
-            end
-        else
-            if required_length(1,2)>required_length(1,1)
-                min_length = required_length(1,1);
-                if length(variable(:,1))<min_length
-                    error('The %s input must be a 4column_of_numbers, namely (N x 4) with N >= %.0d',variable_name,min_length);
-                end
-            elseif required_length(1,2)<required_length(1,1)
-                max_length = required_length(1,1);
-                if length(variable(:,1))>max_length
-                    error('The %s input must be a 4column_of_numbers, namely (N x 4) with N <= %.0d',variable_name,max_length);
-                end
-            else % It has to be equal
-                required_length = required_length(1,1);
-                if length(variable(:,1))~=required_length
-                    error('The %s input must be a 4column_of_numbers, namely (N x 4) with N = %.0d',variable_name,required_length);
-                end
-            end
-        end
-    end
-end
+% Grab flag settings for current input
+flags = INTERNAL_fcn_setFlagsByType(flags,variable_type_string);
 
-%% 2or3column_of_numbers
-if strcmpi(variable_type_string,'2or3column_of_numbers')
-    % Check the station input
-    if ((length(variable(1,:))<2) || (length(variable(1,:))>3)) || ~isnumeric(variable)
-        error('The %s input must be a 2or3column_of_numbers type, namely an N x 2 or N x 3 vector with N>=1',variable_name);
-    end
-    
-    if any(isnan(variable),'all')
-        error('The %s input must be a 2or3column_of_numbers type, namely an N x 2 or N x 3 vector that has no NaN values.',variable_name);
-    end
-    
-    % Is there a specified required length?
-    if nargin == 3
-        required_length = varargin{1};
-        if length(required_length(1,:))==1
-            if length(variable(:,1))~=required_length
-                error('The %s input must be a 2or3column_of_numbers, namely (N x 2) or (N x 3) with N == %.0d',variable_name,required_length);
-            end
-        else
-            if required_length(1,2)>required_length(1,1)
-                min_length = required_length(1,1);
-                if length(variable(:,1))<min_length
-                    error('The %s input must be a 2or3column_of_numbers, namely (N x 2) or (N x 3) with N >= %.0d',variable_name,min_length);
-                end
-            elseif required_length(1,2)<required_length(1,1)
-                max_length = required_length(1,1);
-                if length(variable(:,1))>max_length
-                    error('The %s input must be a 2or3column_of_numbers, namely (N x 2) or (N x 3) with N <= %.0d',variable_name,max_length);
-                end
-            else % It has to be equal
-                required_length = required_length(1,1);
-                if length(variable(:,1))~=required_length
-                    error('The %s input must be a 2or3column_of_numbers, namely (N x 2) or (N x 3) with N = %.0d',variable_name,required_length);
-                end
-            end
-        end
-    end
-end
+% Check that variable meets requirements
+INTERNAL_confirmVariable(flags,variable,variable_name);
 
-%% 2column_of_integers
-if strcmpi(variable_type_string,'2column_of_integers')
-    % Check the station input
-    if (length(variable(1,:))~=2) 
-        error('The %s input must be a 2column_of_integers type, namely an N x 2 vector with N>=1. The number of columns is not 2.',variable_name);
-    end
-    
-    if ~all(round(variable)==variable)
-        error('The %s input must be a 2column_of_integers type, namely an N x 2 vector with N>=1. A non-integer type was found.',variable_name);
-    end
-    
-    if any(isnan(variable),'all')
-        error('The %s input must be a 2column_of_integers type, namely an N x 2 vector that has no NaN values.',variable_name);
-    end
-    
-    if nargin == 3
-        required_length = varargin{1};
-        if length(required_length(1,:))==1
-            if length(variable(:,1))~=required_length
-                error('The %s input must be a 2column_of_integers, namely (N x 2) with N == %.0d',variable_name,required_length);
-            end
-        else
-            if required_length(1,2)>required_length(1,1)
-                min_length = required_length(1,1);
-                if length(variable(:,1))<min_length
-                    error('The %s input must be a 2column_of_integers, namely (N x 2) with N >= %.0d',variable_name,min_length);
-                end
-            elseif required_length(1,2)<required_length(1,1)
-                max_length = required_length(1,1);
-                if length(variable(:,1))>max_length
-                    error('The %s input must be a 2column_of_integers, namely (N x 2) with N <= %.0d',variable_name,max_length);
-                end
-            else % It has to be equal
-                required_length = required_length(1,1);
-                if length(variable(:,1))~=required_length
-                    error('The %s input must be a 2column_of_integers, namely (N x 2) with N = %.0d',variable_name,required_length);
-                end
-            end
-        end
-    end
-end
 
-%% polytopes
-if strcmpi(variable_type_string,'polytopes')
-    % Check the polytopes subfields exist
-    %             vertices: a m+1-by-2 matrix of xy points with row1 =
-    %             rowm+1, where m is the number of the individual polytope
-    %             vertices
-    %             xv: a 1-by-m vector of vertice x-coordinates
-    %             yv: a 1-by-m vector of vertice y-coordinates
-    %             distances: a 1-by-m vector of perimeter distances from one
-    %             point to the next point, distances(i) = distance from
-    %             vertices(i) to vertices(i+1)
-    %             mean: centroid xy coordinate of the polytope
-    %             area: area of the polytope
-    try
-        vertices        = variable(1).vertices;
-        xv              = variable(1).xv;
-        yv              = variable(1).yv;
-        distances       = variable(1).distances;
-        mean            = variable(1).mean;
-        area            = variable(1).area;
-        max_radius      = variable(1).max_radius;
-    catch
-        error('The %s input must be a polytopes type, namely being a structure with fields: vertices, xv, yv, distances, mean, area, max_radius. One or more of the fields were not found. ',variable_name);
-    end
-    
-    % Check that all are numeric
-    if  ...
-            ~isnumeric(vertices) || ...
-            ~isnumeric(xv) || ...
-            ~isnumeric(yv) ||  ...
-            ~isnumeric(distances) || ...
-            ~isnumeric(mean) || ...
-            ~isnumeric(area) || ...
-            ~isnumeric(max_radius)
-        error('The %s input must be a polytope type. All the fields must be numeric, but at least one data field is non-numeric.',variable_name);
-    end
-    
-    %     % Check that all are 1-dimensional columns
-    %     if (length(X_central(1,:))~=1) || (length(Y_central(1,:))~=1) || (length(Z_central(1,:))~=1) ||  (length(Station_central(1,:))~=1)
-    %         error('The %s input must be a traversal type, namely a structure with fields X, Y, Z, and Station, each N x 1 numeric arrays. At least one data field has multiple columns.',variable_name);
-    %     end
-    %
-    %     % Check that their lengths are all the same
-    %     if (length(X_central(:,1))~=length(Y_central(:,1))) || ((length(X_central(:,1))~=length(Z_central(:,1))))  || ((length(X_central(:,1))~=length(Station_central(:,1))))
-    %         error('The %s input must be a traversal type, namely a structure with fields X, Y, Z, and Station, each N x 1 numeric arrays. The lengths do not match.',variable_name);
-    %     end
-    %
-    %     % Make sure the station field is sorted
-    %     if ~issorted(Station_central,'strictascend')
-    %         error('The Station field on the %s input must be strictly increasing',variable_name);
-    %     end
-end
-
+%
 
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -407,16 +182,240 @@ end
 %                            __/ |
 %                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
 if flag_do_plot
     % Nothing to plot here
-end % Ends the flag_do_plot if statement
+end % Ends the flag_do_plot if statement    
 
 if flag_do_debug
-    fprintf(1,'The variable: %s was checked that it meets type: %s, and no errors were detected.\n',variable_name,variable_type_string);
+    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
 end
-if flag_do_debug
-    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file); 
-end
+
 
 end % Ends the function
+
+%% Functions follow
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   ______                _   _                 
+%  |  ____|              | | (_)                
+%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___ 
+%  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
+%  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
+%  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
+%                                               
+% See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
+
+
+function flags = INTERNAL_fcn_setDefaultFlagsToOff
+% Set default flags all to "off" mode
+flags.check_if_isnumeric = 0; % Check to see if isnumeric
+flags.check_required_columns  = 0; % Check the number of columns
+flags.minNrequiredcolumns  = 0; % No check
+flags.maxNrequiredcolumns  = 0; % No check
+flags.check_if_noNaN = 0; % Check that there are no NaN 
+flags.check_if_integer = 0; % Check that the variable is an integer
+flags.check_requiredRowLength = 0;     % Don't check for required length
+flags.rowLengthRangeRequired = [0 0]; % Set to [x y]. Variable must be x or greater if y>x, =x if y=x, x or less if y<x
+flags.check_likeStructure = 0; % Check that result is like a particular structure
+template_structure = ...
+    struct(...
+    'vertices',[],...
+    'xv',[],...
+    'yv',[],...
+    'distances',[],...
+    'mean',[],...
+    'area',[],...
+    'max_radius',[]);
+flags.structureToBeLike = template_structure;
+end
+
+%%
+function flags = INTERNAL_fcn_setFlagsByType(flags, variable_type_string)
+
+% column_of_numbers
+if strcmpi(variable_type_string,'column_of_numbers')
+    flags.check_if_isnumeric = 1; % Must be a number
+    flags.check_required_columns  = 1; % Check the number of columns
+    flags.minNrequiredcolumns  = 1; % Must be 1 columns
+    flags.maxNrequiredcolumns  = 1; % Must be 1 columns
+    flags.check_if_noNaN = 1; % Check that there are no NaN
+end
+
+% 2column_of_numbers
+if strcmpi(variable_type_string,'2column_of_numbers')
+   flags.check_if_isnumeric = 1; % Must be a number
+    flags.check_required_columns  = 1; % Check the number of columns
+    flags.minNrequiredcolumns  = 2; % Must be 2 columns
+    flags.maxNrequiredcolumns  = 2; % Must be 2 columns
+    flags.check_if_noNaN = 1; % Check that there are no NaN
+end
+
+% 4column_of_numbers
+if strcmpi(variable_type_string,'4column_of_numbers')
+    flags.check_if_isnumeric = 1; % Must be a number
+    flags.check_required_columns  = 1; % Check the number of columns
+    flags.minNrequiredcolumns  = 4; % Must be 4 columns
+    flags.maxNrequiredcolumns  = 4; % Must be 4 columns
+    flags.check_if_noNaN = 1; % Check that there are no NaN
+end
+
+% 2or3column_of_numbers
+if strcmpi(variable_type_string,'2or3column_of_numbers')
+    flags.check_if_isnumeric = 1; % Must be a number
+    flags.check_required_columns  = 1; % Check the number of columns
+    flags.minNrequiredcolumns  = 2; % Must be 4 columns
+    flags.maxNrequiredcolumns  = 3; % Must be 4 columns
+    flags.check_if_noNaN = 1; % Check that there are no NaN
+end
+
+% 2column_of_integers
+if strcmpi(variable_type_string,'2column_of_integers')
+    flags.check_if_isnumeric = 1; % Must be a number
+    flags.check_if_integer = 1; % Check that the variable is an integer
+    flags.check_required_columns  = 1; % Check the number of columns
+    flags.minNrequiredcolumns  = 2; % Must be 4 columns
+    flags.maxNrequiredcolumns  = 2; % Must be 4 columns
+    flags.check_if_noNaN = 1; % Check that there are no NaN
+end
+
+% polytopes
+if strcmpi(variable_type_string,'polytopes')
+    flags.check_likeStructure = 1; % Check that result is like a particular structure
+    template_structure = ...
+        struct(...
+        'vertices',[],...
+        'xv',[],...
+        'yv',[],...
+        'distances',[],...
+        'mean',[],...
+        'area',[],...
+        'max_radius',[]);
+    flags.structureToBeLike = template_structure;
+end
+   
+end % Ends INTERNAL_fcn_setFlagsByType
+
+function INTERNAL_confirmVariable(flags,variable,variable_name)
+
+% Numeric?
+if flags.check_if_isnumeric   
+    if ~isnumeric(variable)
+        error('The %s input must be numeric.',variable_name);
+    end
+end
+
+% NaN?
+if flags.check_if_noNaN   
+    if any(isnan(variable),'all')
+        error('The %s input must have no NaN values.',variable_name);
+    end
+end
+
+% Integer?
+if flags.check_if_integer   
+    if ~all(round(variable)==variable)
+        error('The %s input must be an integer.',variable_name);
+    end
+end
+
+% Column length?
+if flags.check_required_columns    
+    if flags.minNrequiredcolumns==0
+        error('Need to set minimum number of columns for variable type: %s.',variable_name);
+    end
+    if flags.maxNrequiredcolumns==0
+        error('Need to set maximum number of columns for variable type: %s.',variable_name);
+    end
+    
+    % Exactly a number of columns?
+    if flags.minNrequiredcolumns==flags.maxNrequiredcolumns
+        if length(variable(1,:))~=flags.minNrequiredcolumns
+            error('The %s input must have exactly %.0d columns.',variable_name,flags.minNrequiredcolumns);
+        end
+    end
+    
+    % A minimum number of columns
+    if length(variable(1,:))<flags.minNrequiredcolumns
+        error('The %s input must have at least %.0d columns.',variable_name,flags.minNrequiredcolumns);
+    end
+
+    % A maximum number of columns
+    if length(variable(1,:))>flags.maxNrequiredcolumns
+        error('The %s input must have no more than %.0d columns.',variable_name,flags.maxNrequiredcolumns);
+    end
+    
+end
+
+% Row length?
+if flags.check_requiredRowLength    
+    required_length = flags.rowLengthRangeRequired;
+    if length(required_length(1,:))==1  % Exact, given number of rows
+        if length(variable(:,1))~=required_length
+            error('The %s input must have exactly %.0d rows',variable_name,required_length);
+        end
+    else
+        if required_length(1,2)>required_length(1,1) % Must be at least given number of rows, or more
+            min_length = required_length(1,1);
+            if length(variable(:,1))<min_length
+                error('The %s input must have %.0d rows or more',variable_name,min_length);
+            end
+        elseif required_length(1,2)<required_length(1,1) % Must be no more than given number of rows
+            max_length = required_length(1,1);
+            if length(variable(:,1))>max_length
+                error('The %s input must have no more than %.0d rows',variable_name,max_length);
+            end
+        else % It has to be equal
+            required_length = required_length(1,1);
+            if length(variable(:,1))~=required_length
+                error('The %s input must have %.0d rows or more',variable_name,required_length);
+            end
+        end
+    end
+end
+
+% Structure?
+if flags.check_likeStructure 
+    template_fields = fieldnames(flags.structureToBeLike);
+    reference_fields = fieldnames(variable);
+    if ~isequal(template_fields,reference_fields)
+        error('The %s input must be a structure type. All the fields must be match the reference structure.',variable_name);
+    end
+    
+end 
+    
+
+end % Ends INTERNAL_confirmVariable
+
+function allowable_inputs = INTERNAL_fcn_showPossibleFields
+num_inputs = 0;
+
+num_inputs = num_inputs+1;
+allowable_inputs(num_inputs).name = 'column_of_numbers';
+allowable_inputs(num_inputs).description = 'checks that the input type is N x 1 and is a number. Optional input: an integer forcing the value of N, giving an error if the input variable does not have length N.';
+
+num_inputs = num_inputs+1;
+allowable_inputs(num_inputs).name = '2column_of_numbers';
+allowable_inputs(num_inputs).description = 'checks that the input type is N x 2 and is a number. Optional input: an integer forcing the value of N, giving an error if the input variable does not have length N. Another optional input is a rwo vector [A B] where, if B is greater than A, then the vector must be A or longer. If B is less than A, then the vector must be A or shorter. If B = A, then the vector must be length A, and no shorter or greater.';
+
+num_inputs = num_inputs+1;
+allowable_inputs(num_inputs).name = '4column_of_numbers';
+allowable_inputs(num_inputs).description = 'checks that the input type is N x 4 and is a number. Optional input: an integer forcing the value of N, giving an error if the input variable does not have length N. Another optional input is a rwo vector [A B] where, if B is greater than A, then the vector must be A or longer. If B is less than A, then the vector must be A or shorter. If B = A, then the vector must be length A, and no shorter or greater.';
+
+num_inputs = num_inputs+1;
+allowable_inputs(num_inputs).name = '2or3column_of_numbers';
+allowable_inputs(num_inputs).description = 'checks that the input type is N x 2 or N x 3 and is a number. Optional input: an integer forcing the value of N, giving an error if the input variable does not have length N. Another optional input is a rwo vector [A B] where, if B is greater than A, then the vector must be A or longer. If B is less than A, then the vector must be A or shorter. If B = A, then the vector must be length A, and no shorter or greater.';
+
+num_inputs = num_inputs+1;
+allowable_inputs(num_inputs).name = '2column_of_integers';
+allowable_inputs(num_inputs).description = 'checks that the input type is N x 2 and is an integer. Optional input: an integer forcing the value of N, giving an error if the input variable does not have length N. Another optional input is a rwo vector [A B] where, if B is greater than A, then the vector must be A or longer. If B is less than A, then the vector must be A or shorter. If B = A, then the vector must be length A, and no shorter or greater.';
+
+num_inputs = num_inputs+1;
+allowable_inputs(num_inputs).name = 'polytopes';
+allowable_inputs(num_inputs).description = 'a 1-by-n seven field structure of polytopes within the boundaries, where n <= number of polytopes with fields:  vertices: a m+1-by-2 matrix of xy points with row1 = rowm+1, where m is the number of the individual polytope vertices  xv: a 1-by-m vector of vertice x-coordinates  yv: a 1-by-m vector of vertice y-coordinates  distances: a 1-by-m vector of perimeter distances from one point to the next point, distances(i) = distance from vertices(i) to vertices(i+1) mean: centroid xy coordinate of the polytope area: area of the polytope max_radius: the largest distance from the centroid to any vertex';
+end
+
+
 
