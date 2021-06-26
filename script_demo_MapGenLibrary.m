@@ -94,7 +94,7 @@ fcn_MapGen_plotPolytopes(tiled_polytopes,fig_num,'r',line_width,axis_limits);
 
 % remove the edge polytopes that extend past the high and low points
 fig_num = 23;
-xlow = 0; xhigh = 1; ylow = 0; yhigh = 1;
+xlow = 0.01; xhigh = 0.99; ylow = 0.01; yhigh = 0.99;
 bounding_box = [xlow ylow; xhigh yhigh];
 trimmed_polytopes = ...
     fcn_MapGen_polytopeCropEdges(tiled_polytopes,bounding_box,fig_num);

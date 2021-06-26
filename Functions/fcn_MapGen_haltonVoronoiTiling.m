@@ -144,7 +144,7 @@ seed_points = seed_points.*stretch;
 % V = V.*stretch;
 
 %% fill polytopes from tiling
-polytopes = INTERNAL_fcn_MapGen_createPolysFromTiling(seed_points,V,C);
+polytopes = INTERNAL_fcn_MapGen_generatePolysFromTiling(seed_points,V,C);
 
 
 %% Plot results?
@@ -180,7 +180,7 @@ end
 end % Ends the function
 
 
-function polytopes = INTERNAL_fcn_MapGen_createPolysFromTiling(seed_points,V,C)
+function polytopes = INTERNAL_fcn_MapGen_generatePolysFromTiling(seed_points,V,C)
 %% create tiling
 num_poly = size(seed_points,1);
 polytopes(num_poly) = ...
@@ -278,7 +278,7 @@ for poly = 1:num_poly % pull each cell from the voronoi diagram
         yv = cropped_vertices(:,2)';        
     end
 
-    % Are polytopes not trivial in length?
+    % Are polytopes not trivial in length? (This may not be needed)
     if length(xv)>2                
     
         % make sure cw

@@ -75,8 +75,8 @@ function [shrunk_polytopes,mu_final,sigma_final] = ...
 
 %% Debugging and Input checks
 flag_check_inputs = 1; % Set equal to 1 to check the input arguments
-flag_do_plot = 0;      %#ok<NASGU> % Set equal to 1 for plotting
-flag_do_debug = 1;     % Set equal to 1 for debugging
+flag_do_plot = 0;      % Set equal to 1 for plotting
+flag_do_debug = 0;     % Set equal to 1 for debugging
 
 if flag_do_debug
     fig_for_debug = 9453;
@@ -134,7 +134,6 @@ else
     if flag_do_debug
         fig = figure;
         fig_for_debug = fig.Number;
-        flag_do_plot = 1;
     end
 end
 
@@ -153,7 +152,7 @@ end
 old_max_radii = [polytopes.max_radius]';
 Nradii = length(old_max_radii);
 old_r_mu = mean(old_max_radii);
-old_r_sigma = std(old_max_radii);
+old_r_sigma = std(old_max_radii); %#ok<NASGU>
 
 if flag_do_debug
     fprintf(1,'Target distrubution statistics:\n');
@@ -184,21 +183,21 @@ new_r_dist = normrnd(des_radius,sigma_radius,[Nradii,1]);
 
 % adjust to ensure the mean value is mu. SETH: is this necessary?
 new_r_dist = new_r_dist + (des_radius-mean(new_r_dist)); 
-new_r_mu = mean(new_r_dist);
-new_r_sigma = std(new_r_dist);
+
 
 if flag_do_debug
-    
+    new_r_mu = mean(new_r_dist);
+    new_r_sigma = std(new_r_dist);
     fprintf(1,'Ideal distrubution statistics:\n');
     fprintf(1,'\tMean: %.4f\n',new_r_mu);
     fprintf(1,'\tStd dev: %.4f\n',new_r_sigma);
-
-   figure(fig_for_debug+2);  
-   histogram(new_r_dist,20)
-   title(sprintf('Histogram of target radii. Mean: %.4f, Std-dev: %.4f. Targets are: %.4f and %.4f',...
-       new_r_mu,new_r_sigma,...
-       des_radius,...
-       sigma_radius));
+    
+    figure(fig_for_debug+2);
+    histogram(new_r_dist,20)
+    title(sprintf('Histogram of target radii. Mean: %.4f, Std-dev: %.4f. Targets are: %.4f and %.4f',...
+        new_r_mu,new_r_sigma,...
+        des_radius,...
+        sigma_radius));
    
 end
 
