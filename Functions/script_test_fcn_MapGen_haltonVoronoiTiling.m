@@ -5,6 +5,13 @@
 % 2021_06_06 
 % -- first written by S. Brennan. 
 
+close all;
 fig_num = 1;
-polytopes = fcn_MapGen_haltonVoronoiTiling([1 1000],[1 1],fig_num);
+stretch = [1 1];
+polytopes = fcn_MapGen_haltonVoronoiTiling([1 1000],stretch,fig_num);
+
+%% Show that the stretch works
+fig_num = 2;
+stretch = [100 200];
+polytopes = fcn_MapGen_haltonVoronoiTiling([1 1000],stretch,fig_num);
 

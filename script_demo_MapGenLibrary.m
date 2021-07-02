@@ -10,6 +10,8 @@
 % -- Added other types of point generators
 
 % TO-DO:
+% -- rebase fcn_MapGen_cropPolytopeToRange
+% -- extract INTERNAL_fcn_MapGen_generatePolysFromTiling out of Halton Voronoi tiling 
 % -- Add positive input checking to fcn_MapGen_polytopesShrinkToRadius
 % -- Add ability to extend halton set to right (e.g. "scrolling" map)
 % -- finish the growth of polytopes functions, e.g. get these working with the library
@@ -155,4 +157,17 @@ fig_num = 7;
     axis_limits,...
     axis_style,...
     fill_info);
+
+
+%% Show how to expand one polytope
+fig_num = 8;
+
+one_polytope = fcn_MapGen_generateOneRandomPolytope;
+exp_polytopes=fcn_MapGen_polytopesExpandEvenly(one_polytope,delta,exp_dist,fig_num);
+
+%% Show how to expand many polytopes
+fig_num = 7;
+delta = 0.01; % Not used, need to deprecate this
+exp_dist = 0.01;
+exp_polytopes=fcn_MapGen_polytopesExpandEvenly(polytopes,delta,exp_dist,fig_num);
 

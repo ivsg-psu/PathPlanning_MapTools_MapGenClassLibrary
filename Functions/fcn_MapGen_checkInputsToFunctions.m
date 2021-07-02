@@ -378,9 +378,17 @@ end
 
 % Structure?
 if flags.check_likeStructure 
-    template_fields = fieldnames(flags.structureToBeLike);
-    reference_fields = fieldnames(variable);
+    template_fields = fieldnames(orderfields(flags.structureToBeLike));
+    reference_fields = fieldnames(orderfields(variable));
     if ~isequal(template_fields,reference_fields)
+        fprintf(1,'The template has fields of:\n');
+        for ith_field = 1:length(template_fields)
+            fprintf(1,'\t %s\n',string(template_fields(ith_field)));
+        end
+        fprintf(1,'The %s input has fields of:\n',variable_name);
+        for ith_field = 1:length(template_fields)
+            fprintf(1,'\t %s\n',string(reference_fields(ith_field)));
+        end
         error('The %s input must be a structure type. All the fields must be match the reference structure.',variable_name);
     end
     

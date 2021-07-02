@@ -76,7 +76,7 @@ flag_do_plot = 0;      % Set equal to 1 for plotting
 flag_do_debug = 0;     % Set equal to 1 for debugging 
 
 if flag_do_debug
-    fig_for_debug = 816;
+    fig_for_debug = 680;
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
 end 
@@ -150,8 +150,10 @@ for polys = 1:size(polytopes,2) % check each obstacle
     xvert = polytopes(polys).xv; % pull vertice values
     yvert = polytopes(polys).yv;
     numverts = length(polytopes(polys).xv); % find number of vertices
+    
+    
     xv = zeros(1,numverts); % pre-allocate xv and yv 
-    yv = xv;
+    yv = zeros(1,numverts); % pre-allocate xv and yv 
     for vert1 = 1:numverts % repeat for each vert
         %% assign 3 vertex indices
         if vert1 < numverts-1 
@@ -200,8 +202,6 @@ for polys = 1:size(polytopes,2) % check each obstacle
     exp_polytopes(polys).max_radius = max(sum((exp_polytopes(polys).vertices(1:end-1,:)-ones(length(xv),1)*exp_polytopes(polys).mean).^2,2).^0.5);
 end
 
-% 
-
 %§
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -218,7 +218,14 @@ end
 
 
 if flag_do_plot
-    % Nothing to plot here
+    LineWidth = 2;
+    fcn_MapGen_plotPolytopes(polytopes,fig_num,'r-',LineWidth);
+    fcn_MapGen_plotPolytopes(exp_polytopes,fig_num,'b-',LineWidth,'square');
+    legend('Original','Expanded')
+    box on
+    xlabel('X Position')
+    ylabel('Y Position')
+
 end % Ends the flag_do_plot if statement    
 
 if flag_do_debug

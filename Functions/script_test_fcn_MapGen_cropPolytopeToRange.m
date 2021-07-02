@@ -84,3 +84,19 @@ hold on;
 plot(verticies(:,1),verticies(:,2),'r-');
 plot(cropped_vertices(:,1),cropped_vertices(:,2),'g-');
 
+%% Points valid except infinity
+interior_point = [0.9404    0.0133];
+
+verticies = [
+    0.9512    0.0385
+       Inf       Inf
+    0.9275    0.0315
+    0.9318    0.0417];
+
+[cropped_vertices] = fcn_MapGen_cropPolytopeToRange(verticies,interior_point);
+
+figure(1);
+clf;
+hold on;
+plot(verticies(:,1),verticies(:,2),'r-');
+plot(cropped_vertices(:,1),cropped_vertices(:,2),'g-');

@@ -1,14 +1,50 @@
 % Scratch Paper Examples for Polytope Error Bubble Generation
-% Nick Carder
-% 3/26/21
+
+% Revision history:
+% 2021_03_26 - Nick Carder
+% -- First write of the function, 
+% 2021_06_28 - S. Brennan
+% -- Reworked to be compatible with MapGen library
+
+close all
+
+%% Set up workspace
+clear flag_was_run_before  % Force init to always run?
+
+if ~exist('flag_was_run_before','var')
+    
+    clc
+    close all
+    
+    % add necessary directories
+    addpath([pwd '\Functions'])
+    %     addpath([pwd '\GeomClassLibrary\Functions'])
+    %     addpath([pwd '\MapGenClassLibrary\Functions'])
+    %     addpath([pwd '\Plotting'])
+    %     addpath([pwd '\Map_Generation\polytope_generation'])
+    %     addpath([pwd '\Map_Generation\polytope_editing'])
+    %     addpath([pwd '\Map_Generation\polytope_calculation'])
+    
+    flag_was_run_before = 1;
+end
+
+
 
 %% Generating Error Bubbles and Plotting
 
 %determine the size of the map with stretch
 stretch = [200, 200]; % stretch in the x and y directions
+%stretch = [1, 1]; % stretch in the x and y directions
 
-%create polytopes
-polytopes = fcn_polytope_generation_halton_voronoi_tiling(1,1000,stretch);
+% %create polytopes
+% polytopes = fcn_polytope_generation_halton_voronoi_tiling(1,1000,stretch);
+
+% Generate a set of polytopes from the Halton set
+fig_num = 12;
+Halton_range = [1 1000]; % range of Halton points to use to generate the tiling
+polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,stretch,fig_num);
+title('Halton set');
+
 
 %plot polytopes to verify map size, polytopes will still be voronoi tiles
 fcn_plot_polytopes(polytopes,1,'b',2,[0 200 -100 100],'square');

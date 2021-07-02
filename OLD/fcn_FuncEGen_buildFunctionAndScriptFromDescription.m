@@ -409,7 +409,7 @@ if FuncEdetails.Flags.CheckInputs == 1
    fprintf(fid,'\n');
    
    fprintf(fid,'    %% Are there the right number of inputs?\n');        
-   fprintf(fid,'    if nargin < %.0d || nargin > %.0d\n',FuncEdetails.N_RequiredInputs,FuncEdetails.N_RequiredInputs+FuncEdetails.N_OptionalInputs);
+   fprintf(fid,'    if nargin < %d || nargin > %d\n',round(FuncEdetails.N_RequiredInputs),round(FuncEdetails.N_RequiredInputs+FuncEdetails.N_OptionalInputs)); 
    fprintf(fid,'        error(''Incorrect number of input arguments'')\n');
    fprintf(fid,'    end\n');
 
@@ -448,6 +448,26 @@ if FuncEdetails.Flags.CheckInputs == 1
    
    % Close the if statement
    fprintf(fid,'end\n');
+end
+
+% Print line break
+fprintf(fid,'\n');
+
+% Check to see if user wants to show the plots
+if FuncEdetails.Flags.DoPlot
+    fprintf(fid,'%% Does user want to show the plots?\n');
+    fprintf(fid,'if  %d== nargin\n',round(FuncEdetails.N_RequiredInputs+FuncEdetails.N_OptionalInputs));
+    fprintf(fid,'    fig_num = varargin{end};\n');
+    fprintf(fid,'    flag_do_plot = 1;\n');
+    if FuncEdetails.Flags.DoDebug        
+        fprintf(fid,'else\n');
+        fprintf(fid,'    if flag_do_debug\n');
+        fprintf(fid,'        fig = figure;\n');
+        fprintf(fid,'        fig_for_debug = fig.Number;\n');
+        fprintf(fid,'        flag_do_plot = 1;\n');
+        fprintf(fid,'    end\n');
+    end
+    fprintf(fid,'end\n');    
 end
 
 % Print line break

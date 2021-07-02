@@ -1,4 +1,4 @@
-function [cropped_vertices] = fcn_MapGen_cropPolytopeToRange(vertices, interior_point)
+function [cropped_vertices] = fcn_MapGen_cropPolytopeToRange(verticies, interior_point)
 
 flag_do_debug = 0;
 
@@ -6,121 +6,110 @@ flag_do_debug = 0;
 % -- allow user to enter the allowable range (hard-coded now to 0 to 1)
 % -- check that inrerior point is inside vertices
 
-% Remove any vertices that are infinite
-flag_is_finite = ~isinf(vertices(:,1)).*~isinf(vertices(:,2));
-vertices = vertices(flag_is_finite>0,:);
-    
-% Pad the vertices to wrap around. 
-vertices = [vertices; vertices(1,:)];
-start_verticies = vertices(1:end-1,:);
-end_verticies = vertices(2:end,:);
+% snap prior to closest wall
+box = [0 0 1 1]; % [xmin ymin xmax ymax]
 
-% Open the figure
+% Convert axis-aligned bounding box to wall format
+walls = [box(1,1) box(1,2); box(1,3) box(1,2); box(1,3) box(1,4); box(1,1) box(1,4); box(1,1) box(1,2)];
+
+% % FOR DEBUGGING
+% if flag_do_debug
+%     if(interior_point(1,1)<0.002)&&(interior_point(1,2)>0.965)
+%         disp('Stop here');
+%     end
+% end
+
+% Open the figure if doing debugging
 if flag_do_debug
     figure(1);
     clf;
     hold on;
+    
+    % Plot the vertices
+    plot(...
+        [verticies(:,1); verticies(1,1)],...
+        [verticies(:,2); verticies(1,2)],...
+        '-');
+    
+    % Plot the walls
+    plot(walls(:,1),walls(:,2),'k-');
+    
+    % Plot the interior point
+    plot(interior_point(:,1),interior_point(:,2),'ro');
+
+end
+
+% Are any verticies infinite? If so, we need to check that the adjacent
+% verticies will create a reasonable polytope. 
+verticies = INTERNAL_fcn_removeInfiniteVerticies(verticies,box);
+
+% Open the figure if doing debugging
+if flag_do_debug
+    % Plot the vertices
+    plot(...
+        [verticies(:,1); verticies(1,1)],...
+        [verticies(:,2); verticies(1,2)],...
+        '-');
 end
 
 % Nudge the interior point inward, if it is on a border
-if interior_point(1,1)<=0
-    interior_point(1,1) = 1e-8;
-elseif interior_point(1,1)>=1
-    interior_point(1,1) = 1 - 1e-8;
-end
-if interior_point(1,2)<=0
-    interior_point(1,2) = 1e-8;
-elseif interior_point(1,2)>=1
-    interior_point(1,2) = 1 - 1e-8;
-end
+interior_point = INTERNAL_fcn_nudgeInteriorPointInward(interior_point,box);
 
 if flag_do_debug
-    % Plot the interior point
+    % Plot the new interior point
     plot(interior_point(:,1),interior_point(:,2),'ro');
-    
-    % Plot the vertices
-    plot(vertices(:,1),vertices(:,2),'r-');
+
 end
 
-
-walls = [0 0; 1 0; 1 1; 0 1; 0 0];
-wall_start = walls(1:end-1,:);
-wall_end = walls(2:end,:);
-
-if flag_do_debug
-    % Plot the walls
-    plot(walls(:,1),walls(:,2),'k-');
-end
-
-% Fill in blank all_points as starter
-all_points = [];
-
-flag_was_intersection = 0;
-% Find all intersection points
-for ith_point = 1:length(start_verticies(:,1))
-    all_points = [all_points; start_verticies(ith_point,:)]; %#ok<AGROW>
-    
-    sensor_vector_start = start_verticies(ith_point,:);
-    sensor_vector_end = end_verticies(ith_point,:);
-    
-    [distance,location,~] = ...
-        INTERNAL_fcn_geometry_findIntersectionOfSegments(...
-        wall_start,...
-        wall_end,...
-        sensor_vector_start,...
-        sensor_vector_end,2);
-    
-    if ~isnan(distance)
-        all_points = [all_points; location]; %#ok<AGROW>
-        flag_was_intersection = 1;
-    end
-   
-end
-
-% Get rid of duplicates (occurs when two points are both on edges)
-indices_not_repeated = [~all(abs(diff(all_points))<eps*10,2); 1];
-all_points = all_points(indices_not_repeated>0,:);
-
-% Check for the enclosing case
-flag_vertices_outside = ((vertices(:,1)>=1) + (vertices(:,1)<=0)).*((vertices(:,2)>=1) + (vertices(:,2)<=0));
-if all(flag_vertices_outside) && (flag_was_intersection==0)
-    cropped_vertices = walls(1:end-1,:);
-    return;
-end
+% Sometimes the polytopes intersect the box boundaries. We can artificially
+% add these border crossings as extra points so that we can project the
+% polytope correctly back onto walls (in a later step).
+[all_points, flag_was_intersection] = INTERNAL_fcn_findAllPoints(verticies,walls);
 
 if flag_do_debug
     % Plot the all_points locations
     plot(all_points(:,1),all_points(:,2),'kx');
 end
 
-% From the interior point, project all_points back onto the wall.
-projected_points = 0*all_points;
-for ith_point = 1:length(all_points(:,1))
-    
-    sensor_vector_start = interior_point;
-    sensor_vector_end = all_points(ith_point,:);
-    
-    [distance,location,~] = ...
-        INTERNAL_fcn_geometry_findIntersectionOfSegments(...
-        wall_start,...
-        wall_end,...
-        sensor_vector_start,...
-        sensor_vector_end);
-    
-    if ~isnan(distance)
-        projected_points(ith_point,:) = location;
-    else
-        projected_points(ith_point,:) = sensor_vector_end;
-    end
-    
+% Check for the enclosing case where the polytope goes completely around
+% the bounding box (e.g. bounding box is INSIDE the polytope!?!). In this
+% case, there will be no projection, and so we should just exit.
+flag_vertices_outside = ((verticies(:,1)>=1) + (verticies(:,1)<=0)).*((verticies(:,2)>=1) + (verticies(:,2)<=0));
+if all(flag_vertices_outside) && (flag_was_intersection==0)
+    cropped_vertices = walls;
+    return;
 end
+
+% From the interior point, project all_points back onto the wall to create
+% a polytope limited by the bounding box.
+projected_points = INTERNAL_fcn_projectAllPointsOntoWalls(interior_point, all_points,walls);
 
 if flag_do_debug
     % Plot the projected_points locations
     plot(projected_points(:,1),projected_points(:,2),'go-');
 end
 
+% Use the cross-product to eliminate co-linear points, as sometimes the
+% above process generates multiple points in a line, which is technically
+% not a polytope.
+cropped_vertices = INTERNAL_fcn_cropRepeatedPoints(projected_points);
+
+% Sometimes the cross-product step above removes the repeated last vertex.
+% So we may have to fix this
+if ~isequal(cropped_vertices(1,:),cropped_vertices(end,:))
+    cropped_vertices = [cropped_vertices; cropped_vertices(1,:)];
+end
+
+if flag_do_debug
+    % Plot the projected_points locations
+    plot(cropped_vertices(:,1),cropped_vertices(:,2),'mo-');
+end
+
+end
+
+function cropped_vertices = INTERNAL_fcn_cropRepeatedPoints(projected_points)
 % Use the cross-product to eliminate co-linear points
+
 Npoints = length(projected_points(:,1));
 good_indices = zeros(Npoints,1);
 
@@ -148,14 +137,175 @@ end
 % Final polytope
 cropped_vertices = projected_points(good_indices>0,:);
 
-if flag_do_debug
-    % Plot the projected_points locations
-    plot(cropped_vertices(:,1),cropped_vertices(:,2),'mo-');
+end % Ends INTERNAL_fcn_cropRepeatedPoints
+
+
+
+function projected_points = INTERNAL_fcn_projectAllPointsOntoWalls(interior_point, all_points,walls)
+% From the interior point, project all_points back onto the wall.
+
+projected_points = 0*all_points;
+for ith_point = 1:length(all_points(:,1))
+    
+    % Define start and end of the sensor
+    sensor_vector_start = interior_point;
+    sensor_vector_end = all_points(ith_point,:);
+    
+    % Define the start and end of the walls
+    wall_start = walls(1:end-1,:);
+    wall_end = walls(2:end,:);
+    
+    [distance,location,~] = ...
+        INTERNAL_fcn_geometry_findIntersectionOfSegments(...
+        wall_start,...
+        wall_end,...
+        sensor_vector_start,...
+        sensor_vector_end);
+    
+    if ~isnan(distance)
+        projected_points(ith_point,:) = location;
+    else
+        projected_points(ith_point,:) = sensor_vector_end;
+    end
+    
+end
 end
 
+
+function [all_points, flag_was_intersection] = INTERNAL_fcn_findAllPoints(verticies,walls)
+
+% Pad the vertices to wrap around, so we don't miss the last wall
+verticies = [verticies; verticies(1,:)];
+start_verticies = verticies(1:end-1,:);
+end_verticies = verticies(2:end,:);
+
+
+% Fill in blank all_points as starter
+all_points = [];
+
+flag_was_intersection = 0;
+% Find all intersection points
+for ith_point = 1:length(start_verticies(:,1))
+    all_points = [all_points; start_verticies(ith_point,:)]; %#ok<AGROW>
+    
+    % Define start and end of the sensor
+    sensor_vector_start = start_verticies(ith_point,:);
+    sensor_vector_end = end_verticies(ith_point,:);
+    
+    % Define the start and end of the walls
+    wall_start = walls(1:end-1,:);
+    wall_end = walls(2:end,:);
+
+    % Call a function that determines where and if the sensor crosses the
+    % walls
+    [distance,location,~] = ...
+        INTERNAL_fcn_geometry_findIntersectionOfSegments(...
+        wall_start,...
+        wall_end,...
+        sensor_vector_start,...
+        sensor_vector_end,2);
+    
+    if ~isnan(distance)
+        all_points = [all_points; location]; %#ok<AGROW>
+        flag_was_intersection = 1;
+    end
+    
 end
 
+% Get rid of duplicates (occurs when two points are both on edges)
+indices_not_repeated = [~all(abs(diff(all_points))<eps*10,2); 1];
+all_points = all_points(indices_not_repeated>0,:);
 
+end % Ends INTERNAL_fcn_findAllPoints
+
+
+function interior_point = INTERNAL_fcn_nudgeInteriorPointInward(interior_point,box)
+% If the interior point is on the edge of the box, or even outside, this
+% nudges the interior point to the true interior.
+
+nudge = 1e-8;
+
+if interior_point(1,1)<=box(1,1)
+    interior_point(1,1) = nudge;
+elseif interior_point(1,1)>=box(1,3)
+    interior_point(1,1) = 1 - nudge;
+end
+if interior_point(1,2)<=box(1,2)
+    interior_point(1,2) = nudge;
+elseif interior_point(1,2)>=box(1,4)
+    interior_point(1,2) = 1 - nudge;
+end
+end % Ends INTERNAL_fcn_nudgeInteriorPointInward
+
+
+function verticies = INTERNAL_fcn_removeInfiniteVerticies(verticies,box)
+% Goes through the verticies and removes infinite values by inserting
+% points prior, and after the infinite one that "close" the polytope.
+
+if any(isinf(verticies),'all')
+    bad_indices = find(any(isinf(verticies),2));
+    
+    if length(bad_indices)>1
+        warning('More than 2 infinities found in one vector. Code may break');
+    end
+    
+    for ith_index = 1:length(bad_indices)
+        bad_index = bad_indices(ith_index);
+        
+        % Find the prior and next points relative to the bad index point
+        [prior_point, next_point, start_data, end_data] =...
+            INTERNAL_fcn_findPriorNextPoints(bad_index,verticies);
+     
+        new_prior = fcn_MapGen_snapToAABB(box,prior_point);
+        new_next  = fcn_MapGen_snapToAABB(box,next_point);
+                      
+        % Substitute data in, removing the infinite value
+        verticies = [start_data; new_prior; new_next; end_data];
+        
+    end
+end 
+
+% Remove any vertices that are infinite, if any still remain (there should
+% be none, so this is just in case)
+flag_is_finite = ~isinf(verticies(:,1)).*~isinf(verticies(:,2));
+verticies = verticies(flag_is_finite>0,:);
+
+end % Ends function INTERNAL_fcn_removeInfiniteVerticies
+
+
+
+
+function [prior_point, next_point, start_data, end_data] =...
+    INTERNAL_fcn_findPriorNextPoints(index,verticies)
+% Grab prior and next indices before and after an infinite value, being
+% careful to check for situations where the infinite index is at start or
+% end. Also creates vectors of points "start_data" and "end_data" which are
+% the points before and after the start/end indices (inclusive)
+Npoints = length(verticies(:,1));
+
+prior_index = index-1;
+next_index  = index+1;
+
+% Is the index at the start?
+if index == 1
+    prior_index = Npoints;
+    start_data = [];
+else
+    start_data = verticies(1:prior_index,:);
+end
+
+% Is the index at the end?
+if index == Npoints
+    next_index = 1;
+    end_data = [];
+else
+    end_data = verticies(next_index:end,:);
+end
+
+% Fill the next points
+prior_point = verticies(prior_index,:);
+next_point  = verticies(next_index,:);
+end % Ends INTERNAL_fcn_findPriorNextPoints
 
 
 function [distance,location,wall_that_was_hit] = ...

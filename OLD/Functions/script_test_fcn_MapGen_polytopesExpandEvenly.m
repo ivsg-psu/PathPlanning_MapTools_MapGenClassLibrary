@@ -24,7 +24,7 @@ delta = 0.01;
 exp_dist = 1;
 
 % Call the function
-exp_polytopes=fcn_MapGen_polytopesExpandEvenly(polytopes,delta,exp_dist);
+exp_polytopes=fcn_polytope_editing_expand_polytopes_evenly(polytopes,delta,exp_dist);
 
 
 % Plot the results
