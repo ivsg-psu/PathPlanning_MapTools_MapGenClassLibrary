@@ -1,35 +1,33 @@
 function [ ...
-snap_point ...
+Centroid, ...
+Area ...
 ] = ...
-fcn_MapGen_snapToAABB( ...
-axis_aligned_bounding_box, ...
-test_point, ...
+fcn_MapGen_polytopeCentroidAndArea( ...
+vertices, ...
 varargin...
 )
-% fcn_MapGen_snapToAABB
-% Given an axis-aligned bounding box (AABB), and a test point, returns a 
-% snap point representing the contact point on the closest wall to the 
-% test point.
+% fcn_MapGen_polytopeCentroidAndArea
+% calculates the centroid and area of a closed polytope.
 % 
 % 
 % 
 % FORMAT:
 % 
 %    [ ...
-%    snap_point ...
+%    Centroid, ...
+%    Area ...
 %    ] = ...
-%    fcn_MapGen_snapToAABB( ...
-%    axis_aligned_bounding_box, ...
-%    test_point, ...
+%    fcn_MapGen_polytopeCentroidAndArea( ...
+%    vertices, ...
 %    (fig_num) ...
 %    )
 % 
 % INPUTS:
 % 
-%     axis_aligned_bounding_box: the axis-aligned bounding box, in format 
-%     [xmin ymin xmax ymax]
-% 
-%     test_point: the test point, in format [x y]
+%     vertices: the list of verticies used to perform calculation, in 
+%     format [x y] where x and y are column vectors. X: x coordinates of 
+%     the polytope (with the same first and last point)  Y: y coordinates 
+%     of the polytope (with the same first and last point)
 % 
 %     (optional inputs)
 %
@@ -39,17 +37,20 @@ varargin...
 % 
 % OUTPUTS:
 % 
-%     snap_point: the resulting snap point, in format [x y]
+%     Centroid: the calculated centroid of the polytope, given as 
+%     [x-coordinate y_coordinate]
+% 
+%     Area: the unsigned area enclosed by the polytope
 % 
 % 
 % DEPENDENCIES:
 % 
-%     (none)
+%     fcn_MapGen_checkInputsToFunctions
 % 
 % 
 % EXAMPLES:
 % 
-% See the script: script_test_fcn_MapGen_snapToAABB
+% See the script: script_test_fcn_MapGen_polytopeCentroidAndArea
 % for a full test suite.
 % 
 % This function was written on 2021_07_02 by Sean Brennan
@@ -72,7 +73,7 @@ flag_do_plot = 0;      % Set equal to 1 for plotting
 flag_do_debug = 0;     % Set equal to 1 for debugging 
 
 if flag_do_debug
-    fig_for_debug = 22;
+    fig_for_debug = 361;
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
 end 
@@ -94,22 +95,18 @@ end
 if 1 == flag_check_inputs
 
     % Are there the right number of inputs?
-    if nargin < 2 || nargin > 3
+    if nargin < 1 || nargin > 2
         error('Incorrect number of input arguments')
     end
 
-    % Check the axis_aligned_bounding_box input, make sure it is '4column_of_numbers' type
+    % Check the vertices input, make sure it is '2column_of_numbers' type
     fcn_MapGen_checkInputsToFunctions(...
-        axis_aligned_bounding_box, '4column_of_numbers',1);
- 
-    % Check the test_point input, make sure it is '2column_of_numbers' type
-    fcn_MapGen_checkInputsToFunctions(...
-        test_point, '2column_of_numbers',1);
+        vertices, '2column_of_numbers');
  
 end
 
 % Does user want to show the plots?
-if  3== nargin
+if  2== nargin
     fig_num = varargin{end};
     flag_do_plot = 1;
 else
@@ -135,40 +132,44 @@ end
 
 
 
-center = [mean([axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,3)]),mean([axis_aligned_bounding_box(1,2) axis_aligned_bounding_box(1,4)])];
-vector = test_point - center;
-angle = atan2(vector(2),vector(1));
 
-snap_point = test_point;
-if angle>=-pi/4 && angle<pi/4  % This is the x-max wall
-    snap_point(1,1) = axis_aligned_bounding_box(1,3);
-elseif angle>=pi/4 && angle<pi*3/4 % This is the y-max wall
-    snap_point(1,2) = axis_aligned_bounding_box(1,4);
-elseif angle>=-3*pi/4 && angle<(-pi/4) % This is the y-min wall
-    snap_point(1,2) = axis_aligned_bounding_box(1,2);
-else % This is the x-min wall 
-    snap_point(1,1) = axis_aligned_bounding_box(1,1);
-end
+% Revision History:
+% 2021_02_23 by Seth Tau
+% -- Added comments
+% 2021_03_02 by Seth Tau
+% -- Removed old add path stuff on 
+% 2021_07_02
+% -- Cleaned up arguments a bit to compactify x,y coordinate convention
 
 
-figure(fig_num);
+% current points
+xi = vertices(1:end-1,1); 
+yi = vertices(1:end-1,2);
+
+% next points
+xip1 = vertices(2:end,1); 
+yip1 = vertices(2:end,2);
+
+% signed area
+A = sum(xi.*yip1 - xip1.*yi)/2; 
+
+% Centroid calculation
+Cx = sum((xi+xip1).*(xi.*yip1 - xip1.*yi))/(6*A); % centroid x coordinate
+Cy = sum((yi+yip1).*(xi.*yip1 - xip1.*yi))/(6*A); % centroid x coordinate
+Centroid = [Cx, Cy];
+
+Area = abs(A); % unsigned area
+
+% Plotting
+fig_num = 2222;
+figure(fig_num)
 clf;
-hold on;
-axis equal
-grid on;
+hold on
 
-% Plot the bounding box
-box_outline = [axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,2); axis_aligned_bounding_box(1,3) axis_aligned_bounding_box(1,2); axis_aligned_bounding_box(1,3) axis_aligned_bounding_box(1,4); axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,4); axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,2)];
-plot(box_outline(:,1),box_outline(:,2),'-');
+plot(vertices(:,1),vertices(:,2),'b-','linewidth',2)
 
-% Plot the test point
-plot(test_point(:,1),test_point(:,2),'o');
+plot(Cx,Cy,'go','Markersize',10)
 
-% Plot the snap point
-plot(snap_point(:,1),snap_point(:,2),'x');
-
-% Plot the snap point
-plot([test_point(:,1) snap_point(1,1)],[test_point(:,2) snap_point(:,2)],'-');
 % 
 
 %§
@@ -210,5 +211,3 @@ end % Ends the function
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
     
-end
-

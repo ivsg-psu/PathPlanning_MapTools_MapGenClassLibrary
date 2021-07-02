@@ -11,7 +11,7 @@ stretch = [1 1];
 polytopes = fcn_MapGen_haltonVoronoiTiling([1 1000],stretch,fig_num);
 
 %% Show that the stretch works
-fig_num = 2;
+fig_num = 200;
 stretch = [100 200];
 polytopes = fcn_MapGen_haltonVoronoiTiling([1 1000],stretch,fig_num);
 

@@ -144,7 +144,7 @@ seed_points = points_scrambled(low_pt:high_pt,:);
 % V = V.*stretch;
 
 %% fill polytopes from tiling
-polytopes = INTERNAL_fcn_MapGen_generatePolysFromTiling(seed_points,V,C,stretch);
+polytopes = fcn_MapGen_generatePolysFromTiling(seed_points,V,C,stretch);
 
 
 %% Plot results?
@@ -167,8 +167,16 @@ if flag_do_plot
     % plot the polytopes
     fcn_MapGen_plotPolytopes(polytopes,fig_num,'b',2);
 
-    % plot the seed points
-    plot(seed_points(:,1),seed_points(:,2),'r.','Markersize',10);
+    % plot the seed points in red
+    moved_seed_points = seed_points.*stretch;
+    plot(moved_seed_points(:,1),moved_seed_points(:,2),'r.','Markersize',10);
+    
+    % plot the means in black
+    temp = zeros(length(polytopes),2);
+    for ith_poly = 1:length(polytopes)
+        temp(ith_poly,:) = polytopes(ith_poly).mean;
+    end
+    plot(temp(:,1),temp(:,2),'ko','Markersize',3);
     
 end
 
@@ -179,94 +187,75 @@ end
 
 end % Ends the function
 
-%% create tiling
-function polytopes = INTERNAL_fcn_MapGen_generatePolysFromTiling(seed_points,V,C,stretch)
-
-flag_do_debug = 1;
-
-num_poly = size(seed_points,1);
-polytopes(num_poly) = ...
-    struct(...
-    'vertices',[],...
-    'xv',[],...
-    'yv',[],...
-    'distances',[],...
-    'mean',[],...
-    'area',[],...
-    'max_radius',[]);
-
-
-remove = 0; % keep track of how many cells to be removed
-for poly = 1:num_poly % pull each cell from the voronoi diagram
-    % x and y values from this cell
-    xv = V(C{poly},1)'; 
-    yv = V(C{poly},2)';
-    
-    verticies = V(C{poly},:);
-    interior_point = seed_points(poly,:);
-    
-    % Are any vertices outside the [0,1] range?
-    if any(xv>1) || any(yv>1) || any(xv<0) || any(yv<0)
-
-        % Crop vertices to allowable range
-        [cropped_vertices] = fcn_MapGen_cropPolytopeToRange(verticies, interior_point);
-        xv = cropped_vertices(1:end-1,1)';
-        yv = cropped_vertices(1:end-1,2)'; 
-    else
-        
-    end 
-
-    % Are polytopes not trivial in length? (This may not be needed)
-    if length(xv)>2                
-    
-        % make sure cw
-        vec1 = [xv(2)-xv(1),yv(2)-yv(1),0]; % vector leading into point
-        vec2 = [xv(3)-xv(2),yv(3)-yv(2),0]; % vector leading out of point
-        xing = cross(vec1,vec2); % cross product of two vectors
-        if sign(xing(3)) == -1 % points ordered in wrong direction
-            xv = fliplr(xv);
-            yv = fliplr(yv);
-        end
-        
-        % enter info into polytope structure
-        polytopes(poly-remove).xv = xv;
-        polytopes(poly-remove).yv = yv;
-        polytopes(poly-remove).vertices = [[xv xv(1)]' [yv yv(1)]']; % repeat first vertice for easy plotting
-        
-        [Cx,Cy,polytopes(poly-remove).area] = ...
-            fcn_MapGen_polytopeCentroidAndArea([xv xv(1)]',[yv yv(1)]');
-        
-        polytopes(poly-remove).mean = [Cx, Cy]; % enter polytope centroid
-        % calculate perimeter distances around the polytope
-        polytopes(poly-remove).distances = sum((polytopes(poly-remove).vertices(1:end-1,:)-polytopes(poly-remove).vertices(2:end,:)).^2,2).^0.5;
-        
-        % calculate the maximum distance from center to a vertex
-        polytopes(poly-remove).max_radius = max(sum((polytopes(poly-remove).vertices(1:end-1,:)-ones(length(xv),1)*polytopes(poly-remove).mean).^2,2).^0.5);
-
-
-    else % if 2 or less points in cell 
-        remove = remove+1; % skip cell and remove later
-    end
-end
-
-% remove extra empty polytopes
-polytopes = polytopes(1:(num_poly-remove));
-
-% Apply the stretch
-num_poly = length(polytopes);
-for poly = 1:num_poly % pull each cell from the voronoi diagram
-    
-    polytopes(poly).vertices  = polytopes(poly).vertices.*stretch;
-    polytopes(poly).xv        = (polytopes(poly).vertices(1:end-1,1)').*stretch(1,1);
-    polytopes(poly).yv        = (polytopes(poly).vertices(1:end-1,2)').*stretch(1,2);
-    polytopes(poly).distances = sum((polytopes(poly).vertices(1:end-1,:)-polytopes(poly).vertices(2:end,:)).^2,2).^0.5;
-    [Cx,Cy,polytopes(poly).area] = ...
-        fcn_MapGen_polytopeCentroidAndArea([xv xv(1)]',[yv yv(1)]');
-    
-    polytopes(poly).mean = [Cx, Cy]; % enter polytope centroid
-    polytopes(poly).max_radius = max(sum((polytopes(poly).vertices(1:end-1,:)-ones(length(polytopes(poly).xv),1)*polytopes(poly).mean).^2,2).^0.5);
-end % Ends for loop for stretch
-
-end
+% %% create tiling
+% function polytopes = INTERNAL_fcn_MapGen_generatePolysFromTiling(seed_points,V,C,stretch)
+% 
+% num_poly = size(seed_points,1);
+% polytopes(num_poly) = ...
+%     struct(...
+%     'vertices',[],...
+%     'xv',[],...
+%     'yv',[],...
+%     'distances',[],...
+%     'mean',[],...
+%     'area',[],...
+%     'max_radius',[]);
+% 
+% 
+% remove = 0; % keep track of how many cells to be removed
+% for poly = 1:num_poly % pull each cell from the voronoi diagram
+%     % x and y values from this cell
+%     xv = V(C{poly},1)'; 
+%     yv = V(C{poly},2)';
+%     
+%     verticies = V(C{poly},:);
+%     interior_point = seed_points(poly,:);
+%     
+%     % Are any vertices outside the [0,1] range?
+%     if any(xv>1) || any(yv>1) || any(xv<0) || any(yv<0)
+% 
+%         % Crop vertices to allowable range
+%         [cropped_vertices] = fcn_MapGen_cropPolytopeToRange(verticies, interior_point);
+%         xv = cropped_vertices(1:end-1,1)';
+%         yv = cropped_vertices(1:end-1,2)'; 
+%     else
+%         
+%     end 
+% 
+%     % Are polytopes not trivial in length? (This may not be needed)
+%     if length(xv)>2                
+%     
+%         % make sure cw
+%         vec1 = [xv(2)-xv(1),yv(2)-yv(1),0]; % vector leading into point
+%         vec2 = [xv(3)-xv(2),yv(3)-yv(2),0]; % vector leading out of point
+%         xing = cross(vec1,vec2); % cross product of two vectors
+%         if sign(xing(3)) == -1 % points ordered in wrong direction
+%             xv = fliplr(xv);
+%             yv = fliplr(yv);
+%         end
+%         
+%         % enter info into polytope structure
+%         polytopes(poly-remove).vertices = [[xv xv(1)]' [yv yv(1)]']; % repeat first vertice for easy plotting
+%         
+%         polytopes(poly-remove) = fcn_MapGen_fillPolytopeFieldsFromVerticies(polytopes(poly-remove));
+% 
+%     else % if 2 or less points in cell 
+%         remove = remove+1; % skip cell and remove later
+%     end
+% end
+% 
+% % remove extra empty polytopes
+% polytopes = polytopes(1:(num_poly-remove));
+% 
+% % Apply the stretch
+% num_poly = length(polytopes);
+% for poly = 1:num_poly % pull each cell from the voronoi diagram
+%     
+%     polytopes(poly).vertices  = polytopes(poly).vertices.*stretch;
+%     polytopes(poly) = fcn_MapGen_fillPolytopeFieldsFromVerticies(polytopes(poly));
+%     
+% end % Ends for loop for stretch
+% 
+% end
 
 

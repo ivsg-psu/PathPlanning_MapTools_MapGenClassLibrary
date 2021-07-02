@@ -1,35 +1,43 @@
 function [ ...
-snap_point ...
+polytopes ...
 ] = ...
-fcn_MapGen_snapToAABB( ...
-axis_aligned_bounding_box, ...
-test_point, ...
+fcn_MapGen_generatePolysFromTiling( ...
+seed_points, ...
+V, ...
+C, ...
+stretch, ...
 varargin...
 )
-% fcn_MapGen_snapToAABB
-% Given an axis-aligned bounding box (AABB), and a test point, returns a 
-% snap point representing the contact point on the closest wall to the 
-% test point.
+% fcn_MapGen_generatePolysFromTiling
+% creates polytopes given seed points, V and C matrices from Voronoi 
+% tiling, and stretch matrix
 % 
 % 
 % 
 % FORMAT:
 % 
 %    [ ...
-%    snap_point ...
+%    polytopes ...
 %    ] = ...
-%    fcn_MapGen_snapToAABB( ...
-%    axis_aligned_bounding_box, ...
-%    test_point, ...
+%    fcn_MapGen_generatePolysFromTiling( ...
+%    seed_points, ...
+%    V, ...
+%    C, ...
+%    stretch, ...
 %    (fig_num) ...
 %    )
 % 
 % INPUTS:
 % 
-%     axis_aligned_bounding_box: the axis-aligned bounding box, in format 
-%     [xmin ymin xmax ymax]
+%     seed_points: the list of seed points in [x y] format, where x and y 
+%     are columns
 % 
-%     test_point: the test point, in format [x y]
+%     V: the V matrix resulting from Voronoi calculations
+% 
+%     C: the C matrix resulting from Voronoi calculations
+% 
+%     stretch: the list of seed points in [x y] format, where x and y are 
+%     columns
 % 
 %     (optional inputs)
 %
@@ -39,17 +47,21 @@ varargin...
 % 
 % OUTPUTS:
 % 
-%     snap_point: the resulting snap point, in format [x y]
+%     polytopes: the resulting polytopes after converting to polytope form.
 % 
 % 
 % DEPENDENCIES:
 % 
-%     (none)
+%     fcn_MapGen_checkInputsToFunctions
+% 
+%     fcn_MapGen_cropPolytopeToRange
+% 
+%     fcn_MapGen_fillPolytopeFieldsFromVerticies
 % 
 % 
 % EXAMPLES:
 % 
-% See the script: script_test_fcn_MapGen_snapToAABB
+% See the script: script_test_fcn_MapGen_generatePolysFromTiling
 % for a full test suite.
 % 
 % This function was written on 2021_07_02 by Sean Brennan
@@ -72,7 +84,7 @@ flag_do_plot = 0;      % Set equal to 1 for plotting
 flag_do_debug = 0;     % Set equal to 1 for debugging 
 
 if flag_do_debug
-    fig_for_debug = 22;
+    fig_for_debug = 846;
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
 end 
@@ -94,22 +106,22 @@ end
 if 1 == flag_check_inputs
 
     % Are there the right number of inputs?
-    if nargin < 2 || nargin > 3
+    if nargin < 4 || nargin > 5
         error('Incorrect number of input arguments')
     end
 
-    % Check the axis_aligned_bounding_box input, make sure it is '4column_of_numbers' type
+    % Check the seed_points input, make sure it is '2column_of_numbers' type
     fcn_MapGen_checkInputsToFunctions(...
-        axis_aligned_bounding_box, '4column_of_numbers',1);
+        seed_points, '2column_of_numbers');
  
-    % Check the test_point input, make sure it is '2column_of_numbers' type
+    % Check the stretch input, make sure it is '2column_of_numbers' type
     fcn_MapGen_checkInputsToFunctions(...
-        test_point, '2column_of_numbers',1);
- 
+        stretch, '2column_of_numbers',[1]);
+        , ' 
 end
 
 % Does user want to show the plots?
-if  3== nargin
+if  5== nargin
     fig_num = varargin{end};
     flag_do_plot = 1;
 else
@@ -135,40 +147,72 @@ end
 
 
 
-center = [mean([axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,3)]),mean([axis_aligned_bounding_box(1,2) axis_aligned_bounding_box(1,4)])];
-vector = test_point - center;
-angle = atan2(vector(2),vector(1));
+num_poly = size(seed_points,1);
+polytopes(num_poly) = ...
+    struct(...
+    'vertices',[],...
+    'xv',[],...
+    'yv',[],...
+    'distances',[],...
+    'mean',[],...
+    'area',[],...
+    'max_radius',[]);
 
-snap_point = test_point;
-if angle>=-pi/4 && angle<pi/4  % This is the x-max wall
-    snap_point(1,1) = axis_aligned_bounding_box(1,3);
-elseif angle>=pi/4 && angle<pi*3/4 % This is the y-max wall
-    snap_point(1,2) = axis_aligned_bounding_box(1,4);
-elseif angle>=-3*pi/4 && angle<(-pi/4) % This is the y-min wall
-    snap_point(1,2) = axis_aligned_bounding_box(1,2);
-else % This is the x-min wall 
-    snap_point(1,1) = axis_aligned_bounding_box(1,1);
+
+remove = 0; % keep track of how many cells to be removed
+for poly = 1:num_poly % pull each cell from the voronoi diagram
+    % x and y values from this cell
+    xv = V(C{poly},1)'; 
+    yv = V(C{poly},2)';
+    
+    verticies = V(C{poly},:);
+    interior_point = seed_points(poly,:);
+    
+    % Are any vertices outside the [0,1] range?
+    if any(xv>1) || any(yv>1) || any(xv<0) || any(yv<0)
+
+        % Crop vertices to allowable range
+        [cropped_vertices] = fcn_MapGen_cropPolytopeToRange(verticies, interior_point);
+        xv = cropped_vertices(1:end-1,1)';
+        yv = cropped_vertices(1:end-1,2)'; 
+    else
+        
+    end 
+
+    % Are polytopes not trivial in length? (This may not be needed)
+    if length(xv)>2                
+    
+        % make sure cw
+        vec1 = [xv(2)-xv(1),yv(2)-yv(1),0]; % vector leading into point
+        vec2 = [xv(3)-xv(2),yv(3)-yv(2),0]; % vector leading out of point
+        xing = cross(vec1,vec2); % cross product of two vectors
+        if sign(xing(3)) == -1 % points ordered in wrong direction
+            xv = fliplr(xv);
+            yv = fliplr(yv);
+        end
+        
+        % enter info into polytope structure
+        polytopes(poly-remove).vertices = [[xv xv(1)]' [yv yv(1)]']; % repeat first vertice for easy plotting
+        
+        polytopes(poly-remove) = fcn_MapGen_fillPolytopeFieldsFromVerticies(polytopes(poly-remove));
+
+    else % if 2 or less points in cell 
+        remove = remove+1; % skip cell and remove later
+    end
 end
 
+% remove extra empty polytopes
+polytopes = polytopes(1:(num_poly-remove));
 
-figure(fig_num);
-clf;
-hold on;
-axis equal
-grid on;
+% Apply the stretch
+num_poly = length(polytopes);
+for poly = 1:num_poly % pull each cell from the voronoi diagram
+    
+    polytopes(poly).vertices  = polytopes(poly).vertices.*stretch;
+    polytopes(poly) = fcn_MapGen_fillPolytopeFieldsFromVerticies(polytopes(poly));
+    
+end % Ends for loop for stretch
 
-% Plot the bounding box
-box_outline = [axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,2); axis_aligned_bounding_box(1,3) axis_aligned_bounding_box(1,2); axis_aligned_bounding_box(1,3) axis_aligned_bounding_box(1,4); axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,4); axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,2)];
-plot(box_outline(:,1),box_outline(:,2),'-');
-
-% Plot the test point
-plot(test_point(:,1),test_point(:,2),'o');
-
-% Plot the snap point
-plot(snap_point(:,1),snap_point(:,2),'x');
-
-% Plot the snap point
-plot([test_point(:,1) snap_point(1,1)],[test_point(:,2) snap_point(:,2)],'-');
 % 
 
 %§
@@ -209,6 +253,7 @@ end % Ends the function
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
-    
 end
+
+
 

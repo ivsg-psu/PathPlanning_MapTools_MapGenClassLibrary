@@ -1,10 +1,15 @@
-% script_test_fcn_MapGen_polytopesShrinkToRadius
-% Tests function: fcn_MapGen_polytopesShrinkToRadius
+% script_test_fcn_MapGen_polytopeRemoveTightVerticies
+% Tests: fcn_MapGen_polytopeRemoveTightVerticies
 
+% 
 % REVISION HISTORY:
-% 2021_06_09
-% -- first written by S. Brennan using
-% script_test_fcn_MapGen_polytopeCropEdges as a template
+% 
+% 2021_07_02 by Sean Brennan
+% -- first write of script
+%%%%%%%%%%%%%%§
+
+
+
 
 %% Set up variables
 fig_num = 1;
@@ -64,3 +69,4 @@ end
 % plot the last output polytope in black
 fcn_MapGen_plotPolytopes(shrunk_polytope,fig_num,'k.',2);
   
+

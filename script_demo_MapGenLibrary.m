@@ -10,8 +10,6 @@
 % -- Added other types of point generators
 
 % TO-DO:
-% -- rebase fcn_MapGen_cropPolytopeToRange
-% -- extract INTERNAL_fcn_MapGen_generatePolysFromTiling out of Halton Voronoi tiling 
 % -- Add positive input checking to fcn_MapGen_polytopesShrinkToRadius
 % -- Add ability to extend halton set to right (e.g. "scrolling" map)
 % -- finish the growth of polytopes functions, e.g. get these working with the library
@@ -46,6 +44,22 @@ end
 Twocolumn_of_numbers_test = [4 1; 3 0; 2 5];
 fcn_MapGen_checkInputsToFunctions(Twocolumn_of_numbers_test, '2column_of_numbers');
 
+%% Show how to generate polytopes from a tiling
+fig_num = 10;
+
+% pull halton set
+halton_points = haltonset(2);
+points_scrambled = scramble(halton_points,'RR2'); % scramble values
+
+% pick values from halton set
+low_pt = Halton_range(1,1);
+high_pt = Halton_range(1,2);
+seed_points = points_scrambled(low_pt:high_pt,:);
+[V,C] = voronoin(seed_points);
+% V = V.*stretch;
+
+% fill polytopes from tiling
+polytopes = fcn_MapGen_generatePolysFromTiling(seed_points,V,C,stretch,fig_num);
 
 %% Generate a set of polytopes from various pseudo-random sources
 close all;
@@ -88,20 +102,20 @@ fig_num = 21;
 Halton_range = [1 200]; % range of Halton points to use to generate the tiling
 tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
 
-% Plot the polytopes
+%% Plot the polytopes
 fig_num = 22;
 line_width = 2;
 axis_limits = [0 1 0 1];
 fcn_MapGen_plotPolytopes(tiled_polytopes,fig_num,'r',line_width,axis_limits);
 
-% remove the edge polytopes that extend past the high and low points
+%% remove the edge polytopes that extend past the high and low points
 fig_num = 23;
 xlow = 0.01; xhigh = 0.99; ylow = 0.01; yhigh = 0.99;
 bounding_box = [xlow ylow; xhigh yhigh];
 trimmed_polytopes = ...
     fcn_MapGen_polytopeCropEdges(tiled_polytopes,bounding_box,fig_num);
 
-% Shrink to radius
+%% Shrink to radius
 fig_num = 24;
 des_rad = 0.03; sigma_radius = 0; min_rad = 0.001;
 shrunk_polytopes2=fcn_MapGen_polytopesShrinkToRadius(...
@@ -125,6 +139,23 @@ for ith_ratio = 1:length(ratios)
     pause(0.01);
 end
 
+%% Show results of removing tight verticies
+fig_num = 32;
+figure(fig_num);
+clf;
+orig_radius = shrinker.max_radius;
+ratios = (0.99:-0.05:0);
+
+for ith_ratio = 1:length(ratios)
+    des_rad = orig_radius*ratios(ith_ratio);
+    tolerance = 0.02;
+    shrunk_polytope =...
+        fcn_MapGen_polytopeShrinkToRadius(...
+        shrinker,des_rad,tolerance);
+    cleaned_polytope = fcn_MapGen_polytopeRemoveTightVerticies(...
+        shrunk_polytope, tolerance,fig_num);
+    pause(0.01);
+end
 
 %% Generate plots (all above steps) in just one function call
 des_radius = 0.03; % desired average maximum radius

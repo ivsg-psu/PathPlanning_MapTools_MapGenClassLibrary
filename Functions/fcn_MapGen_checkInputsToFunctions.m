@@ -386,7 +386,7 @@ if flags.check_likeStructure
             fprintf(1,'\t %s\n',string(template_fields(ith_field)));
         end
         fprintf(1,'The %s input has fields of:\n',variable_name);
-        for ith_field = 1:length(template_fields)
+        for ith_field = 1:length(reference_fields)
             fprintf(1,'\t %s\n',string(reference_fields(ith_field)));
         end
         error('The %s input must be a structure type. All the fields must be match the reference structure.',variable_name);

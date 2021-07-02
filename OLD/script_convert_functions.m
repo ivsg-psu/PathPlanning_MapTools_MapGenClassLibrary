@@ -157,8 +157,225 @@ FuncEGen(filenum).Flags.DoPlot = 1; % Adds the plotting
 FuncEGen(filenum).Flags.CheckInputs = 1; % Adds input checking, turns this on by default
 
 
+%% Create fillPolytopeFieldsFromVerticies file
 
-% Call the function to build the files
+filenum = 4;
+
+
+% Create a snapToAABB file
+FuncEGen(filenum).fileNameSuffix = 'fillPolytopeFieldsFromVerticies';
+FuncEGen(filenum).class = 'MapGen';
+FuncEGen(filenum).short_description = 'Given a polytoope structure array where the verticies field is filled, calculates the values for all the other fields.';
+FuncEGen(filenum).long_description = ''; % ImportLongText('fcn_polytope_editing_expand_polytopes_evenly.txt');
+FuncEGen(filenum).filename_main = 'codeCore_fillPolytopeFieldsFromVerticies.m';
+FuncEGen(filenum).filename_script = 'codeCore_fillPolytopeFieldsFromVerticies_script.m'; 
+
+% Input Arguments
+FuncEGen(filenum).Inputs(1).Name = 'polytopes';
+FuncEGen(filenum).Inputs(1).Type = 'polytopes'; % of polytopes type
+FuncEGen(filenum).Inputs(1).Required = 1; % 1 is required, 0 is not
+FuncEGen(filenum).Inputs(1).Description = 'an individual structure or structure array of ''polytopes'' type that stores the polytopes to be filled'; 
+
+FuncEGen(filenum).Inputs(2).Name = 'fig_num';
+FuncEGen(filenum).Inputs(2).Type = 'numeric'; % Must be a number
+FuncEGen(filenum).Inputs(2).Required = 0; % 1 is required, 0 is not
+FuncEGen(filenum).Inputs(2).Description = 'any number that acts as a figure number output, causing a figure to be drawn showing results.'; 
+
+FuncEGen(filenum).N_RequiredInputs = 1;
+FuncEGen(filenum).N_OptionalInputs = 1;
+
+% Dependencies
+FuncEGen(filenum).Dependencies(1).Name = 'fcn_MapGen_polytopeCentroidAndArea';
+
+% Output Arguments
+FuncEGen(filenum).Outputs(1).Name = 'filled_polytopes';
+FuncEGen(filenum).Outputs(1).Type = 'polytopes'; % See fcn_MapGen_checkInputsToFunctions
+FuncEGen(filenum).Outputs(1).Required = 1; % 1 is required, 0 is not
+FuncEGen(filenum).Outputs(1).Description = 'the polytopes array with all fields completed'; 
+
+% Authorship
+FuncEGen(filenum).Author = 'Sean Brennan';
+FuncEGen(filenum).Date = '2021_07_02';
+FuncEGen(filenum).Contact = 'sbrennan@psu.edu';
+
+% Common Flags
+FuncEGen(filenum).Flags.DoDebug = 1; % Adds the debug flag, header/tailer options
+FuncEGen(filenum).Flags.DoPlot = 1; % Adds the plotting
+FuncEGen(filenum).Flags.CheckInputs = 1; % Adds input checking, turns this on by default
+
+%% Create fcn_MapGen_polytopeCentroidAndArea file
+
+filenum = 5;
+
+
+% Create a snapToAABB file
+FuncEGen(filenum).fileNameSuffix = 'polytopeCentroidAndArea';
+FuncEGen(filenum).class = 'MapGen';
+FuncEGen(filenum).short_description = 'calculates the centroid and area of a closed polytope.';
+FuncEGen(filenum).long_description = ''; % ImportLongText('fcn_polytope_editing_expand_polytopes_evenly.txt');
+FuncEGen(filenum).filename_main = 'codeCore_polytopeCentroidAndArea.m';
+FuncEGen(filenum).filename_script = 'codeCore_polytopeCentroidAndArea_script.m'; 
+
+% Input Arguments
+FuncEGen(filenum).Inputs(1).Name = 'vertices';
+FuncEGen(filenum).Inputs(1).Type = '2column_of_numbers'; % of polytopes type
+FuncEGen(filenum).Inputs(2).TypeOptions = [4 5]; % Forces it to have 4 or more rows
+FuncEGen(filenum).Inputs(1).Required = 1; % 1 is required, 0 is not
+FuncEGen(filenum).Inputs(1).Description = 'the list of verticies used to perform calculation, in format [x y] where x and y are column vectors. X: x coordinates of the polytope (with the same first and last point)  Y: y coordinates of the polytope (with the same first and last point)'; 
+
+FuncEGen(filenum).Inputs(2).Name = 'fig_num';
+FuncEGen(filenum).Inputs(2).Type = 'numeric'; % Must be a number
+FuncEGen(filenum).Inputs(2).Required = 0; % 1 is required, 0 is not
+FuncEGen(filenum).Inputs(2).Description = 'any number that acts as a figure number output, causing a figure to be drawn showing results.'; 
+
+FuncEGen(filenum).N_RequiredInputs = 1;
+FuncEGen(filenum).N_OptionalInputs = 1;
+
+% Dependencies
+FuncEGen(filenum).Dependencies(1).Name = 'fcn_MapGen_checkInputsToFunctions';
+
+% Output Arguments
+FuncEGen(filenum).Outputs(1).Name = 'Centroid';
+FuncEGen(filenum).Outputs(1).Type = '2column_of_numbers'; % See fcn_MapGen_checkInputsToFunctions
+FuncEGen(filenum).Outputs(1).Required = 1; % 1 is required, 0 is not
+FuncEGen(filenum).Outputs(1).Description = 'the calculated centroid of the polytope, given as [x-coordinate y_coordinate]'; 
+
+FuncEGen(filenum).Outputs(2).Name = 'Area';
+FuncEGen(filenum).Outputs(2).Type = 'numeric'; % See fcn_MapGen_checkInputsToFunctions
+FuncEGen(filenum).Outputs(2).Required = 1; % 1 is required, 0 is not
+FuncEGen(filenum).Outputs(2).Description = 'the unsigned area enclosed by the polytope'; 
+
+% Authorship
+FuncEGen(filenum).Author = 'Sean Brennan';
+FuncEGen(filenum).Date = '2021_07_02';
+FuncEGen(filenum).Contact = 'sbrennan@psu.edu';
+
+% Common Flags
+FuncEGen(filenum).Flags.DoDebug = 1; % Adds the debug flag, header/tailer options
+FuncEGen(filenum).Flags.DoPlot = 1; % Adds the plotting
+FuncEGen(filenum).Flags.CheckInputs = 1; % Adds input checking, turns this on by default
+
+
+%% Create fcn_MapGen_polytopeRemoveTightVerticies file
+
+filenum = 6;
+
+
+% Create a snapToAABB file
+FuncEGen(filenum).fileNameSuffix = 'polytopeRemoveTightVerticies';
+FuncEGen(filenum).class = 'MapGen';
+FuncEGen(filenum).short_description = 'removes verticies of polytopes that are too close to each other, measured by a tolerance';
+FuncEGen(filenum).long_description = 'Sometimes, when shrinking, the new verticies are particularly close to each other to where an edge has a trivial length. To prevent this, we get rid of one of any vertices that are too close to each other. This proximity is set by a user-defined tolerance.'; % ImportLongText('fcn_polytope_editing_expand_polytopes_evenly.txt');
+FuncEGen(filenum).filename_main = 'codeCore_fcn_polytopeRemoveTightVerticies.m';
+FuncEGen(filenum).filename_script = 'codeCore_fcn_polytopeRemoveTightVerticies_script.m'; 
+
+% Input Arguments
+FuncEGen(filenum).Inputs(1).Name = 'polytopes';
+FuncEGen(filenum).Inputs(1).Type = 'polytopes'; % of polytopes type
+FuncEGen(filenum).Inputs(1).Required = 1; % 1 is required, 0 is not
+FuncEGen(filenum).Inputs(1).Description = 'an individual structure or structure array of ''polytopes'' type that stores the polytopes to be evaluated'; 
+
+FuncEGen(filenum).Inputs(2).Name = 'tolerance';
+FuncEGen(filenum).Inputs(2).Type = 'numeric'; % Must be a number
+FuncEGen(filenum).Inputs(2).Required = 1; % 1 is required, 0 is not
+FuncEGen(filenum).Inputs(2).Description = 'a numeric value that defines how close points should be to be removed'; 
+
+FuncEGen(filenum).Inputs(3).Name = 'fig_num';
+FuncEGen(filenum).Inputs(3).Type = 'numeric'; % Must be a number
+FuncEGen(filenum).Inputs(3).Required = 0; % 1 is required, 0 is not
+FuncEGen(filenum).Inputs(3).Description = 'any number that acts as a figure number output, causing a figure to be drawn showing results.'; 
+
+FuncEGen(filenum).N_RequiredInputs = 2;
+FuncEGen(filenum).N_OptionalInputs = 1;
+
+% Dependencies
+FuncEGen(filenum).Dependencies(1).Name = 'fcn_MapGen_checkInputsToFunctions';
+FuncEGen(filenum).Dependencies(2).Name = 'fcn_MapGen_fillPolytopeFieldsFromVerticies';
+
+% Output Arguments
+FuncEGen(filenum).Outputs(1).Name = 'cleaned_polytope';
+FuncEGen(filenum).Outputs(1).Type = 'polytopes'; % See fcn_MapGen_checkInputsToFunctions
+FuncEGen(filenum).Outputs(1).Required = 1; % 1 is required, 0 is not
+FuncEGen(filenum).Outputs(1).Description = 'the resulting polytope after close edges are removed.'; 
+
+% Authorship
+FuncEGen(filenum).Author = 'Sean Brennan';
+FuncEGen(filenum).Date = '2021_07_02';
+FuncEGen(filenum).Contact = 'sbrennan@psu.edu';
+
+% Common Flags
+FuncEGen(filenum).Flags.DoDebug = 1; % Adds the debug flag, header/tailer options
+FuncEGen(filenum).Flags.DoPlot = 1; % Adds the plotting
+FuncEGen(filenum).Flags.CheckInputs = 1; % Adds input checking, turns this on by default
+
+
+%% Create fcn_MapGen_generatePolysFromTiling file
+
+filenum = 7;
+
+
+% Create a fcn_MapGen_generatePolysFromTiling file
+FuncEGen(filenum).fileNameSuffix = 'generatePolysFromTiling';
+FuncEGen(filenum).class = 'MapGen';
+FuncEGen(filenum).short_description = 'creates polytopes given seed points, V and C matrices from Voronoi tiling, and stretch matrix';
+FuncEGen(filenum).long_description = '';
+FuncEGen(filenum).filename_main = 'codeCore_generatePolysFromTiling.m';
+FuncEGen(filenum).filename_script = ''; 
+
+% Input Arguments
+FuncEGen(filenum).Inputs(1).Name = 'seed_points';
+FuncEGen(filenum).Inputs(1).Type = '2column_of_numbers'; % of polytopes type
+FuncEGen(filenum).Inputs(1).Required = 1; % 1 is required, 0 is not
+FuncEGen(filenum).Inputs(1).Description = 'the list of seed points in [x y] format, where x and y are columns'; 
+
+FuncEGen(filenum).Inputs(2).Name = 'V';
+FuncEGen(filenum).Inputs(2).Type = ''; % No check
+FuncEGen(filenum).Inputs(2).Required = 1; % 1 is required, 0 is not
+FuncEGen(filenum).Inputs(2).Description = 'the V matrix resulting from Voronoi calculations'; 
+
+FuncEGen(filenum).Inputs(3).Name = 'C';
+FuncEGen(filenum).Inputs(3).Type = ''; % No check
+FuncEGen(filenum).Inputs(3).Required = 1; % 1 is required, 0 is not
+FuncEGen(filenum).Inputs(3).Description = 'the C matrix resulting from Voronoi calculations'; 
+
+FuncEGen(filenum).Inputs(4).Name = 'stretch';
+FuncEGen(filenum).Inputs(4).Type = '2column_of_numbers'; % of polytopes type
+FuncEGen(filenum).Inputs(4).TypeOptions = [1 1]; % Forces it to have only 1 row
+FuncEGen(filenum).Inputs(4).Required = 1; % 1 is required, 0 is not
+FuncEGen(filenum).Inputs(4).Description = 'the list of seed points in [x y] format, where x and y are columns'; 
+
+FuncEGen(filenum).Inputs(5).Name = 'fig_num';
+FuncEGen(filenum).Inputs(5).Type = 'numeric'; % Must be a number
+FuncEGen(filenum).Inputs(5).Required = 0; % 1 is required, 0 is not
+FuncEGen(filenum).Inputs(5).Description = 'any number that acts as a figure number output, causing a figure to be drawn showing results.'; 
+
+FuncEGen(filenum).N_RequiredInputs = 4;
+FuncEGen(filenum).N_OptionalInputs = 1;
+
+% Dependencies
+FuncEGen(filenum).Dependencies(1).Name = 'fcn_MapGen_checkInputsToFunctions';
+FuncEGen(filenum).Dependencies(2).Name = 'fcn_MapGen_cropPolytopeToRange';
+FuncEGen(filenum).Dependencies(3).Name = 'fcn_MapGen_fillPolytopeFieldsFromVerticies';
+
+
+% Output Arguments
+FuncEGen(filenum).Outputs(1).Name = 'polytopes';
+FuncEGen(filenum).Outputs(1).Type = 'polytopes'; % See fcn_MapGen_checkInputsToFunctions
+FuncEGen(filenum).Outputs(1).Required = 1; % 1 is required, 0 is not
+FuncEGen(filenum).Outputs(1).Description = 'the resulting polytopes after converting to polytope form.'; 
+
+% Authorship
+FuncEGen(filenum).Author = 'Sean Brennan';
+FuncEGen(filenum).Date = '2021_07_02';
+FuncEGen(filenum).Contact = 'sbrennan@psu.edu';
+
+% Common Flags
+FuncEGen(filenum).Flags.DoDebug = 1; % Adds the debug flag, header/tailer options
+FuncEGen(filenum).Flags.DoPlot = 1; % Adds the plotting
+FuncEGen(filenum).Flags.CheckInputs = 1; % Adds input checking, turns this on by default
+
+
+%% Call the function to build the files
 fcn_FuncEGen_buildFunctionAndScriptFromDescription(FuncEGen);
 
 

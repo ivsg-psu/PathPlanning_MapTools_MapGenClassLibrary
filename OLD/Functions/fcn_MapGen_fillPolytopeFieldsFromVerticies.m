@@ -1,35 +1,30 @@
 function [ ...
-snap_point ...
+filled_polytopes ...
 ] = ...
-fcn_MapGen_snapToAABB( ...
-axis_aligned_bounding_box, ...
-test_point, ...
+fcn_MapGen_fillPolytopeFieldsFromVerticies( ...
+polytopes, ...
 varargin...
 )
-% fcn_MapGen_snapToAABB
-% Given an axis-aligned bounding box (AABB), and a test point, returns a 
-% snap point representing the contact point on the closest wall to the 
-% test point.
+% fcn_MapGen_fillPolytopeFieldsFromVerticies
+% Given a polytoope structure array where the verticies field is filled, 
+% calculates the values for all the other fields.
 % 
 % 
 % 
 % FORMAT:
 % 
 %    [ ...
-%    snap_point ...
+%    filled_polytopes ...
 %    ] = ...
-%    fcn_MapGen_snapToAABB( ...
-%    axis_aligned_bounding_box, ...
-%    test_point, ...
+%    fcn_MapGen_fillPolytopeFieldsFromVerticies( ...
+%    polytopes, ...
 %    (fig_num) ...
 %    )
 % 
 % INPUTS:
 % 
-%     axis_aligned_bounding_box: the axis-aligned bounding box, in format 
-%     [xmin ymin xmax ymax]
-% 
-%     test_point: the test point, in format [x y]
+%     polytopes: an individual structure or structure array of 'polytopes' 
+%     type that stores the polytopes to be filled
 % 
 %     (optional inputs)
 %
@@ -39,17 +34,17 @@ varargin...
 % 
 % OUTPUTS:
 % 
-%     snap_point: the resulting snap point, in format [x y]
+%     filled_polytopes: the polytopes array with all fields completed
 % 
 % 
 % DEPENDENCIES:
 % 
-%     (none)
+%     fcn_MapGen_polytopeCentroidAndArea
 % 
 % 
 % EXAMPLES:
 % 
-% See the script: script_test_fcn_MapGen_snapToAABB
+% See the script: script_test_fcn_MapGen_fillPolytopeFieldsFromVerticies
 % for a full test suite.
 % 
 % This function was written on 2021_07_02 by Sean Brennan
@@ -72,7 +67,7 @@ flag_do_plot = 0;      % Set equal to 1 for plotting
 flag_do_debug = 0;     % Set equal to 1 for debugging 
 
 if flag_do_debug
-    fig_for_debug = 22;
+    fig_for_debug = 605;
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
 end 
@@ -94,22 +89,18 @@ end
 if 1 == flag_check_inputs
 
     % Are there the right number of inputs?
-    if nargin < 2 || nargin > 3
+    if nargin < 1 || nargin > 2
         error('Incorrect number of input arguments')
     end
 
-    % Check the axis_aligned_bounding_box input, make sure it is '4column_of_numbers' type
+    % Check the polytopes input, make sure it is 'polytopes' type
     fcn_MapGen_checkInputsToFunctions(...
-        axis_aligned_bounding_box, '4column_of_numbers',1);
- 
-    % Check the test_point input, make sure it is '2column_of_numbers' type
-    fcn_MapGen_checkInputsToFunctions(...
-        test_point, '2column_of_numbers',1);
+        polytopes, 'polytopes');
  
 end
 
 % Does user want to show the plots?
-if  3== nargin
+if  2== nargin
     fig_num = varargin{end};
     flag_do_plot = 1;
 else
@@ -135,40 +126,31 @@ end
 
 
 
-center = [mean([axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,3)]),mean([axis_aligned_bounding_box(1,2) axis_aligned_bounding_box(1,4)])];
-vector = test_point - center;
-angle = atan2(vector(2),vector(1));
 
-snap_point = test_point;
-if angle>=-pi/4 && angle<pi/4  % This is the x-max wall
-    snap_point(1,1) = axis_aligned_bounding_box(1,3);
-elseif angle>=pi/4 && angle<pi*3/4 % This is the y-max wall
-    snap_point(1,2) = axis_aligned_bounding_box(1,4);
-elseif angle>=-3*pi/4 && angle<(-pi/4) % This is the y-min wall
-    snap_point(1,2) = axis_aligned_bounding_box(1,2);
-else % This is the x-min wall 
-    snap_point(1,1) = axis_aligned_bounding_box(1,1);
+
+% Apply the stretch
+num_poly = length(polytopes);
+for ith_poly = 1:num_poly % pull each polytope
+    
+    % adjust polytopes
+    filled_polytopes(ith_poly).xv        = (polytopes(ith_poly).vertices(1:end-1,1)');
+    filled_polytopes(ith_poly).yv        = (polytopes(ith_poly).vertices(1:end-1,2)');
+    filled_polytopes(ith_poly).distances = ...
+        sum((polytopes(ith_poly).vertices(1:end-1,:) - ...
+        polytopes(ith_poly).vertices(2:end,:)).^2,2).^0.5;
+    
+    % Calculate the mean and area
+    [filled_polytopes(ith_poly).mean,filled_polytopes(ith_poly).area] = ...
+        fcn_MapGen_polytopeCentroidAndArea(polytopes(ith_poly).vertices);
+    
+    % Find max radius
+    radii = sum(...
+        (polytopes(ith_poly).vertices(1:end-1,:) - ...
+        ones(length(polytopes(ith_poly).xv),1)*polytopes(ith_poly).mean).^2,2).^0.5;
+    filled_polytopes(ith_poly).max_radius = ...
+        max(radii);
 end
 
-
-figure(fig_num);
-clf;
-hold on;
-axis equal
-grid on;
-
-% Plot the bounding box
-box_outline = [axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,2); axis_aligned_bounding_box(1,3) axis_aligned_bounding_box(1,2); axis_aligned_bounding_box(1,3) axis_aligned_bounding_box(1,4); axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,4); axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,2)];
-plot(box_outline(:,1),box_outline(:,2),'-');
-
-% Plot the test point
-plot(test_point(:,1),test_point(:,2),'o');
-
-% Plot the snap point
-plot(snap_point(:,1),snap_point(:,2),'x');
-
-% Plot the snap point
-plot([test_point(:,1) snap_point(1,1)],[test_point(:,2) snap_point(:,2)],'-');
 % 
 
 %§
@@ -209,6 +191,5 @@ end % Ends the function
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
-    
 end
 

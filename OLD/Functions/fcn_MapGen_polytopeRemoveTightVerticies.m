@@ -1,35 +1,38 @@
 function [ ...
-snap_point ...
+cleaned_polytope ...
 ] = ...
-fcn_MapGen_snapToAABB( ...
-axis_aligned_bounding_box, ...
-test_point, ...
+fcn_MapGen_polytopeRemoveTightVerticies( ...
+polytopes, ...
+tolerance, ...
 varargin...
 )
-% fcn_MapGen_snapToAABB
-% Given an axis-aligned bounding box (AABB), and a test point, returns a 
-% snap point representing the contact point on the closest wall to the 
-% test point.
+% fcn_MapGen_polytopeRemoveTightVerticies
+% removes verticies of polytopes that are too close to each other, 
+% measured by a tolerance
 % 
-% 
+% Sometimes, when shrinking, the new verticies are particularly close to 
+% each other to where an edge has a trivial length. To prevent this, we 
+% get rid of one of any vertices that are too close to each other. This 
+% proximity is set by a user-defined tolerance.
 % 
 % FORMAT:
 % 
 %    [ ...
-%    snap_point ...
+%    cleaned_polytope ...
 %    ] = ...
-%    fcn_MapGen_snapToAABB( ...
-%    axis_aligned_bounding_box, ...
-%    test_point, ...
+%    fcn_MapGen_polytopeRemoveTightVerticies( ...
+%    polytopes, ...
+%    tolerance, ...
 %    (fig_num) ...
 %    )
 % 
 % INPUTS:
 % 
-%     axis_aligned_bounding_box: the axis-aligned bounding box, in format 
-%     [xmin ymin xmax ymax]
+%     polytopes: an individual structure or structure array of 'polytopes' 
+%     type that stores the polytopes to be evaluated
 % 
-%     test_point: the test point, in format [x y]
+%     tolerance: a numeric value that defines how close points should be 
+%     to be removed
 % 
 %     (optional inputs)
 %
@@ -39,17 +42,20 @@ varargin...
 % 
 % OUTPUTS:
 % 
-%     snap_point: the resulting snap point, in format [x y]
+%     cleaned_polytope: the resulting polytope after close edges are 
+%     removed.
 % 
 % 
 % DEPENDENCIES:
 % 
-%     (none)
+%     fcn_MapGen_checkInputsToFunctions
+% 
+%     fcn_MapGen_fillPolytopeFieldsFromVerticies
 % 
 % 
 % EXAMPLES:
 % 
-% See the script: script_test_fcn_MapGen_snapToAABB
+% See the script: script_test_fcn_MapGen_polytopeRemoveTightVerticies
 % for a full test suite.
 % 
 % This function was written on 2021_07_02 by Sean Brennan
@@ -72,7 +78,7 @@ flag_do_plot = 0;      % Set equal to 1 for plotting
 flag_do_debug = 0;     % Set equal to 1 for debugging 
 
 if flag_do_debug
-    fig_for_debug = 22;
+    fig_for_debug = 814;
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
 end 
@@ -98,13 +104,13 @@ if 1 == flag_check_inputs
         error('Incorrect number of input arguments')
     end
 
-    % Check the axis_aligned_bounding_box input, make sure it is '4column_of_numbers' type
+    % Check the polytopes input, make sure it is 'polytopes' type
     fcn_MapGen_checkInputsToFunctions(...
-        axis_aligned_bounding_box, '4column_of_numbers',1);
+        polytopes, 'polytopes');
  
-    % Check the test_point input, make sure it is '2column_of_numbers' type
+    % Check the tolerance input, make sure it is 'numeric' type
     fcn_MapGen_checkInputsToFunctions(...
-        test_point, '2column_of_numbers',1);
+        tolerance, 'numeric');
  
 end
 
@@ -135,40 +141,46 @@ end
 
 
 
-center = [mean([axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,3)]),mean([axis_aligned_bounding_box(1,2) axis_aligned_bounding_box(1,4)])];
-vector = test_point - center;
-angle = atan2(vector(2),vector(1));
 
-snap_point = test_point;
-if angle>=-pi/4 && angle<pi/4  % This is the x-max wall
-    snap_point(1,1) = axis_aligned_bounding_box(1,3);
-elseif angle>=pi/4 && angle<pi*3/4 % This is the y-max wall
-    snap_point(1,2) = axis_aligned_bounding_box(1,4);
-elseif angle>=-3*pi/4 && angle<(-pi/4) % This is the y-min wall
-    snap_point(1,2) = axis_aligned_bounding_box(1,2);
-else % This is the x-min wall 
-    snap_point(1,1) = axis_aligned_bounding_box(1,1);
+% pull values
+vertices = polytope.vertices;
+centroid = polytope.mean;
+
+
+% Work with tolerance squared, since it avoids square-root calculations
+tol_squared = tolerance.^2;
+
+% find all vertices that are larger away from next one, relative to
+% tolerance
+good_ind = ...
+    sum((vertices(1:end-1,:)-vertices(2:end,:)).^2,2)>(tol_squared);
+
+% Check how many are good. If only 2 points are left, then the
+% result is just a line. If 1 or zero, then result is just a point.
+if sum(good_ind)>2 % sufficient good points to make a shape
+    new_vert = vertices(good_ind,:);
+elseif sum(good_ind)==2 % line shape
+    new_vert = vertices(good_ind,:);
+    
+    % The line may not go through the centroid, which is odd. We force
+    % this by removing the point closest to the centroid
+    distances_to_centroid = sum((new_vert-centroid).^2,2).^0.5;
+    if distances_to_centroid(1,1)>distances_to_centroid(2,1)
+        new_vert(2,:)=centroid;
+    else
+        new_vert(1,:)=centroid;
+    end
+    
+    new_vert = [new_vert; flipud(new_vert)];
+else % singular shape (i.e. point) or no shape
+    new_vert = [centroid; centroid; centroid];
 end
 
+% adjust polytopes
+cleaned_polytope.vertices = [new_vert; new_vert(1,:)];
+cleaned_polytope = fcn_MapGen_fillPolytopeFieldsFromVerticies(cleaned_polytope);
 
-figure(fig_num);
-clf;
-hold on;
-axis equal
-grid on;
 
-% Plot the bounding box
-box_outline = [axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,2); axis_aligned_bounding_box(1,3) axis_aligned_bounding_box(1,2); axis_aligned_bounding_box(1,3) axis_aligned_bounding_box(1,4); axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,4); axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,2)];
-plot(box_outline(:,1),box_outline(:,2),'-');
-
-% Plot the test point
-plot(test_point(:,1),test_point(:,2),'o');
-
-% Plot the snap point
-plot(snap_point(:,1),snap_point(:,2),'x');
-
-% Plot the snap point
-plot([test_point(:,1) snap_point(1,1)],[test_point(:,2) snap_point(:,2)],'-');
 % 
 
 %§
@@ -208,7 +220,4 @@ end % Ends the function
 %                                               
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
-
-    
-end
 

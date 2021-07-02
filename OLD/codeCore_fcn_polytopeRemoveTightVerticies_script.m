@@ -5,6 +5,7 @@
 % 2021_06_09
 % -- first written by S. Brennan using
 % script_test_fcn_MapGen_polytopeCropEdges as a template
+%% main code §
 
 %% Set up variables
 fig_num = 1;
