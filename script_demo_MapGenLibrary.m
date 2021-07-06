@@ -10,10 +10,9 @@
 % -- Added other types of point generators
 
 % TO-DO:
-% -- Add positive input checking to fcn_MapGen_polytopesShrinkToRadius
-% -- Add ability to extend halton set to right (e.g. "scrolling" map)
 % -- finish the growth of polytopes functions, e.g. get these working with the library
 % -- add Nick's sensor code 
+% -- Add ability to extend halton set to right (e.g. "scrolling" map)
 % -- add functions that, given a map, give core statistics (look out limit, linear density, etc - basically make functions to calculate all the pi-values and interpretations we might need)
 % -- add prior work on grid-based map generation
 
@@ -194,11 +193,10 @@ fig_num = 7;
 fig_num = 8;
 
 one_polytope = fcn_MapGen_generateOneRandomPolytope;
-exp_polytopes=fcn_MapGen_polytopesExpandEvenly(one_polytope,delta,exp_dist,fig_num);
+exp_polytopes=fcn_MapGen_polytopesExpandEvenly(one_polytope,exp_dist,fig_num);
 
 %% Show how to expand many polytopes
 fig_num = 7;
-delta = 0.01; % Not used, need to deprecate this
 exp_dist = 0.01;
-exp_polytopes=fcn_MapGen_polytopesExpandEvenly(polytopes,delta,exp_dist,fig_num);
+exp_polytopes=fcn_MapGen_polytopesExpandEvenly(polytopes,exp_dist,fig_num);
 

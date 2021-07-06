@@ -47,6 +47,12 @@ function [shrunk_polytopes,mu_final,sigma_final] = ...
 %
 %     SIGMA_FINAL: final variance achieved
 %   
+% DEPENDENCIES:
+% 
+%     fcn_MapGen_checkInputsToFunctions
+%     fcn_MapGen_plotPolytopes
+%     fcn_MapGen_polytopeShrinkToRadius
+% 
 % EXAMPLES:
 %
 % For additional examples, see: script_test_fcn_MapGen_polytopesShrinkToRadius

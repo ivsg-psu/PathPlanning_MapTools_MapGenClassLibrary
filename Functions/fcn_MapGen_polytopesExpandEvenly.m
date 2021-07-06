@@ -3,7 +3,6 @@ exp_polytopes ...
 ] = ...
 fcn_MapGen_polytopesExpandEvenly( ...
 polytopes, ...
-delta, ...
 exp_dist, ...
 varargin...
 )
@@ -29,9 +28,6 @@ varargin...
 %     polytopes: the structure of 'polytopes' type that stores the 
 %     polytopes to be expanded
 % 
-%     delta: a small number relative to vehicle size to determine the 
-%     inside of an obstacle
-% 
 %     exp_dist: distance to expand the obstacle
 % 
 %     (optional inputs)
@@ -48,7 +44,9 @@ varargin...
 % 
 % DEPENDENCIES:
 % 
-%     fcn_MapGen_polytopeCentroidAndArea
+%     fcn_MapGen_checkInputsToFunctions
+%     fcn_MapGen_fillPolytopeFieldsFromVertices
+%     fcn_MapGen_plotPolytopes
 % 
 % 
 % EXAMPLES:
@@ -69,6 +67,9 @@ varargin...
 % 2021_06_26 S. Brennan
 % -- Rebased code
 % -- Rewrote for clarity
+% 2021_07_06 S. Brennan
+% -- Vectorized plotting into array structure, to better support legends
+% (rather than plotting all polytopes individually)
 
 % 
 % TO DO:
@@ -103,26 +104,27 @@ end
 if 1 == flag_check_inputs
 
     % Are there the right number of inputs?
-    if nargin < 3 || nargin > 4
+    % if nargin < 3 || nargin > 4
+    if nargin < 2 || nargin > 3
         error('Incorrect number of input arguments')
     end
 
     % Check the polytopes input, make sure it is 'polytopes' type
     fcn_MapGen_checkInputsToFunctions(...
         polytopes, 'polytopes');
+    
+    %     % Check the delta input, make sure it is 'positive_column_of_numbers' type
+    %     fcn_MapGen_checkInputsToFunctions(...
+    %         delta, 'positive_column_of_numbers',1);
  
-    % Check the delta input, make sure it is 'column_of_numbers' type
+    % Check the exp_dist input, make sure it is 'positive_column_of_numbers' type
     fcn_MapGen_checkInputsToFunctions(...
-        delta, 'column_of_numbers',1);
- 
-    % Check the exp_dist input, make sure it is 'column_of_numbers' type
-    fcn_MapGen_checkInputsToFunctions(...
-        exp_dist, 'column_of_numbers',1);
+        exp_dist, 'positive_column_of_numbers',1);
  
 end
 
 % Does user want to show the plots?
-if  4== nargin
+if  3== nargin
     fig_num = varargin{end};
     flag_do_plot = 1;
 else
@@ -145,13 +147,10 @@ end
 %See: http://patorjk.com/software/taag/#p=display&f=Big&t=Main
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
-
-
-
-
 exp_polytopes = polytopes; % both structures will be the same size
 
 for ith_poly = 1:size(polytopes,2) % check each obstacle
+    
     % pull values
     vertices = polytopes(ith_poly).vertices;
     centroid = polytopes(ith_poly).mean;
@@ -161,64 +160,11 @@ for ith_poly = 1:size(polytopes,2) % check each obstacle
     scale = (rad+exp_dist)/rad;
     
     % Calculate new vertices
-    new_vert = centroid + scale*(vertices-centroid);
+    exp_polytopes(ith_poly).vertices = centroid + scale*(vertices-centroid);
     
-    % adjust polytopes
-    exp_polytopes(ith_poly).vertices = [new_vert; new_vert(1,:)];
-    exp_polytopes(ith_poly).xv = new_vert(:,1)';
-    exp_polytopes(ith_poly).yv = new_vert(:,2)';
-    exp_polytopes(ith_poly).distances = sum((new_vert(1:end-1,:)-new_vert(2:end,:)).^2,2).^0.5;
-    exp_polytopes(ith_poly).area = polytopes(ith_poly).area*scale^2;
-    exp_polytopes(ith_poly).max_radius = polytopes(ith_poly).max_radius*scale;
-    
-    %     xv = zeros(1,numverts); % pre-allocate xv and yv
-    %     yv = zeros(1,numverts); % pre-allocate xv and yv
-    %     for vert1 = 1:numverts % repeat for each vert
-    %         %% assign 3 vertex indices
-    %         if vert1 < numverts-1
-    %             vert2 = vert1 + 1;
-    %             vert3 = vert2 + 1;
-    %         elseif vert1 < numverts
-    %             vert2 = vert1 + 1;
-    %             vert3 = 1;
-    %         else
-    %             vert2 = 1;
-    %             vert3 = vert2 + 1;
-    %         end
-    %         %% find which side of the line is in the obstacle
-    %         ang1 = atan2(yvert(vert2)-yvert(vert1),xvert(vert2)-xvert(vert1)); % angle of first segment
-    %         if vert1 == 1 % only execute once per obstacle
-    %             mid_point = [(xvert(vert2)+xvert(vert1))/2; (yvert(vert2)+yvert(vert1))/2; 0]; % segment midpoint
-    %             % check if turning ccw puts the point in the obstacle
-    %             if inpolygon(mid_point(1)+delta*cos(ang1+pi/2),mid_point(2)+delta*sin(ang1+pi/2),xvert,yvert)
-    %                 turn = -pi/2; % turn the other way
-    %             else % if puts point out of the obstacle
-    %                 turn = pi/2; % keep turning that way
-    %             end
-    %         end
-    %         ang2 = atan2(yvert(vert3)-yvert(vert2),xvert(vert3)-xvert(vert2)); % angle of second segment
-    %         %% force both angles to be positive
-    %         if ang1 < 0
-    %             ang1 = ang1 + 2*pi;
-    %         end
-    %         if ang2 < 0
-    %             ang2 = ang2 + 2*pi;
-    %         end
-    %         %% move vertices
-    %         exp_ang = (ang1 + ang2 + 2*turn)/2; % direction to move vertex
-    %         inner_ang = exp_ang - ang2 - turn; % angle for determining distance
-    %         dist = exp_dist/cos(inner_ang); % how far to move to ensure both sides move out by exp_dist
-    %         xv(vert2) = polytopes(ith_poly).xv(vert2) + dist*cos(exp_ang); % change x of vert2
-    %         yv(vert2) = polytopes(ith_poly).yv(vert2) + dist*sin(exp_ang); % change y of vert2
-    %     end
-    %     %% assign new exp_polytopes values
-    %     exp_polytopes(ith_poly).vertices = [[xv xv(1)]' [yv yv(1)]'];
-    %     exp_polytopes(ith_poly).xv = xv;
-    %     exp_polytopes(ith_poly).yv = yv;
-    %     exp_polytopes(ith_poly).distances = sum((exp_polytopes(ith_poly).vertices(1:end-1,:)-exp_polytopes(ith_poly).vertices(2:end,:)).^2,2).^0.5;
-    %     [Cx,Cy,exp_polytopes(ith_poly).area] = fcn_MapGen_polytopeCentroidAndArea([xv xv(1)]', [yv yv(1)]');
-    %     exp_polytopes(ith_poly).mean = [Cx, Cy];
-    %     exp_polytopes(ith_poly).max_radius = max(sum((exp_polytopes(ith_poly).vertices(1:end-1,:)-ones(length(xv),1)*exp_polytopes(ith_poly).mean).^2,2).^0.5);
+    % fill in other fields from the vertices field
+    exp_polytopes(ith_poly) = fcn_MapGen_fillPolytopeFieldsFromVertices(exp_polytopes(ith_poly));
+
 end
 
 %§
@@ -237,6 +183,9 @@ end
 
 
 if flag_do_plot
+    figure(fig_num)
+    clf;
+    
     LineWidth = 2;
     fcn_MapGen_plotPolytopes(polytopes,fig_num,'r-',LineWidth);
     fcn_MapGen_plotPolytopes(exp_polytopes,fig_num,'b-',LineWidth,'square');

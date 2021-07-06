@@ -56,7 +56,7 @@ varargin...
 % 
 %     fcn_MapGen_cropPolytopeToRange
 % 
-%     fcn_MapGen_fillPolytopeFieldsFromVerticies
+%     fcn_MapGen_fillPolytopeFieldsFromVertices
 % 
 % 
 % EXAMPLES:
@@ -194,7 +194,7 @@ for poly = 1:num_poly % pull each cell from the voronoi diagram
         % enter info into polytope structure
         polytopes(poly-remove).vertices = [[xv xv(1)]' [yv yv(1)]']; % repeat first vertice for easy plotting
         
-        polytopes(poly-remove) = fcn_MapGen_fillPolytopeFieldsFromVerticies(polytopes(poly-remove));
+        polytopes(poly-remove) = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes(poly-remove));
 
     else % if 2 or less points in cell 
         remove = remove+1; % skip cell and remove later
@@ -209,7 +209,7 @@ num_poly = length(polytopes);
 for poly = 1:num_poly % pull each cell from the voronoi diagram
     
     polytopes(poly).vertices  = polytopes(poly).vertices.*stretch;
-    polytopes(poly) = fcn_MapGen_fillPolytopeFieldsFromVerticies(polytopes(poly));
+    polytopes(poly) = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes(poly));
     
 end % Ends for loop for stretch
 

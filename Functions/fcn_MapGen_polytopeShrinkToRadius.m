@@ -44,7 +44,12 @@ function [shrunk_polytope] = ...
 %       area: area of the polytope
 %       max_radius: distance from the mean to the farthest vertex
 %   
-% EXAMPLES:
+% DEPENDENCIES:
+% 
+%     fcn_MapGen_checkInputsToFunctions
+%     fcn_MapGen_fillPolytopeFieldsFromVertices
+% 
+% % EXAMPLES:
 %      
 %
 % For additional examples, see: script_test_fcn_MapGen_polytopeShrinkToRadius
@@ -151,8 +156,8 @@ if scale < 1
     shrunk_polytope.vertices = [new_vert; new_vert(1,:)];
 end
 
-% adjust polytopes
-shrunk_polytope = fcn_MapGen_fillPolytopeFieldsFromVerticies(shrunk_polytope);
+% fill in other fields from the vertices field
+shrunk_polytope = fcn_MapGen_fillPolytopeFieldsFromVertices(shrunk_polytope);
 
 
 %% Plot results?

@@ -50,18 +50,18 @@ polytopes.area = 0.0079;
 polytopes.max_radius = 0.1045;
 
 % Set parameters
-delta = 0.01; % Set the delta value (what is this used for?)
+% delta = 0.01; % Set the delta value (what is this used for?)
 exp_dist = 0.04; % Set the expansion distance
-fig_num = 222; % Set the figure number
+fig_num = 221; % Set the figure number
 
 % Call the function
-exp_polytopes=fcn_MapGen_polytopesExpandEvenly(polytopes,delta,exp_dist,fig_num);
+exp_polytopes=fcn_MapGen_polytopesExpandEvenly(polytopes,exp_dist,fig_num);
 
-% Call the function
-exp_polytopes=fcn_MapGen_polytopesExpandEvenly_OLD(polytopes,delta,exp_dist,fig_num);
+% Call the OLD function
+% exp_polytopes=fcn_MapGen_polytopesExpandEvenly_OLD(polytopes,delta,exp_dist,fig_num);
 
 %% Second test
-%% Generate a map from a name
+% Generate a map from a name
 map_name = "HST 30 450 SQT 0 1 0 1 SMV 0.02 0.005 1e-6 1234";
 plot_flag = 1; disp_name = [1, 0.05 -0.05, 0.5 0.5 0.5, 10];
 line_style = '-'; line_width = 2; color = [0 0 1];
@@ -81,5 +81,9 @@ fig_num = 7;
     axis_style,...
     fill_info);
 
+% Set expansion parameters
+exp_dist = 0.01; % Set the expansion distance
+fig_num = 222; % Set the figure number
+
 % Call the function
-exp_polytopes=fcn_MapGen_polytopesExpandEvenly(polytopes,delta,exp_dist,fig_num);
+exp_polytopes=fcn_MapGen_polytopesExpandEvenly(polytopes,exp_dist,fig_num);

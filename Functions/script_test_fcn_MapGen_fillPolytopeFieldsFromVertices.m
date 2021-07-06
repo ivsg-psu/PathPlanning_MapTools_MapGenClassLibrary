@@ -13,5 +13,5 @@
 
 clear polytopes
 polytopes(1).vertices = [0 0; 4 2; 2 4; 0 0];
-polytopes = fcn_MapGen_fillPolytopeFieldsFromVerticies(polytopes);
+polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes);
 

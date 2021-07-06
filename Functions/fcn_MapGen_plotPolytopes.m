@@ -155,15 +155,22 @@ if fill_info(1) == 1
         filler.FaceAlpha = fill_info(5);
     end
 end
-if plots == 1 % basic plot
-    for polys = 1:size(polytopes,2) % plot each polytope
-        plot(polytopes(polys).vertices(:,1),polytopes(polys).vertices(:,2),line_spec,'linewidth',line_width)
-    end
-else
-    for polys = 1:size(polytopes,2) % plot each polytope
-        plot(polytopes(polys).vertices(:,1),polytopes(polys).vertices(:,2),line_spec,'Color',color,'linewidth',line_width)
-    end
+
+% Fill in the x and y data
+polytope_plot_data_x = [];
+polytope_plot_data_y = [];
+for polys = 1:size(polytopes,2) % plot each polytope
+    polytope_plot_data_x = [polytope_plot_data_x; polytopes(polys).vertices(:,1); nan]; %#ok<AGROW>
+    polytope_plot_data_y = [polytope_plot_data_y; polytopes(polys).vertices(:,2); nan]; %#ok<AGROW>
 end
+
+% Plot depending on line style
+if plots == 1 % basic plot
+    plot(polytope_plot_data_x,polytope_plot_data_y,line_spec,'linewidth',line_width)
+else
+    plot(polytope_plot_data_x,polytope_plot_data_y,line_spec,'Color',color,'linewidth',line_width)
+end
+
 
 axis(axis_limits);
 axis(axis_style);
