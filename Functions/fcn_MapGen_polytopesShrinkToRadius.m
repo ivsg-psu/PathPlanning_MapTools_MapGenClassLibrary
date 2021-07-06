@@ -66,7 +66,8 @@ function [shrunk_polytopes,mu_final,sigma_final] = ...
 % -- made warnings more clear on the truncations.
 % 2021-06-16
 % -- added more comments via Seth's inputs
-
+% 2021-07-06
+% -- added positive input checking to fcn_MapGen_polytopesShrinkToRadius
 
 % TO DO
 % -- Vectorize the for loop if possible
@@ -109,7 +110,7 @@ if flag_check_inputs
     
     % Check the des_radius input
     fcn_MapGen_checkInputsToFunctions(...
-        des_radius, 'column_of_numbers',1);
+        des_radius, 'positive_column_of_numbers',1);
     
     % Check the sigma_radius input
     fcn_MapGen_checkInputsToFunctions(...
@@ -117,11 +118,8 @@ if flag_check_inputs
  
     % Check the min_rad input
     fcn_MapGen_checkInputsToFunctions(...
-        min_rad, 'column_of_numbers',1);
-    if min_rad<0
-        st = dbstack;
-        warning('In function: %s, in file: %s\n\tA minimum radius less than zero was given for the shrinking range: min_rad input was %f \n\tForcing minimum radius, min_rad, to be zero.\n',st(1).name,st(1).file,min_rad);
-    end
+        min_rad, 'positive_column_of_numbers',1);
+
 end
     
 

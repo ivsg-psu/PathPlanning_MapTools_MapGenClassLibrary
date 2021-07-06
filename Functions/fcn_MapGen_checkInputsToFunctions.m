@@ -141,9 +141,6 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
 
-
-
-
 % Grab the variable name
 variable_name = inputname(1);
 
@@ -212,6 +209,7 @@ end % Ends the function
 function flags = INTERNAL_fcn_setDefaultFlagsToOff
 % Set default flags all to "off" mode
 flags.check_if_isnumeric = 0; % Check to see if isnumeric
+flags.check_if_strictly_positive = 0; % Check to see if number is greater than zero, and not zero
 flags.check_required_columns  = 0; % Check the number of columns
 flags.minNrequiredcolumns  = 0; % No check
 flags.maxNrequiredcolumns  = 0; % No check
@@ -238,6 +236,16 @@ function flags = INTERNAL_fcn_setFlagsByType(flags, variable_type_string)
 % column_of_numbers
 if strcmpi(variable_type_string,'column_of_numbers')
     flags.check_if_isnumeric = 1; % Must be a number
+    flags.check_required_columns  = 1; % Check the number of columns
+    flags.minNrequiredcolumns  = 1; % Must be 1 columns
+    flags.maxNrequiredcolumns  = 1; % Must be 1 columns
+    flags.check_if_noNaN = 1; % Check that there are no NaN
+end
+
+% positive_column_of_numbers
+if strcmpi(variable_type_string,'positive_column_of_numbers')
+    flags.check_if_isnumeric = 1; % Must be a number
+    flags.check_if_strictly_positive = 1; % Must be a number    
     flags.check_required_columns  = 1; % Check the number of columns
     flags.minNrequiredcolumns  = 1; % Must be 1 columns
     flags.maxNrequiredcolumns  = 1; % Must be 1 columns
@@ -304,6 +312,13 @@ function INTERNAL_confirmVariable(flags,variable,variable_name)
 if flags.check_if_isnumeric   
     if ~isnumeric(variable)
         error('The %s input must be numeric.',variable_name);
+    end
+end
+
+% Strictly positive?
+if flags.check_if_strictly_positive   
+    if any(variable<=0)
+        error('The %s input must be strictly positive, e.g. greater than zero and not equal to zero.',variable_name);
     end
 end
 
@@ -403,6 +418,10 @@ num_inputs = 0;
 num_inputs = num_inputs+1;
 allowable_inputs(num_inputs).name = 'column_of_numbers';
 allowable_inputs(num_inputs).description = 'checks that the input type is N x 1 and is a number. Optional input: an integer forcing the value of N, giving an error if the input variable does not have length N.';
+
+num_inputs = num_inputs+1;
+allowable_inputs(num_inputs).name = 'positive_column_of_numbers';
+allowable_inputs(num_inputs).description = 'checks that the input type is N x 1 and is a strictly positive number. Optional input: an integer forcing the value of N, giving an error if the input variable does not have length N.';
 
 num_inputs = num_inputs+1;
 allowable_inputs(num_inputs).name = '2column_of_numbers';

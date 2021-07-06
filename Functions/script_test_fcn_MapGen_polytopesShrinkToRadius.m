@@ -27,18 +27,23 @@ des_rad = 0.05; sigma_radius = 0.01; min_rad = 0.001;
 shrunk_polytopes2=fcn_MapGen_polytopesShrinkToRadius(...
     trim_polytopes,des_rad,sigma_radius,min_rad,fig_num);
 
-%% Warning thrown because minimum radius less than zero
-fig_num = 4;
-des_rad = 0.05; sigma_radius = 0.01; min_rad = -0.001;
-shrunk_polytopes1=...
-    fcn_MapGen_polytopesShrinkToRadius(...
-    trim_polytopes,des_rad,sigma_radius,min_rad,fig_num); %#ok<*NASGU>
-
 
 %% Warning thrown because of truncation
 % This happens, for example, where there is a large standard deviation with small radius
 fig_num = 4;
-des_rad = 0.001; sigma_radius = 0.01; min_rad = 0;
+des_rad = 0.001; sigma_radius = 0.01; min_rad = 0.0001;
 shrunk_polytopes1=...
     fcn_MapGen_polytopesShrinkToRadius(...
     trim_polytopes,des_rad,sigma_radius,min_rad,fig_num);
+
+
+%% Error cases follow
+
+if 1==0
+    %% Error thrown because minimum radius less than zero
+    fig_num = 4;
+    des_rad = 0.05; sigma_radius = 0.01; min_rad = -0.001;
+    shrunk_polytopes1=...
+        fcn_MapGen_polytopesShrinkToRadius(...
+        trim_polytopes,des_rad,sigma_radius,min_rad,fig_num); %#ok<*NASGU>
+end
