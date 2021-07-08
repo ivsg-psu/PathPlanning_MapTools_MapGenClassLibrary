@@ -83,7 +83,8 @@ varargin...
 % 
 % 2021_06_20 by S. Brennan
 % -- first write of function
-
+% 2021_07_07 by S. Brennan
+% -- modified to allow general input types, e.g. 8column_of_integers
 % 
 % TO DO:
 % 
@@ -233,60 +234,44 @@ end
 %%
 function flags = INTERNAL_fcn_setFlagsByType(flags, variable_type_string)
 
-% column_of_numbers
-if strcmpi(variable_type_string,'column_of_numbers')
+flag_pattern_was_matched = 0;
+
+% Check the "Ncolumn_of" pattern, where N is a digit
+pattern = digitsPattern(1)+"column_of";
+if contains(variable_type_string,pattern)
+    match = extract(variable_type_string,pattern);
+    string_result = match{1};
+    ncols_max = str2double(string_result(1));
+
+    % Check for NorMcolumn_of format
+    pattern = digitsPattern(1)+"or"+digitsPattern(1)+"column_of";
+    if contains(variable_type_string,pattern)
+        match = extract(variable_type_string,pattern);
+        string_result = match{1};
+        ncols_min = str2double(string_result(1));
+    else
+        ncols_min = ncols_max;
+    end
+    
     flags.check_if_isnumeric = 1; % Must be a number
     flags.check_required_columns  = 1; % Check the number of columns
-    flags.minNrequiredcolumns  = 1; % Must be 1 columns
-    flags.maxNrequiredcolumns  = 1; % Must be 1 columns
+    flags.minNrequiredcolumns  = ncols_min; % Must be 1 columns
+    flags.maxNrequiredcolumns  = ncols_max; % Must be 1 columns
     flags.check_if_noNaN = 1; % Check that there are no NaN
+    
+    flag_pattern_was_matched = 1;
 end
 
-% positive_column_of_numbers
-if strcmpi(variable_type_string,'positive_column_of_numbers')
-    flags.check_if_isnumeric = 1; % Must be a number
+% positive_XXX
+pattern = 'positive_';
+if contains(variable_type_string,pattern)
     flags.check_if_strictly_positive = 1; % Must be a number    
-    flags.check_required_columns  = 1; % Check the number of columns
-    flags.minNrequiredcolumns  = 1; % Must be 1 columns
-    flags.maxNrequiredcolumns  = 1; % Must be 1 columns
-    flags.check_if_noNaN = 1; % Check that there are no NaN
 end
 
-% 2column_of_numbers
-if strcmpi(variable_type_string,'2column_of_numbers')
-   flags.check_if_isnumeric = 1; % Must be a number
-    flags.check_required_columns  = 1; % Check the number of columns
-    flags.minNrequiredcolumns  = 2; % Must be 2 columns
-    flags.maxNrequiredcolumns  = 2; % Must be 2 columns
-    flags.check_if_noNaN = 1; % Check that there are no NaN
-end
-
-% 4column_of_numbers
-if strcmpi(variable_type_string,'4column_of_numbers')
-    flags.check_if_isnumeric = 1; % Must be a number
-    flags.check_required_columns  = 1; % Check the number of columns
-    flags.minNrequiredcolumns  = 4; % Must be 4 columns
-    flags.maxNrequiredcolumns  = 4; % Must be 4 columns
-    flags.check_if_noNaN = 1; % Check that there are no NaN
-end
-
-% 2or3column_of_numbers
-if strcmpi(variable_type_string,'2or3column_of_numbers')
-    flags.check_if_isnumeric = 1; % Must be a number
-    flags.check_required_columns  = 1; % Check the number of columns
-    flags.minNrequiredcolumns  = 2; % Must be 4 columns
-    flags.maxNrequiredcolumns  = 3; % Must be 4 columns
-    flags.check_if_noNaN = 1; % Check that there are no NaN
-end
-
-% 2column_of_integers
-if strcmpi(variable_type_string,'2column_of_integers')
-    flags.check_if_isnumeric = 1; % Must be a number
+% XXX_of_integers
+pattern = '_of_integers';
+if contains(variable_type_string,pattern)
     flags.check_if_integer = 1; % Check that the variable is an integer
-    flags.check_required_columns  = 1; % Check the number of columns
-    flags.minNrequiredcolumns  = 2; % Must be 4 columns
-    flags.maxNrequiredcolumns  = 2; % Must be 4 columns
-    flags.check_if_noNaN = 1; % Check that there are no NaN
 end
 
 % polytopes
@@ -302,8 +287,14 @@ if strcmpi(variable_type_string,'polytopes')
         'area',[],...
         'max_radius',[]);
     flags.structureToBeLike = template_structure;
+
+    flag_pattern_was_matched = 1;
 end
-   
+
+if 0==flag_pattern_was_matched
+    error('The variable type: %s is not defined in context of error checking.',variable_type_string);
+end
+
 end % Ends INTERNAL_fcn_setFlagsByType
 
 function INTERNAL_confirmVariable(flags,variable,variable_name)
@@ -416,11 +407,11 @@ function allowable_inputs = INTERNAL_fcn_showPossibleFields
 num_inputs = 0;
 
 num_inputs = num_inputs+1;
-allowable_inputs(num_inputs).name = 'column_of_numbers';
+allowable_inputs(num_inputs).name = '1column_of_numbers';
 allowable_inputs(num_inputs).description = 'checks that the input type is N x 1 and is a number. Optional input: an integer forcing the value of N, giving an error if the input variable does not have length N.';
 
 num_inputs = num_inputs+1;
-allowable_inputs(num_inputs).name = 'positive_column_of_numbers';
+allowable_inputs(num_inputs).name = 'positive_1column_of_numbers';
 allowable_inputs(num_inputs).description = 'checks that the input type is N x 1 and is a strictly positive number. Optional input: an integer forcing the value of N, giving an error if the input variable does not have length N.';
 
 num_inputs = num_inputs+1;

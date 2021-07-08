@@ -162,10 +162,10 @@ if flag_do_plot
     hold on
     
     % Plot the input polytopes in red
-    fcn_MapGen_plotPolytopes(polytopes,fig_num,'r',2,[0 1 0 1]);
+    fcn_MapGen_plotPolytopes(polytopes,fig_num,'r',2,[xlow xhigh ylow yhigh]);
     
     % plot the tiled_polytopes in blue
-    fcn_MapGen_plotPolytopes(trim_polytopes,fig_num,'b',2,[0 1 0 1]);
+    fcn_MapGen_plotPolytopes(trim_polytopes,fig_num,'b',2,[xlow xhigh ylow yhigh]);
 
 end
 

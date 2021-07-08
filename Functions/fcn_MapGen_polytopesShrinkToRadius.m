@@ -116,15 +116,15 @@ if flag_check_inputs
     
     % Check the des_radius input
     fcn_MapGen_checkInputsToFunctions(...
-        des_radius, 'positive_column_of_numbers',1);
+        des_radius, 'positive_1column_of_numbers',1);
     
     % Check the sigma_radius input
     fcn_MapGen_checkInputsToFunctions(...
-        sigma_radius, 'column_of_numbers',1);
+        sigma_radius, '1column_of_numbers',1);
  
     % Check the min_rad input
     fcn_MapGen_checkInputsToFunctions(...
-        min_rad, 'positive_column_of_numbers',1);
+        min_rad, 'positive_1column_of_numbers',1);
 
 end
     
@@ -338,10 +338,10 @@ if flag_do_plot
     hold on
     
     % Plot the input polytopes in red
-    fcn_MapGen_plotPolytopes(polytopes,fig_num,'r',2,[0 1 0 1]);
+    fcn_MapGen_plotPolytopes(polytopes,fig_num,'r',2);
     
     % plot the shrunk in blue
-    fcn_MapGen_plotPolytopes(shrunk_polytopes,fig_num,'b',2,[0 1 0 1]);
+    fcn_MapGen_plotPolytopes(shrunk_polytopes,fig_num,'b',2);
 
 end
 

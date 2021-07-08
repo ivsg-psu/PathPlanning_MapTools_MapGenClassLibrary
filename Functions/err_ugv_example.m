@@ -1,34 +1,6 @@
 % Scratch Paper Examples for Polytope Error Bubble Generation
-
-% Revision history:
-% 2021_03_26 - Nick Carder
-% -- First write of the function, 
-% 2021_06_28 - S. Brennan
-% -- Reworked to be compatible with MapGen library
-
-close all
-
-%% Set up workspace
-clear flag_was_run_before  % Force init to always run?
-
-if ~exist('flag_was_run_before','var')
-    
-    clc
-    close all
-    
-    % add necessary directories
-    addpath([pwd '\Functions'])
-    %     addpath([pwd '\GeomClassLibrary\Functions'])
-    %     addpath([pwd '\MapGenClassLibrary\Functions'])
-    %     addpath([pwd '\Plotting'])
-    %     addpath([pwd '\Map_Generation\polytope_generation'])
-    %     addpath([pwd '\Map_Generation\polytope_editing'])
-    %     addpath([pwd '\Map_Generation\polytope_calculation'])
-    
-    flag_was_run_before = 1;
-end
-
-
+% Nick Carder
+% 3/26/21
 
 %% Generating Error Bubbles and Plotting
 
@@ -52,10 +24,13 @@ trimmed_polytopes = ...
     fcn_MapGen_polytopeCropEdges(polytopes,bounding_box,fig_num);
 
 %shrink polytopes to create space
-fig_num = 24;
+scale = ones(1,size(trim_polytopes,2));
 des_rad = 1; sigma_radius = 0.5; min_rad = 0.25;
-shrunk_polytopes2=fcn_MapGen_polytopesShrinkToRadius(...
-    trimmed_polytopes,des_rad,sigma_radius,min_rad,fig_num);
+shrunk_polytopes2=fcn_polytope_editing_shrink_to_average_max_radius_with_variance(trim_polytopes,des_rad,sigma_radius,min_rad);
+
+
+
+
 
 
 

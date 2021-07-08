@@ -108,9 +108,10 @@ if 1 == flag_check_inputs
     fcn_MapGen_checkInputsToFunctions(...
         polytope, 'polytopes');
  
-    % Check the tolerance input, make sure it is 'numeric' type
+    % Check the tolerance input, make sure it is '1column_of_numbers' type,
+    % e.g. 1x1 numerical data.
     fcn_MapGen_checkInputsToFunctions(...
-        tolerance, 'numeric');
+        tolerance, '1column_of_numbers',[1 1]);
  
 end
 
@@ -178,7 +179,7 @@ end
 
 % adjust polytopes
 cleaned_polytope.vertices = [new_vert; new_vert(1,:)];
-cleaned_polytope = fcn_MapGen_fillPolytopeFieldsFromVerticies(cleaned_polytope);
+cleaned_polytope = fcn_MapGen_fillPolytopeFieldsFromVertices(cleaned_polytope);
 
 %§
 %% Plot the results (for debugging)?

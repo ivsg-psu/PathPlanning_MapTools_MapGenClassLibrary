@@ -175,7 +175,7 @@ if flag_check_inputs
     
     % Check the plot_flag input
     fcn_MapGen_checkInputsToFunctions(...
-        plot_flag, 'column_of_numbers',1);       
+        plot_flag, '1column_of_numbers',1);       
 
 end
 

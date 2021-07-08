@@ -6,53 +6,56 @@
 % 
 % 2021_06_20 by S. Brennan
 % -- first write of script
+% 2021_07_07 by S. Brennan
+% -- modified to allow variable input types
 %%%%%%%%%%%%%%§
 
 
 
 
-%% column_of_numbers
-%             _                               __                       _
-%            | |                             / _|                     | |
-%    ___ ___ | |_   _ _ __ ___  _ __    ___ | |_ _ __  _   _ _ __ ___ | |__   ___ _ __ ___
-%   / __/ _ \| | | | | '_ ` _ \| '_ \  / _ \|  _| '_ \| | | | '_ ` _ \| '_ \ / _ \ '__/ __|
-%  | (_| (_) | | |_| | | | | | | | | || (_) | | | | | | |_| | | | | | | |_) |  __/ |  \__ \
-%   \___\___/|_|\__,_|_| |_| |_|_| |_| \___/|_| |_| |_|\__,_|_| |_| |_|_.__/ \___|_|  |___/
-%                                  ______   ______
-%                                 |______| |______|
-%
+%% 1column_of_numbers
+% 
+%   __           _                               __                       _                   
+%  /_ |         | |                             / _|                     | |                  
+%   | | ___ ___ | |_   _ _ __ ___  _ __    ___ | |_ _ __  _   _ _ __ ___ | |__   ___ _ __ ___ 
+%   | |/ __/ _ \| | | | | '_ ` _ \| '_ \  / _ \|  _| '_ \| | | | '_ ` _ \| '_ \ / _ \ '__/ __|
+%   | | (_| (_) | | |_| | | | | | | | | || (_) | | | | | | |_| | | | | | | |_) |  __/ |  \__ \
+%   |_|\___\___/|_|\__,_|_| |_| |_|_| |_| \___/|_| |_| |_|\__,_|_| |_| |_|_.__/ \___|_|  |___/
+%                                     ______   ______                                         
+%                                    |______| |______|                                        
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 
 %% Test the column_of_numbers type (success)
 column_of_numbers_test = 4;
-fcn_MapGen_checkInputsToFunctions(column_of_numbers_test, 'column_of_numbers');
+fcn_MapGen_checkInputsToFunctions(column_of_numbers_test, '1column_of_numbers');
 
 column_of_numbers_test = [4; 3; 2];
-fcn_MapGen_checkInputsToFunctions(column_of_numbers_test, 'column_of_numbers');
+fcn_MapGen_checkInputsToFunctions(column_of_numbers_test, '1column_of_numbers');
 
 column_of_numbers_test = [4; 3; 2];
-fcn_MapGen_checkInputsToFunctions(column_of_numbers_test, 'column_of_numbers',3);
+fcn_MapGen_checkInputsToFunctions(column_of_numbers_test, '1column_of_numbers',3);
 
 %% positive_column_of_numbers
-%                   _   _                      _                               __                       _                   
-%                  | | (_)                    | |                             / _|                     | |                  
-%   _ __   ___  ___| |_ ___   _____   ___ ___ | |_   _ _ __ ___  _ __    ___ | |_ _ __  _   _ _ __ ___ | |__   ___ _ __ ___ 
-%  | '_ \ / _ \/ __| __| \ \ / / _ \ / __/ _ \| | | | | '_ ` _ \| '_ \  / _ \|  _| '_ \| | | | '_ ` _ \| '_ \ / _ \ '__/ __|
-%  | |_) | (_) \__ \ |_| |\ V /  __/| (_| (_) | | |_| | | | | | | | | || (_) | | | | | | |_| | | | | | | |_) |  __/ |  \__ \
-%  | .__/ \___/|___/\__|_| \_/ \___| \___\___/|_|\__,_|_| |_| |_|_| |_| \___/|_| |_| |_|\__,_|_| |_| |_|_.__/ \___|_|  |___/
-%  | |                           ______                             ______   ______                                         
-%  |_|                          |______|                           |______| |______|                                        
+% 
+%                   _ _   _            __           _                               __                       _                   
+%                  (_) | (_)          /_ |         | |                             / _|                     | |                  
+%   _ __   ___  ___ _| |_ ___   _____  | | ___ ___ | |_   _ _ __ ___  _ __    ___ | |_ _ __  _   _ _ __ ___ | |__   ___ _ __ ___ 
+%  | '_ \ / _ \/ __| | __| \ \ / / _ \ | |/ __/ _ \| | | | | '_ ` _ \| '_ \  / _ \|  _| '_ \| | | | '_ ` _ \| '_ \ / _ \ '__/ __|
+%  | |_) | (_) \__ \ | |_| |\ V /  __/ | | (_| (_) | | |_| | | | | | | | | || (_) | | | | | | |_| | | | | | | |_) |  __/ |  \__ \
+%  | .__/ \___/|___/_|\__|_| \_/ \___| |_|\___\___/|_|\__,_|_| |_| |_|_| |_| \___/|_| |_| |_|\__,_|_| |_| |_|_.__/ \___|_|  |___/
+%  | |                             ______                                ______   ______                                         
+%  |_|                            |______|                              |______| |______|                                        
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 
 %% Test the column_of_numbers type (success)
 column_of_numbers_test = 4;
-fcn_MapGen_checkInputsToFunctions(column_of_numbers_test, 'positive_column_of_numbers');
+fcn_MapGen_checkInputsToFunctions(column_of_numbers_test, 'positive_1column_of_numbers');
 
 column_of_numbers_test = [4; 3; 2];
-fcn_MapGen_checkInputsToFunctions(column_of_numbers_test, 'positive_column_of_numbers');
+fcn_MapGen_checkInputsToFunctions(column_of_numbers_test, 'positive_1column_of_numbers');
 
 column_of_numbers_test = [4; 3; 2];
-fcn_MapGen_checkInputsToFunctions(column_of_numbers_test, 'positive_column_of_numbers',3);
+fcn_MapGen_checkInputsToFunctions(column_of_numbers_test, 'positive_1column_of_numbers',3);
 
 
 %% 2column_of_numbers
@@ -191,62 +194,67 @@ fcn_MapGen_checkInputsToFunctions(Twocolumn_of_integers_test, '2column_of_intege
 
 %% Fail conditions
 if 1==0
-    %% column_of_numbers
-    %             _                               __                       _
-    %            | |                             / _|                     | |
-    %    ___ ___ | |_   _ _ __ ___  _ __    ___ | |_ _ __  _   _ _ __ ___ | |__   ___ _ __ ___
-    %   / __/ _ \| | | | | '_ ` _ \| '_ \  / _ \|  _| '_ \| | | | '_ ` _ \| '_ \ / _ \ '__/ __|
-    %  | (_| (_) | | |_| | | | | | | | | || (_) | | | | | | |_| | | | | | | |_) |  __/ |  \__ \
-    %   \___\___/|_|\__,_|_| |_| |_|_| |_| \___/|_| |_| |_|\__,_|_| |_| |_|_.__/ \___|_|  |___/
-    %                                  ______   ______
-    %                                 |______| |______|
+    %% Bad string
+    column_of_numbers_test = [4 1];
+    fcn_MapGen_checkInputsToFunctions(column_of_numbers_test, 'dumb_text');
+    
+    %% 1column_of_numbers
     %
-    %
+    %   __           _                               __                       _
+    %  /_ |         | |                             / _|                     | |
+    %   | | ___ ___ | |_   _ _ __ ___  _ __    ___ | |_ _ __  _   _ _ __ ___ | |__   ___ _ __ ___
+    %   | |/ __/ _ \| | | | | '_ ` _ \| '_ \  / _ \|  _| '_ \| | | | '_ ` _ \| '_ \ / _ \ '__/ __|
+    %   | | (_| (_) | | |_| | | | | | | | | || (_) | | | | | | |_| | | | | | | |_) |  __/ |  \__ \
+    %   |_|\___\___/|_|\__,_|_| |_| |_|_| |_| \___/|_| |_| |_|\__,_|_| |_| |_|_.__/ \___|_|  |___/
+    %                                     ______   ______
+    %                                    |______| |______|
+    % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
     
     
     %% Test the column_of_numbers type (FAILURE because 1 x 2)
     column_of_numbers_test = [4 1];
-    fcn_MapGen_checkInputsToFunctions(column_of_numbers_test, 'column_of_numbers');
+    fcn_MapGen_checkInputsToFunctions(column_of_numbers_test, '1column_of_numbers');
     
     %% Test the column_of_numbers type (FAILURE because 3 long, not 2)
     column_of_numbers_test = [4; 3; 2];
-    fcn_MapGen_checkInputsToFunctions(column_of_numbers_test, 'column_of_numbers',2);
+    fcn_MapGen_checkInputsToFunctions(column_of_numbers_test, '1column_of_numbers',2);
     
     %% Test the column_of_numbers type (FAILURE because NaN)
     column_of_numbers_test = [4; nan; 2];
-    fcn_MapGen_checkInputsToFunctions(column_of_numbers_test, 'column_of_numbers',3);
+    fcn_MapGen_checkInputsToFunctions(column_of_numbers_test, '1column_of_numbers',3);
     
     
     %% positive_column_of_numbers
-    %                   _   _                      _                               __                       _
-    %                  | | (_)                    | |                             / _|                     | |
-    %   _ __   ___  ___| |_ ___   _____   ___ ___ | |_   _ _ __ ___  _ __    ___ | |_ _ __  _   _ _ __ ___ | |__   ___ _ __ ___
-    %  | '_ \ / _ \/ __| __| \ \ / / _ \ / __/ _ \| | | | | '_ ` _ \| '_ \  / _ \|  _| '_ \| | | | '_ ` _ \| '_ \ / _ \ '__/ __|
-    %  | |_) | (_) \__ \ |_| |\ V /  __/| (_| (_) | | |_| | | | | | | | | || (_) | | | | | | |_| | | | | | | |_) |  __/ |  \__ \
-    %  | .__/ \___/|___/\__|_| \_/ \___| \___\___/|_|\__,_|_| |_| |_|_| |_| \___/|_| |_| |_|\__,_|_| |_| |_|_.__/ \___|_|  |___/
-    %  | |                           ______                             ______   ______
-    %  |_|                          |______|                           |______| |______|
+    %
+    %                   _ _   _            __           _                               __                       _
+    %                  (_) | (_)          /_ |         | |                             / _|                     | |
+    %   _ __   ___  ___ _| |_ ___   _____  | | ___ ___ | |_   _ _ __ ___  _ __    ___ | |_ _ __  _   _ _ __ ___ | |__   ___ _ __ ___
+    %  | '_ \ / _ \/ __| | __| \ \ / / _ \ | |/ __/ _ \| | | | | '_ ` _ \| '_ \  / _ \|  _| '_ \| | | | '_ ` _ \| '_ \ / _ \ '__/ __|
+    %  | |_) | (_) \__ \ | |_| |\ V /  __/ | | (_| (_) | | |_| | | | | | | | | || (_) | | | | | | |_| | | | | | | |_) |  __/ |  \__ \
+    %  | .__/ \___/|___/_|\__|_| \_/ \___| |_|\___\___/|_|\__,_|_| |_| |_|_| |_| \___/|_| |_| |_|\__,_|_| |_| |_|_.__/ \___|_|  |___/
+    %  | |                             ______                                ______   ______
+    %  |_|                            |______|                              |______| |______|
     % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
     
     %% Test the positive_column_of_numbers type (FAILURE because 1 x 2)
     positive_column_of_numbers_test = [4 1];
-    fcn_MapGen_checkInputsToFunctions(positive_column_of_numbers_test, 'positive_column_of_numbers');
+    fcn_MapGen_checkInputsToFunctions(positive_column_of_numbers_test, 'positive_1column_of_numbers');
     
     %% Test the positive_column_of_numbers type (FAILURE because 3 long, not 2)
     positive_column_of_numbers_test = [4; 3; 2];
-    fcn_MapGen_checkInputsToFunctions(positive_column_of_numbers_test, 'positive_column_of_numbers',2);
+    fcn_MapGen_checkInputsToFunctions(positive_column_of_numbers_test, 'positive_1column_of_numbers',2);
     
     %% Test the positive_column_of_numbers type (FAILURE because NaN)
     positive_column_of_numbers_test = [4; nan; 2];
-    fcn_MapGen_checkInputsToFunctions(positive_column_of_numbers_test, 'positive_column_of_numbers',3);
+    fcn_MapGen_checkInputsToFunctions(positive_column_of_numbers_test, 'positive_1column_of_numbers',3);
 
     %% Test the positive_column_of_numbers type (FAILURE because negative value)
     positive_column_of_numbers_test = [4; -1; 2];
-    fcn_MapGen_checkInputsToFunctions(positive_column_of_numbers_test, 'positive_column_of_numbers',3);
+    fcn_MapGen_checkInputsToFunctions(positive_column_of_numbers_test, 'positive_1column_of_numbers',3);
 
     %% Test the positive_column_of_numbers type (FAILURE because zero value)
     positive_column_of_numbers_test = [4; 1; 0];
-    fcn_MapGen_checkInputsToFunctions(positive_column_of_numbers_test, 'positive_column_of_numbers',3);
+    fcn_MapGen_checkInputsToFunctions(positive_column_of_numbers_test, 'positive_1column_of_numbers',3);
 
 
     %% 2column_of_numbers
@@ -269,6 +277,10 @@ if 1==0
     %% Test the column_of_numbers type (FAILURE because 3 long, not 2)
     Twocolumn_of_numbers_test = [4 1; 3 1; 2 2];
     fcn_MapGen_checkInputsToFunctions(Twocolumn_of_numbers_test, '2column_of_numbers',2);
+        
+    %% Test the column_of_numbers type (FAILURE because 4 columns)
+    Twocolumn_of_numbers_test = [4 1 1 4];
+    fcn_MapGen_checkInputsToFunctions(Twocolumn_of_numbers_test, '2column_of_numbers');
        
     %% Test the column_of_numbers type (FAILURE because NaN)
     Twocolumn_of_numbers_test = [4 1; nan 1; 2 0];

@@ -12,6 +12,10 @@ end
 % Loop through FuncE structure, creating rebased file for each entry
 for ith_function = 1:length(FuncEGen)
     
+    if ith_function == 9
+        disp('pause here');
+    end
+    
     ith_FuncE = FuncEGen(ith_function);
     
     % FUNCTION STARTS HERE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -435,7 +439,11 @@ if FuncEdetails.Flags.CheckInputs == 1
            % Check to see if there is a special field
            if isfield(FuncEdetails.Inputs(ith_input),'TypeOptions') && ~isempty(FuncEdetails.Inputs(ith_input).TypeOptions)
                if length(FuncEdetails.Inputs(ith_input).TypeOptions)>1
-                   fprintf(fid,'        %s, ''%s'',[%d]);\n',FuncEdetails.Inputs(ith_input).Name,FuncEdetails.Inputs(ith_input).Type,FuncEdetails.Inputs(ith_input).TypeOptions);
+                   fprintf(fid,'        %s, ''%s'',[',FuncEdetails.Inputs(ith_input).Name,FuncEdetails.Inputs(ith_input).Type);
+                   for ith_entry = 1:length(FuncEdetails.Inputs(ith_input).TypeOptions)
+                       fprintf(fid,'%d ',FuncEdetails.Inputs(ith_input).TypeOptions(ith_entry));
+                   end
+                   fprintf(fid,']);\n');
                else
                    fprintf(fid,'        %s, ''%s'',%d);\n',FuncEdetails.Inputs(ith_input).Name,FuncEdetails.Inputs(ith_input).Type,FuncEdetails.Inputs(ith_input).TypeOptions);
                end

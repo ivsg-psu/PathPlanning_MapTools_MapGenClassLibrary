@@ -1,4 +1,5 @@
 % Scratch Paper Examples for Polytope Error Bubble Generation
+%% main code §
 
 % Revision history:
 % 2021_03_26 - Nick Carder
@@ -9,8 +10,6 @@
 close all
 
 %% Set up workspace
-clear flag_was_run_before  % Force init to always run?
-
 if ~exist('flag_was_run_before','var')
     
     clc

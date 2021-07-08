@@ -374,6 +374,141 @@ FuncEGen(filenum).Flags.DoDebug = 1; % Adds the debug flag, header/tailer option
 FuncEGen(filenum).Flags.DoPlot = 1; % Adds the plotting
 FuncEGen(filenum).Flags.CheckInputs = 1; % Adds input checking, turns this on by default
 
+%% Create fcn_MapGen_generatePolysFromTiling file
+
+filenum = 8;
+
+
+% Create a fcn_MapGen_generatePolysFromTiling file
+FuncEGen(filenum).fileNameSuffix = 'ugvSensorError';
+FuncEGen(filenum).class = 'MapGen';
+FuncEGen(filenum).short_description = 'calculates error in sensed locations from a UGV perspective';
+FuncEGen(filenum).long_description = ImportLongText('codeCore_err_ugv_v3_header.m');
+FuncEGen(filenum).filename_main = 'codeCore_err_ugv_v3.m';
+FuncEGen(filenum).filename_script = 'codeCore_err_ugv_v3_script.m'; 
+
+% Input Arguments
+FuncEGen(filenum).Inputs(1).Name = 'Scanning_Results';
+FuncEGen(filenum).Inputs(1).Type = 'positive_3column_of_numbers'; % of polytopes type
+FuncEGen(filenum).Inputs(1).Required = 1; % 1 is required, 0 is not
+FuncEGen(filenum).Inputs(1).Description = 'a Nx3 matrix, N being the number of received lidar points or sensor scans'; 
+
+FuncEGen(filenum).Inputs(2).Name = 'Position_Uncertainty';
+FuncEGen(filenum).Inputs(2).Type = 'positive_3column_of_numbers'; % No check
+FuncEGen(filenum).Inputs(2).TypeOptions = [1 1]; % Forces it to have only 1 row
+FuncEGen(filenum).Inputs(2).Required = 1; % 1 is required, 0 is not
+FuncEGen(filenum).Inputs(2).Description = 'a 1x3 vector of constants defining uncertainty in the x, y, and z directions'; 
+
+FuncEGen(filenum).Inputs(3).Name = 'Angular_Uncertainty';
+FuncEGen(filenum).Inputs(3).Type = 'positive_3column_of_numbers'; % No check
+FuncEGen(filenum).Inputs(3).TypeOptions = [1 1]; % Forces it to have only 1 row
+FuncEGen(filenum).Inputs(3).Required = 1; % 1 is required, 0 is not
+FuncEGen(filenum).Inputs(3).Description = 'a 1x3 vector of constants defining uncertainty in the x, y, and z pointing angle (in degrees)'; 
+
+FuncEGen(filenum).Inputs(4).Name = 'Laser_Uncertainty';
+FuncEGen(filenum).Inputs(4).Type = 'positive_2column_of_numbers'; % No check
+FuncEGen(filenum).Inputs(4).TypeOptions = [1 1]; % Forces it to have only 1 row
+FuncEGen(filenum).Inputs(4).Required = 1; % 1 is required, 0 is not
+FuncEGen(filenum).Inputs(4).Description = 'a 1x2 vector of constants defining uncertainty in the LIDAR (see long description)'; 
+
+FuncEGen(filenum).Inputs(5).Name = 'fig_num';
+FuncEGen(filenum).Inputs(5).Type = 'numeric'; % Must be a number
+FuncEGen(filenum).Inputs(5).Required = 0; % 1 is required, 0 is not
+FuncEGen(filenum).Inputs(5).Description = 'any number that acts as a figure number output, causing a figure to be drawn showing results.'; 
+
+FuncEGen(filenum).N_RequiredInputs = 4;
+FuncEGen(filenum).N_OptionalInputs = 1;
+
+% Dependencies
+FuncEGen(filenum).Dependencies(1).Name = 'fcn_MapGen_checkInputsToFunctions';
+
+% Output Arguments
+FuncEGen(filenum).Outputs(1).Name = 'DX_err';
+FuncEGen(filenum).Outputs(1).Type = ''; 
+FuncEGen(filenum).Outputs(1).Required = 1; % 1 is required, 0 is not
+FuncEGen(filenum).Outputs(1).Description = 'Error in the x position'; 
+
+FuncEGen(filenum).Outputs(2).Name = 'DY_err';
+FuncEGen(filenum).Outputs(2).Type = ''; 
+FuncEGen(filenum).Outputs(2).Required = 1; % 1 is required, 0 is not
+FuncEGen(filenum).Outputs(2).Description = 'Error in the y position'; 
+
+FuncEGen(filenum).Outputs(3).Name = 'DZ_err';
+FuncEGen(filenum).Outputs(3).Type = ''; 
+FuncEGen(filenum).Outputs(3).Required = 1; % 1 is required, 0 is not
+FuncEGen(filenum).Outputs(3).Description = 'Error in the z position'; 
+
+
+% Authorship
+FuncEGen(filenum).Author = 'Sean Brennan';
+FuncEGen(filenum).Date = '2021_07_07';
+FuncEGen(filenum).Contact = 'sbrennan@psu.edu';
+
+% Common Flags
+FuncEGen(filenum).Flags.DoDebug = 1; % Adds the debug flag, header/tailer options
+FuncEGen(filenum).Flags.DoPlot = 1; % Adds the plotting
+FuncEGen(filenum).Flags.CheckInputs = 1; % Adds input checking, turns this on by default
+
+%% Create fcn_MapGen_generatePolysFromTiling file
+
+filenum = 9;
+
+
+% Create a fcn_MapGen_ugvSensorErrorBubble file
+FuncEGen(filenum).fileNameSuffix = 'ugvSensorErrorBubble';
+FuncEGen(filenum).class = 'MapGen';
+FuncEGen(filenum).short_description = 'calculates error in sensed locations from a UGV perspective';
+FuncEGen(filenum).long_description = '';
+FuncEGen(filenum).filename_main = 'codeCore_err_ugv_bubble_v3.m';
+FuncEGen(filenum).filename_script = 'codeCore_err_ugv_v3_script.m'; 
+
+% Input Arguments
+FuncEGen(filenum).Inputs(1).Name = 'Polytopes';
+FuncEGen(filenum).Inputs(1).Type = 'polytopes'; % of polytopes type
+FuncEGen(filenum).Inputs(1).Required = 1; % 1 is required, 0 is not
+FuncEGen(filenum).Inputs(1).Description = 'an individual structure or structure array of ''polytopes'' type that stores the polytopes to be evaluated'; 
+
+FuncEGen(filenum).Inputs(2).Name = 'Heading_Angle'; 
+FuncEGen(filenum).Inputs(2).Type = '1column_of_numbers'; 
+FuncEGen(filenum).Inputs(2).TypeOptions = [1 1]; % Forces it to have only 1 row
+FuncEGen(filenum).Inputs(2).Required = 1; % 1 is required, 0 is not
+FuncEGen(filenum).Inputs(2).Description = 'is a singular value in degrees of the robot''s heading angle'; 
+
+FuncEGen(filenum).Inputs(3).Name = 'Bubble_Resolution';
+FuncEGen(filenum).Inputs(3).Type = '1column_of_numbers'; % No check
+FuncEGen(filenum).Inputs(3).TypeOptions = [1 1]; % Forces it to have only 1 row
+FuncEGen(filenum).Inputs(3).Required = 1; % 1 is required, 0 is not
+FuncEGen(filenum).Inputs(3).Description = 'is a singular value (unitless)'; 
+
+FuncEGen(filenum).Inputs(4).Name = 'fig_num';
+FuncEGen(filenum).Inputs(4).Type = 'numeric'; % Must be a number
+FuncEGen(filenum).Inputs(4).Required = 0; % 1 is required, 0 is not
+FuncEGen(filenum).Inputs(4).Description = 'any number that acts as a figure number output, causing a figure to be drawn showing results.'; 
+
+FuncEGen(filenum).N_RequiredInputs = 3;
+FuncEGen(filenum).N_OptionalInputs = 1;
+
+% Dependencies
+FuncEGen(filenum).Dependencies(1).Name = 'fcn_MapGen_checkInputsToFunctions';
+FuncEGen(filenum).Dependencies(1).Name = 'fcn_MapGen_ugvSensorError';
+
+
+% Output Arguments
+FuncEGen(filenum).Outputs(1).Name = 'err';
+FuncEGen(filenum).Outputs(1).Type = ''; 
+FuncEGen(filenum).Outputs(1).Required = 1; % 1 is required, 0 is not
+FuncEGen(filenum).Outputs(1).Description = 'Error result'; 
+
+% Authorship
+FuncEGen(filenum).Author = 'Sean Brennan';
+FuncEGen(filenum).Date = '2021_07_08';
+FuncEGen(filenum).Contact = 'sbrennan@psu.edu';
+
+% Common Flags
+FuncEGen(filenum).Flags.DoDebug = 1; % Adds the debug flag, header/tailer options
+FuncEGen(filenum).Flags.DoPlot = 1; % Adds the plotting
+FuncEGen(filenum).Flags.CheckInputs = 1; % Adds input checking, turns this on by default
+
 
 %% Call the function to build the files
 fcn_FuncEGen_buildFunctionAndScriptFromDescription(FuncEGen);

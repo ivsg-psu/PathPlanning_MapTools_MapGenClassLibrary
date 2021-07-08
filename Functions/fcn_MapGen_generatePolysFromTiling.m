@@ -171,7 +171,7 @@ for poly = 1:num_poly % pull each cell from the voronoi diagram
     % Are any vertices outside the [0,1] range?
     if any(xv>1) || any(yv>1) || any(xv<0) || any(yv<0)
 
-        % Crop vertices to allowable range
+        % Crop vertices to allowable range        
         [cropped_vertices] = fcn_MapGen_cropPolytopeToRange(verticies, interior_point);
         xv = cropped_vertices(1:end-1,1)';
         yv = cropped_vertices(1:end-1,2)'; 

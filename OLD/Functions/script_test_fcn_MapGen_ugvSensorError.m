@@ -1,4 +1,15 @@
-% Scratch Paper Examples for Polytope Error Bubble Generation
+% script_test_fcn_MapGen_ugvSensorError
+% Tests: fcn_MapGen_ugvSensorError
+
+% 
+% REVISION HISTORY:
+% 
+% 2021_07_07 by Sean Brennan
+% -- first write of script
+%%%%%%%%%%%%%%§
+
+
+
 
 % Revision history:
 % 2021_03_26 - Nick Carder
@@ -9,8 +20,6 @@
 close all
 
 %% Set up workspace
-clear flag_was_run_before  % Force init to always run?
-
 if ~exist('flag_was_run_before','var')
     
     clc
@@ -115,3 +124,4 @@ h=colorbar;
 title('Total Error (Bubble Radius) [m]')
 xlabel('X [m]')
 ylabel('Y [m]')
+

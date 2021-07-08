@@ -105,11 +105,11 @@ if flag_check_inputs
     
     % Check the new_radius input
     fcn_MapGen_checkInputsToFunctions(...
-        new_radius, 'column_of_numbers',1);
+        new_radius, 'positive_1column_of_numbers',1);
     
     % Check the tolerance input
     fcn_MapGen_checkInputsToFunctions(...
-        tolerance, 'column_of_numbers',1);  
+        tolerance, 'positive_1column_of_numbers',1);  
     
 end
     

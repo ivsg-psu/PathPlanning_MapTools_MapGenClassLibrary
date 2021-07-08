@@ -29,7 +29,7 @@ if flag_do_debug
     plot(...
         [verticies(:,1); verticies(1,1)],...
         [verticies(:,2); verticies(1,2)],...
-        '-');
+        '.-');
     
     % Plot the walls
     plot(walls(:,1),walls(:,2),'k-');
@@ -41,15 +41,15 @@ end
 
 % Are any verticies infinite? If so, we need to check that the adjacent
 % verticies will create a reasonable polytope. 
-verticies = INTERNAL_fcn_removeInfiniteVerticies(verticies,box);
+verticies_no_infinite = INTERNAL_fcn_removeInfiniteVerticies(verticies,box);
 
 % Open the figure if doing debugging
 if flag_do_debug
     % Plot the vertices
     plot(...
-        [verticies(:,1); verticies(1,1)],...
-        [verticies(:,2); verticies(1,2)],...
-        '-');
+        [verticies_no_infinite(:,1); verticies_no_infinite(1,1)],...
+        [verticies_no_infinite(:,2); verticies_no_infinite(1,2)],...
+        '.-');
 end
 
 % Nudge the interior point inward, if it is on a border
@@ -64,7 +64,7 @@ end
 % Sometimes the polytopes intersect the box boundaries. We can artificially
 % add these border crossings as extra points so that we can project the
 % polytope correctly back onto walls (in a later step).
-[all_points, flag_was_intersection] = INTERNAL_fcn_findAllPoints(verticies,walls);
+[all_points, flag_was_intersection] = INTERNAL_fcn_findAllPoints(verticies_no_infinite,walls);
 
 if flag_do_debug
     % Plot the all_points locations
@@ -74,7 +74,7 @@ end
 % Check for the enclosing case where the polytope goes completely around
 % the bounding box (e.g. bounding box is INSIDE the polytope!?!). In this
 % case, there will be no projection, and so we should just exit.
-flag_vertices_outside = ((verticies(:,1)>=1) + (verticies(:,1)<=0)).*((verticies(:,2)>=1) + (verticies(:,2)<=0));
+flag_vertices_outside = ((verticies_no_infinite(:,1)>=1) + (verticies_no_infinite(:,1)<=0)).*((verticies_no_infinite(:,2)>=1) + (verticies_no_infinite(:,2)<=0));
 if all(flag_vertices_outside) && (flag_was_intersection==0)
     cropped_vertices = walls;
     return;
@@ -96,8 +96,12 @@ cropped_vertices = INTERNAL_fcn_cropRepeatedPoints(projected_points);
 
 % Sometimes the cross-product step above removes the repeated last vertex.
 % So we may have to fix this
-if ~isequal(cropped_vertices(1,:),cropped_vertices(end,:))
-    cropped_vertices = [cropped_vertices; cropped_vertices(1,:)];
+if ~isempty(cropped_vertices)
+    if ~isequal(cropped_vertices(1,:),cropped_vertices(end,:))
+        cropped_vertices = [cropped_vertices; cropped_vertices(1,:)];
+    end
+else
+    disp('Stop here');
 end
 
 if flag_do_debug

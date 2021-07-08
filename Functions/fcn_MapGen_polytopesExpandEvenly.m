@@ -119,7 +119,7 @@ if 1 == flag_check_inputs
  
     % Check the exp_dist input, make sure it is 'positive_column_of_numbers' type
     fcn_MapGen_checkInputsToFunctions(...
-        exp_dist, 'positive_column_of_numbers',1);
+        exp_dist, 'positive_1column_of_numbers',1);
  
 end
 

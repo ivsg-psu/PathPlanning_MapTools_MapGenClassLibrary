@@ -100,8 +100,8 @@ if 1 == flag_check_inputs
     end
     
     % Check the vertices input to have 4 or more rows, 2 columns
-    fcn_MapGen_checkInputsToFunctions(...
-        polytopes.vertices, '2column_of_numbers',[4 5]); 
+    %     fcn_MapGen_checkInputsToFunctions(...
+    %         polytopes.vertices, '2column_of_numbers',[4 5]);
     
  
 end
