@@ -132,7 +132,7 @@ end
 %See: http://patorjk.com/software/taag/#p=display&f=Big&t=Main
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
-if INTERNAL_fcn_isWithinABBB(axis_aligned_bounding_box,test_point)
+if fcn_MapGen_isWithinABBB(axis_aligned_bounding_box,test_point)
     center = [mean([axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,3)]),mean([axis_aligned_bounding_box(1,2) axis_aligned_bounding_box(1,4)])];
     vector = test_point - center;
     angle = atan2(vector(2),vector(1));
@@ -207,7 +207,7 @@ end % Ends the function
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
 
-function isInside = INTERNAL_fcn_isWithinABBB(box,test_point)
+function isInside = fcn_MapGen_isWithinABBB(box,test_point)
 % Checks if the point is within the AABB?
 % % See: https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
 % % for details on axis-aligned bounding boxes (AABB)

@@ -5,6 +5,7 @@ fcn_MapGen_generatePolysFromTiling( ...
 seed_points, ...
 V, ...
 C, ...
+AABB, ...
 stretch, ...
 varargin...
 )
@@ -23,6 +24,7 @@ varargin...
 %    seed_points, ...
 %    V, ...
 %    C, ...
+%    AABB, ...
 %    stretch, ...
 %    (fig_num) ...
 %    )
@@ -35,9 +37,13 @@ varargin...
 %     V: the V matrix resulting from Voronoi calculations
 % 
 %     C: the C matrix resulting from Voronoi calculations
+%
+%     AABB: the axis-aligned bounding box, in format of 
+%     [xmin ymin xmax ymax], wherein the resulting polytopes must be
+%     bounded.
 % 
-%     stretch: the list of seed points in [x y] format, where x and y are 
-%     columns
+%     stretch: the factor to stretch the polytopes after they are
+%     calculated, in format of [xmagnification ymagnification]
 % 
 %     (optional inputs)
 %
@@ -106,7 +112,7 @@ end
 if 1 == flag_check_inputs
 
     % Are there the right number of inputs?
-    if nargin < 4 || nargin > 5
+    if nargin < 5 || nargin > 6
         error('Incorrect number of input arguments')
     end
 
@@ -121,7 +127,7 @@ if 1 == flag_check_inputs
 end
 
 % Does user want to show the plots?
-if  5== nargin
+if  6== nargin
     fig_num = varargin{end};
     flag_do_plot = 1;
 else
@@ -161,40 +167,45 @@ polytopes(num_poly) = ...
 
 remove = 0; % keep track of how many cells to be removed
 for poly = 1:num_poly % pull each cell from the voronoi diagram
-    % x and y values from this cell
-    xv = V(C{poly},1)'; 
-    yv = V(C{poly},2)';
-    
-    verticies = V(C{poly},:);
+    % Grab verticies    
+    verticies = V(C{poly},:);    
     interior_point = seed_points(poly,:);
-    
-    % Are any vertices outside the [0,1] range?
-    if any(xv>1) || any(yv>1) || any(xv<0) || any(yv<0)
 
-        % Crop vertices to allowable range        
-        [cropped_vertices] = fcn_MapGen_cropPolytopeToRange(verticies, interior_point);
-        xv = cropped_vertices(1:end-1,1)';
-        yv = cropped_vertices(1:end-1,2)'; 
-    else
+    %     if (interior_point(1,1)<0.0079/2) && (interior_point(1,1)>0.0078/2) && (interior_point(1,2)<0.754/2) && (interior_point(1,2)>0.753/2)
+    %         disp('stop here');
+    %     end
+    
+    %     % Are any vertices outside the [0,1] range?
+    %     if any(xv>1) || any(yv>1) || any(xv<0) || any(yv<0)
+    
+    % Are any vertices outside the AABB?
+    if ~all(fcn_MapGen_isWithinABBB(AABB,verticies)==1)
         
+        % Crop vertices to allowable range        
+        [cropped_vertices] = ...
+            fcn_MapGen_cropPolytopeToRange(verticies, interior_point, AABB);
+        %         xv = cropped_vertices(1:end-1,1)';
+        %         yv = cropped_vertices(1:end-1,2)';
+    else
+        cropped_vertices = [verticies; verticies(1,:)]; % Close off the vertices
+        %         % x and y values from this cell
+        %         xv = verticies(:,1)';
+        %         yv = verticies(:,2)';
     end 
 
     % Are polytopes not trivial in length? (This may not be needed)
-    if length(xv)>2                
+    if length(cropped_vertices(:,1))>2                
     
         % make sure cw
-        vec1 = [xv(2)-xv(1),yv(2)-yv(1),0]; % vector leading into point
-        vec2 = [xv(3)-xv(2),yv(3)-yv(2),0]; % vector leading out of point
+        vec1 = [cropped_vertices(2,:)-cropped_vertices(1,:),0]; % vector leading into point
+        vec2 = [cropped_vertices(3,:)-cropped_vertices(2,:),0]; % vector leading out of point
         xing = cross(vec1,vec2); % cross product of two vectors
         if sign(xing(3)) == -1 % points ordered in wrong direction
-            xv = fliplr(xv);
-            yv = fliplr(yv);
+            cropped_vertices = flipud(cropped_vertices);
         end
         
         % enter info into polytope structure
-        polytopes(poly-remove).vertices = [[xv xv(1)]' [yv yv(1)]']; % repeat first vertice for easy plotting
-        
-        polytopes(poly-remove) = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes(poly-remove));
+        polytopes(poly-remove).vertices = cropped_vertices; 
 
     else % if 2 or less points in cell 
         remove = remove+1; % skip cell and remove later
@@ -206,13 +217,13 @@ polytopes = polytopes(1:(num_poly-remove));
 
 % Apply the stretch
 num_poly = length(polytopes);
-for poly = 1:num_poly % pull each cell from the voronoi diagram
-    
-    polytopes(poly).vertices  = polytopes(poly).vertices.*stretch;
-    polytopes(poly) = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes(poly));
-    
+for poly = 1:num_poly % pull each cell from the voronoi diagram   
+    polytopes(poly).vertices  = polytopes(poly).vertices.*stretch;    
 end % Ends for loop for stretch
 
+% Fill in all the other fields
+polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes);
+    
 %§
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

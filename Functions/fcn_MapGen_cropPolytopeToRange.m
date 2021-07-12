@@ -1,23 +1,155 @@
-function [cropped_vertices] = fcn_MapGen_cropPolytopeToRange(verticies, interior_point)
+function [cropped_vertices] = ...
+    fcn_MapGen_cropPolytopeToRange(...
+    verticies, ...
+    interior_point,...
+    AABB,...
+    varargin...
+    )
+% fcn_MapGen_cropPolytopeToRange
+% crops the given verticies of a polytope to an axis-aligned bounding box 
+% 
+% FORMAT:
+% 
+%    [cropped_vertices] = ...
+%     fcn_MapGen_cropPolytopeToRange(...
+%     verticies, ...
+%     interior_point,...
+%     AABB,...
+%    (fig_num) ...
+%    )
+% 
+% INPUTS:
+% 
+%     vertices: the list of vertex points defining the polytope, in [x y]
+%     format, where x and y are columns
+% 
+%     interior_point: a point inside the polytope, in [x y]
+%     format, where x and y are scalars
+% 
+%     AABB: the axis-aligned bounding box, in format of 
+%     [xmin ymin xmax ymax], wherein the resulting polytopes must be
+%     bounded.
+% 
+%     (optional inputs)
+%
+%     fig_num: any number that acts as a figure number output, causing a 
+%     figure to be drawn showing results.
+% 
+% 
+% OUTPUTS:
+% 
+%     cropped_vertices: the resulting verticies of the polytope, forced to
+%     fit within the AABB
+% 
+% 
+% DEPENDENCIES:
+% 
+%     fcn_MapGen_checkInputsToFunctions
+% 
+% EXAMPLES:
+% 
+% See the script: script_test_fcn_MapGen_cropPolytopeToRange
+% for a full test suite.
+% 
+% This function was written on 2021_07_11 by Sean Brennan
+% Questions or comments? contact sbrennan@psu.edu
 
-flag_do_debug = 0;
+% 
+% REVISION HISTORY:
+% 
+% 2021_07_11 by Sean Brennan
+% -- first write of function
 
-% TO-DO:
+% 
+% TO DO:
+% 
 % -- allow user to enter the allowable range (hard-coded now to 0 to 1)
 % -- check that inrerior point is inside vertices
 
+%% Debugging and Input checks
+flag_check_inputs = 1; % Set equal to 1 to check the input arguments 
+flag_do_plot = 0;      % % Set equal to 1 for plotting 
+flag_do_debug = 0;     % Set equal to 1 for debugging 
+
+if flag_do_debug
+    fig_for_debug = 846;
+    st = dbstack; %#ok<*UNRCH>
+    fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+end 
+
+%% check input arguments?
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   _____                   _
+%  |_   _|                 | |
+%    | |  _ __  _ __  _   _| |_ ___
+%    | | | '_ \| '_ \| | | | __/ __|
+%   _| |_| | | | |_) | |_| | |_\__ \
+%  |_____|_| |_| .__/ \__,_|\__|___/
+%              | |
+%              |_|
+% See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+if 1 == flag_check_inputs
+
+    % Are there the right number of inputs?
+    if nargin < 3 || nargin > 4
+        error('Incorrect number of input arguments')
+    end
+
+    % Check the verticies input, make sure it is '2column_of_numbers' type
+    fcn_MapGen_checkInputsToFunctions(...
+        verticies, '2column_of_numbers');
+
+    % Check the interior_point input, make sure it is '2column_of_numbers'
+    % type, with 1 row
+    fcn_MapGen_checkInputsToFunctions(...
+        interior_point, '2column_of_numbers',1);
+    
+    % Check the AABB input, make sure it is '4column_of_numbers' type, with
+    % 1 row
+    fcn_MapGen_checkInputsToFunctions(...
+        AABB, '4column_of_numbers',1);
+
+end
+
+% Does user want to show the plots?
+if  4== nargin
+    fig_num = varargin{end}; 
+    flag_do_plot = 1; 
+else
+    if flag_do_debug
+        fig = figure;
+        fig_for_debug = fig.Number;
+        flag_do_plot = 1;
+    end
+end
+
+%% Start of main code
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   __  __       _
+%  |  \/  |     (_)
+%  | \  / | __ _ _ _ __
+%  | |\/| |/ _` | | '_ \
+%  | |  | | (_| | | | | |
+%  |_|  |_|\__,_|_|_| |_|
+%
+%See: http://patorjk.com/software/taag/#p=display&f=Big&t=Main
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
+
+
 % snap prior to closest wall
-box = [0 0 1 1]; % [xmin ymin xmax ymax]
+box = AABB; % [xmin ymin xmax ymax]
 
 % Convert axis-aligned bounding box to wall format
-walls = [box(1,1) box(1,2); box(1,3) box(1,2); box(1,3) box(1,4); box(1,1) box(1,4); box(1,1) box(1,2)];
+walls = [...
+    box(1,1) box(1,2); ...
+    box(1,3) box(1,2); ...
+    box(1,3) box(1,4); ...
+    box(1,1) box(1,4); ...
+    box(1,1) box(1,2)];
 
-% % FOR DEBUGGING
-% if flag_do_debug
-%     if(interior_point(1,1)<0.002)&&(interior_point(1,2)>0.965)
-%         disp('Stop here');
-%     end
-% end
 
 % Open the figure if doing debugging
 if flag_do_debug
@@ -25,7 +157,7 @@ if flag_do_debug
     clf;
     hold on;
     
-    % Plot the vertices
+    % Plot the original vertices
     plot(...
         [verticies(:,1); verticies(1,1)],...
         [verticies(:,2); verticies(1,2)],...
@@ -41,7 +173,8 @@ end
 
 % Are any verticies infinite? If so, we need to check that the adjacent
 % verticies will create a reasonable polytope. 
-verticies_no_infinite = INTERNAL_fcn_removeInfiniteVerticies(verticies,box);
+verticies_no_infinite = ...
+    INTERNAL_fcn_removeInfiniteVerticies(verticies,box);
 
 % Open the figure if doing debugging
 if flag_do_debug
@@ -53,7 +186,8 @@ if flag_do_debug
 end
 
 % Nudge the interior point inward, if it is on a border
-interior_point = INTERNAL_fcn_nudgeInteriorPointInward(interior_point,box);
+interior_point = ...
+    INTERNAL_fcn_nudgeInteriorPointInward(interior_point,box);
 
 if flag_do_debug
     % Plot the new interior point
@@ -64,7 +198,8 @@ end
 % Sometimes the polytopes intersect the box boundaries. We can artificially
 % add these border crossings as extra points so that we can project the
 % polytope correctly back onto walls (in a later step).
-[all_points, flag_was_intersection] = INTERNAL_fcn_findAllPoints(verticies_no_infinite,walls);
+[all_points, flag_was_intersection] = ...
+    INTERNAL_fcn_findAllPoints(verticies_no_infinite,walls);
 
 if flag_do_debug
     % Plot the all_points locations
@@ -74,46 +209,109 @@ end
 % Check for the enclosing case where the polytope goes completely around
 % the bounding box (e.g. bounding box is INSIDE the polytope!?!). In this
 % case, there will be no projection, and so we should just exit.
-flag_vertices_outside = ((verticies_no_infinite(:,1)>=1) + (verticies_no_infinite(:,1)<=0)).*((verticies_no_infinite(:,2)>=1) + (verticies_no_infinite(:,2)<=0));
+flag_vertices_outside = ((verticies_no_infinite(:,1)>=AABB(1,3)) + ...
+    (verticies_no_infinite(:,1)<=AABB(1,1))).*((verticies_no_infinite(:,2)>=AABB(1,4)) + ...
+    (verticies_no_infinite(:,2)<=AABB(1,2)));
 if all(flag_vertices_outside) && (flag_was_intersection==0)
     cropped_vertices = walls;
-    return;
-end
-
-% From the interior point, project all_points back onto the wall to create
-% a polytope limited by the bounding box.
-projected_points = INTERNAL_fcn_projectAllPointsOntoWalls(interior_point, all_points,walls);
-
-if flag_do_debug
-    % Plot the projected_points locations
-    plot(projected_points(:,1),projected_points(:,2),'go-');
-end
-
-% Use the cross-product to eliminate co-linear points, as sometimes the
-% above process generates multiple points in a line, which is technically
-% not a polytope.
-cropped_vertices = INTERNAL_fcn_cropRepeatedPoints(projected_points);
-
-% Sometimes the cross-product step above removes the repeated last vertex.
-% So we may have to fix this
-if ~isempty(cropped_vertices)
-    if ~isequal(cropped_vertices(1,:),cropped_vertices(end,:))
-        cropped_vertices = [cropped_vertices; cropped_vertices(1,:)];
-    end
 else
-    disp('Stop here');
-end
+    
+    % From the interior point, project all_points back onto the wall to create
+    % a polytope limited by the bounding box.
+    projected_points = ...
+        INTERNAL_fcn_projectAllPointsOntoWalls(interior_point, all_points,walls);
+    
+    if flag_do_debug
+        % Plot the projected_points locations
+        plot(projected_points(:,1),projected_points(:,2),'go-');
+    end
+    
+    % Use the cross-product to eliminate co-linear points, as sometimes the
+    % above process generates multiple points in a line, which is technically
+    % not a polytope.
+    cropped_vertices = INTERNAL_fcn_cropRepeatedPoints(projected_points);
+    
+    % Sometimes the cross-product step above removes the repeated last vertex.
+    % So we may have to fix this
+    if ~isempty(cropped_vertices)
+        if ~isequal(cropped_vertices(1,:),cropped_vertices(end,:))
+            cropped_vertices = [cropped_vertices; cropped_vertices(1,:)];
+        end
+    else
+        disp('Stop here');
+    end
+end % Ends if statement to check if all points are encloses
+
+
+%§
+%% Plot the results (for debugging)?
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   _____       _
+%  |  __ \     | |
+%  | |  | | ___| |__  _   _  __ _
+%  | |  | |/ _ \ '_ \| | | |/ _` |
+%  | |__| |  __/ |_) | |_| | (_| |
+%  |_____/ \___|_.__/ \__,_|\__, |
+%                            __/ |
+%                           |___/
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+if flag_do_plot    
+    figure(fig_num);
+    clf;
+    hold on;
+    grid on;
+    grid minor;
+    
+    % Plot the original vertices
+    plot(...
+        [verticies(:,1); verticies(1,1)],...
+        [verticies(:,2); verticies(1,2)],...
+        '.-');
+    
+    % Plot the walls
+    plot(walls(:,1),walls(:,2),'k-');
+    
+    % Plot the interior point
+    plot(interior_point(:,1),interior_point(:,2),'ro');
+    
+    % Plot the cropped_vertices locations
+    plot(cropped_vertices(:,1),cropped_vertices(:,2),'mo-');
+    
+end % Ends the flag_do_plot if statement
 
 if flag_do_debug
-    % Plot the projected_points locations
-    plot(cropped_vertices(:,1),cropped_vertices(:,2),'mo-');
+    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
 end
 
-end
 
-function cropped_vertices = INTERNAL_fcn_cropRepeatedPoints(projected_points)
+end % Ends the function
+
+
+
+
+
+
+%% Functions follow
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   ______                _   _                 
+%  |  ____|              | | (_)                
+%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___ 
+%  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
+%  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
+%  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
+%                                               
+% See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
+
+
+function cropped_vertices = INTERNAL_fcn_cropRepeatedPoints(projected_points_with_repeats)
+% Remove repeats
+[projected_points,~,~] = unique(projected_points_with_repeats,'rows','stable');
+
 % Use the cross-product to eliminate co-linear points
-
 Npoints = length(projected_points(:,1));
 good_indices = zeros(Npoints,1);
 
@@ -145,8 +343,16 @@ end % Ends INTERNAL_fcn_cropRepeatedPoints
 
 
 
-function projected_points = INTERNAL_fcn_projectAllPointsOntoWalls(interior_point, all_points,walls)
+function projected_points = INTERNAL_fcn_projectAllPointsOntoWalls(interior_point, all_points_unsorted,walls)
 % From the interior point, project all_points back onto the wall.
+
+% Convert the input xy data into polar coordinates, so that we can sort by
+% theta. If we don't do this, then sometimes (rarely) the walls of the
+% polytope will jump around producing very weird results.
+offset_points = all_points_unsorted - interior_point;
+[theta,~]=cart2pol(offset_points(:,1),offset_points(:,2));
+[~,index_sorted] = sort(theta,'descend');
+all_points = all_points_unsorted(index_sorted,:);
 
 projected_points = 0*all_points;
 for ith_point = 1:length(all_points(:,1))

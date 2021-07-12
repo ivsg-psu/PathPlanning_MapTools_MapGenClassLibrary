@@ -291,6 +291,19 @@ if strcmpi(variable_type_string,'polytopes')
     flag_pattern_was_matched = 1;
 end
 
+% mixedset
+if strcmpi(variable_type_string,'mixedset')
+    flags.check_likeStructure = 1; % Check that result is like a particular structure
+    template_structure = ...
+        struct(...
+        'name',[],...
+        'settings',[],...
+        'AABB',[]);
+    flags.structureToBeLike = template_structure;
+
+    flag_pattern_was_matched = 1;
+end
+
 if 0==flag_pattern_was_matched
     error('The variable type: %s is not defined in context of error checking.',variable_type_string);
 end

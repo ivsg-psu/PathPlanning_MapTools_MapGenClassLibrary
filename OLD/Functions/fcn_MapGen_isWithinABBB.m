@@ -1,60 +1,66 @@
 function [ ...
-filled_polytopes ...
+isInside ...
 ] = ...
-fcn_MapGen_fillPolytopeFieldsFromVertices( ...
-polytopes, ...
+fcn_MapGen_isWithinABBB( ...
+AABB, ...
+test_points, ...
 varargin...
 )
-% fcn_MapGen_fillPolytopeFieldsFromVertices
-% Given a polytoope structure array where the vertices field is filled, 
-% calculates the values for all the other fields.
+% fcn_MapGen_isWithinABBB
+% Checks if the points are within the AABB, returning a vector of 1' or 
+% 0's the same length as the nubmer of rows of points.
 % 
 % 
 % 
 % FORMAT:
 % 
 %    [ ...
-%    filled_polytopes ...
+%    isInside ...
 %    ] = ...
-%    fcn_MapGen_fillPolytopeFieldsFromVertices( ...
-%    polytopes, ...
+%    fcn_MapGen_isWithinABBB( ...
+%    AABB, ...
+%    test_points, ...
 %    (fig_num) ...
 %    )
 % 
 % INPUTS:
 % 
-%     polytopes: an individual structure or structure array of 'polytopes' 
-%     type that stores the polytopes to be filled
+%     AABB: the Axis-Aligned Bounding Box, defined in form of [xmin ymin 
+%     xmax ymax]
+% 
+%     test_points: the test points to check, in form of [x y] where x and 
+%     y are scalar or column vectors
 % 
 %     (optional inputs)
 %
-%     fig_num: any number that acts as a figure number output, causing a 
-%     figure to be drawn showing results.
+%     fig_num: any number that acts somewhat like a figure number output. 
+%     If given, this forces the variable types to be displayed as output 
+%     and as well makes the input check process verbose.
 % 
 % 
 % OUTPUTS:
 % 
-%     filled_polytopes: the polytopes array with all fields completed
+%     isInside: a column of 1's or 0's, one for each test point, with 1 
+%     meaning that the test point is within the AABB
 % 
 % 
 % DEPENDENCIES:
 % 
-%     fcn_MapGen_polytopeCentroidAndArea
 %     fcn_MapGen_checkInputsToFunctions
 % 
 % 
 % EXAMPLES:
 % 
-% See the script: script_test_fcn_MapGen_fillPolytopeFieldsFromVertices
+% See the script: script_test_fcn_MapGen_isWithinABBB
 % for a full test suite.
 % 
-% This function was written on 2021_07_02 by Sean Brennan
+% This function was written on 2021_07_11 by Sean Brennan
 % Questions or comments? contact sbrennan@psu.edu
 
 % 
 % REVISION HISTORY:
 % 
-% 2021_07_02 by Sean Brennan
+% 2021_07_11 by Sean Brennan
 % -- first write of function
 
 % 
@@ -68,7 +74,7 @@ flag_do_plot = 0;      % Set equal to 1 for plotting
 flag_do_debug = 0;     % Set equal to 1 for debugging 
 
 if flag_do_debug
-    fig_for_debug = 3;
+    fig_for_debug = 225;
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
 end 
@@ -90,24 +96,22 @@ end
 if 1 == flag_check_inputs
 
     % Are there the right number of inputs?
-    if nargin < 1 || nargin > 2
+    if nargin < 2 || nargin > 3
         error('Incorrect number of input arguments')
     end
 
-    % Check the polytopes input, make sure it has vertices   
-    if ~isfield(polytopes,'vertices')
-        error('Field of vertices was not found');
-    end
-    
-    % Check the vertices input to have 4 or more rows, 2 columns
-    %     fcn_MapGen_checkInputsToFunctions(...
-    %         polytopes.vertices, '2column_of_numbers',[4 5]);
-    
+    % Check the AABB input, make sure it is '4column_of_numbers' type
+    fcn_MapGen_checkInputsToFunctions(...
+        AABB, '4column_of_numbers',1);
+ 
+    % Check the test_points input, make sure it is '2column_of_numbers' type
+    fcn_MapGen_checkInputsToFunctions(...
+        test_points, '2column_of_numbers',1);
  
 end
 
 % Does user want to show the plots?
-if  2== nargin
+if  3== nargin
     fig_num = varargin{end};
     flag_do_plot = 1;
 else
@@ -130,30 +134,41 @@ end
 %See: http://patorjk.com/software/taag/#p=display&f=Big&t=Main
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
-% Initialize variables
-filled_polytopes = polytopes;
-num_poly = length(polytopes);
 
-for ith_poly = 1:num_poly % pull each polytope
-    
-    % adjust polytopes
-    filled_polytopes(ith_poly).xv        = (polytopes(ith_poly).vertices(1:end-1,1)');
-    filled_polytopes(ith_poly).yv        = (polytopes(ith_poly).vertices(1:end-1,2)');
-    filled_polytopes(ith_poly).distances = ...
-        sum((polytopes(ith_poly).vertices(1:end-1,:) - ...
-        polytopes(ith_poly).vertices(2:end,:)).^2,2).^0.5;
-    
-    % Calculate the mean and area
-    [filled_polytopes(ith_poly).mean,filled_polytopes(ith_poly).area] = ...
-        fcn_MapGen_polytopeCentroidAndArea(polytopes(ith_poly).vertices);
-    
-    % Find max radius
-    radii = sum(...
-        (filled_polytopes(ith_poly).vertices(1:end-1,:) - ...
-        ones(length(filled_polytopes(ith_poly).xv),1)*filled_polytopes(ith_poly).mean).^2,2).^0.5;
-    filled_polytopes(ith_poly).max_radius = ...
-        max(radii);
-end
+
+
+
+% % See: https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
+% % for details on axis-aligned bounding boxes (AABB)
+
+isInside = (test_points(:,1)>AABB(1,1))  & ...
+    (test_points(:,2)>AABB(1,2))  & ...
+    (test_points(:,1)<AABB(1,3))  & ...
+    (test_points(:,2)<AABB(1,4));
+
+% plotting
+figure(fig_num);
+clf;
+hold on;
+
+% Convert axis-aligned bounding box to wall format
+walls = [AABB(1,1) AABB(1,2); AABB(1,3) AABB(1,2); AABB(1,3) AABB(1,4); AABB(1,1) AABB(1,4); AABB(1,1) AABB(1,2)];
+
+% Plot the walls
+plot(walls(:,1),walls(:,2),'k-');
+
+% Plot the test_points
+
+% plot(...
+%     [test_points(:,1); test_points(1,1)],...
+%     [test_points(:,2); test_points(1,2)],...
+%     '.-');
+plot(test_points(:,1), test_points(:,2),'k.');
+
+% Plot the interior points
+plot(test_points(isInside,1),test_points(isInside,2),'go');
+
+% 
 
 %§
 %% Plot the results (for debugging)?
@@ -171,18 +186,7 @@ end
 
 
 if flag_do_plot
-    figure(fig_num);
-    hold on
-    
-    % plot the polytopes
-    fcn_MapGen_plotPolytopes(filled_polytopes,fig_num,'b',2);
-      
-    % plot the means in black
-    temp = zeros(length(filled_polytopes),2);
-    for ith_poly = 1:length(filled_polytopes)
-        temp(ith_poly,:) = filled_polytopes(ith_poly).mean;
-    end
-    plot(temp(:,1),temp(:,2),'ko','Markersize',3);
+    % Nothing to plot here
 end % Ends the flag_do_plot if statement    
 
 if flag_do_debug
@@ -205,4 +209,5 @@ end % Ends the function
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
 
+end
 

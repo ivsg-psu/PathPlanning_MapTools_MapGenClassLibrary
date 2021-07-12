@@ -144,8 +144,8 @@ seed_points = rand_points;
 % V = V.*stretch;
 
 %% fill polytopes from tiling
-polytopes = fcn_MapGen_generatePolysFromTiling(seed_points,V,C,stretch);
-
+AABB = [0 0 1 1];
+polytopes = fcn_MapGen_generatePolysFromTiling(seed_points,V,C,AABB, stretch);
 
 
 %% Plot results?

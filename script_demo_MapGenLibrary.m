@@ -10,11 +10,11 @@
 % -- Added other types of point generators
 % 2021_07_06
 % -- Updated to include the newer expansion functions
+% 2021_07_11
+% -- Add ability to extend halton set to right (e.g. "scrolling" map), see
+% the function: fcn_MapGen_mixedSetVoronoiTiling
 
 % TO-DO:
-% -- finish the growth of polytopes functions, e.g. get the 
-% function: fcn_polytope_editing_expand_polytopes_for_sensing, working
-% -- Add ability to extend halton set to right (e.g. "scrolling" map)
 % -- add functions that, given a map, give core statistics (look out limit, linear density, etc - basically make functions to calculate all the pi-values and interpretations we might need)
 % -- add prior work on grid-based map generation
 
@@ -45,6 +45,15 @@ end
 Twocolumn_of_numbers_test = [4 1; 3 0; 2 5];
 fcn_MapGen_checkInputsToFunctions(Twocolumn_of_numbers_test, '2column_of_numbers');
 
+
+%% Show how to check if points are within an Axis-Aligned Bounding Box
+AABB = [0 0 1 1]; % Define the axis-aligned bounding box
+test_points = randn(100,2);
+fig_num = 1;
+isInside = fcn_MapGen_isWithinABBB(AABB,test_points,fig_num);
+
+
+
 %% Show how to generate polytopes from a tiling
 fig_num = 10;
 
@@ -57,10 +66,12 @@ low_pt = Halton_range(1,1);
 high_pt = Halton_range(1,2);
 seed_points = points_scrambled(low_pt:high_pt,:);
 [V,C] = voronoin(seed_points);
-% V = V.*stretch;
+
+AABB = [0 0 1 1]; % Define the axis-aligned bounding box
+stretch = [1 1];
 
 % fill polytopes from tiling
-polytopes = fcn_MapGen_generatePolysFromTiling(seed_points,V,C,stretch,fig_num);
+polytopes = fcn_MapGen_generatePolysFromTiling(seed_points,V,C,AABB, stretch,fig_num);
 
 %% Generate a set of polytopes from various pseudo-random sources
 close all;
@@ -96,6 +107,27 @@ fig_num = 15;
 Rand_range = [1 1000]; % range of Halton points to use to generate the tiling
 tiled_polytopes = fcn_MapGen_randomNormalVoronoiTiling(Rand_range,[1 1],fig_num);
 title('Random normally distributed set');
+
+%% Show how to create an overlapping set using different AABBs for each set.
+close all;
+clear mixedSet
+
+fig_num = 1;
+stretch = [1 1];
+set_range = [1 100];
+
+rng(1234);
+
+mixedSet(1).name = 'haltonset';
+mixedSet(1).settings = set_range;
+mixedSet(1).AABB = [0 0 1 1];
+
+mixedSet(2).name = 'rand';
+mixedSet(2).settings = set_range;
+mixedSet(2).AABB = [0.5 0 0.75 1];
+
+polytopes = fcn_MapGen_mixedSetVoronoiTiling(mixedSet,stretch,fig_num);
+
 
 %% Show how the maps can be trimmed, shrunk, etc
 % Generate a set of polytopes from the Halton set
@@ -232,7 +264,7 @@ shrunk_polytopes2=fcn_MapGen_polytopesShrinkToRadius(...
 
 
 
-%% generate error bubbles via fcn_MapGen_ugvSensorErrorBubble
+% generate error bubbles via fcn_MapGen_ugvSensorErrorBubble
 [err] = fcn_MapGen_ugvSensorErrorBubble(shrunk_polytopes2, 0, 5);
 
 % Convert error bounds into polytope structure

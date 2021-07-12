@@ -166,8 +166,6 @@ Area = abs(A); % unsigned area
 %                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-
 if flag_do_plot
     figure(fig_num)
     clf;
