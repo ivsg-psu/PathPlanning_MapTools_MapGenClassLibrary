@@ -13,6 +13,10 @@
 % 2021_07_11
 % -- Add ability to extend halton set to right (e.g. "scrolling" map), see
 % the function: fcn_MapGen_mixedSetVoronoiTiling
+% 2021_07_12
+% -- Added ability to determine generic map statistics via
+% the function: fcn_MapGen_polytopesStatistics
+
 
 % TO-DO:
 % -- add functions that, given a map, give core statistics (look out limit, linear density, etc - basically make functions to calculate all the pi-values and interpretations we might need)
@@ -233,6 +237,26 @@ exp_polytopes=fcn_MapGen_polytopesExpandEvenly(one_polytope,exp_dist,fig_num);
 fig_num = 7;
 exp_dist = 0.01;
 exp_polytopes=fcn_MapGen_polytopesExpandEvenly(polytopes,exp_dist,fig_num);
+
+%% Show calculation of map statistics
+fig_num = 9;
+fcn_MapGen_polytopesStatistics(...
+    polytopes,...
+    fig_num);
+
+%% Remove close points and redo statistics
+tolerance = 0.01;
+cleaned_polytopes = polytopes;
+for ith_poly = 1:length(polytopes)
+    cleaned_polytopes(ith_poly) = fcn_MapGen_polytopeRemoveTightVerticies(...
+        polytopes(ith_poly), tolerance);    
+end
+
+fig_num = 20;
+fcn_MapGen_polytopesStatistics(...
+    cleaned_polytopes,...
+    fig_num);
+
 
 %% Generating starting map for UGV Error Bubbles and Plotting functions (Nick's work)
 

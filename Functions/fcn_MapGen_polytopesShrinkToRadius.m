@@ -28,6 +28,10 @@ function [shrunk_polytopes,mu_final,sigma_final] = ...
 %
 %     MIN_RAD: minimum acceptable radius
 %
+%     (optional inputs)
+%
+%     fig_num: any number that acts as a figure number output, causing a
+%     figure to be drawn showing results.
 %
 % OUTPUTS:
 %
