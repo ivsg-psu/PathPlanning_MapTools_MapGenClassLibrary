@@ -2,9 +2,9 @@ function [ ...
     snap_point,...
     wall_number...
     ] = ...
-    fcn_MapGen_snapToAABB( ...
+    fcn_MapGen_projectVectorToAABB( ...
     axis_aligned_bounding_box, ...
-    test_point, ...
+    projection_vector, ...
     varargin...
     )
 % fcn_MapGen_snapToAABB
@@ -35,12 +35,8 @@ function [ ...
 %
 %     (optional inputs)
 %
-%     snap_type: 
-%         0 - (default) snap to projection from middle of AABB wall
-%         1 - snap to closest wall, 
-%         2 - project the vector to closest wall. 
-%             for option 2: test_point must have 2 rows representing
-%             [start; end] of vector
+%     snap_type: 1 - snap to closest wall, 0 (default) snap to projection
+%     from middle of AABB.
 %
 %     fig_num: any number that acts as a figure number output, causing a
 %     figure to be drawn showing results.
@@ -71,8 +67,6 @@ function [ ...
 % -- first write of function
 % 2021_07_14
 % -- added snap type to allow projections from center
-% 2021_07_17
-% -- added vector projection snap type
 
 %
 % TO DO:
@@ -111,21 +105,14 @@ if 1 == flag_check_inputs
         error('Incorrect number of input arguments')
     end
     
-    % Check the axis_aligned_bounding_box input, make sure it is
-    % '4column_of_numbers' type
+    % Check the axis_aligned_bounding_box input, make sure it is '4column_of_numbers' type
     fcn_MapGen_checkInputsToFunctions(...
         axis_aligned_bounding_box, '4column_of_numbers',1);
     
     % Check the test_point input, make sure it is '2column_of_numbers' type
-    % with 1 or more rows
     fcn_MapGen_checkInputsToFunctions(...
-        test_point, '2column_of_numbers',[1 2]);
-
-    % Check the test_point input, make sure it is '2column_of_numbers' type
-    % with 2 or less rows
-    fcn_MapGen_checkInputsToFunctions(...
-        test_point, '2column_of_numbers',[2 1]);
-
+        projection_vector, '2column_of_numbers',1);
+    
 end
 
 flag_snap_type = 0;
@@ -164,24 +151,26 @@ walls = [...
     axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,2)];
 
 center = [mean([axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,3)]),mean([axis_aligned_bounding_box(1,2) axis_aligned_bounding_box(1,4)])];
-vector = test_point - center;
+vector = projection_vector - center;
 angle = atan2(vector(2),vector(1));
 
 % Is the point within the AABB?
-if fcn_MapGen_isWithinABBB(axis_aligned_bounding_box,test_point)
+if fcn_MapGen_isWithinABBB(axis_aligned_bounding_box,projection_vector)
     
     % Snap via projection, or nearest wall?
-    if flag_snap_type == 0    % Use projection from center of AABB to wall
+    if flag_snap_type==0
+        % Use projection
         [~,snap_point,wall_number] = ...
             INTERNAL_fcn_geometry_findIntersectionOfSegments(...
             walls(1:end-1,:),...
             walls(2:end,:),...
             center,...
-            test_point,...
+            projection_vector,...
             3);
         
-    elseif flag_snap_type == 1     % Use nearest wall
-        snap_point = test_point;
+    else
+        % Use nearest wall
+        snap_point = projection_vector;
         if angle>=-pi/4 && angle<pi/4  % This is the x-max wall
             snap_point(1,1) = axis_aligned_bounding_box(1,3);
         elseif angle>=pi/4 && angle<pi*3/4 % This is the y-max wall
@@ -191,16 +180,6 @@ if fcn_MapGen_isWithinABBB(axis_aligned_bounding_box,test_point)
         else % This is the x-min wall
             snap_point(1,1) = axis_aligned_bounding_box(1,1);
         end
-    elseif flag_snap_type == 3    % Use user-entered vector projection
-        [~,snap_point,wall_number] = ...
-            INTERNAL_fcn_geometry_findIntersectionOfSegments(...
-            walls(1:end-1,:),...
-            walls(2:end,:),...
-            test_point(1,:),...  % Start
-            test_point(2,:),...   % End
-            3);
-    else
-        error('Unrecognized projection type!');
     end
 else % Point is outside the box - no need to snap
     [~,~,wall_number] = ...
@@ -208,9 +187,9 @@ else % Point is outside the box - no need to snap
         walls(1:end-1,:),...
         walls(2:end,:),...
         center,...
-        test_point,...
+        projection_vector,...
         3);
-    snap_point = test_point;
+    snap_point = projection_vector;
 end
 
 %§
@@ -237,14 +216,14 @@ if flag_do_plot
     box_outline = [axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,2); axis_aligned_bounding_box(1,3) axis_aligned_bounding_box(1,2); axis_aligned_bounding_box(1,3) axis_aligned_bounding_box(1,4); axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,4); axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,2)];
     plot(box_outline(:,1),box_outline(:,2),'-');
     
-    % Plot the test point(s)
-    plot(test_point(:,1),test_point(:,2),'o-');
+    % Plot the test point
+    plot(projection_vector(:,1),projection_vector(:,2),'o');
     
     % Plot the snap point
     plot(snap_point(:,1),snap_point(:,2),'x');
     
-    % Plot the snap point to test point line
-    plot([test_point(1,1) snap_point(1,1)],[test_point(1,2) snap_point(:,2)],'-');
+    % Plot the snap point
+    plot([projection_vector(:,1) snap_point(1,1)],[projection_vector(:,2) snap_point(:,2)],'-');
     %
     
 end % Ends the flag_do_plot if statement

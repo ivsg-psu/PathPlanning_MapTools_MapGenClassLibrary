@@ -1,59 +1,42 @@
-function [ ...
-isInside ...
-] = ...
-fcn_MapGen_isWithinABBB( ...
-AABB, ...
-test_points, ...
-varargin...
-)
-% fcn_MapGen_isWithinABBB
-% Checks if the points are within the given axis-aligned bounding box,
-% AABB, returning a vector of 1' or 0's the same length as the nubmer of
-% rows of points. Each point must be strictly within the AABB - e.g. this
-% function returns "false" if a point is on the "wall" of the AABB.
-% 
-% 
+function [walls] = ...
+    fcn_MapGen_convertAABBtoWalls(...
+    AABB,varargin)
+
+% fcn_MapGen_convertAABBtoWalls
+% converts axis-aligned bounding boxes into equivalent enclosing walls
 % 
 % FORMAT:
 % 
-%    [ ...
-%    isInside ...
-%    ] = ...
-%    fcn_MapGen_isWithinABBB( ...
-%    AABB, ...
-%    test_points, ...
-%    (fig_num) ...
-%    )
+%    [walls] = ...
+%    fcn_MapGen_convertAABBtoWalls(...
+%    AABB,(fig_num))
 % 
 % INPUTS:
 % 
-%     AABB: the Axis-Aligned Bounding Box, defined in form of [xmin ymin 
-%     xmax ymax]
-% 
-%     test_points: the test points to check, in form of [x y] where x and 
-%     y are scalar or column vectors
-% 
+%     AABB: the axis-aligned bounding box, in format of 
+%     [xmin ymin xmax ymax], wherein the resulting polytopes must be
+%     bounded.
+%
 %     (optional inputs)
 %
-%     fig_num: any number that acts somewhat like a figure number output. 
-%     If given, this forces the variable types to be displayed as output 
-%     and as well makes the input check process verbose.
+%     fig_num: any number that acts as a figure number output, causing a 
+%     figure to be drawn showing results.
 % 
 % 
 % OUTPUTS:
 % 
-%     isInside: a column of 1's or 0's, one for each test point, with 1 
-%     meaning that the test point is within the AABB
+%     walls: the resulting vertices of the walls in [x y] format. Note that
+%     the walls enclose, so the last vertices will be the same as the
+%     first.
 % 
 % 
 % DEPENDENCIES:
 % 
 %     fcn_MapGen_checkInputsToFunctions
 % 
-% 
 % EXAMPLES:
 % 
-% See the script: script_test_fcn_MapGen_isWithinABBB
+% See the script: script_test_fcn_MapGen_convertAABBtoWalls
 % for a full test suite.
 % 
 % This function was written on 2021_07_11 by Sean Brennan
@@ -62,23 +45,21 @@ varargin...
 % 
 % REVISION HISTORY:
 % 
-% 2021_07_11 by Sean Brennan
-% -- first write of function
 % 2021_07_17 by Sean Brennan
-% -- clarified strictness of the AABB
+% -- first write of function
 
 % 
 % TO DO:
 % 
-% -- fill in to-do items here.
+
 
 %% Debugging and Input checks
 flag_check_inputs = 1; % Set equal to 1 to check the input arguments 
-flag_do_plot = 0;      % Set equal to 1 for plotting 
+flag_do_plot = 0;      % % Set equal to 1 for plotting 
 flag_do_debug = 0;     % Set equal to 1 for debugging 
 
 if flag_do_debug
-    fig_for_debug = 225;
+    fig_for_debug = 4564;
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
 end 
@@ -100,28 +81,24 @@ end
 if 1 == flag_check_inputs
 
     % Are there the right number of inputs?
-    if nargin < 2 || nargin > 3
+    if nargin < 1 || nargin > 2
         error('Incorrect number of input arguments')
     end
-
-    % Check the AABB input, make sure it is '4column_of_numbers' type
+   
+    % Check the AABB input, make sure it is '4column_of_numbers' type, with
+    % 1 row
     fcn_MapGen_checkInputsToFunctions(...
         AABB, '4column_of_numbers',1);
- 
-    % Check the test_points input, make sure it is '2column_of_numbers' type
-    fcn_MapGen_checkInputsToFunctions(...
-        test_points, '2column_of_numbers');
- 
+
 end
 
 % Does user want to show the plots?
-if  3== nargin
-    fig_num = varargin{end};
-    flag_do_plot = 1;
+if  2== nargin
+    fig_num = varargin{end}; 
+    flag_do_plot = 1; 
 else
     if flag_do_debug
-        fig = figure;
-        fig_for_debug = fig.Number;
+        fig_num = fig_for_debug;
         flag_do_plot = 1;
     end
 end
@@ -137,19 +114,15 @@ end
 %
 %See: http://patorjk.com/software/taag/#p=display&f=Big&t=Main
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
-
-
-
-
-
-% % See: https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
-% % for details on axis-aligned bounding boxes (AABB)
-
-isInside = (test_points(:,1)>AABB(1,1))  & ...
-    (test_points(:,2)>AABB(1,2))  & ...
-    (test_points(:,1)<AABB(1,3))  & ...
-    (test_points(:,2)<AABB(1,4));
-
+% Goes through the vertices and removes infinite values by inserting
+% points prior, and after the infinite one that "close" the polytope.
+% Convert axis-aligned bounding box to wall format
+walls = [...
+    AABB(1,1) AABB(1,2); ...
+    AABB(1,3) AABB(1,2); ...
+    AABB(1,3) AABB(1,4); ...
+    AABB(1,1) AABB(1,4); ...
+    AABB(1,1) AABB(1,2)];
 
 %§
 %% Plot the results (for debugging)?
@@ -166,28 +139,20 @@ isInside = (test_points(:,1)>AABB(1,1))  & ...
 
 
 
-if flag_do_plot
+if flag_do_plot    
     figure(fig_num);
     clf;
     hold on;
+    grid on;
+    grid minor;
     
-    % Convert axis-aligned bounding box to wall format
-    walls = [AABB(1,1) AABB(1,2); AABB(1,3) AABB(1,2); AABB(1,3) AABB(1,4); AABB(1,1) AABB(1,4); AABB(1,1) AABB(1,2)];
+    scale = max(AABB,[],'all') - min(AABB,[],'all');
+    new_axis = [AABB(1)-scale/2 AABB(3)+scale/2 AABB(2)-scale/2 AABB(4)+scale/2];
+    axis(new_axis);
     
     % Plot the walls
-    plot(walls(:,1),walls(:,2),'k-');
-    
-    % Plot the test_points
-    
-    % plot(...
-    %     [test_points(:,1); test_points(1,1)],...
-    %     [test_points(:,2); test_points(1,2)],...
-    %     '.-');
-    plot(test_points(:,1), test_points(:,2),'k.');
-    
-    % Plot the interior points with green
-    plot(test_points(isInside,1),test_points(isInside,2),'go');
-    
+    plot(walls(:,1),walls(:,2),'b-');
+        
 end % Ends the flag_do_plot if statement
 
 if flag_do_debug
@@ -196,6 +161,11 @@ end
 
 
 end % Ends the function
+
+
+
+
+
 
 %% Functions follow
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -208,7 +178,6 @@ end % Ends the function
 %                                               
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
-
 
 
 

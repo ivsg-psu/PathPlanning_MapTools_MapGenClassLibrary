@@ -167,9 +167,8 @@ Nvertices_per_poly = 20; % Maximum estimate
 Nvertices_per_map = Npolys*Nvertices_per_poly;
 all_vertices = nan(Nvertices_per_map,3);
 all_neighbors = nan(Nvertices_per_map,1);
-flag_contains_corner = zeros(Npolys,1);
 
-% Loop through the polytopes, filling verticies matrix
+% Loop through the polytopes, filling verticies and neighbors matrix
 for ith_poly = 1:Npolys
     vertices_open = V(C{ith_poly},:); 
     vertices = [vertices_open; vertices_open(1,:)]; % Close off the vertices
@@ -182,38 +181,16 @@ for ith_poly = 1:Npolys
         all_vertices(row_offset+1:row_offset+Nvertices,2:3) = vertices;
     end
     
-    for jth_neighbor = 1:Npolys
-        if jth_neighbor~=ith_poly % Make sure not checking self
-            vertices_neighbors = V(C{jth_neighbor},:); % Grab verticies
-            vertices_neighbors = vertices_neighbors(~isinf(vertices_neighbors(:,1)),:);
-            if any(ismember(vertices_open,vertices_neighbors)) % Any shared?
-                neighbors_vector = all_neighbors(row_offset+1:row_offset+Nvertices_per_poly,:);
-                if ~any(ismember(neighbors_vector,jth_neighbor))
-                    next_index = find(isnan(neighbors_vector),1,'first');
-                    if ~isempty(next_index)
-                        neighbors_vector(next_index) = jth_neighbor;
-                        all_neighbors(row_offset+1:row_offset+Nvertices_per_poly,:) = ...
-                            neighbors_vector;
-                    else
-                        error('Need to make neighbors bigger');
-                    end
-                end
-            end
-        end
-    end % Ends loop through neighbors
-    
+       
 end
 
-% % Convert cartesian to polar
-% [theta_values,~] = cart2pol(all_vertices(:,2),all_vertices(:,3));
-% 
-% % Reshape by polytope
-% theta_matrix = reshape(theta_values,Nvertices_per_poly,Npolys);
-% 
-% 
-% all_vertices_column_no_nan = all_vertices_column(~isnan(all_vertices_column));
-% 
-% exterior_polytopes = INTERNAL_fcn_MapGen_findBoundaryPolytopes(all_vertices);
+
+% Remove infinite vertices
+[bounded_vertices] = ...
+    fcn_MapGen_removeInfiniteVertices(all_vertices,seed_points,AABB,Nvertices_per_poly);
+
+
+
 
 remove = 0; % keep track of how many cells to be removed
 for poly = 1:num_poly % pull each cell from the voronoi diagram
@@ -233,10 +210,10 @@ for poly = 1:num_poly % pull each cell from the voronoi diagram
     %     end
     
    
-    % Are any vertices outside the AABB?
+    % Are any vertices outside the AABB? If so, there's a process
     if ~all(fcn_MapGen_isWithinABBB(AABB,vertices)==1)
         
-        % Crop vertices to allowable range        
+      % Crop vertices to allowable range        
         [cropped_vertices] = ...
             fcn_MapGen_cropPolytopeToRange(vertices, interior_point, AABB);
         %         xv = cropped_vertices(1:end-1,1)';
@@ -320,7 +297,32 @@ if flag_do_plot
     end
     plot(temp(:,1),temp(:,2),'ko','Markersize',3);
     
-    % plot the connections between the polytopes
+    % plot the connections between the polytope neighbors
+    
+    % Fill in neighbors - Note: this is SLOW. A much better way to do this
+    % would be to sort the all-verticies by the point values, then cluster
+    % the polytope indices together.
+    for jth_neighbor = 1:Npolys
+        if jth_neighbor~=ith_poly % Make sure not checking self
+            vertices_neighbors = V(C{jth_neighbor},:); % Grab verticies
+            vertices_neighbors = vertices_neighbors(~isinf(vertices_neighbors(:,1)),:);
+            if any(ismember(vertices_open,vertices_neighbors)) % Any shared?
+                neighbors_vector = all_neighbors(row_offset+1:row_offset+Nvertices_per_poly,:);
+                if ~any(ismember(neighbors_vector,jth_neighbor))
+                    next_index = find(isnan(neighbors_vector),1,'first');
+                    if ~isempty(next_index)
+                        neighbors_vector(next_index) = jth_neighbor;
+                        all_neighbors(row_offset+1:row_offset+Nvertices_per_poly,:) = ...
+                            neighbors_vector;
+                    else
+                        error('Need to make neighbors bigger');
+                    end
+                end
+            end
+        end
+    end % Ends loop through neighbors
+    
+    
     data = [];
     for ith_poly = 1:Npolys
         row_offset = (ith_poly-1)*Nvertices_per_poly;

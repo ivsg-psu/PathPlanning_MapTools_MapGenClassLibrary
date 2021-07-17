@@ -274,6 +274,12 @@ if contains(variable_type_string,pattern)
     flags.check_if_integer = 1; % Check that the variable is an integer
 end
 
+% XXX_of_mixed
+pattern = '_of_mixed';
+if contains(variable_type_string,pattern)
+    flags.check_if_noNaN = 0; % Removes check that it be numeric
+end
+
 % polytopes
 if strcmpi(variable_type_string,'polytopes')
     flags.check_likeStructure = 1; % Check that result is like a particular structure
