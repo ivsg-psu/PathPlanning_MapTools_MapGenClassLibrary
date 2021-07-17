@@ -1,42 +1,27 @@
-function [ ...
-    snap_point,...
-    wall_number...
-    ] = ...
-    fcn_MapGen_snapToAABB( ...
-    axis_aligned_bounding_box, ...
-    test_point, ...
-    varargin...
-    )
-% fcn_MapGen_snapToAABB
-% Given an axis-aligned bounding box (AABB), and a test point, returns a
-% snap point representing the contact point on the closest wall to the
-% test point.
-%
-%
+function [cropped_vertices,NwallsHit] = ...
+   fcn_MapGen_cropVerticesByWallIntersections(vertex_string,walls,varargin)
+
+% fcn_MapGen_cropVerticesByWallIntersections
+% Crops a vertex string by the walls
 %
 % FORMAT:
 %
-%    [ ...
-%    snap_point ...
-%    ] = ...
-%    fcn_MapGen_snapToAABB( ...
-%    axis_aligned_bounding_box, ...
-%    test_point, ...
-%    (snap_type),...
-%    (fig_num) ...
-%    )
+%    [cropped_vertices] = ...
+%   fcn_MapGen_cropVerticesByWallIntersections(vertex_string,walls)
 %
 % INPUTS:
 %
-%     axis_aligned_bounding_box: the axis-aligned bounding box, in format
-%     [xmin ymin xmax ymax]
-%
-%     test_point: the test point, in format [x y]
-%
+%     vertex_string: a list of vertex points defining, usually, a portion
+%     of a polytope. These are listed as an N x 2 array, where in [x y]
+%     format, where x and y are columns with at least 2 or more rows
+% 
+%     walls: a list of the walls of a polytope used to crop the vertex
+%     string. Only the vertices inside the walls are kept along with the
+%     entry/exit points in/out of the walls. These are listed as an N x 2
+%     array, where in [x y] format, where x and y are columns with at least
+%     2 or more rows. Note: it is assumed that the walls are connected.
+% 
 %     (optional inputs)
-%
-%     snap_type: 1 - snap to closest wall, 0 (default) snap to projection
-%     from middle of AABB.
 %
 %     fig_num: any number that acts as a figure number output, causing a
 %     figure to be drawn showing results.
@@ -44,29 +29,32 @@ function [ ...
 %
 % OUTPUTS:
 %
-%     snap_point: the resulting snap point, in format [x y]
+%     cropped_vertices: a list of vertex points defining only the portion
+%     of the vertex string within the walls, including the entry and exit
+%     points.These are listed as an N x 2 array, where in [x y]
+%     format, where x and y are columns
 %
+%     NwallsHit: the count of the different number of walls that were hit
 %
 % DEPENDENCIES:
 %
-%     (none)
-%
+%     fcn_MapGen_checkInputsToFunctions
+%     fcn_MapGen_checkIfPointInsideConvexPolytope
+%     INTERNAL_fcn_geometry_findIntersectionOfSegments
 %
 % EXAMPLES:
 %
-% See the script: script_test_fcn_MapGen_snapToAABB
+% See the script: script_test_fcn_MapGen_cropVerticesByWallIntersections
 % for a full test suite.
 %
-% This function was written on 2021_07_02 by Sean Brennan
+% This function was written on 2021_07_15 by Sean Brennan
 % Questions or comments? contact sbrennan@psu.edu
 
 %
 % REVISION HISTORY:
 %
-% 2021_07_02 by Sean Brennan
+% 2021_07_15 by Sean Brennan
 % -- first write of function
-% 2021_07_14
-% -- added snap type to allow projections from center
 
 %
 % TO DO:
@@ -101,27 +89,23 @@ end
 if 1 == flag_check_inputs
     
     % Are there the right number of inputs?
-    if nargin < 2 || nargin > 4
+    if nargin < 2 || nargin > 3
         error('Incorrect number of input arguments')
     end
-    
-    % Check the axis_aligned_bounding_box input, make sure it is '4column_of_numbers' type
+      
+    % Check the vertex_string input, make sure it is '2column_of_numbers'
+    % type, with 2 or more rows
     fcn_MapGen_checkInputsToFunctions(...
-        axis_aligned_bounding_box, '4column_of_numbers',1);
+        vertex_string, '2column_of_numbers',[2 3]);
     
-    % Check the test_point input, make sure it is '2column_of_numbers' type
+    % Check the walls input, make sure it is '2column_of_numbers' type,
+    % with 2 or more rows 
     fcn_MapGen_checkInputsToFunctions(...
-        test_point, '2column_of_numbers',1);
-    
-end
-
-flag_snap_type = 0;
-if  3<= nargin
-    flag_snap_type = varargin{1};
+        walls, '2column_of_numbers',[2 3]);
 end
 
 % Does user want to show the plots?
-if  4== nargin
+if 3 == nargin
     fig_num = varargin{end};
     flag_do_plot = 1;
 else
@@ -143,54 +127,45 @@ end
 %
 %See: http://patorjk.com/software/taag/#p=display&f=Big&t=Main
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
-walls = [...
-    axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,2); ...
-    axis_aligned_bounding_box(1,3) axis_aligned_bounding_box(1,2); ...
-    axis_aligned_bounding_box(1,3) axis_aligned_bounding_box(1,4); ...
-    axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,4); ...
-    axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,2)];
 
-center = [mean([axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,3)]),mean([axis_aligned_bounding_box(1,2) axis_aligned_bounding_box(1,4)])];
-vector = test_point - center;
-angle = atan2(vector(2),vector(1));
+% STEP 1: Loop through all the vertices, looking for intersections
+Nvertices = length(vertex_string(:,1));
+Nwalls = length(walls(:,1))-1;
+flags_in_walls = zeros(Nvertices,1);
 
-% Is the point within the AABB?
-if fcn_MapGen_isWithinABBB(axis_aligned_bounding_box,test_point)
+cropped_vertices = [];
+walls_hit = zeros(Nwalls,1);
+
+for ith_vertex = 1:Nvertices
+    % Check if this vertex is inside a wall?
+    flags_in_walls(ith_vertex)  = ...
+        fcn_MapGen_checkIfPointInsideConvexPolytope( ...
+        vertex_string(ith_vertex,:), ...
+        walls);
+    if flags_in_walls(ith_vertex)
+        cropped_vertices = [cropped_vertices; vertex_string(ith_vertex,:)]; %#ok<AGROW>
+    end
     
-    % Snap via projection, or nearest wall?
-    if flag_snap_type==0
-        % Use projection
-        [~,snap_point,wall_number] = ...
+    % Find intersection points?
+    if ith_vertex~=Nvertices
+        sensor_vector_start = vertex_string(ith_vertex,:);
+        sensor_vector_end = vertex_string(ith_vertex+1,:);
+        [~,wall_hit_locations, wall_that_was_hit] = ...
             INTERNAL_fcn_geometry_findIntersectionOfSegments(...
             walls(1:end-1,:),...
             walls(2:end,:),...
-            center,...
-            test_point,...
-            3);
-        
-    else
-        % Use nearest wall
-        snap_point = test_point;
-        if angle>=-pi/4 && angle<pi/4  % This is the x-max wall
-            snap_point(1,1) = axis_aligned_bounding_box(1,3);
-        elseif angle>=pi/4 && angle<pi*3/4 % This is the y-max wall
-            snap_point(1,2) = axis_aligned_bounding_box(1,4);
-        elseif angle>=-3*pi/4 && angle<(-pi/4) % This is the y-min wall
-            snap_point(1,2) = axis_aligned_bounding_box(1,2);
-        else % This is the x-min wall
-            snap_point(1,1) = axis_aligned_bounding_box(1,1);
+            sensor_vector_start,...
+            sensor_vector_end,...
+            2);  % All overlaps
+        if ~isempty(wall_hit_locations)
+            cropped_vertices = [cropped_vertices; wall_hit_locations]; %#ok<AGROW>
+            walls_hit(wall_that_was_hit)=1;
         end
     end
-else % Point is outside the box - no need to snap
-    [~,~,wall_number] = ...
-        INTERNAL_fcn_geometry_findIntersectionOfSegments(...
-        walls(1:end-1,:),...
-        walls(2:end,:),...
-        center,...
-        test_point,...
-        3);
-    snap_point = test_point;
 end
+   
+cropped_vertices = unique(cropped_vertices,'rows','stable');
+NwallsHit = sum(walls_hit);
 
 %§
 %% Plot the results (for debugging)?
@@ -212,20 +187,17 @@ if flag_do_plot
     axis equal
     grid on;
     
-    % Plot the bounding box
-    box_outline = [axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,2); axis_aligned_bounding_box(1,3) axis_aligned_bounding_box(1,2); axis_aligned_bounding_box(1,3) axis_aligned_bounding_box(1,4); axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,4); axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,2)];
-    plot(box_outline(:,1),box_outline(:,2),'-');
+    % Plot the vertex_string
+    plot(vertex_string(:,1),vertex_string(:,2),'ko-');
     
-    % Plot the test point
-    plot(test_point(:,1),test_point(:,2),'o');
+    % Plot the walls
+    plot(walls(:,1),walls(:,2),'b-');
     
-    % Plot the snap point
-    plot(snap_point(:,1),snap_point(:,2),'x');
-    
-    % Plot the snap point
-    plot([test_point(:,1) snap_point(1,1)],[test_point(:,2) snap_point(:,2)],'-');
-    %
-    
+    if ~isempty(cropped_vertices)
+        % Plot the cropped_vertices
+        plot(cropped_vertices(:,1),cropped_vertices(:,2),'g.-');
+    end
+       
 end % Ends the flag_do_plot if statement
 
 if flag_do_debug
@@ -246,18 +218,6 @@ end % Ends the function
 %
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
-
-
-function isInside = fcn_MapGen_isWithinABBB(box,test_point)
-% Checks if the point is within the AABB?
-% % See: https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
-% % for details on axis-aligned bounding boxes (AABB)
-
-isInside = (test_point(1,1)>box(1,1))  && ...
-        (test_point(1,2)>box(1,2))  && ...
-        (test_point(1,1)<box(1,3))  && ...
-        (test_point(1,2)<box(1,4));
-end
 
 
 

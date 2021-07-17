@@ -1,4 +1,4 @@
-function fcn_MapGen_polytopesStatistics(...
+function poly_map_stats = fcn_MapGen_polytopesStatistics(...
     polytopes,...
     varargin)
 % fcn_MapGen_polytopesStatistics calculates key statistics for the
@@ -6,7 +6,7 @@ function fcn_MapGen_polytopesStatistics(...
 %
 % FORMAT:
 % 
-% [(no outputs)] = ...
+% [poly_map_stats] = ...
 %     fcn_MapGen_polytopesStatistics(...
 %     polytopes,...
 %     (fig_num))
@@ -19,6 +19,11 @@ function fcn_MapGen_polytopesStatistics(...
 %
 %     fig_num: any number that acts as a figure number output, causing a
 %     figure to be drawn showing results.
+%
+% OUTPUTS:
+%
+%     poly_map_stats: a structure whose fields contain the polytope map's
+%     statistics
 %
 % DEPENDENCIES:
 % 
@@ -106,10 +111,20 @@ all_angles = nan(Nverticies_per_poly,Npolys);
 all_lengths = nan(Nverticies_per_poly,Npolys);
 all_side_count = zeros(Npolys,1);
 all_max_radius = zeros(Npolys,1);
+all_areas = zeros(Npolys,1);
+AABB = [inf inf -inf -inf];
 
 % Loop through the polytopes
 for ith_poly = 1:Npolys
     vertices = polytopes(ith_poly).vertices;
+
+    % Update the AABB
+    AABB(1) = min(AABB(1),min(vertices(:,1)));
+    AABB(2) = min(AABB(2),min(vertices(:,2)));
+    AABB(3) = max(AABB(3),max(vertices(:,1)));
+    AABB(4) = max(AABB(4),max(vertices(:,2)));
+
+    
     Nangles = length(vertices(:,1))-1;
     calculation_vertices = [vertices; vertices(2,:)];
     
@@ -130,6 +145,7 @@ for ith_poly = 1:Npolys
     all_lengths(1:Nangles,ith_poly) = polytopes(ith_poly).distances;
     all_side_count(ith_poly,1) = Nangles;
     all_max_radius(ith_poly,1) = polytopes(ith_poly).max_radius;
+    all_areas(ith_poly,1) = polytopes(ith_poly).area;
         
     % Plot the input polytopes in red
     %fcn_MapGen_plotPolytopes(polytopes(ith_poly),fig_num,'r',2);
@@ -137,9 +153,46 @@ for ith_poly = 1:Npolys
 end
 angle_column = reshape(all_angles,Nverticies_per_poly*Npolys,1);
 angle_column_no_nan = angle_column(~isnan(angle_column));
+average_vertex_angle = nanmean(angle_column_no_nan*180/pi);
+std_vertex_angle = nanstd(angle_column_no_nan*180/pi);
+
+average_max_radius = nanmean(all_max_radius);
+std_max_radius = nanstd(all_max_radius);
 
 length_column = reshape(all_lengths,Nverticies_per_poly*Npolys,1);
 length_column_no_nan = length_column(~isnan(length_column));
+total_perimeter = sum(length_column_no_nan);
+
+average_side_length = nanmean(length_column_no_nan);
+std_side_length = nanstd(length_column_no_nan);
+
+occupied_area = sum(all_areas);
+total_area    = (AABB(3)-AABB(1))*(AABB(4)-AABB(2));
+unoccupied_area = total_area-occupied_area;
+unoccupancy_ratio = (total_area - occupied_area)/total_area;
+
+point_density = length(polytopes)/total_area;
+linear_density = point_density.^0.5;
+
+average_gap_size_G_bar = (unoccupancy_ratio/point_density)^0.5; % See Eq. (4.24 in Seth Tau's thesis)
+perimeter_gap_size = 2*unoccupied_area/(total_perimeter);
+
+% Fill in results
+poly_map_stats.occupied_area = occupied_area;
+poly_map_stats.total_area = total_area;
+poly_map_stats.unoccupied_area = unoccupied_area;
+poly_map_stats.unoccupancy_ratio = unoccupancy_ratio;
+poly_map_stats.point_density = point_density;
+poly_map_stats.linear_density = linear_density;
+poly_map_stats.average_gap_size_G_bar = average_gap_size_G_bar;
+poly_map_stats.perimeter_gap_size = perimeter_gap_size;
+poly_map_stats.average_vertex_angle = average_vertex_angle;
+poly_map_stats.std_vertex_angle = std_vertex_angle;
+poly_map_stats.average_max_radius = average_max_radius;
+poly_map_stats.std_max_radius = std_max_radius;
+poly_map_stats.average_side_length = average_side_length;
+poly_map_stats.std_side_length = std_side_length;
+poly_map_stats.total_perimeter = total_perimeter;
 
 
 %% Plot results?
@@ -155,6 +208,25 @@ length_column_no_nan = length_column(~isnan(length_column));
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if flag_do_plot
+    
+    fprintf(1,'\n\nSUMMARY STATISTICS: \n');
+    fprintf(1,'\tOccupied Area: %.2f\n',occupied_area);
+    fprintf(1,'\tTotal Area: %.2f\n',total_area);
+    fprintf(1,'\tUnoccupied Area: %.2f\n',unoccupied_area);
+    fprintf(1,'\tUnoccupancy ratio: %.2f\n',unoccupancy_ratio);
+    fprintf(1,'\tPoint density: %.2f\n',point_density);
+    fprintf(1,'\tLinear density: %.2f\n',linear_density);
+    fprintf(1,'\tAverage gap size, G-bar: %.5f\n',average_gap_size_G_bar);
+    fprintf(1,'\tPerimeter gap size: %.5f\n',perimeter_gap_size);
+    fprintf(1,'\tAverage vertex angle (deg): %.2f\n',average_vertex_angle);
+    fprintf(1,'\tStd dev vertex angle (deg): %.2f\n',std_vertex_angle);
+    fprintf(1,'\tAverage maximum radius: %.4f\n',average_max_radius);
+    fprintf(1,'\tStd dev maximum radius: %.4f\n',std_max_radius);
+    fprintf(1,'\tAverage side length: %.4f\n',average_side_length);
+    fprintf(1,'\tStd dev side length: %.4f\n',std_side_length);
+    fprintf(1,'\tTotal perimeter: %.4f\n',total_perimeter);
+    
+    
     
     figure(fig_num)
     
@@ -174,7 +246,7 @@ if flag_do_plot
     subplot(2,3,2);   
     histogram(angle_column_no_nan*180/pi,100);
     xlabel('Angles (deg)');
-    title(sprintf('Histogram of angles. Mean: %.2f, StdDev: %.2f',nanmean(angle_column_no_nan*180/pi),nanstd(angle_column_no_nan*180/pi)));
+    title(sprintf('Histogram of angles. Mean: %.2f, StdDev: %.2f',average_vertex_angle,std_vertex_angle));
     
     subplot(2,3,3);   
     histogram(all_side_count,100);
@@ -184,12 +256,12 @@ if flag_do_plot
     subplot(2,3,4);   
     histogram(length_column_no_nan,100);
     xlabel('Side Lengths');
-    title(sprintf('Histogram of side length. Mean: %.4f, StdDev: %.4f',nanmean(length_column_no_nan),nanstd(length_column_no_nan)));
+    title(sprintf('Histogram of side length. Mean: %.4f, StdDev: %.4f',average_side_length,std_side_length));
     
     subplot(2,3,5); 
     histogram(all_max_radius,100);
     xlabel('Max radius');
-    title(sprintf('Histogram of max radius. Mean: %.4f, StdDev: %.4f',nanmean(all_max_radius),nanstd(all_max_radius)));
+    title(sprintf('Histogram of max radius. Mean: %.4f, StdDev: %.4f',average_max_radius,std_max_radius));
 
 end
 

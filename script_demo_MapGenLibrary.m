@@ -65,7 +65,9 @@ fig_num = 10;
 halton_points = haltonset(2);
 points_scrambled = scramble(halton_points,'RR2'); % scramble values
 
+
 % pick values from halton set
+Halton_range = [1 100];
 low_pt = Halton_range(1,1);
 high_pt = Halton_range(1,2);
 seed_points = points_scrambled(low_pt:high_pt,:);
@@ -136,8 +138,18 @@ polytopes = fcn_MapGen_mixedSetVoronoiTiling(mixedSet,stretch,fig_num);
 %% Show how the maps can be trimmed, shrunk, etc
 % Generate a set of polytopes from the Halton set
 fig_num = 21;
-Halton_range = [1 200]; % range of Halton points to use to generate the tiling
-tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
+for i=1:100:10000
+    figure(fig_num); clf;
+    Halton_range = [i i+100]; % range of Halton points to use to generate the tiling
+    % The following gives an example, top left, of where generator point is NOT inside resulting polytope: Halton_range = [3901        4001];
+    tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
+    title(sprintf('Halton range is: [%.0d %.0d]',i,i+100));
+    pause;
+end
+
+fcn_MapGen_polytopesStatistics(...
+    tiled_polytopes,...
+    fig_num+1);
 
 % Plot the polytopes
 fig_num = 22;

@@ -1,16 +1,12 @@
-function [ ...
-    snap_point,...
-    wall_number...
+function [ in_polytope ...
     ] = ...
-    fcn_MapGen_snapToAABB( ...
-    axis_aligned_bounding_box, ...
+    fcn_MapGen_checkIfPointInsidePolytope( ...
     test_point, ...
+    vertices, ...
     varargin...
     )
-% fcn_MapGen_snapToAABB
-% Given an axis-aligned bounding box (AABB), and a test point, returns a
-% snap point representing the contact point on the closest wall to the
-% test point.
+% fcn_MapGen_checkIfPointInsidePolytope
+% Given an convex polytope, checks if point is within the polytope
 %
 %
 %
@@ -19,24 +15,20 @@ function [ ...
 %    [ ...
 %    snap_point ...
 %    ] = ...
-%    fcn_MapGen_snapToAABB( ...
-%    axis_aligned_bounding_box, ...
+%    fcn_MapGen_checkIfPointInsidePolytope( ...
 %    test_point, ...
-%    (snap_type),...
+%    vertices, ...
 %    (fig_num) ...
 %    )
 %
 % INPUTS:
 %
-%     axis_aligned_bounding_box: the axis-aligned bounding box, in format
-%     [xmin ymin xmax ymax]
-%
 %     test_point: the test point, in format [x y]
 %
+%     vertices: the list of vertex points defining the polytope, in [x y]
+%     format, where x and y are columns
+% 
 %     (optional inputs)
-%
-%     snap_type: 1 - snap to closest wall, 0 (default) snap to projection
-%     from middle of AABB.
 %
 %     fig_num: any number that acts as a figure number output, causing a
 %     figure to be drawn showing results.
@@ -44,7 +36,7 @@ function [ ...
 %
 % OUTPUTS:
 %
-%     snap_point: the resulting snap point, in format [x y]
+%     in_polytope: 1 if the point is within the polytope, 0 otherwise
 %
 %
 % DEPENDENCIES:
@@ -54,19 +46,17 @@ function [ ...
 %
 % EXAMPLES:
 %
-% See the script: script_test_fcn_MapGen_snapToAABB
+% See the script: script_test_fcn_MapGen_checkIfPointInsidePolytope
 % for a full test suite.
 %
-% This function was written on 2021_07_02 by Sean Brennan
+% This function was written on 2021_07_14 by Sean Brennan
 % Questions or comments? contact sbrennan@psu.edu
 
 %
 % REVISION HISTORY:
 %
-% 2021_07_02 by Sean Brennan
+% 2021_07_14 by Sean Brennan
 % -- first write of function
-% 2021_07_14
-% -- added snap type to allow projections from center
 
 %
 % TO DO:
@@ -101,27 +91,21 @@ end
 if 1 == flag_check_inputs
     
     % Are there the right number of inputs?
-    if nargin < 2 || nargin > 4
+    if nargin < 2 || nargin > 3
         error('Incorrect number of input arguments')
     end
-    
-    % Check the axis_aligned_bounding_box input, make sure it is '4column_of_numbers' type
-    fcn_MapGen_checkInputsToFunctions(...
-        axis_aligned_bounding_box, '4column_of_numbers',1);
-    
+      
     % Check the test_point input, make sure it is '2column_of_numbers' type
     fcn_MapGen_checkInputsToFunctions(...
         test_point, '2column_of_numbers',1);
     
-end
-
-flag_snap_type = 0;
-if  3<= nargin
-    flag_snap_type = varargin{1};
+    % Check the verticies input, make sure it is '2column_of_numbers' type
+    fcn_MapGen_checkInputsToFunctions(...
+        verticies, '2column_of_numbers');
 end
 
 % Does user want to show the plots?
-if  4== nargin
+if 3 == nargin
     fig_num = varargin{end};
     flag_do_plot = 1;
 else
@@ -143,54 +127,8 @@ end
 %
 %See: http://patorjk.com/software/taag/#p=display&f=Big&t=Main
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
-walls = [...
-    axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,2); ...
-    axis_aligned_bounding_box(1,3) axis_aligned_bounding_box(1,2); ...
-    axis_aligned_bounding_box(1,3) axis_aligned_bounding_box(1,4); ...
-    axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,4); ...
-    axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,2)];
 
-center = [mean([axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,3)]),mean([axis_aligned_bounding_box(1,2) axis_aligned_bounding_box(1,4)])];
-vector = test_point - center;
-angle = atan2(vector(2),vector(1));
 
-% Is the point within the AABB?
-if fcn_MapGen_isWithinABBB(axis_aligned_bounding_box,test_point)
-    
-    % Snap via projection, or nearest wall?
-    if flag_snap_type==0
-        % Use projection
-        [~,snap_point,wall_number] = ...
-            INTERNAL_fcn_geometry_findIntersectionOfSegments(...
-            walls(1:end-1,:),...
-            walls(2:end,:),...
-            center,...
-            test_point,...
-            3);
-        
-    else
-        % Use nearest wall
-        snap_point = test_point;
-        if angle>=-pi/4 && angle<pi/4  % This is the x-max wall
-            snap_point(1,1) = axis_aligned_bounding_box(1,3);
-        elseif angle>=pi/4 && angle<pi*3/4 % This is the y-max wall
-            snap_point(1,2) = axis_aligned_bounding_box(1,4);
-        elseif angle>=-3*pi/4 && angle<(-pi/4) % This is the y-min wall
-            snap_point(1,2) = axis_aligned_bounding_box(1,2);
-        else % This is the x-min wall
-            snap_point(1,1) = axis_aligned_bounding_box(1,1);
-        end
-    end
-else % Point is outside the box - no need to snap
-    [~,~,wall_number] = ...
-        INTERNAL_fcn_geometry_findIntersectionOfSegments(...
-        walls(1:end-1,:),...
-        walls(2:end,:),...
-        center,...
-        test_point,...
-        3);
-    snap_point = test_point;
-end
 
 %§
 %% Plot the results (for debugging)?
@@ -212,19 +150,15 @@ if flag_do_plot
     axis equal
     grid on;
     
-    % Plot the bounding box
-    box_outline = [axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,2); axis_aligned_bounding_box(1,3) axis_aligned_bounding_box(1,2); axis_aligned_bounding_box(1,3) axis_aligned_bounding_box(1,4); axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,4); axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,2)];
-    plot(box_outline(:,1),box_outline(:,2),'-');
-    
     % Plot the test point
-    plot(test_point(:,1),test_point(:,2),'o');
+    plot(test_point(:,1),test_point(:,2),'x');
     
-    % Plot the snap point
-    plot(snap_point(:,1),snap_point(:,2),'x');
+    % Plot the vertices
+    plot(vertices(:,1),vertices(:,2),'b-');
     
-    % Plot the snap point
-    plot([test_point(:,1) snap_point(1,1)],[test_point(:,2) snap_point(:,2)],'-');
-    %
+    % Plot the result
+    plot(test_point(:,1),test_point(:,2),'x');
+    
     
 end % Ends the flag_do_plot if statement
 
