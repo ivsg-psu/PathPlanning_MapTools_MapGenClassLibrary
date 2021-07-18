@@ -187,27 +187,31 @@ end
 
 % Remove infinite vertices
 [bounded_vertices] = ...
-    fcn_MapGen_removeInfiniteVertices(all_vertices,seed_points,AABB,Nvertices_per_poly);
-
-
+    fcn_MapGen_removeInfiniteVertices(...
+    all_vertices,seed_points,AABB,Nvertices_per_poly,21);
 
 
 remove = 0; % keep track of how many cells to be removed
 for poly = 1:num_poly % pull each cell from the voronoi diagram
     % Grab verticies    
-    vertices_open = V(C{poly},:); 
-    vertices = [vertices_open; vertices_open(1,:)]; % Close off the vertices
+    %     row_offset = (poly-1)*Nvertices_per_poly;
+    %     vertices = bounded_vertices(row_offset+1:row_offset+Nvertices,2:3);
+    %     vertices = vertices(~isnan(vertices(:,1)));
+    indices = bounded_vertices(:,1)==poly;
+    vertices = bounded_vertices(indices,2:3);
+    
+
     interior_point = seed_points(poly,:);
 
-    %     tolerance = 0.001;
-    %     location = [0.2102 0.0506];
-    %     if (...
-    %             (interior_point(1,1)<location(1)+tolerance) && ...
-    %             (interior_point(1,1)>location(1)-tolerance) && ...
-    %             (interior_point(1,2)<location(2)+tolerance) && ...
-    %             (interior_point(1,2)>location(2)-tolerance))
-    %         disp('stop here');
-    %     end
+    tolerance = 0.001;
+    location = [0.0351 0.0946];
+    if (...
+            (interior_point(1,1)<location(1)+tolerance) && ...
+            (interior_point(1,1)>location(1)-tolerance) && ...
+            (interior_point(1,2)<location(2)+tolerance) && ...
+            (interior_point(1,2)>location(2)-tolerance))
+        disp('stop here');
+    end
     
    
     % Are any vertices outside the AABB? If so, there's a process
@@ -216,13 +220,8 @@ for poly = 1:num_poly % pull each cell from the voronoi diagram
       % Crop vertices to allowable range        
         [cropped_vertices] = ...
             fcn_MapGen_cropPolytopeToRange(vertices, interior_point, AABB);
-        %         xv = cropped_vertices(1:end-1,1)';
-        %         yv = cropped_vertices(1:end-1,2)';
     else
-        cropped_vertices = [vertices; vertices(1,:)]; % Close off the vertices
-        %         % x and y values from this cell
-        %         xv = verticies(:,1)';
-        %         yv = verticies(:,2)';
+        cropped_vertices = vertices; 
     end 
 
     % Are polytopes not trivial in length? (This may not be needed)
@@ -298,38 +297,25 @@ if flag_do_plot
     plot(temp(:,1),temp(:,2),'ko','Markersize',3);
     
     % plot the connections between the polytope neighbors
+    % Clean up and sort the vertices so that we can associate neighbors
+    all_vertices_no_nan = all_vertices(~isnan(all_vertices(:,1)),:);
+    sorted_all_vertices = sortrows(all_vertices_no_nan,[2 3]);
     
-    % Fill in neighbors - Note: this is SLOW. A much better way to do this
-    % would be to sort the all-verticies by the point values, then cluster
-    % the polytope indices together.
-    for jth_neighbor = 1:Npolys
-        if jth_neighbor~=ith_poly % Make sure not checking self
-            vertices_neighbors = V(C{jth_neighbor},:); % Grab verticies
-            vertices_neighbors = vertices_neighbors(~isinf(vertices_neighbors(:,1)),:);
-            if any(ismember(vertices_open,vertices_neighbors)) % Any shared?
-                neighbors_vector = all_neighbors(row_offset+1:row_offset+Nvertices_per_poly,:);
-                if ~any(ismember(neighbors_vector,jth_neighbor))
-                    next_index = find(isnan(neighbors_vector),1,'first');
-                    if ~isempty(next_index)
-                        neighbors_vector(next_index) = jth_neighbor;
-                        all_neighbors(row_offset+1:row_offset+Nvertices_per_poly,:) = ...
-                            neighbors_vector;
-                    else
-                        error('Need to make neighbors bigger');
-                    end
-                end
-            end
-        end
-    end % Ends loop through neighbors
+    % Remove repeats
+    sorted_all_vertices = unique(sorted_all_vertices,'rows','stable');
     
+    % Remove infinities
+    sorted_all_vertices = sorted_all_vertices(~isinf(sorted_all_vertices(:,2)));    
     
-    data = [];
-    for ith_poly = 1:Npolys
-        row_offset = (ith_poly-1)*Nvertices_per_poly;
-        neighbors_vector = all_neighbors(row_offset+1:row_offset+Nvertices_per_poly,:);
-        neighbors = neighbors_vector(~isnan(neighbors_vector));
-        for jth_neighbor = 1:length(neighbors)
-            data = [data; seed_points(ith_poly,:); seed_points(neighbors(jth_neighbor),:); nan nan]; %#ok<AGROW>
+    Nrealvertices = floor(length(sorted_all_vertices(:,1))/3);
+    data = zeros(Nrealvertices*6,2);
+    for ith_poly = 1:Nrealvertices
+        row_offset = (ith_poly-1)*3;
+        neighbors = sorted_all_vertices(row_offset+1:row_offset+3,1);        
+        
+        for jth_neighbor = 2:length(neighbors)
+            neigh_offset = (ith_poly-1)*6 + ((jth_neighbor-2)*3);
+            data(neigh_offset+1:neigh_offset+3,:) = [seed_points(neighbors(1),:); seed_points(neighbors(jth_neighbor),:); nan nan];
         end
     end
     plot(data(:,1),data(:,2),'-','Linewidth',0.5);
@@ -342,6 +328,32 @@ end
 
 
 end % Ends the function
+
+
+
+
+% Fill in neighbors - Note: this is SLOW. A much better way to do this
+% would be to sort the all-verticies by the point values, then cluster
+% the polytope indices together.
+
+%         if jth_neighbor~=ith_poly % Make sure not checking self
+%             vertices_neighbors = V(C{jth_neighbor},:); % Grab verticies
+%             vertices_neighbors = vertices_neighbors(~isinf(vertices_neighbors(:,1)),:);
+%             if any(ismember(vertices_open,vertices_neighbors)) % Any shared?
+%                 neighbors_vector = all_neighbors(row_offset+1:row_offset+Nvertices_per_poly,:);
+%                 if ~any(ismember(neighbors_vector,jth_neighbor))
+%                     next_index = find(isnan(neighbors_vector),1,'first');
+%                     if ~isempty(next_index)
+%                         neighbors_vector(next_index) = jth_neighbor;
+%                         all_neighbors(row_offset+1:row_offset+Nvertices_per_poly,:) = ...
+%                             neighbors_vector;
+%                     else
+%                         error('Need to make neighbors bigger');
+%                     end
+%                 end
+%             end
+%         end
+% end % Ends loop through neighbors
 
 %% Functions follow
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

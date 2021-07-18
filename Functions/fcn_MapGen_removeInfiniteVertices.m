@@ -69,7 +69,7 @@ function [bounded_vertices] = ...
 %% Debugging and Input checks
 flag_check_inputs = 1; % Set equal to 1 to check the input arguments
 flag_do_plot = 0;      % % Set equal to 1 for plotting
-flag_do_debug = 1;     % Set equal to 1 for debugging
+flag_do_debug = 0;     % Set equal to 1 for debugging
 
 if flag_do_debug
     fig_for_debug = 846;
@@ -186,6 +186,19 @@ if any(isinf(all_vertices),'all') % Are there any infinite vertices
     for ith_poly = 1:length(bad_polytopes)
         bad_poly = bad_polytopes(ith_poly);
         
+        
+        interior_point = seed_points(bad_poly,:);
+        tolerance = 0.001;
+        location = [0.0351 0.0946];
+        if (...
+                (interior_point(1,1)<location(1)+tolerance) && ...
+                (interior_point(1,1)>location(1)-tolerance) && ...
+                (interior_point(1,2)<location(2)+tolerance) && ...
+                (interior_point(1,2)>location(2)-tolerance))
+            disp('stop here');
+        end
+
+        
         % Grab this bad polytope
         row_offset = (bad_poly-1)*Nvertices_per_poly;
         this_poly = all_vertices(row_offset+1:row_offset+Nvertices_per_poly,:);
@@ -195,7 +208,7 @@ if any(isinf(all_vertices),'all') % Are there any infinite vertices
             plot(this_poly(:,2),this_poly(:,3),'b.-');
         end
         
-        % Grab vertices out of tis polytope, removing nan values
+        % Grab vertices out of this polytope, removing nan values
         vertices = this_poly(:,2:3);
         vertices = vertices(~isnan(vertices(:,1)),:);
         
@@ -236,23 +249,31 @@ if any(isinf(all_vertices),'all') % Are there any infinite vertices
             plot(vertex_string(:,1),vertex_string(:,2),'b.-');
         end
         
-        [cropped_vertices,~] = ...
-            fcn_MapGen_cropVerticesByWallIntersections(vertex_string,walls);
-        
-        if flag_do_debug
-            % Plot the cropped_vertices
-            plot(cropped_vertices(:,1),cropped_vertices(:,2),'g.-');
-        end
+        %         [cropped_vertices,~] = ...
+        %             fcn_MapGen_cropVerticesByWallIntersections(vertex_string,walls);
+        %
+        %         if flag_do_debug
+        %             % Plot the cropped_vertices
+        %             plot(cropped_vertices(:,1),cropped_vertices(:,2),'g.-');
+        %         end
+        %
+        %         prior_point = cropped_vertices(end,:);
+        %         prior_point_lead_in = cropped_vertices(end-1,:);
+        %         next_point = cropped_vertices(1,:);
+        %         start_data = [];
+        %         end_data = cropped_vertices(1:end,:);
         
         % Find the prior and next points relative to the bad index point
         % The prior_point and next_point are not used as vertices themselves,
         % but rather to create new vertices by snapping to the bounding polygon
         % or ABB. Thus, the data before and after these points, including these
         % points, must be kept.
-        prior_point = cropped_vertices(end,:);
-        next_point = cropped_vertices(1,:);
+        prior_point = vertex_string(end,:);
+        prior_point_lead_in = vertex_string(end-1,:);
+        next_point = vertex_string(1,:);
+        next_point_lead_in = vertex_string(2,:);
         start_data = [];
-        end_data = cropped_vertices(1:end,:);
+        end_data = vertex_string(1:end,:);
         
         % If prior or next points are inside the AABB, need to push them
         % out to the boundaries. This is a bit challenging since these
@@ -261,26 +282,26 @@ if any(isinf(all_vertices),'all') % Are there any infinite vertices
         isInside = fcn_MapGen_isWithinABBB(AABB, [prior_point; next_point]);        
         if isInside(1)
             new_prior = INTERNAL_fcn_MapGen_findMissingBoundaryPoint(...
-                prior_point,bad_poly,AABB,sorted_all_vertices,seed_points);
+                prior_point,prior_point_lead_in, bad_poly,AABB,sorted_all_vertices,seed_points);
         else
             new_prior = prior_point;
         end
         
         if isInside(2)
             new_next = INTERNAL_fcn_MapGen_findMissingBoundaryPoint(...
-                next_point,bad_poly,AABB,sorted_all_vertices,seed_points);
+                next_point,next_point_lead_in, bad_poly,AABB,sorted_all_vertices,seed_points);
         else
             new_next = next_point;
         end
         
         
-        % Substitute data in, removing the infinite value
-        resulting_vertices = [start_data; new_prior; new_next; end_data];
-        
-        if flag_do_debug
-            % Plot the resulting_vertices
-            plot(resulting_vertices(:,1),resulting_vertices(:,2),'g.-');
-        end
+        %         % Substitute data in, removing the infinite value
+        %         resulting_vertices = [start_data; new_prior; new_next; end_data];
+        %
+        %         if flag_do_debug
+        %             % Plot the resulting_vertices
+        %             plot(resulting_vertices(:,1),resulting_vertices(:,2),'g.-');
+        %         end
         
 
         % Is the point is in a corner? If so, add an extra point for the
@@ -288,7 +309,7 @@ if any(isinf(all_vertices),'all') % Are there any infinite vertices
         extra_point = [];
         if all(isinf(vertices(bad_index,:)))
             % Calculate the angles covered by the vertices
-            end_points_offset = [prior_point; next_point] - mean([AABB(1:2);AABB(3:4)],1);
+            end_points_offset = [new_prior; new_next] - mean([AABB(1:2);AABB(3:4)],1);
             [angles, ~] = cart2pol(end_points_offset(:,1),end_points_offset(:,2));
             min_angle = min(angles);
             max_angle = max(angles);
@@ -327,23 +348,20 @@ if any(isinf(all_vertices),'all') % Are there any infinite vertices
         fill_vertices = [start_data; new_prior; extra_point; new_next; end_data];
         
         % Close off vertices
-        fill_vertices = ...
+        closed_fill_vertices = ...
             [fill_vertices; fill_vertices(1,:)];
         
         % Push into format for all_vertices
-        non_repeating_resulting_vertices(1:length(fill_vertices(:,1)),1) = ...
+        non_repeating_resulting_vertices(1:length(closed_fill_vertices(:,1)),1) = ...
             bad_poly;
-        non_repeating_resulting_vertices(1:length(fill_vertices(:,1)),2:3) = ...
-            fill_vertices;
+        non_repeating_resulting_vertices(1:length(closed_fill_vertices(:,1)),2:3) = ...
+            closed_fill_vertices;
 
 
         bounded_vertices(row_offset+1:row_offset+Nvertices_per_poly,:) = ...
             non_repeating_resulting_vertices;        
     end % Ends loop through bad indices
      
-else
-    
-    bounded_vertices = all_vertices;
 end
 
 %§
@@ -413,61 +431,117 @@ end % Ends the function
 
 
 function new_point = INTERNAL_fcn_MapGen_findMissingBoundaryPoint(...
-    test_point,bad_poly,AABB,sorted_all_vertices,seed_points)
+    test_point,incoming_point, bad_poly,AABB,sorted_all_vertices,seed_points)
 
-flag_do_debug = 1;
-fig_for_debug = 846;
+flag_do_debug = 0;
+fig_for_debug = 846; %#ok<NASGU>
 
 % Find the current and neighbor seed points by finding which ones
 % have the same x values
 current_seed = seed_points(bad_poly,:);
 
-% Find the wall number and point location where prior point would
-% nominally snap to
-[nominal_new_boundary_point, ~] = fcn_MapGen_snapToAABB(AABB,test_point);
+tolerance = 0.001;
+location = [0.0351 0.0946];
+if (...
+        (current_seed(1,1)<location(1)+tolerance) && ...
+        (current_seed(1,1)>location(1)-tolerance) && ...
+        (current_seed(1,2)<location(2)+tolerance) && ...
+        (current_seed(1,2)>location(2)-tolerance))
+    disp('stop here');
+end
 
-% Grab the neighbors
-index_neighbors_prior = ismember(sorted_all_vertices(:,2),test_point(1,1));
-neighbors_prior = sorted_all_vertices(index_neighbors_prior,1);
-neighbors_prior = neighbors_prior(neighbors_prior~=bad_poly);
-neighbors_prior_seeds = seed_points(neighbors_prior,:);
 
-% Find the distance between the seed points and nominal snap point,
-% keeping the minimum
-distances_squared = ...
-    sum((neighbors_prior_seeds-nominal_new_boundary_point).^2,2);
-[~,closest_index] = min(distances_squared);
-neighbors_prior_seed = neighbors_prior_seeds(closest_index,:);
+if flag_do_debug
+    figure(fig_for_debug);
+    
+    % Plot the current_seed
+    plot(current_seed(:,1),current_seed(:,2),'g.','Markersize',20);
+    plot(current_seed(:,1),current_seed(:,2),'b.','Markersize',10);
+    plot(test_point(:,1),test_point(:,2),'bo','Markersize',10);
+    plot(incoming_point(:,1),incoming_point(:,2),'bo','Markersize',5);
 
-% Take midpoint between seeds
-midpoint = (current_seed+neighbors_prior_seed)/2;
+end 
 
-% Check which is closer - midpoint or the current point?
+% Each point can be connected to only three other polytopes. If there's an
+% infinity there, then one of the connections is missing. To find the
+% missing connections, we trace out the connections.
+
+% Grab the neighbors by first finding all the vertices that match the test
+% point
+index_neighbors = ismember(sorted_all_vertices(:,2),test_point(1,1));
+
+% Grab the ID numbers of all neighbors
+neighbors = sorted_all_vertices(index_neighbors,1);
+
+% Remove the neighbor that matches the current polytope
+neighbors = neighbors(neighbors~=bad_poly);
+
+
+% Grab the incoming by first finding all the vertices that match the
+% incoming point
+index_incoming = ismember(sorted_all_vertices(:,2),incoming_point(1,1));
+
+% Grab the ID numbers of all incoming
+incoming = sorted_all_vertices(index_incoming,1);
+
+% Remove the incoming that matches the current polytope
+incoming = incoming(incoming~=bad_poly);
+
+% We can identify which vertex to create by finding which neighbor is NOT
+% incoming
+missing_neighbor = neighbors(~ismember(neighbors,incoming));
+
+% Grab the seed points of the missing_neighbor
+missing_neighbors_seed = seed_points(missing_neighbor,:);
+
+% Take midpoint between seeds. This will be used to create a vector that
+% creates the missing wall between the current polytope and the other one
+% that contains the missing wall.
+midpoint = (current_seed+missing_neighbors_seed)/2;
+
+if flag_do_debug
+    figure(fig_for_debug);
+       
+    % Plot the neighbors_prior_seeds
+    plot(missing_neighbors_seed(:,1),missing_neighbors_seed(:,2),'g.','Markersize',20);
+    
+    % Plot the midpoint
+    plot(midpoint(:,1),midpoint(:,2),'k.','Markersize',10);
+
+end
+
+% Check which is closer - midpoint or the current point? - to where the
+% snap point would have been:
 points_for_vector = [midpoint;test_point];
+nominal_new_boundary_point = fcn_MapGen_snapToAABB(AABB,test_point);
 distances_squared = ...
     sum((points_for_vector-nominal_new_boundary_point).^2,2);
 [~,sort_index] = sort(distances_squared,'descend');
 sorted_points_for_vector = points_for_vector(sort_index,:);
 
-snap_type = 3;
-new_point = fcn_MapGen_snapToAABB(AABB,sorted_points_for_vector,snap_type);
-
 if flag_do_debug
     figure(fig_for_debug);
-    % Plot the current_seed
-    plot(current_seed(:,1),current_seed(:,2),'c.','Markersize',10);
     
     % Plot the vote
     plot(nominal_new_boundary_point(:,1),nominal_new_boundary_point(:,2),'mo','Markersize',10);
+
+    % Plot the tail of the vector small
+    plot(sorted_points_for_vector(1,1),sorted_points_for_vector(1,2),'k.','Markersize',20);
     
-    % Plot the neighbors_prior_seeds
-    plot(neighbors_prior_seed(:,1),neighbors_prior_seed(:,2),'r.','Markersize',10);
-    
-    % Plot the midpoint
-    plot(midpoint(:,1),midpoint(:,2),'k.','Markersize',10);
+    % Plot the head of the vector big
+    plot(sorted_points_for_vector(2,1),sorted_points_for_vector(2,2),'k.','Markersize',30);
+
+end
+
+
+snap_type = 3;
+new_point = fcn_MapGen_snapToAABB(AABB,sorted_points_for_vector,snap_type);
+
+
+if flag_do_debug
     
     % Plot the new_point
-    plot(new_point(:,1),new_point(:,2),'k.','Markersize',10);
+    plot(new_point(:,1),new_point(:,2),'k.','Markersize',40);
 
 end
 

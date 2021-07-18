@@ -7,14 +7,14 @@
 % 2021_07_02 by Sean Brennan
 % -- first write of script
 %%%%%%%%%%%%%%§
-
+close all
 
 %% pull halton set
 halton_points = haltonset(2);
 points_scrambled = scramble(halton_points,'RR2'); % scramble values
 
 %% pick values from halton set
-Halton_range = [3901        4001];
+Halton_range = [101        201];
 low_pt = Halton_range(1,1);
 high_pt = Halton_range(1,2);
 seed_points = points_scrambled(low_pt:high_pt,:);
@@ -63,6 +63,7 @@ end
 
 %% Remove infinite vertices
 fig_num = 222;
+figure(fig_num); clf;
 [bounded_vertices] = ...
     fcn_MapGen_removeInfiniteVertices(...
     all_vertices,seed_points,AABB,Nvertices_per_poly,fig_num);

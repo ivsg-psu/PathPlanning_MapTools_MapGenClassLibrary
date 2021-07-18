@@ -70,7 +70,7 @@ function [cropped_vertices] = ...
 %% Debugging and Input checks
 flag_check_inputs = 1; % Set equal to 1 to check the input arguments 
 flag_do_plot = 0;      % % Set equal to 1 for plotting 
-flag_do_debug = 0;     % Set equal to 1 for debugging 
+flag_do_debug = 1;     % Set equal to 1 for debugging 
 
 if flag_do_debug
     fig_for_debug = 846;
@@ -139,7 +139,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
 tolerance = 0.001;
-location = [0.0539 0.9394];
+location = [0.0351 0.0946];
 if (...
         (interior_point(1,1)<location(1)+tolerance) && ...
         (interior_point(1,1)>location(1)-tolerance) && ...
@@ -161,7 +161,7 @@ if flag_do_debug
     plot(...
         [vertices(:,1); vertices(1,1)],...
         [vertices(:,2); vertices(1,2)],...
-        '.-');
+        '.-','Linewidth',3);
     
     % Plot the walls
     plot(walls(:,1),walls(:,2),'k-');
@@ -184,7 +184,7 @@ end
 
 % Are any vertices infinite? If so, we need to check that the adjacent
 % vertices will create a reasonable polytope. 
-[vertices_no_infinite,flag_infinite_was_found] = ...
+[vertices_no_infinite,~] = ...
     INTERNAL_fcn_removeInfiniteVertices(vertices,AABB,walls);
 
 % Open the figure if doing debugging
@@ -322,69 +322,69 @@ end % Ends the function
 %                                               
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
-
-function projected_with_corner_points = ...
-    INTERNAL_fcn_addCorners(vertices,flag_infinite_was_found,walls)
-
-%
-% % Check if any of the corners, e.g. where the walls start, are inside the
-% % polytope. If so, need to add these.
-% for ith_wall = 1:length(walls(1:end-1,1))
-%     test_point = walls(ith_wall,:);
-%     [ in_polytope ] = ...
-%         fcn_MapGen_checkIfPointInsideConvexPolytope( ...
-%         test_point, ...
-%         vertices);
-%     if in_polytope
-%         all_points = [all_points; test_point]; %#ok<AGROW>
-%     end
-%
+% 
+% function projected_with_corner_points = ...
+%     INTERNAL_fcn_addCorners(vertices,flag_infinite_was_found,walls)
+% 
+% %
+% % % Check if any of the corners, e.g. where the walls start, are inside the
+% % % polytope. If so, need to add these.
+% % for ith_wall = 1:length(walls(1:end-1,1))
+% %     test_point = walls(ith_wall,:);
+% %     [ in_polytope ] = ...
+% %         fcn_MapGen_checkIfPointInsideConvexPolytope( ...
+% %         test_point, ...
+% %         vertices);
+% %     if in_polytope
+% %         all_points = [all_points; test_point]; %#ok<AGROW>
+% %     end
+% %
+% % end
+% 
+% if flag_infinite_was_found
+%     
+%     % Is the point is in a corner? If so, add an extra point for the
+%     % corner
+%     extra_point = [];
+%     if all(isinf(vertices(bad_index,:)))
+%         % Calculate the angles covered by the vertices
+%         end_points_offset = [prior_point; next_point] - mean([box(1:2);box(3:4)],1);
+%         [angles, ~] = cart2pol(end_points_offset(:,1),end_points_offset(:,2));
+%         min_angle = min(angles);
+%         max_angle = max(angles);
+%         
+%         % Check to see if angle crosses over -180 degrees
+%         if (max_angle-min_angle)>pi
+%             angles = mod(angles,2*pi);
+%             min_angle = min(angles);
+%             max_angle = max(angles);
+%         end
+%         
+%         box_angle_right = abs(atan2(box(4)-box(2),box(3)-box(1)));
+%         box_angle_left  = pi-box_angle_right;
+%         
+%         % Find location of the corners, and add them
+%         if min_angle<-box_angle_left && max_angle>= -box_angle_left
+%             % Bottom left corner
+%             extra_point = [box(1) box(2)];
+%         elseif min_angle<-box_angle_right && max_angle>= -box_angle_right
+%             % Bottom right corner
+%             extra_point = [box(3) box(2)];
+%         elseif min_angle<box_angle_left && max_angle>= box_angle_left
+%             % Top left corner
+%             extra_point = [box(1) box(4)];
+%         elseif min_angle<box_angle_right && max_angle>= box_angle_right
+%             % Top right corner
+%             extra_point = [box(3) box(4)];
+%         end
+%     end % Ends if for all vertices bad
+%     projected_with_corner_points = [start_data; new_prior; extra_point; new_next; end_data];
+% else
+%     projected_with_corner_points = vertices;
+% end % Ends if for flag_infinite_was_found
+% 
+% 
 % end
-
-if flag_infinite_was_found
-    
-    % Is the point is in a corner? If so, add an extra point for the
-    % corner
-    extra_point = [];
-    if all(isinf(vertices(bad_index,:)))
-        % Calculate the angles covered by the vertices
-        end_points_offset = [prior_point; next_point] - mean([box(1:2);box(3:4)],1);
-        [angles, ~] = cart2pol(end_points_offset(:,1),end_points_offset(:,2));
-        min_angle = min(angles);
-        max_angle = max(angles);
-        
-        % Check to see if angle crosses over -180 degrees
-        if (max_angle-min_angle)>pi
-            angles = mod(angles,2*pi);
-            min_angle = min(angles);
-            max_angle = max(angles);
-        end
-        
-        box_angle_right = abs(atan2(box(4)-box(2),box(3)-box(1)));
-        box_angle_left  = pi-box_angle_right;
-        
-        % Find location of the corners, and add them
-        if min_angle<-box_angle_left && max_angle>= -box_angle_left
-            % Bottom left corner
-            extra_point = [box(1) box(2)];
-        elseif min_angle<-box_angle_right && max_angle>= -box_angle_right
-            % Bottom right corner
-            extra_point = [box(3) box(2)];
-        elseif min_angle<box_angle_left && max_angle>= box_angle_left
-            % Top left corner
-            extra_point = [box(1) box(4)];
-        elseif min_angle<box_angle_right && max_angle>= box_angle_right
-            % Top right corner
-            extra_point = [box(3) box(4)];
-        end
-    end % Ends if for all vertices bad
-    projected_with_corner_points = [start_data; new_prior; extra_point; new_next; end_data];
-else
-    projected_with_corner_points = vertices;
-end % Ends if for flag_infinite_was_found
-
-
-end
 
 function cropped_vertices = INTERNAL_fcn_cropRepeatedPoints(projected_points_with_repeats)
 % Remove repeats
@@ -565,128 +565,128 @@ end
 
 flag_infinite_was_found = 0;
 if any(isinf(vertices),'all') % Are there any infinite vertices
-    flag_infinite_was_found = 1;
-    
-    bad_indices = find(any(isinf(vertices),2));
-    
-    % Warn user if 2 infinite values found. This may cause the code to fail
-    % because it searches for the points before and after infinity,
-    % assuming these points are NOT infinite.
-    if length(bad_indices)>1
-        % Check to see if the infinity is at start and end, artificially
-        % repeated
-        if isequal(bad_indices,[1; length(vertices(:,1))])
-            vertices_no_repeats = vertices(1:end-1,:);
-        else
-            warning('More than 2 infinities found in one vector. Code may break');
-        end
-    else
-        vertices_no_repeats = vertices(1:end-1,:);
-    end
-    
-    bad_index = bad_indices(1);    
-    % Rearrange the points so that the infinite index is the first one.
-    % Makes things easier in later steps since we don't have to carry
-    % around two snips of data, just one    
-    vertex_string = ...
-        [vertices_no_repeats(bad_index+1:end,:); ...
-        vertices_no_repeats(1:bad_index-1,:)];
-    
-    if flag_do_debug
-        % Plot the vertex_string
-        plot(vertex_string(:,1),vertex_string(:,2),'b.-');
-    end
-
-    [cropped_vertices,NwallsHit] = ...
-        fcn_MapGen_cropVerticesByWallIntersections(vertex_string,walls);
-
-    if flag_do_debug
-        % Plot the cropped_vertices
-        plot(cropped_vertices(:,1),cropped_vertices(:,2),'g.-');
-    end
-
-    % Find the prior and next points relative to the bad index point
-    % The prior_point and next_point are not used as vertices themselves,
-    % but rather to create new vertices by snapping to the bounding polygon
-    % or ABB. Thus, the data before and after these points, including these
-    % points, must be kept.
-    prior_point = cropped_vertices(end,:);
-    next_point = cropped_vertices(1,:);
-    start_data = [];
-    end_data = cropped_vertices(1:end,:);
-    
-    [new_prior, ~] = fcn_MapGen_snapToAABB(AABB,prior_point);
-    [new_next, ~]  = fcn_MapGen_snapToAABB(AABB,next_point);
-    
-    
-    % Substitute data in, removing the infinite value
-    resulting_vertices = [start_data; new_prior; new_next; end_data];
-    
-    if flag_do_debug
-        % Plot the resulting_vertices
-        plot(resulting_vertices(:,1),resulting_vertices(:,2),'g.-');
-    end
-    
-    %         % Check if any of the corners, e.g. where the walls start, are inside the
-    %         % polytope. If so, need to add these.
-    %         for ith_wall = 1:length(walls(1:end-1,1))
-    %             test_point = walls(ith_wall,:);
-    %             [ in_polytope ] = ...
-    %                 fcn_MapGen_checkIfPointInsideConvexPolytope( ...
-    %                 test_point, ...
-    %                 vertices);
-    %             if in_polytope
-    %                 all_points = [all_points; test_point]; %#ok<AGROW>
-    %             end
+    warning('Infinite vertices found ... this should not have happened as a prior function should have cleaned these!');
+    %     flag_infinite_was_found = 1;
     %
+    %     bad_indices = find(any(isinf(vertices),2));
+    %
+    %     % Warn user if 2 infinite values found. This may cause the code to fail
+    %     % because it searches for the points before and after infinity,
+    %     % assuming these points are NOT infinite.
+    %     if length(bad_indices)>1
+    %         % Check to see if the infinity is at start and end, artificially
+    %         % repeated
+    %         if isequal(bad_indices,[1; length(vertices(:,1))])
+    %             vertices_no_repeats = vertices(1:end-1,:);
+    %         else
+    %             warning('More than 2 infinities found in one vector. Code may break');
     %         end
-    
-    % Is the point is in a corner? If so, add an extra point for the
-    % corner
-    extra_point = [];
-    if all(isinf(vertices(bad_index,:)))
-        % Calculate the angles covered by the vertices
-        end_points_offset = [prior_point; next_point] - mean([AABB(1:2);AABB(3:4)],1);
-        [angles, ~] = cart2pol(end_points_offset(:,1),end_points_offset(:,2));
-        min_angle = min(angles);
-        max_angle = max(angles);
-        
-        % Check to see if angle crosses over -180 degrees
-        if (max_angle-min_angle)>pi
-            angles = mod(angles,2*pi);
-            min_angle = min(angles);
-            max_angle = max(angles);
-        end
-        
-        box_angle_right = abs(atan2(AABB(4)-AABB(2),AABB(3)-AABB(1)));
-        box_angle_left  = pi-box_angle_right;
-        
-        % Find location of the corners, and add them
-        if min_angle<-box_angle_left && max_angle>= -box_angle_left
-            % Bottom left corner
-            extra_point = [AABB(1) AABB(2)];
-        elseif min_angle<-box_angle_right && max_angle>= -box_angle_right
-            % Bottom right corner
-            extra_point = [AABB(3) AABB(2)];
-        elseif min_angle<box_angle_left && max_angle>= box_angle_left
-            % Top left corner
-            extra_point = [AABB(1) AABB(4)];
-        elseif min_angle<box_angle_right && max_angle>= box_angle_right
-            % Top right corner
-            extra_point = [AABB(3) AABB(4)];
-        end
-    end
-    
-    non_repeating_resulting_vertices = [start_data; new_prior; extra_point; new_next; end_data];
-    resulting_vertices = [non_repeating_resulting_vertices; non_repeating_resulting_vertices(1,:)];
+    %     else
+    %         vertices_no_repeats = vertices(1:end-1,:);
+    %     end
+    %
+    %     bad_index = bad_indices(1);
+    %     % Rearrange the points so that the infinite index is the first one.
+    %     % Makes things easier in later steps since we don't have to carry
+    %     % around two snips of data, just one
+    %     vertex_string = ...
+    %         [vertices_no_repeats(bad_index+1:end,:); ...
+    %         vertices_no_repeats(1:bad_index-1,:)];
+    %
+    %     if flag_do_debug
+    %         % Plot the vertex_string
+    %         plot(vertex_string(:,1),vertex_string(:,2),'b.-');
+    %     end
+    % else
+    %     vertex_string = vertices;
+    % end
+    %
+    % % Now we crop the vertices
+    % [cropped_vertices,~] = ...
+    %     fcn_MapGen_cropVerticesByWallIntersections(vertex_string,walls);
+    %
+    % if flag_do_debug
+    %     % Plot the cropped_vertices
+    %     plot(cropped_vertices(:,1),cropped_vertices(:,2),'g.-');
+    % end
+    %
+    %     % Find the prior and next points relative to the bad index point
+    %     % The prior_point and next_point are not used as vertices themselves,
+    %     % but rather to create new vertices by snapping to the bounding polygon
+    %     % or ABB. Thus, the data before and after these points, including these
+    %     % points, must be kept.
+    %     prior_point = cropped_vertices(end,:);
+    %     next_point = cropped_vertices(1,:);
+    %     start_data = [];
+    %     end_data = cropped_vertices(1:end,:);
+    %
+    %     [new_prior, ~] = fcn_MapGen_snapToAABB(AABB,prior_point);
+    %     [new_next, ~]  = fcn_MapGen_snapToAABB(AABB,next_point);
+    %
+    %
+    %     % Substitute data in, removing the infinite value
+    %     resulting_vertices = [start_data; new_prior; new_next; end_data];
+    %
+    %     if flag_do_debug
+    %         % Plot the resulting_vertices
+    %         plot(resulting_vertices(:,1),resulting_vertices(:,2),'g.-');
+    %     end
+    %
+    %     %         % Check if any of the corners, e.g. where the walls start, are inside the
+    %     %         % polytope. If so, need to add these.
+    %     %         for ith_wall = 1:length(walls(1:end-1,1))
+    %     %             test_point = walls(ith_wall,:);
+    %     %             [ in_polytope ] = ...
+    %     %                 fcn_MapGen_checkIfPointInsideConvexPolytope( ...
+    %     %                 test_point, ...
+    %     %                 vertices);
+    %     %             if in_polytope
+    %     %                 all_points = [all_points; test_point]; %#ok<AGROW>
+    %     %             end
+    %     %
+    %     %         end
+    %
+    %     % Is the point is in a corner? If so, add an extra point for the
+    %     % corner
+    %     extra_point = [];
+    %     if all(isinf(vertices(bad_index,:)))
+    %         % Calculate the angles covered by the vertices
+    %         end_points_offset = [prior_point; next_point] - mean([AABB(1:2);AABB(3:4)],1);
+    %         [angles, ~] = cart2pol(end_points_offset(:,1),end_points_offset(:,2));
+    %         min_angle = min(angles);
+    %         max_angle = max(angles);
+    %
+    %         % Check to see if angle crosses over -180 degrees
+    %         if (max_angle-min_angle)>pi
+    %             angles = mod(angles,2*pi);
+    %             min_angle = min(angles);
+    %             max_angle = max(angles);
+    %         end
+    %
+    %         box_angle_right = abs(atan2(AABB(4)-AABB(2),AABB(3)-AABB(1)));
+    %         box_angle_left  = pi-box_angle_right;
+    %
+    %         % Find location of the corners, and add them
+    %         if min_angle<-box_angle_left && max_angle>= -box_angle_left
+    %             % Bottom left corner
+    %             extra_point = [AABB(1) AABB(2)];
+    %         elseif min_angle<-box_angle_right && max_angle>= -box_angle_right
+    %             % Bottom right corner
+    %             extra_point = [AABB(3) AABB(2)];
+    %         elseif min_angle<box_angle_left && max_angle>= box_angle_left
+    %             % Top left corner
+    %             extra_point = [AABB(1) AABB(4)];
+    %         elseif min_angle<box_angle_right && max_angle>= box_angle_right
+    %             % Top right corner
+    %             extra_point = [AABB(3) AABB(4)];
+    %         end
+    %     end
+    %
+    %     non_repeating_resulting_vertices = [start_data; new_prior; extra_point; new_next; end_data];
+    %     resulting_vertices = [non_repeating_resulting_vertices; non_repeating_resulting_vertices(1,:)];
 else
     resulting_vertices = vertices;
 end 
-
-% Remove any vertices that are infinite, if any still remain (there should
-% be none, so this is just in case)
-flag_is_finite = ~isinf(resulting_vertices(:,1)).*~isinf(resulting_vertices(:,2));
-resulting_vertices = resulting_vertices(flag_is_finite>0,:);
 
 end % Ends function INTERNAL_fcn_removeInfiniteVertices
 

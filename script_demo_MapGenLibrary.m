@@ -140,7 +140,8 @@ polytopes = fcn_MapGen_mixedSetVoronoiTiling(mixedSet,stretch,fig_num);
 fig_num = 21;
 for i=1:100:10000
     figure(fig_num); clf;
-    Halton_range = [i i+100]; % range of Halton points to use to generate the tiling
+    % Halton_range = [i i+100]; % range of Halton points to use to generate the tiling
+    Halton_range = [101 201];
     % The following gives an example, top left, of where generator point is NOT inside resulting polytope: Halton_range = [3901        4001];
     tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
     title(sprintf('Halton range is: [%.0d %.0d]',i,i+100));
