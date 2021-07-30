@@ -76,8 +76,9 @@ varargin...
 % 
 % 2021_07_02 by Sean Brennan
 % -- first write of function
-
-% 
+% 2021_07_30 by Sean Brennan
+% -- fixed errors due to corners being omitted
+ 
 % TO DO:
 % 
 % -- fill in to-do items here.
@@ -150,7 +151,7 @@ end
 
 
 
-
+%% Initiate data structures
 num_poly = size(seed_points,1);
 polytopes(num_poly) = ...
     struct(...
@@ -166,9 +167,9 @@ Npolys = length(polytopes);
 Nvertices_per_poly = 20; % Maximum estimate
 Nvertices_per_map = Npolys*Nvertices_per_poly;
 all_vertices = nan(Nvertices_per_map,3);
-all_neighbors = nan(Nvertices_per_map,1);
+% all_neighbors = nan(Nvertices_per_map,1);
 
-% Loop through the polytopes, filling verticies and neighbors matrix
+%% Loop through the polytopes, filling verticies and neighbors matrix
 for ith_poly = 1:Npolys
     vertices_open = V(C{ith_poly},:); 
     vertices = [vertices_open; vertices_open(1,:)]; % Close off the vertices
@@ -185,12 +186,12 @@ for ith_poly = 1:Npolys
 end
 
 
-% Remove infinite vertices
+%% Remove infinite vertices
 [bounded_vertices] = ...
     fcn_MapGen_removeInfiniteVertices(...
     all_vertices,seed_points,AABB,Nvertices_per_poly,21);
 
-
+%% Crop vertices
 remove = 0; % keep track of how many cells to be removed
 for poly = 1:num_poly % pull each cell from the voronoi diagram
     % Grab verticies    
@@ -202,9 +203,8 @@ for poly = 1:num_poly % pull each cell from the voronoi diagram
     
 
     interior_point = seed_points(poly,:);
-
     tolerance = 0.001;
-    location = [0.0351 0.0946];
+    location = [0.02970 0.12467];
     if (...
             (interior_point(1,1)<location(1)+tolerance) && ...
             (interior_point(1,1)>location(1)-tolerance) && ...
@@ -214,7 +214,7 @@ for poly = 1:num_poly % pull each cell from the voronoi diagram
     end
     
    
-    % Are any vertices outside the AABB? If so, there's a process
+    % Are any vertices outside the AABB? If so, must crop them
     if ~all(fcn_MapGen_isWithinABBB(AABB,vertices)==1)
         
       % Crop vertices to allowable range        
@@ -237,14 +237,21 @@ for poly = 1:num_poly % pull each cell from the voronoi diagram
         
         % enter info into polytope structure
         polytopes(poly-remove).vertices = cropped_vertices; 
+        % polytopes(poly-remove).seed_point = interior_point;
 
     else % if 2 or less points in cell 
-        remove = remove+1; % skip cell and remove later
+        remove = remove+1; %#ok<NASGU> % skip cell and remove later
+        error('2 points or less found in a polytope, must exit');
     end
 end
 
+
+
 % remove extra empty polytopes
 polytopes = polytopes(1:(num_poly-remove));
+
+% Check that all the wall corners are inside polytopes
+polytopes = INTERNAL_fcn_addCorners(polytopes,seed_points,AABB);
 
 % Apply the stretch
 num_poly = length(polytopes);
@@ -297,28 +304,30 @@ if flag_do_plot
     plot(temp(:,1),temp(:,2),'ko','Markersize',3);
     
     % plot the connections between the polytope neighbors
-    % Clean up and sort the vertices so that we can associate neighbors
-    all_vertices_no_nan = all_vertices(~isnan(all_vertices(:,1)),:);
-    sorted_all_vertices = sortrows(all_vertices_no_nan,[2 3]);
-    
-    % Remove repeats
-    sorted_all_vertices = unique(sorted_all_vertices,'rows','stable');
-    
-    % Remove infinities
-    sorted_all_vertices = sorted_all_vertices(~isinf(sorted_all_vertices(:,2)));    
-    
-    Nrealvertices = floor(length(sorted_all_vertices(:,1))/3);
-    data = zeros(Nrealvertices*6,2);
-    for ith_poly = 1:Nrealvertices
-        row_offset = (ith_poly-1)*3;
-        neighbors = sorted_all_vertices(row_offset+1:row_offset+3,1);        
+    if 1==0
+        % Clean up and sort the vertices so that we can associate neighbors
+        all_vertices_no_nan = all_vertices(~isnan(all_vertices(:,1)),:);
+        sorted_all_vertices = sortrows(all_vertices_no_nan,[2 3]);
         
-        for jth_neighbor = 2:length(neighbors)
-            neigh_offset = (ith_poly-1)*6 + ((jth_neighbor-2)*3);
-            data(neigh_offset+1:neigh_offset+3,:) = [seed_points(neighbors(1),:); seed_points(neighbors(jth_neighbor),:); nan nan];
+        % Remove repeats
+        sorted_all_vertices = unique(sorted_all_vertices,'rows','stable');
+        
+        % Remove infinities
+        sorted_all_vertices = sorted_all_vertices(~isinf(sorted_all_vertices(:,2)));
+        
+        Nrealvertices = floor(length(sorted_all_vertices(:,1))/3);
+        data = zeros(Nrealvertices*6,2);
+        for ith_poly = 1:Nrealvertices
+            row_offset = (ith_poly-1)*3;
+            neighbors = sorted_all_vertices(row_offset+1:row_offset+3,1);
+            
+            for jth_neighbor = 2:length(neighbors)
+                neigh_offset = (ith_poly-1)*6 + ((jth_neighbor-2)*3);
+                data(neigh_offset+1:neigh_offset+3,:) = [seed_points(neighbors(1),:); seed_points(neighbors(jth_neighbor),:); nan nan];
+            end
         end
+        plot(data(:,1),data(:,2),'-','Linewidth',0.5);
     end
-    plot(data(:,1),data(:,2),'-','Linewidth',0.5);
     
 end % Ends the flag_do_plot if statement    
 
@@ -367,6 +376,65 @@ end % Ends the function
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
+function polytopes_with_corners = INTERNAL_fcn_addCorners(polytopes,seed_points,AABB)
+% This function loops through the corners of the AABB, and checks to see
+% that all are within polytopes. If they are not, it finds the closest
+% polytope to each missing corner (based on seed point location), finds the
+% wall of the polytope that needs to be added, adds the corner in, then
+% trims that polytope down to appropriate size with the corner included.
+
+% Check that all the wall corners are inside polytopes
+walls = fcn_MapGen_convertAABBtoWalls(AABB);
+test_points = walls(1:4,:);
+all_found = zeros(length(test_points(:,1)),1); % keep track of which vertices are hit
+for poly = 1:length(polytopes) 
+    vertices = polytopes(poly).vertices;
+    in_polytope = inpolygon(test_points(:,1),test_points(:,2),vertices(:,1),vertices(:,2));
+    all_found = all_found + in_polytope;
+end
+missing_vertices = test_points(all_found==0,:);
 
 
-
+% Loop through vertices that are NOT in polytopes, putting them in closest
+% one
+polytopes_with_corners = polytopes; % Initialize output
+for ith_missing = 1:length(missing_vertices(:,1))
+    missing_point = missing_vertices(ith_missing,:);
+    
+    % Find closest seed point
+    distances_squared = sum((missing_point - seed_points).^2,2);
+    [~,closest_poly] = min(distances_squared);    
+    vertices = polytopes(closest_poly).vertices;
+    interior_point = seed_points(closest_poly,:);
+    
+    % Find the polytope wall that is closest to the missing point
+    [~,~,wall_that_was_hit] = ...
+        fcn_MapGen_findIntersectionOfSegments(...
+        vertices(1:end-1,:),...  % wall start
+        vertices(2:end,:),...    % wall end
+        missing_point,...        % sensor_vector_start
+        interior_point,...       % sensor_vector_end
+        0);
+    
+    % Put the point into the vertices
+    shoved_vertices = [...
+        vertices(1:wall_that_was_hit,:); ...
+        missing_point; ...
+        vertices(wall_that_was_hit+1:end,:)];
+    
+    % Crop vertices to allowable range
+    [cropped_vertices] = ...
+        fcn_MapGen_cropPolytopeToRange(shoved_vertices, interior_point, AABB);
+    
+    % make sure cw
+    vec1 = [cropped_vertices(2,:)-cropped_vertices(1,:),0]; % vector leading into point
+    vec2 = [cropped_vertices(3,:)-cropped_vertices(2,:),0]; % vector leading out of point
+    xing = cross(vec1,vec2); % cross product of two vectors
+    if sign(xing(3)) == -1 % points ordered in wrong direction
+        cropped_vertices = flipud(cropped_vertices);
+    end
+    
+    % re-enter info into polytope structure
+    polytopes_with_corners(closest_poly).vertices = cropped_vertices;            
+end
+end

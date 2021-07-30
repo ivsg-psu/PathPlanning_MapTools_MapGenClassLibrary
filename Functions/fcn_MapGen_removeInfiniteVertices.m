@@ -60,6 +60,8 @@ function [bounded_vertices] = ...
 %
 % 2021_07_17 by Sean Brennan
 % -- first write of function
+% 2021_07_30 by Sean Brennan
+% -- fixed errors due to corners being omitted
 
 %
 % TO DO:
@@ -186,10 +188,10 @@ if any(isinf(all_vertices),'all') % Are there any infinite vertices
     for ith_poly = 1:length(bad_polytopes)
         bad_poly = bad_polytopes(ith_poly);
         
-        
+        % FOR DEBUGGING:
         interior_point = seed_points(bad_poly,:);
         tolerance = 0.001;
-        location = [0.0351 0.0946];
+        location = [0.9935 0.1354];
         if (...
                 (interior_point(1,1)<location(1)+tolerance) && ...
                 (interior_point(1,1)>location(1)-tolerance) && ...
@@ -303,42 +305,48 @@ if any(isinf(all_vertices),'all') % Are there any infinite vertices
         %             plot(resulting_vertices(:,1),resulting_vertices(:,2),'g.-');
         %         end
         
-
+        if flag_do_debug
+            % Plot the resulting_vertices
+            plot(new_prior(:,1),new_prior(:,2),'g.');
+            plot(new_next(1,1),new_next(1,2),'go');
+        end
+        
         % Is the point is in a corner? If so, add an extra point for the
         % corner
         extra_point = [];
-        if all(isinf(vertices(bad_index,:)))
-            % Calculate the angles covered by the vertices
-            end_points_offset = [new_prior; new_next] - mean([AABB(1:2);AABB(3:4)],1);
-            [angles, ~] = cart2pol(end_points_offset(:,1),end_points_offset(:,2));
-            min_angle = min(angles);
-            max_angle = max(angles);
-            
-            % Check to see if angle crosses over -180 degrees
-            if (max_angle-min_angle)>pi
-                angles = mod(angles,2*pi);
-                min_angle = min(angles);
-                max_angle = max(angles);
-            end
-            
-            box_angle_right = abs(atan2(AABB(4)-AABB(2),AABB(3)-AABB(1)));
-            box_angle_left  = pi-box_angle_right;
-            
-            % Find location of the corners, and add them
-            if min_angle<-box_angle_left && max_angle>= -box_angle_left
-                % Bottom left corner
-                extra_point = [AABB(1) AABB(2)];
-            elseif min_angle<-box_angle_right && max_angle>= -box_angle_right
-                % Bottom right corner
-                extra_point = [AABB(3) AABB(2)];
-            elseif min_angle<box_angle_left && max_angle>= box_angle_left
-                % Top left corner
-                extra_point = [AABB(1) AABB(4)];
-            elseif min_angle<box_angle_right && max_angle>= box_angle_right
-                % Top right corner
-                extra_point = [AABB(3) AABB(4)];
-            end
-        end
+        % COMMENTED OUT BECAUSE CORNER CAPTURE IS NOW IN LATER SECTIONS
+        %         if all(isinf(vertices(bad_index,:))) && any(isInside)
+        %             % Calculate the angles covered by the vertices
+        %             end_points_offset = [new_prior; new_next] - mean([AABB(1:2);AABB(3:4)],1);
+        %             [angles, ~] = cart2pol(end_points_offset(:,1),end_points_offset(:,2));
+        %             min_angle = min(angles);
+        %             max_angle = max(angles);
+        %
+        %             % Check to see if angle crosses over -180 degrees
+        %             if (max_angle-min_angle)>pi
+        %                 angles = mod(angles,2*pi);
+        %                 min_angle = min(angles);
+        %                 max_angle = max(angles);
+        %             end
+        %
+        %             box_angle_right = abs(atan2(AABB(4)-AABB(2),AABB(3)-AABB(1)));
+        %             box_angle_left  = pi-box_angle_right;
+        %
+        %             % Find location of the corners, and add them
+        %             if min_angle<-box_angle_left && max_angle>= -box_angle_left
+        %                 % Bottom left corner
+        %                 extra_point = [AABB(1) AABB(2)];
+        %             elseif min_angle<-box_angle_right && max_angle>= -box_angle_right
+        %                 % Bottom right corner
+        %                 extra_point = [AABB(3) AABB(2)];
+        %             elseif min_angle<box_angle_left && max_angle>= box_angle_left
+        %                 % Top left corner
+        %                 extra_point = [AABB(1) AABB(4)];
+        %             elseif min_angle<box_angle_right && max_angle>= box_angle_right
+        %                 % Top right corner
+        %                 extra_point = [AABB(3) AABB(4)];
+        %             end
+        %         end
         
         % Shuffle data into result
         % Make a fresh nan_vector
@@ -441,7 +449,7 @@ fig_for_debug = 846; %#ok<NASGU>
 current_seed = seed_points(bad_poly,:);
 
 tolerance = 0.001;
-location = [0.0351 0.0946];
+location = [0.9935 0.1354];
 if (...
         (current_seed(1,1)<location(1)+tolerance) && ...
         (current_seed(1,1)>location(1)-tolerance) && ...

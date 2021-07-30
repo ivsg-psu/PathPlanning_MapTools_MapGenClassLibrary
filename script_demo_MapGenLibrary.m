@@ -14,8 +14,8 @@
 % -- Add ability to extend halton set to right (e.g. "scrolling" map), see
 % the function: fcn_MapGen_mixedSetVoronoiTiling
 % 2021_07_12
-% -- Added ability to determine generic map statistics via
-% the function: fcn_MapGen_polytopesStatistics
+% -- Added ability to determine generic map statistics via the function:
+% fcn_MapGen_polytopesStatistics
 
 
 % TO-DO:
@@ -140,12 +140,18 @@ polytopes = fcn_MapGen_mixedSetVoronoiTiling(mixedSet,stretch,fig_num);
 fig_num = 21;
 for i=1:100:10000
     figure(fig_num); clf;
-    % Halton_range = [i i+100]; % range of Halton points to use to generate the tiling
-    Halton_range = [101 201];
-    % The following gives an example, top left, of where generator point is NOT inside resulting polytope: Halton_range = [3901        4001];
+    Halton_range = [i i+100]; % range of Halton points to use to generate the tiling
+    % Halton_range = [5401 5501];
+           
     tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
+    
+    % Do statistics
+    temp = fcn_MapGen_polytopesStatistics(...
+    polytopes);
     title(sprintf('Halton range is: [%.0d %.0d]',i,i+100));
-    pause;
+    assert(isequal(0,temp.unoccupancy_ratio));
+    assert(isequal(101,temp.point_density));
+    pause(0.1);
 end
 
 fcn_MapGen_polytopesStatistics(...
@@ -158,7 +164,7 @@ line_width = 2;
 axis_limits = [0 1 0 1];
 fcn_MapGen_plotPolytopes(tiled_polytopes,fig_num,'r',line_width,axis_limits);
 
-% remove the edge polytopes that extend past the high and low points
+% remove the edge polytopes that extend on or past the high and low points
 fig_num = 23;
 xlow = 0.01; xhigh = 0.99; ylow = 0.01; yhigh = 0.99;
 bounding_box = [xlow ylow; xhigh yhigh];
