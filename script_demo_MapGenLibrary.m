@@ -145,7 +145,8 @@ for i=1:100:10000
            
     tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
     
-    % Do statistics
+    % Do statistics, checking that the area is always fully filled and we
+    % get 101 polytopes each time
     temp = fcn_MapGen_polytopesStatistics(...
     polytopes);
     title(sprintf('Halton range is: [%.0d %.0d]',i,i+100));

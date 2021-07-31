@@ -189,7 +189,7 @@ end
 %% Remove infinite vertices
 [bounded_vertices] = ...
     fcn_MapGen_removeInfiniteVertices(...
-    all_vertices,seed_points,AABB,Nvertices_per_poly,21);
+    all_vertices,seed_points,AABB,Nvertices_per_poly);
 
 %% Crop vertices
 remove = 0; % keep track of how many cells to be removed
@@ -302,6 +302,18 @@ if flag_do_plot
         temp(ith_poly,:) = polytopes(ith_poly).mean;
     end
     plot(temp(:,1),temp(:,2),'ko','Markersize',3);
+    
+    % number the polytopes at seed points
+    for ith_poly = 1:length(polytopes)
+        text_location = seed_points(ith_poly,:);
+        text(text_location(1,1),text_location(1,2),sprintf('%.0d',ith_poly));
+    end
+        
+    %     % number the polytopes at means
+    %     for ith_poly = 1:length(polytopes)
+    %         text_location = polytopes(ith_poly).mean;
+    %         text(text_location(1,1),text_location(1,2),sprintf('%.0d',ith_poly));
+    %     end
     
     % plot the connections between the polytope neighbors
     if 1==0

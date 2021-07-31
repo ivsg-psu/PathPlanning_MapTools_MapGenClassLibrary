@@ -178,6 +178,13 @@ if flag_do_plot
     end
     plot(temp(:,1),temp(:,2),'ko','Markersize',3);
     
+    % number the polytopes    
+    for ith_poly = 1:length(polytopes)
+        text_location = moved_seed_points(ith_poly,:);
+        text(text_location(1,1),text_location(1,2),sprintf('%.0d',ith_poly));
+    end
+    
+    
 end
 
 if flag_do_debug
