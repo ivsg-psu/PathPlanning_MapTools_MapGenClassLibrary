@@ -15,7 +15,7 @@ halton_points = haltonset(2);
 points_scrambled = scramble(halton_points,'RR2'); % scramble values
 
 %% pick values from halton set
-Halton_range = [5401 5501];
+Halton_range = [1801 1901];
 low_pt = Halton_range(1,1);
 high_pt = Halton_range(1,2);
 seed_points = points_scrambled(low_pt:high_pt,:);

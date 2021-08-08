@@ -17,32 +17,46 @@ polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1]);
 
 fcn_MapGen_polytopesStatistics(...
     polytopes,...
-    fig_num)
+    fig_num);
 
 
-
-% Shrink all polytopes by a gap of 0.001
-shrinkage = 0.015;
-shrunk_polytopes = polytopes;
+shrinkage = 0.001;
+%% Shrink all polytopes by a gap using radial shrinking
+shrunk_polytopes_radial = polytopes;
 for ith_poly = 1:length(polytopes)
     orig_radius = polytopes(ith_poly).max_radius;
     des_rad = orig_radius - shrinkage;
 
     tolerance = 1e-5; % This is the edge distance below which vertices are merged together in the polytope
-    shrunk_polytopes(ith_poly) =...
+    shrunk_polytopes_radial(ith_poly) =...
         fcn_MapGen_polytopeShrinkToRadius(...
         polytopes(ith_poly),des_rad,tolerance);
 end
 
-
-
-% des_rad = 0.03; 
-% sigma_radius = 0; 
-% min_rad = 0.001;
-% shrunk_polytopes2=fcn_MapGen_polytopesShrinkToRadius(...
-%     polytopes,des_rad,sigma_radius,min_rad);
-
+% Check the statistics on these
 fig_num = 13;
 fcn_MapGen_polytopesStatistics(...
-    shrunk_polytopes,...
-    fig_num)
+    shrunk_polytopes_radial,...
+    fig_num);
+
+%% Shrink all polytopes by a gap using edge shrinking
+shrunk_polytopes_edge = polytopes;
+for ith_poly = 1:length(polytopes)
+    shrunk_polytopes_edge(ith_poly) = ...
+        fcn_MapGen_polytopeShrinkFromEdges(...
+        polytopes(ith_poly),shrinkage);
+end
+
+% Check the statistics on these
+fig_num = 14;
+fcn_MapGen_polytopesStatistics(...
+    shrunk_polytopes_edge,...
+    fig_num);
+
+% Show the original polytopes
+h_plot = subplot(2,3,1);
+hold on;
+line_width = 2;
+fcn_MapGen_plotPolytopes(polytopes,h_plot,'r',line_width);
+
+

@@ -86,10 +86,17 @@ if nargin < 4 || nargin > 8
 end
 
 %% open figures
+is_axes = 0;
 if isempty(fig_num)
     fig = figure; % create new figure with next default index
 else
-    fig = figure(fig_num); % open specific figure
+    % check to see that the handle is an axis. If so, use it and don't just
+    % go to a new figure
+    if isgraphics(fig_num,'axes')
+        axes(fig_num);
+    else
+        fig = figure(fig_num); % open specific figure
+    end
 end
 hold on % allow multiple plot calls
 

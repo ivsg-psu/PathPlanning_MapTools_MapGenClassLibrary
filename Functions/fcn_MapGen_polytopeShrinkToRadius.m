@@ -5,7 +5,9 @@ function [shrunk_polytope] = ...
     tolerance,...
     varargin)
 % fcn_MapGen_polytopesShrinkToRadius shrinks the polytopes to achieve the
-% desired mean radius and specified variance
+% specified maximum radius. The vertices are all porportionally pulled
+% toward the cetroid location such that the new maximum radius matches the
+% specified maximum radius.
 %
 % FORMAT:
 % 
@@ -153,7 +155,7 @@ scale = new_radius/rad;
 if scale < 1 
     % find new vertices
     new_vert = centroid + scale*(vertices-centroid);
-    shrunk_polytope.vertices = [new_vert; new_vert(1,:)];
+    shrunk_polytope.vertices = new_vert;
 end
 
 % fill in other fields from the vertices field

@@ -168,12 +168,16 @@ if flag_do_debug
     plot(walls(:,1),walls(:,2),'k-');
 end
 
+
+
 % Clean up and sort the vertices so that we can associate neighbors
 all_vertices_no_nan = all_vertices(~isnan(all_vertices(:,1)),:);
 sorted_all_vertices = sortrows(all_vertices_no_nan,[2 3]);
 
 % Remove repeats
 sorted_all_vertices = unique(sorted_all_vertices,'rows','stable');
+
+
 
 bounded_vertices = all_vertices; % Initialize the array
 if any(isinf(all_vertices),'all') % Are there any infinite vertices
@@ -188,17 +192,17 @@ if any(isinf(all_vertices),'all') % Are there any infinite vertices
     for ith_poly = 1:length(bad_polytopes)
         bad_poly = bad_polytopes(ith_poly);
         
-        % FOR DEBUGGING:
-        interior_point = seed_points(bad_poly,:);
-        tolerance = 0.001;
-        location = [0.9935 0.1354];
-        if (...
-                (interior_point(1,1)<location(1)+tolerance) && ...
-                (interior_point(1,1)>location(1)-tolerance) && ...
-                (interior_point(1,2)<location(2)+tolerance) && ...
-                (interior_point(1,2)>location(2)-tolerance))
-            disp('stop here');
-        end
+        %         % FOR DEBUGGING:
+        %         interior_point = seed_points(bad_poly,:);
+        %         tolerance = 0.001;
+        %         location = [0.6128 0.9867];
+        %         if (...
+        %                 (interior_point(1,1)<location(1)+tolerance) && ...
+        %                 (interior_point(1,1)>location(1)-tolerance) && ...
+        %                 (interior_point(1,2)<location(2)+tolerance) && ...
+        %                 (interior_point(1,2)>location(2)-tolerance))
+        %             disp('stop here');
+        %         end
 
         
         % Grab this bad polytope

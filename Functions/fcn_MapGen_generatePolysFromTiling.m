@@ -171,8 +171,28 @@ all_vertices = nan(Nvertices_per_map,3);
 
 %% Loop through the polytopes, filling verticies and neighbors matrix
 for ith_poly = 1:Npolys
+    
+    %     if ith_poly==50
+    %         disp('Stop here');
+    %     end
+    
     vertices_open = V(C{ith_poly},:); 
+    
+    % Remove ill-conditioned points by setting the ones really, really far
+    % away to infinity
+    scale = max(AABB,[],'all') - min(AABB,[],'all');
+    center = [AABB(1)+AABB(3), AABB(2)+AABB(4)]/2;
+    distances_from_center = sum((vertices_open-center).^2,2).^0.5;
+    near_infinite = (distances_from_center/scale)>1E5;
+    if any(near_infinite)
+        vertices_open(near_infinite,:) = inf;
+        % Remove repeated infinities
+        vertices_open = unique(vertices_open,'rows','stable');
+    end    
+
+    % Append results to close off the vector loop
     vertices = [vertices_open; vertices_open(1,:)]; % Close off the vertices
+    
     Nvertices = length(vertices(:,1));
     if Nvertices>Nvertices_per_poly
         error('Need to resize the number of allowable vertices');
@@ -182,6 +202,7 @@ for ith_poly = 1:Npolys
         all_vertices(row_offset+1:row_offset+Nvertices,2:3) = vertices;
     end
     
+
        
 end
 
@@ -200,18 +221,22 @@ for poly = 1:num_poly % pull each cell from the voronoi diagram
     %     vertices = vertices(~isnan(vertices(:,1)));
     indices = bounded_vertices(:,1)==poly;
     vertices = bounded_vertices(indices,2:3);
-    
-
     interior_point = seed_points(poly,:);
-    tolerance = 0.001;
-    location = [0.02970 0.12467];
-    if (...
-            (interior_point(1,1)<location(1)+tolerance) && ...
-            (interior_point(1,1)>location(1)-tolerance) && ...
-            (interior_point(1,2)<location(2)+tolerance) && ...
-            (interior_point(1,2)>location(2)-tolerance))
-        disp('stop here');
-    end
+
+    %     % For debugging
+    %     tolerance = 0.001;
+    %     location = [0.02970 0.12467];
+    %     if (...
+    %             (interior_point(1,1)<location(1)+tolerance) && ...
+    %             (interior_point(1,1)>location(1)-tolerance) && ...
+    %             (interior_point(1,2)<location(2)+tolerance) && ...
+    %             (interior_point(1,2)>location(2)-tolerance))
+    %         disp('stop here');
+    %     end
+    %
+    %     if poly==50
+    %         disp('stop here');
+    %     end
     
    
     % Are any vertices outside the AABB? If so, must crop them

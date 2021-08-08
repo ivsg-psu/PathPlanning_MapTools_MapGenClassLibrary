@@ -135,26 +135,27 @@ mixedSet(2).AABB = [0.5 0 0.75 1];
 polytopes = fcn_MapGen_mixedSetVoronoiTiling(mixedSet,stretch,fig_num);
 
 
-%% Show how the maps can be trimmed, shrunk, etc
-% Generate a set of polytopes from the Halton set
-fig_num = 21;
+%% Generate many test sets of polytopes from the Halton set
 for i=1:100:10000
+    fig_num = 21+i;
     figure(fig_num); clf;
+    
     Halton_range = [i i+100]; % range of Halton points to use to generate the tiling
-    % Halton_range = [5401 5501];
+    % Halton_range = [1801 1901];
            
-    tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
+    polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
     
     % Do statistics, checking that the area is always fully filled and we
     % get 101 polytopes each time
     temp = fcn_MapGen_polytopesStatistics(...
     polytopes);
     title(sprintf('Halton range is: [%.0d %.0d]',i,i+100));
-    assert(isequal(0,temp.unoccupancy_ratio));
+    assert(abs(temp.unoccupancy_ratio)<(1000*eps));
     assert(isequal(101,temp.point_density));
     pause(0.1);
 end
 
+%% Show how the maps can be trimmed, shrunk, etc
 fcn_MapGen_polytopesStatistics(...
     tiled_polytopes,...
     fig_num+1);
@@ -177,6 +178,27 @@ fig_num = 24;
 des_rad = 0.03; sigma_radius = 0; min_rad = 0.001;
 shrunk_polytopes2=fcn_MapGen_polytopesShrinkToRadius(...
     trimmed_polytopes,des_rad,sigma_radius,min_rad,fig_num);
+
+%% Show how different shrinking methods change statistics
+fig_num = 555;
+
+% Generate polytopes from the Halton set
+Halton_range = [5401 5501];
+           
+tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
+    
+% Grab statistics on original map
+fcn_MapGen_polytopesStatistics(...
+    tiled_polytopes,...
+    fig_num+1);
+
+% Shrink to radius
+URHERE
+fig_num = 556;
+des_rad = 0.03; sigma_radius = 0; min_rad = 0.001;
+shrunk_polytopes2=fcn_MapGen_polytopesShrinkToRadius(...
+    trimmed_polytopes,des_rad,sigma_radius,min_rad,fig_num);
+
 
 %% Show how we can shrink one polytope
 Npolys = length(trimmed_polytopes);
