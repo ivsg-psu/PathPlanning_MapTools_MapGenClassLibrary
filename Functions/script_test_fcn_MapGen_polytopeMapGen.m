@@ -2,8 +2,8 @@
 % Tests function: fcn_MapGen_polytopeMapGen
 
 % REVISION HISTORY:
-% 2021_06_06 
-% -- first written by S. Brennan. 
+% 2021_06_06
+% -- first written by S. Brennan.
 
 
 % generate Voronoi tiling from Halton points
@@ -24,6 +24,7 @@ fig_num = 1;
     Halton_range,bounding_box,...
     des_radius,sigma_radius,min_rad,shrink_seed,fig_num);
 
+assert(true);
 
 % Initiate the plot
 fig = 103; % figure to plot on

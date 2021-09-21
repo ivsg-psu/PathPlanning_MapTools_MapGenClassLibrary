@@ -66,6 +66,7 @@ shrunk_polytopes2=fcn_MapGen_polytopesShrinkToRadius(...
 
 %% generate error bubbles via fcn_MapGen_ugvSensorErrorBubble
 [err] = fcn_MapGen_ugvSensorErrorBubble(shrunk_polytopes2, 0, 5);
+assert(true);
 
 % Convert error bounds into polytope structure
 error_polytopes = shrunk_polytopes2; % Initialize the structure

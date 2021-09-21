@@ -1,13 +1,13 @@
 % script_test_fcn_MapGen_polytopesExpandEvenly
 % Tests: fcn_MapGen_polytopesExpandEvenly
 
-% 
+%
 % REVISION HISTORY:
-%§ 
-% 2018_11_17, Seth Tau 
+%§
+% 2018_11_17, Seth Tau
 % -- first write of script
 % 2021_04_28, Seth Tau
-% -- Adjusted example code , 
+% -- Adjusted example code ,
 % 2021_06_26 S. Brennan
 % -- Rebased code
 
@@ -21,7 +21,7 @@ polytopes = fcn_MapGen_generateOneRandomPolytope;
 % polytopes.vertices = [[xv xv(1)]' [yv yv(1)]'];
 % polytopes.xv = xv;
 % polytopes.yv = yv;
-% 
+%
 % polytopes.distances = sum((polytopes(1).vertices(1:end-1,:)-polytopes(1).vertices(2:end,:)).^2,2).^0.5;
 % [Cx,Cy,polytopes.area] = fcn_MapGen_polytopeCentroidAndArea([xv xv(1)],[yv yv(1)]);
 % polytopes.mean = [Cx, Cy];
@@ -36,7 +36,7 @@ polytopes.vertices = [
     0.8472    0.6479
     0.8921    0.5627
     1.0000    0.5217
-];            
+];
 polytopes.xv = [1 1 0.9300 0.8472 0.8921];
 polytopes.yv = [0.5217 0.5242 0.6329 0.6479 0.5627];
 polytopes.distances = [
@@ -57,6 +57,9 @@ fig_num = 221; % Set the figure number
 % Call the function
 exp_polytopes=fcn_MapGen_polytopesExpandEvenly(polytopes,exp_dist,fig_num);
 
+assert(isequal(round(exp_polytopes.area,4),0.0150));
+assert(isequal(round(exp_polytopes.max_radius,4),0.1445));
+
 % Call the OLD function
 % exp_polytopes=fcn_MapGen_polytopesExpandEvenly_OLD(polytopes,delta,exp_dist,fig_num);
 
@@ -67,7 +70,7 @@ plot_flag = 1; disp_name = [1, 0.05 -0.05, 0.5 0.5 0.5, 10];
 line_style = '-'; line_width = 2; color = [0 0 1];
 axis_limits = [0 1 -0.1 1]; axis_style = 'square';
 fill_info = [1 1 0 1 0.5];
-fig_num = 7; 
+fig_num = 7;
 
 [polytopes,fig]=fcn_MapGen_nameToMap(...
     map_name,...

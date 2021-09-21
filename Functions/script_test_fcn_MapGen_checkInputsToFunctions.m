@@ -1,9 +1,9 @@
 % script_test_fcn_MapGen_checkInputsToFunctions
 % Tests: fcn_MapGen_checkInputsToFunctions
 
-% 
+%
 % REVISION HISTORY:
-% 
+%
 % 2021_06_20 by S. Brennan
 % -- first write of script
 % 2021_07_07 by S. Brennan
@@ -14,20 +14,22 @@
 
 
 %% 1column_of_numbers
-% 
-%   __           _                               __                       _                   
-%  /_ |         | |                             / _|                     | |                  
-%   | | ___ ___ | |_   _ _ __ ___  _ __    ___ | |_ _ __  _   _ _ __ ___ | |__   ___ _ __ ___ 
+%
+%   __           _                               __                       _
+%  /_ |         | |                             / _|                     | |
+%   | | ___ ___ | |_   _ _ __ ___  _ __    ___ | |_ _ __  _   _ _ __ ___ | |__   ___ _ __ ___
 %   | |/ __/ _ \| | | | | '_ ` _ \| '_ \  / _ \|  _| '_ \| | | | '_ ` _ \| '_ \ / _ \ '__/ __|
 %   | | (_| (_) | | |_| | | | | | | | | || (_) | | | | | | |_| | | | | | | |_) |  __/ |  \__ \
 %   |_|\___\___/|_|\__,_|_| |_| |_|_| |_| \___/|_| |_| |_|\__,_|_| |_| |_|_.__/ \___|_|  |___/
-%                                     ______   ______                                         
-%                                    |______| |______|                                        
+%                                     ______   ______
+%                                    |______| |______|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 
 %% Test the column_of_numbers type (success)
 column_of_numbers_test = 4;
 fcn_MapGen_checkInputsToFunctions(column_of_numbers_test, '1column_of_numbers');
+
+assert(true); % pass the test defined by this section if no errors were thrown
 
 column_of_numbers_test = [4; 3; 2];
 fcn_MapGen_checkInputsToFunctions(column_of_numbers_test, '1column_of_numbers');
@@ -36,15 +38,15 @@ column_of_numbers_test = [4; 3; 2];
 fcn_MapGen_checkInputsToFunctions(column_of_numbers_test, '1column_of_numbers',3);
 
 %% positive_column_of_numbers
-% 
-%                   _ _   _            __           _                               __                       _                   
-%                  (_) | (_)          /_ |         | |                             / _|                     | |                  
-%   _ __   ___  ___ _| |_ ___   _____  | | ___ ___ | |_   _ _ __ ___  _ __    ___ | |_ _ __  _   _ _ __ ___ | |__   ___ _ __ ___ 
+%
+%                   _ _   _            __           _                               __                       _
+%                  (_) | (_)          /_ |         | |                             / _|                     | |
+%   _ __   ___  ___ _| |_ ___   _____  | | ___ ___ | |_   _ _ __ ___  _ __    ___ | |_ _ __  _   _ _ __ ___ | |__   ___ _ __ ___
 %  | '_ \ / _ \/ __| | __| \ \ / / _ \ | |/ __/ _ \| | | | | '_ ` _ \| '_ \  / _ \|  _| '_ \| | | | '_ ` _ \| '_ \ / _ \ '__/ __|
 %  | |_) | (_) \__ \ | |_| |\ V /  __/ | | (_| (_) | | |_| | | | | | | | | || (_) | | | | | | |_| | | | | | | |_) |  __/ |  \__ \
 %  | .__/ \___/|___/_|\__|_| \_/ \___| |_|\___\___/|_|\__,_|_| |_| |_|_| |_| \___/|_| |_| |_|\__,_|_| |_| |_|_.__/ \___|_|  |___/
-%  | |                             ______                                ______   ______                                         
-%  |_|                            |______|                              |______| |______|                                        
+%  | |                             ______                                ______   ______
+%  |_|                            |______|                              |______| |______|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 
 %% Test the column_of_numbers type (success)
@@ -59,15 +61,15 @@ fcn_MapGen_checkInputsToFunctions(column_of_numbers_test, 'positive_1column_of_n
 
 
 %% 2column_of_numbers
-% 
-%   ___           _                               __                       _                   
-%  |__ \         | |                             / _|                     | |                  
-%     ) |___ ___ | |_   _ _ __ ___  _ __    ___ | |_ _ __  _   _ _ __ ___ | |__   ___ _ __ ___ 
+%
+%   ___           _                               __                       _
+%  |__ \         | |                             / _|                     | |
+%     ) |___ ___ | |_   _ _ __ ___  _ __    ___ | |_ _ __  _   _ _ __ ___ | |__   ___ _ __ ___
 %    / // __/ _ \| | | | | '_ ` _ \| '_ \  / _ \|  _| '_ \| | | | '_ ` _ \| '_ \ / _ \ '__/ __|
 %   / /| (_| (_) | | |_| | | | | | | | | || (_) | | | | | | |_| | | | | | | |_) |  __/ |  \__ \
 %  |____\___\___/|_|\__,_|_| |_| |_|_| |_| \___/|_| |_| |_|\__,_|_| |_| |_|_.__/ \___|_|  |___/
-%                                      ______   ______                                         
-%                                     |______| |______|                                        
+%                                      ______   ______
+%                                     |______| |______|
 %
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 
@@ -95,15 +97,15 @@ fcn_MapGen_checkInputsToFunctions(Twocolumn_of_numbers_test, '2column_of_numbers
 
 
 %% 2or3column_of_numbers
-% 
-%   ___           ____            _                               __                       _                   
-%  |__ \         |___ \          | |                             / _|                     | |                  
-%     ) |___  _ __ __) | ___ ___ | |_   _ _ __ ___  _ __    ___ | |_ _ __  _   _ _ __ ___ | |__   ___ _ __ ___ 
+%
+%   ___           ____            _                               __                       _
+%  |__ \         |___ \          | |                             / _|                     | |
+%     ) |___  _ __ __) | ___ ___ | |_   _ _ __ ___  _ __    ___ | |_ _ __  _   _ _ __ ___ | |__   ___ _ __ ___
 %    / // _ \| '__|__ < / __/ _ \| | | | | '_ ` _ \| '_ \  / _ \|  _| '_ \| | | | '_ ` _ \| '_ \ / _ \ '__/ __|
 %   / /| (_) | |  ___) | (_| (_) | | |_| | | | | | | | | || (_) | | | | | | |_| | | | | | | |_) |  __/ |  \__ \
 %  |____\___/|_| |____/ \___\___/|_|\__,_|_| |_| |_|_| |_| \___/|_| |_| |_|\__,_|_| |_| |_|_.__/ \___|_|  |___/
-%                                                      ______   ______                                         
-%                                                     |______| |______|                                        
+%                                                      ______   ______
+%                                                     |______| |______|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 
 
@@ -157,16 +159,16 @@ TwoOrThreeColumn_of_numbers_test = [4 1 3; 3 9 3; 2 7 3];
 fcn_MapGen_checkInputsToFunctions(TwoOrThreeColumn_of_numbers_test, '2or3column_of_numbers',[3 3]);
 
 %% 2column_of_integers
-% 
-% 
-%   ___           _                               __ _       _                           
-%  |__ \         | |                             / _(_)     | |                          
-%     ) |___ ___ | |_   _ _ __ ___  _ __    ___ | |_ _ _ __ | |_ ___  __ _  ___ _ __ ___ 
+%
+%
+%   ___           _                               __ _       _
+%  |__ \         | |                             / _(_)     | |
+%     ) |___ ___ | |_   _ _ __ ___  _ __    ___ | |_ _ _ __ | |_ ___  __ _  ___ _ __ ___
 %    / // __/ _ \| | | | | '_ ` _ \| '_ \  / _ \|  _| | '_ \| __/ _ \/ _` |/ _ \ '__/ __|
 %   / /| (_| (_) | | |_| | | | | | | | | || (_) | | | | | | | ||  __/ (_| |  __/ |  \__ \
 %  |____\___\___/|_|\__,_|_| |_| |_|_| |_| \___/|_| |_|_| |_|\__\___|\__, |\___|_|  |___/
-%                                      ______   ______                __/ |              
-%                                     |______| |______|              |___/               
+%                                      ______   ______                __/ |
+%                                     |______| |______|              |___/
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 
 %% Test the 2column_of_integers type (success)
@@ -197,7 +199,7 @@ if 1==0
     %% Bad string
     column_of_numbers_test = [4 1];
     fcn_MapGen_checkInputsToFunctions(column_of_numbers_test, 'dumb_text');
-    
+
     %% 1column_of_numbers
     %
     %   __           _                               __                       _
@@ -209,21 +211,21 @@ if 1==0
     %                                     ______   ______
     %                                    |______| |______|
     % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
-    
-    
+
+
     %% Test the column_of_numbers type (FAILURE because 1 x 2)
     column_of_numbers_test = [4 1];
     fcn_MapGen_checkInputsToFunctions(column_of_numbers_test, '1column_of_numbers');
-    
+
     %% Test the column_of_numbers type (FAILURE because 3 long, not 2)
     column_of_numbers_test = [4; 3; 2];
     fcn_MapGen_checkInputsToFunctions(column_of_numbers_test, '1column_of_numbers',2);
-    
+
     %% Test the column_of_numbers type (FAILURE because NaN)
     column_of_numbers_test = [4; nan; 2];
     fcn_MapGen_checkInputsToFunctions(column_of_numbers_test, '1column_of_numbers',3);
-    
-    
+
+
     %% positive_column_of_numbers
     %
     %                   _ _   _            __           _                               __                       _
@@ -235,15 +237,15 @@ if 1==0
     %  | |                             ______                                ______   ______
     %  |_|                            |______|                              |______| |______|
     % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
-    
+
     %% Test the positive_column_of_numbers type (FAILURE because 1 x 2)
     positive_column_of_numbers_test = [4 1];
     fcn_MapGen_checkInputsToFunctions(positive_column_of_numbers_test, 'positive_1column_of_numbers');
-    
+
     %% Test the positive_column_of_numbers type (FAILURE because 3 long, not 2)
     positive_column_of_numbers_test = [4; 3; 2];
     fcn_MapGen_checkInputsToFunctions(positive_column_of_numbers_test, 'positive_1column_of_numbers',2);
-    
+
     %% Test the positive_column_of_numbers type (FAILURE because NaN)
     positive_column_of_numbers_test = [4; nan; 2];
     fcn_MapGen_checkInputsToFunctions(positive_column_of_numbers_test, 'positive_1column_of_numbers',3);
@@ -269,36 +271,36 @@ if 1==0
     %                                     |______| |______|
     %
     % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
-    
+
     %% Test the column_of_numbers type (FAILURE because 1 x 1)
     Twocolumn_of_numbers_test = [4];
     fcn_MapGen_checkInputsToFunctions(Twocolumn_of_numbers_test, '2column_of_numbers');
-    
+
     %% Test the column_of_numbers type (FAILURE because 3 long, not 2)
     Twocolumn_of_numbers_test = [4 1; 3 1; 2 2];
     fcn_MapGen_checkInputsToFunctions(Twocolumn_of_numbers_test, '2column_of_numbers',2);
-        
+
     %% Test the column_of_numbers type (FAILURE because 4 columns)
     Twocolumn_of_numbers_test = [4 1 1 4];
     fcn_MapGen_checkInputsToFunctions(Twocolumn_of_numbers_test, '2column_of_numbers');
-       
+
     %% Test the column_of_numbers type (FAILURE because NaN)
     Twocolumn_of_numbers_test = [4 1; nan 1; 2 0];
     fcn_MapGen_checkInputsToFunctions(Twocolumn_of_numbers_test, '2column_of_numbers',3);
-    
-    
+
+
     %% Minimum length is 4 or greater
     Twocolumn_of_numbers_test = [4 1; 3 9; 2 7];
     fcn_MapGen_checkInputsToFunctions(Twocolumn_of_numbers_test, '2column_of_numbers',[4 5]);
-    
+
     %% Maximum length is 2 or less
     Twocolumn_of_numbers_test = [4 1; 3 9; 2 7];
     fcn_MapGen_checkInputsToFunctions(Twocolumn_of_numbers_test, '2column_of_numbers',[2 1]);
-    
+
     %% Maximum length is 2
     Twocolumn_of_numbers_test = [4 1; 3 9; 2 7];
     fcn_MapGen_checkInputsToFunctions(Twocolumn_of_numbers_test, '2column_of_numbers',[2 2]);
-    
+
     %% 2or3column_of_numbers
     %
     %   ___           ____            _                               __                       _
@@ -310,8 +312,8 @@ if 1==0
     %                                                      ______   ______
     %                                                     |______| |______|
     % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
-    
-    
+
+
 
     %% Test the column_of_numbers type (FAILURE because 1 x 1)
     TwoOrThreeColumn_of_numbers_test = [4];
@@ -324,24 +326,24 @@ if 1==0
     %% Test the column_of_numbers type (FAILURE because 3 long, not 2)
     TwoOrThreeColumn_of_numbers_test = [4 1; 3 1; 2 2];
     fcn_MapGen_checkInputsToFunctions(TwoOrThreeColumn_of_numbers_test, '2or3column_of_numbers',2);
-       
+
     %% Test the column_of_numbers type (FAILURE because NaN)
     TwoOrThreeColumn_of_numbers_test = [4 1; nan 1; 2 0];
     fcn_MapGen_checkInputsToFunctions(TwoOrThreeColumn_of_numbers_test, '2or3column_of_numbers',3);
-    
-    
+
+
     %% Minimum length is 4 or greater
     TwoOrThreeColumn_of_numbers_test = [4 1; 3 9; 2 7];
     fcn_MapGen_checkInputsToFunctions(TwoOrThreeColumn_of_numbers_test, '2or3column_of_numbers',[4 5]);
-    
+
     %% Maximum length is 2 or less
     TwoOrThreeColumn_of_numbers_test = [4 1; 3 9; 2 7];
     fcn_MapGen_checkInputsToFunctions(TwoOrThreeColumn_of_numbers_test, '2or3column_of_numbers',[2 1]);
-    
+
     %% Maximum length is 2
     TwoOrThreeColumn_of_numbers_test = [4 1; 3 9; 2 7];
     fcn_MapGen_checkInputsToFunctions(TwoOrThreeColumn_of_numbers_test, '2or3column_of_numbers',[2 2]);
-    
+
     %% 2column_of_integers
     %
     %
@@ -357,28 +359,28 @@ if 1==0
     %% Test the 2column_of_integers type (FAILURE because not integers)
     Twocolumn_of_integers_test = [4 3.2];
     fcn_MapGen_checkInputsToFunctions(Twocolumn_of_integers_test, '2column_of_integers');
-    
+
     %% Test the 2column_of_integers type (FAILURE because 1 x 1)
     Twocolumn_of_integers_test = [4];
     fcn_MapGen_checkInputsToFunctions(Twocolumn_of_integers_test, '2column_of_integers');
-    
+
     %% Test the 2column_of_integers type (FAILURE because 3 long, not 2)
     Twocolumn_of_integers_test = [4 1; 3 1; 2 2];
     fcn_MapGen_checkInputsToFunctions(Twocolumn_of_integers_test, '2column_of_integers',2);
-       
+
     %% Test the 2column_of_integers type (FAILURE because NaN)
     Twocolumn_of_integers_test = [4 1; nan 1; 2 0];
     fcn_MapGen_checkInputsToFunctions(Twocolumn_of_integers_test, '2column_of_integers',3);
-    
-    
+
+
     %% Minimum length is 4 or greater
     Twocolumn_of_integers_test = [4 1; 3 9; 2 7];
     fcn_MapGen_checkInputsToFunctions(Twocolumn_of_integers_test, '2column_of_integers',[4 5]);
-    
+
     %% Maximum length is 2 or less
     Twocolumn_of_integers_test = [4 1; 3 9; 2 7];
     fcn_MapGen_checkInputsToFunctions(Twocolumn_of_integers_test, '2column_of_integers',[2 1]);
-    
+
     %% Maximum length is 2
     Twocolumn_of_integers_test = [4 1; 3 9; 2 7];
     fcn_MapGen_checkInputsToFunctions(Twocolumn_of_integers_test, '2column_of_integers',[2 2]);

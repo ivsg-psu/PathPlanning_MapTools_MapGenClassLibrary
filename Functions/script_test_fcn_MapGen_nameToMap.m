@@ -14,6 +14,8 @@ line_width = 2;
 [polytopes,fig]=...
     fcn_MapGen_nameToMap(map_name,plot_flag,disp_name,fig_num,line_style,line_width); %#ok<*ASGLU>
 
+assert(true);
+
 %% Advanced Example
 map_name = "HST 30 450 SQT 0 1 0 1 SMV 0.02 0.005 1e-6 1234";
 plot_flag = 1; disp_name = [1, 0.05 -0.05, 0.5 0.5 0.5, 10];

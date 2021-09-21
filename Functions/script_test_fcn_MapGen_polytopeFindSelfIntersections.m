@@ -12,3 +12,4 @@ vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
 fcn_MapGen_polytopeFindSelfIntersections(...
     vertices,fig_num);
 
+assert(true);
