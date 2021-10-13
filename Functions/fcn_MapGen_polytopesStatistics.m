@@ -5,7 +5,7 @@ function poly_map_stats = fcn_MapGen_polytopesStatistics(...
 % polytopes
 %
 % FORMAT:
-% 
+%
 % [poly_map_stats] = ...
 %     fcn_MapGen_polytopesStatistics(...
 %     polytopes,...
@@ -13,7 +13,7 @@ function poly_map_stats = fcn_MapGen_polytopesStatistics(...
 %
 % INPUTS:
 %
-%     POLYTOPES: polytopes to analyze 
+%     POLYTOPES: polytopes to analyze
 %
 %     (optional inputs)
 %
@@ -26,11 +26,11 @@ function poly_map_stats = fcn_MapGen_polytopesStatistics(...
 %     statistics
 %
 % DEPENDENCIES:
-% 
+%
 %     fcn_MapGen_checkInputsToFunctions
 %     fcn_MapGen_polytopeFindVertexAngles
 %     fcn_MapGen_plotPolytopes
-% 
+%
 % EXAMPLES:
 %
 % For additional examples, see: script_test_fcn_MapGen_polytopesStatistics
@@ -70,19 +70,19 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
+
 if flag_check_inputs
     % Are there the right number of inputs?
     if nargin < 1 || nargin > 2
         error('Incorrect number of input arguments')
     end
-    
+
     % Check the polytopes input
     fcn_MapGen_checkInputsToFunctions(...
         polytopes, 'polytopes');
-    
+
 end
-    
+
 
 % Does user want to show the plots?
 if  2 == nargin
@@ -124,7 +124,7 @@ for ith_poly = 1:Npolys
     vertices = polytopes(ith_poly).vertices;
     Nvertices = length(vertices(:,1))-1;
     NrealVertices = NrealVertices + Nvertices;
-    
+
     % Save the start/end wall locations created by the polytope walls
     offset_row = (ith_poly-1)*Nverticies_per_poly;
     rows_to_fill = (1:Nvertices) + offset_row;
@@ -142,22 +142,22 @@ for ith_poly = 1:Npolys
 
     % Determine number of verticies
     Nangles = length(vertices(:,1))-1;
-    
+
     % Calculate the angles, noting that the function gives outside angles,
     % so we have to subtract them from 180 degrees to get the interior
     % angles
     [angles] = fcn_MapGen_polytopeFindVertexAngles(vertices);
     all_angles(1:Nangles,ith_poly)  = pi - angles;
-    
+
     % Calculate the other stats
     all_lengths(1:Nangles,ith_poly) = polytopes(ith_poly).distances;
     all_side_count(ith_poly,1) = Nangles;
     all_max_radius(ith_poly,1) = polytopes(ith_poly).max_radius;
     all_areas(ith_poly,1) = polytopes(ith_poly).area;
-        
+
     % Plot the input polytopes in red
     %fcn_MapGen_plotPolytopes(polytopes(ith_poly),fig_num,'r',2);
-    
+
 end
 
 % Remove the NaN values from all_walls variables
@@ -181,6 +181,8 @@ length_column_no_nan = length_column(~isnan(length_column));
 total_perimeter = sum(length_column_no_nan);
 average_side_length = nanmean(length_column_no_nan);
 std_side_length = nanstd(length_column_no_nan);
+% TODO @steve average_perimeter = total perimeter/N
+% TODO @steve std_dev_perimeter = etc.
 
 % Determine the area properties of the map
 occupied_area = sum(all_areas);
@@ -197,7 +199,8 @@ linear_density = point_density.^0.5;
 % gaps are all associated with the perimeters.
 average_gap_size_G_bar = (unoccupancy_ratio/point_density)^0.5; % See Eq. (4.24 in Seth Tau's thesis)
 perimeter_gap_size = 2*unoccupied_area/(total_perimeter);
-
+% TODO @steve theoretical r_LC from gap size = average gap size ^2 + average_side_length^2)^0.5 or something
+% TODO @steve actual r_LC from looping through each polytope, using max radius? or side length and gap size?
 % Fill in results
 poly_map_stats.Npolys = Npolys;
 poly_map_stats.NtotalVertices = NrealVertices;
@@ -230,27 +233,27 @@ poly_map_stats.total_perimeter = total_perimeter;
 
 
 if flag_do_debug
-    
+
     figure(fig_for_debug);
     clf;
     hold on
     scale = max(AABB,[],'all') - min(AABB,[],'all');
     new_axis = [AABB(1)-scale/2 AABB(3)+scale/2 AABB(2)-scale/2 AABB(4)+scale/2];
     axis(new_axis);
-    
+
     % plot the polytopes
     fcn_MapGen_plotPolytopes(polytopes,fig_for_debug,'b',2);
-    
+
     % plot all vertices
     plot(all_walls_start_no_nan(:,1),all_walls_start_no_nan(:,2),'c.','Markersize',10);
-    
+
     % plot the means in black
     temp = zeros(length(polytopes),2);
     for ith_poly = 1:length(polytopes)
         temp(ith_poly,:) = polytopes(ith_poly).mean;
     end
     plot(temp(:,1),temp(:,2),'ko','Markersize',3);
-    
+
     % number the polytopes at seed points
     for ith_poly = 1:length(polytopes)
         text_location = polytopes(ith_poly).mean;
@@ -280,9 +283,9 @@ for ith_try = 1:Ntries
     this_overlap = INTERNAL_fcn_findRatioOverlaps(...
         this_y,AABB,all_walls_start_no_nan,all_walls_end_no_nan,...
         delta_y_range);
-    
+
     % Average results
-    ratio_overlaps = ratio_overlaps + (1/Ntries)*this_overlap;    
+    ratio_overlaps = ratio_overlaps + (1/Ntries)*this_overlap;
 end
 
 %% Find the experimental linear density
@@ -298,19 +301,19 @@ poly_map_stats.linear_density_std = std(line_crossing_hits);
 
 %% Plot results?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____       _                 
-%  |  __ \     | |                
-%  | |  | | ___| |__  _   _  __ _ 
+%   _____       _
+%  |  __ \     | |
+%  | |  | | ___| |__  _   _  __ _
 %  | |  | |/ _ \ '_ \| | | |/ _` |
 %  | |__| |  __/ |_) | |_| | (_| |
 %  |_____/ \___|_.__/ \__,_|\__, |
 %                            __/ |
-%                           |___/ 
+%                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if flag_do_plot
-    
-    fprintf(1,'\n\nSUMMARY STATISTICS: \n');    
+
+    fprintf(1,'\n\nSUMMARY STATISTICS: \n');
     fprintf(1,'\t Number of polytopes: %.0d\n',poly_map_stats.Npolys);
     fprintf(1,'\t Number of vertices: %.0d\n',poly_map_stats.NtotalVertices);
 
@@ -328,28 +331,28 @@ if flag_do_plot
     fprintf(1,'\t Calculated Linear density: %.2f +/- %.4f\n',poly_map_stats.linear_density_mean,2*poly_map_stats.linear_density_std);
     fprintf(1,'\t Average gap size, G-bar: %.5f\n',average_gap_size_G_bar);
     fprintf(1,'\t Perimeter gap size: %.5f\n',perimeter_gap_size);
-    
+
     fprintf(1,'\n\t ANGLE METRICS:\n');
     fprintf(1,'\t Total number of vertices: %.2f\n',poly_map_stats.Nangles);
     fprintf(1,'\t Average vertex angle (deg): %.2f\n',average_vertex_angle);
     fprintf(1,'\t Std dev vertex angle (deg): %.2f\n',std_vertex_angle);
-    
+
     fprintf(1,'\n\t LENGTH METRICS:\n');
     fprintf(1,'\t Average maximum radius: %.4f\n',average_max_radius);
     fprintf(1,'\t Std dev maximum radius: %.4f\n',std_max_radius);
     fprintf(1,'\t Average side length: %.4f\n',average_side_length);
     fprintf(1,'\t Std dev side length: %.4f\n',std_side_length);
     fprintf(1,'\t Total perimeter: %.4f\n',total_perimeter);
-    
-    
-    
+
+
+
     figure(fig_num)
-    
-    subplot(2,3,1); 
+
+    subplot(2,3,1);
     axis equal
     grid on;
     grid minor;
-    
+
     % Fill in the x and y data
     polytope_plot_data_x = [];
     polytope_plot_data_y = [];
@@ -360,24 +363,24 @@ if flag_do_plot
     % Plot polytopes
     plot(polytope_plot_data_x,polytope_plot_data_y,'-','Linewidth',2)
     title('Polytopes being analyzed');
-    
-    
-    subplot(2,3,2);   
+
+
+    subplot(2,3,2);
     histogram(angle_column_no_nan*180/pi,100);
     xlabel('Angles (deg)');
     title(sprintf('Histogram of angles. Mean: %.2f, StdDev: %.2f',average_vertex_angle,std_vertex_angle));
-    
-    subplot(2,3,3);   
+
+    subplot(2,3,3);
     histogram(all_side_count,100);
     xlabel('N vertices (count)');
     title(sprintf('Histogram of side count. Mean: %.4f, StdDev: %.4f',nanmean(all_side_count),nanstd(all_side_count)));
-    
-    subplot(2,3,4);   
+
+    subplot(2,3,4);
     histogram(length_column_no_nan,100);
     xlabel('Side Lengths');
     title(sprintf('Histogram of side length. Mean: %.4f, StdDev: %.4f',average_side_length,std_side_length));
-    
-    subplot(2,3,5); 
+
+    subplot(2,3,5);
     histogram(all_max_radius,100);
     xlabel('Max radius');
     title(sprintf('Histogram of max radius. Mean: %.4f, StdDev: %.4f',average_max_radius,std_max_radius));
@@ -393,7 +396,7 @@ if flag_do_plot
 end
 
 if flag_do_debug
-    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file); 
+    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
 end
 
 end % Ends function
@@ -401,14 +404,14 @@ end % Ends function
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   ______                _   _                 
-%  |  ____|              | | (_)                
-%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___ 
+%   ______                _   _
+%  |  ____|              | | (_)
+%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___
 %  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
 %  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
 %  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
-%                                               
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                                               
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function line_crossing_hits = INTERNAL_fcn_findLinearDensityStats(...
     y_search_range, AABB,walls_start,walls_end)
@@ -421,21 +424,21 @@ if flag_do_debug
     clf
     grid on;
     hold on;
-    
-    % Fill in the x and y data to plot the polytopes    
+
+    % Fill in the x and y data to plot the polytopes
     Nwalls = length(walls_start(:,1));
     polytope_plot_data_x = zeros(3*length(walls_start(:,1)),1);
     polytope_plot_data_y = zeros(3*length(walls_start(:,1)),1);
     for ith_wall = 1:Nwalls % plot each wall
         row_range = (ith_wall-1)*3 + (1:3);
-        polytope_plot_data_x(row_range,1) = [walls_start(ith_wall,1); walls_end(ith_wall,1); nan]; 
-        polytope_plot_data_y(row_range,1) = [walls_start(ith_wall,2); walls_end(ith_wall,2); nan]; 
+        polytope_plot_data_x(row_range,1) = [walls_start(ith_wall,1); walls_end(ith_wall,1); nan];
+        polytope_plot_data_y(row_range,1) = [walls_start(ith_wall,2); walls_end(ith_wall,2); nan];
     end
-    
+
     % Plot polytopes
     plot(polytope_plot_data_x,polytope_plot_data_y,'-','Linewidth',2)
     title('Polytopes being analyzed for linear density statistics');
-    
+
 end
 
 line_crossing_hits = zeros(length(y_search_range(:,1)),1);
@@ -443,12 +446,12 @@ for ith_y = 1:length(y_search_range)
     this_y = y_search_range(ith_y);
     polytopes_hit = INTERNAL_fcn_findPolysCrossedAtY(...
         this_y,AABB,walls_start,walls_end);
-    line_crossing_hits(ith_y,1) = length(polytopes_hit(:,1));  
-    
-    if flag_do_debug        
+    line_crossing_hits(ith_y,1) = length(polytopes_hit(:,1));
+
+    if flag_do_debug
         figure(fig_for_debug);
         yline(this_y,'r-');
-        text(AABB(3),this_y,sprintf('%.0d hits',line_crossing_hits(ith_y,1)));        
+        text(AABB(3),this_y,sprintf('%.0d hits',line_crossing_hits(ith_y,1)));
     end
 end
 
@@ -485,7 +488,7 @@ original_polytopes_hit = INTERNAL_fcn_findPolysCrossedAtY(...
     midpoint_y,AABB,all_walls_start_no_nan,all_walls_end_no_nan);
 original_num_hit = length(original_polytopes_hit);
 
-if flag_do_debug    
+if flag_do_debug
     figure(fig_for_debug);
     yline(midpoint_y,...
         'k-','Linewidth',3);
