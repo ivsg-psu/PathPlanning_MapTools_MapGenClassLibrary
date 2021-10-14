@@ -175,14 +175,19 @@ std_vertex_angle = nanstd(angle_column_no_nan*180/pi);
 average_max_radius = nanmean(all_max_radius);
 std_max_radius = nanstd(all_max_radius);
 
+% Find the perimeter of each polytope
+all_lengths_zeroes = all_lengths;
+all_lengths_zeroes(isnan(all_lengths_zeroes)) = 0;
+all_perimeters = sum(all_lengths_zeroes,1);
+
 % Determine the length properties related to sides of polytopes
 length_column = reshape(all_lengths,Nverticies_per_poly*Npolys,1);
 length_column_no_nan = length_column(~isnan(length_column));
 total_perimeter = sum(length_column_no_nan);
 average_side_length = nanmean(length_column_no_nan);
 std_side_length = nanstd(length_column_no_nan);
-% TODO @steve average_perimeter = total perimeter/N
-% TODO @steve std_dev_perimeter = etc.
+average_perimeter = total_perimeter/Npolys;
+std_perimeter = nanstd(all_perimeters);
 
 % Determine the area properties of the map
 occupied_area = sum(all_areas);
@@ -199,7 +204,14 @@ linear_density = point_density.^0.5;
 % gaps are all associated with the perimeters.
 average_gap_size_G_bar = (unoccupancy_ratio/point_density)^0.5; % See Eq. (4.24 in Seth Tau's thesis)
 perimeter_gap_size = 2*unoccupied_area/(total_perimeter);
-% TODO @steve theoretical r_LC from gap size = average gap size ^2 + average_side_length^2)^0.5 or something
+avg_r_D = average_max_radius*linear_density;
+std_r_D = std_max_radius*linear_density;
+avg_r_LC_from_avg_gap = linear_density*(average_gap_size_G_bar.^2+average_side_length.^2).^0.5;
+std_r_LC_from_avg_gap = linear_density*()
+L_E = total_area^0.5;
+N_int = L_E*linear_density;
+all_max_radius_sorted = sort(all_max_radius);
+
 % TODO @steve actual r_LC from looping through each polytope, using max radius? or side length and gap size?
 % Fill in results
 poly_map_stats.Npolys = Npolys;
