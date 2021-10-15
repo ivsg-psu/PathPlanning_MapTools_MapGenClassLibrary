@@ -212,7 +212,7 @@ L_E = total_area^0.5;
 N_int = L_E*linear_density;
 all_max_radius_sorted = sort(all_max_radius);
 % linear model
-r_LC_linaer1 = (L_E + 2*(average_max_radius.^2+average_max_radius.^2.*tan(average_vertex_angle./2)).^0.5-2*average_max_radius.*tan(average_vertex_angle./2))./L_E;
+r_LC_linear1 = (L_E + 2*(average_max_radius.^2+average_max_radius.^2.*tan(average_vertex_angle./2)).^0.5-2*average_max_radius.*tan(average_vertex_angle./2))./L_E;
 % linear model II
 r_LC_linear2 = (point_density^0.5*L_E*(2*sqrt((avg_r_D./point_density).^2+(avg_r_D./point_density).^2.*(tan(average_vertex_angle./2)).^2)-2*avg_r_D./point_density.*tan(average_vertex_angle./2))+L_E)./L_E;
 % vary theta variation as tan(theta/2)=1/r_D, 1D example where theta is directly from R
@@ -234,6 +234,15 @@ height = 2.*average_max_radius - linear_density.^(-1);
 hypotenuse = (base.^2+height.^2).^0.5;
 L_P = L_E + N_int.*(2*hypotenuse-2*base);
 r_LC_2d_density_variation3 = L_P./L_E;
+
+figure(1);
+plot(avg_r_D,r_LC_linear1,'go')
+plot(avg_r_D,r_LC_linear2,'ko')
+plot(avg_r_D,r_LC_1d_density_variation,'bo')
+plot(avg_r_D,r_LC_2d_density_variation1,'co')
+plot(avg_r_D,r_LC_2d_density_variation2,'mo')
+plot(avg_r_D,r_LC_2d_density_variation3,'ro')
+legend('linear','linear2','1d density variation','2d density variation1','2d density variation2','2d density variation3');
 
 % Fill in results
 poly_map_stats.Npolys = Npolys;
