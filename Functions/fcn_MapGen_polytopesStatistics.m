@@ -220,7 +220,7 @@ r_LC_1d_density_variation = (L_E + 2*(average_max_radius.^2+average_max_radius.^
 
 %% varying horizontal and vertical density, may be a mistake on using 1/lambda
 base = 1./linear_density;
-height = 2*R-1./(linear_density);
+height = 2*average_max_radius-1./(linear_density);
 hypotenuse = (base.^2+height.^2).^0.5;
 L_P = L_E + N_int.*(2*hypotenuse-2*base);
 r_LC_2d_density_variation1= L_P./L_E;
@@ -230,7 +230,7 @@ r_LC_2d_density_variation2 = 1+(avg_r_D./(average_max_radius)).*sqrt((avg_r_D./a
 
 % changing the horizontal and vertical lambda model to do 2R-1/lambda_v for height
 base = 1./linear_density;
-height = 2.*R - linear_density.^(-1);
+height = 2.*average_max_radius - linear_density.^(-1);
 hypotenuse = (base.^2+height.^2).^0.5;
 L_P = L_E + N_int.*(2*hypotenuse-2*base);
 r_LC_2d_density_variation3 = L_P./L_E;

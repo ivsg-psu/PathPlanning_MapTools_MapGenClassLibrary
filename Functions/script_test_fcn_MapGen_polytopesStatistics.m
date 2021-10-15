@@ -1,9 +1,9 @@
 % script_test_fcn_MapGen_polytopesStatistics
 % Tests: fcn_MapGen_polytopesStatistics
 
-% 
+%
 % REVISION HISTORY:
-% 
+%
 % 2021_07_12 by Sean Brennan
 % -- first write of script
 %%%%%%%%%%%%%%§
