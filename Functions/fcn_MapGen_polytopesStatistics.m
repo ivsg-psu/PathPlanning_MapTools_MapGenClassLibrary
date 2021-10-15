@@ -207,12 +207,34 @@ perimeter_gap_size = 2*unoccupied_area/(total_perimeter);
 avg_r_D = average_max_radius*linear_density;
 std_r_D = std_max_radius*linear_density;
 avg_r_LC_from_avg_gap = linear_density*(average_gap_size_G_bar.^2+average_side_length.^2).^0.5;
-std_r_LC_from_avg_gap = linear_density*()
+std_r_LC_from_avg_gap = linear_density*(average_gap_size_G_bar.^2+std_side_length.^2)
 L_E = total_area^0.5;
 N_int = L_E*linear_density;
 all_max_radius_sorted = sort(all_max_radius);
+% linear model
+r_LC_linaer1 = (L_E + 2*(average_max_radius.^2+average_max_radius.^2.*tan(average_vertex_angle./2)).^0.5-2*average_max_radius.*tan(average_vertex_angle./2))./L_E;
+% linear model II
+r_LC_linear2 = (point_density^0.5*L_E*(2*sqrt((avg_r_D./point_density).^2+(avg_r_D./point_density).^2.*(tan(average_vertex_angle./2)).^2)-2*avg_r_D./point_density.*tan(average_vertex_angle./2))+L_E)./L_E;
+% vary theta variation as tan(theta/2)=1/r_D, 1D example where theta is directly from R
+r_LC_1d_density_variation = (L_E + 2*(average_max_radius.^2+average_max_radius.^2.*1./(2*average_max_radius)).^0.5-2*average_max_radius.*1./(2*average_max_radius))./L_E;
 
-% TODO @steve actual r_LC from looping through each polytope, using max radius? or side length and gap size?
+%% varying horizontal and vertical density, may be a mistake on using 1/lambda
+base = 1./linear_density;
+height = 2*R-1./(linear_density);
+hypotenuse = (base.^2+height.^2).^0.5;
+L_P = L_E + N_int.*(2*hypotenuse-2*base);
+r_LC_2d_density_variation1= L_P./L_E;
+
+% rewriting the above to be a proper expression for r_LC in terms of r_D
+r_LC_2d_density_variation2 = 1+(avg_r_D./(average_max_radius)).*sqrt((avg_r_D./average_max_radius).^(-2)+(2*average_max_radius-(avg_r_D./average_max_radius)).^2);
+
+% changing the horizontal and vertical lambda model to do 2R-1/lambda_v for height
+base = 1./linear_density;
+height = 2.*R - linear_density.^(-1);
+hypotenuse = (base.^2+height.^2).^0.5;
+L_P = L_E + N_int.*(2*hypotenuse-2*base);
+r_LC_2d_density_variation3 = L_P./L_E;
+
 % Fill in results
 poly_map_stats.Npolys = Npolys;
 poly_map_stats.NtotalVertices = NrealVertices;
