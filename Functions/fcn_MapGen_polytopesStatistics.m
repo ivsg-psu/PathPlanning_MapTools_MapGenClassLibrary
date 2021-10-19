@@ -206,9 +206,9 @@ average_gap_size_G_bar = (unoccupancy_ratio/point_density)^0.5; % See Eq. (4.24 
 perimeter_gap_size = 2*unoccupied_area/(total_perimeter);
 avg_r_D = average_max_radius*linear_density;
 std_r_D = std_max_radius*linear_density;
-avg_r_LC_from_avg_gap = linear_density*(average_gap_size_G_bar.^2+average_side_length.^2).^0.5; % TODO(@sjharnett) debug to determine why this produces such small values
-std_r_LC_from_avg_gap = linear_density*(average_gap_size_G_bar.^2+std_side_length.^2)
 L_E = total_area^0.5;
+avg_r_LC_from_avg_gap = (linear_density*(average_gap_size_G_bar.^2+average_side_length.^2).^0.5)./L_E; % TODO(@sjharnett) debug to determine why produces complex values
+std_r_LC_from_avg_gap = (linear_density*(average_gap_size_G_bar.^2+std_side_length.^2))./L_E;
 N_int = L_E*linear_density;
 all_max_radius_sorted = sort(all_max_radius);
 % linear model
@@ -236,7 +236,7 @@ L_P = L_E + N_int.*(2*hypotenuse-2*base);
 r_LC_2d_density_variation3 = L_P./L_E;
 
 figure(1);
-plot(avg_r_D,average_gap_size_G_bar,'ro')
+plot(avg_r_D,avg_r_LC_from_avg_gap,'ro')
 % plot(avg_r_D,r_LC_linear1,'go')
 % plot(avg_r_D,r_LC_linear2,'ko')
 % plot(avg_r_D,r_LC_1d_density_variation,'bo')
