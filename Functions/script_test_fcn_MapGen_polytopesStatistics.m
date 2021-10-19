@@ -8,7 +8,7 @@
 % -- first write of script
 %%%%%%%%%%%%%%§
 
-close all;
+close all; clear all; clc;
 
 % Generate a set of polytopes from the Halton set
 % fig_num = 12;
@@ -24,7 +24,7 @@ hold on;
 for i=1:10%0
     Halton_range = [200 301]; % range of Halton points to use to generate the tiling
     polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1]);
-    shrinkage = 0.05*i;
+    shrinkage = 0.005*i;
     %% Shrink all polytopes by a gap using radial shrinking
     shrunk_polytopes_radial = polytopes;
     for ith_poly = 1:length(polytopes)
