@@ -207,10 +207,10 @@ perimeter_gap_size = 2*unoccupied_area/(total_perimeter);
 avg_r_D = average_max_radius*linear_density;
 std_r_D = std_max_radius*linear_density;
 L_E = total_area^0.5;
-avg_r_LC_from_avg_gap = (linear_density*(average_gap_size_G_bar.^2+average_side_length.^2).^0.5)./L_E; % TODO(@sjharnett) debug to determine why produces complex values
-std_r_LC_from_avg_gap = (linear_density*(average_gap_size_G_bar.^2+std_side_length.^2))./L_E;
 N_int = L_E*linear_density;
 all_max_radius_sorted = sort(all_max_radius);
+avg_r_LC_from_avg_gap = linear_density*2*(average_gap_size_G_bar.^2+average_side_length.^2).^0.5; % TODO(@sjharnett) debug to determine why produces complex values
+std_r_LC_from_avg_gap = linear_density*2*(average_gap_size_G_bar.^2+std_side_length.^2).^0.5; % TODO(@sjharnett) debug to determine why produces complex values
 % linear model
 r_LC_linear1 = (L_E + 2*(average_max_radius.^2+average_max_radius.^2.*tan(average_vertex_angle./2)).^0.5-2*average_max_radius.*tan(average_vertex_angle./2))./L_E;
 % linear model II
@@ -224,7 +224,6 @@ height = 2*average_max_radius-1./(linear_density);
 hypotenuse = (base.^2+height.^2).^0.5;
 L_P = L_E + N_int.*(2*hypotenuse-2*base);
 r_LC_2d_density_variation1= L_P./L_E; % TODO(@sjharnett) add std deviation for this
-
 % rewriting the above to be a proper expression for r_LC in terms of r_D
 r_LC_2d_density_variation2 = 1+(avg_r_D./(average_max_radius)).*sqrt((avg_r_D./average_max_radius).^(-2)+(2*average_max_radius-(avg_r_D./average_max_radius)).^2);
 
@@ -236,15 +235,18 @@ L_P = L_E + N_int.*(2*hypotenuse-2*base);
 r_LC_2d_density_variation3 = L_P./L_E;
 
 figure(1);
+% errorbar(avg_r_D,avg_r_LC_from_avg_gap,std_r_LC_from_avg_gap,'ro')
 plot(avg_r_D,avg_r_LC_from_avg_gap,'ro')
 % plot(avg_r_D,r_LC_linear1,'go')
 % plot(avg_r_D,r_LC_linear2,'ko')
 % plot(avg_r_D,r_LC_1d_density_variation,'bo')
-plot(avg_r_D,r_LC_2d_density_variation1,'co')
+% plot(avg_r_D,r_LC_2d_density_variation1,'co')
 % plot(avg_r_D,r_LC_2d_density_variation2,'mo')
 % plot(avg_r_D,r_LC_2d_density_variation3,'ro')
-legend('linear','linear2','1d density variation','2d density variation1','2d density variation2','2d density variation3');
-
+% legend('linear','linear2','1d density variation','2d density variation1','2d density variation2','2d density variation3');
+% legend('length cost ratio from average gap size','length cost ratio from linear density');
+xlabel('r_D');
+ylabel('predicted r_{LC}');
 % Fill in results
 poly_map_stats.Npolys = Npolys;
 poly_map_stats.NtotalVertices = NrealVertices;
