@@ -67,14 +67,28 @@ length_mean_vectors = sum(mean_vectors.^2,2).^0.5;
 unit_direction_of_cut = mean_vectors./length_mean_vectors;
 quiver(vertices(1:end-1,1),vertices(1:end-1,2),unit_direction_of_cut(:,1),unit_direction_of_cut(:,2),'g')
 vertex_normal_vectors = [unit_direction_of_cut(:,1),unit_direction_of_cut(:,2)]
-vertex_normal_vectors = circshift(vertex_normal_vectors,1)
+% vertex_normal_vectors = circshift(vertex_normal_vectors,1)
 side_vectors = zeros(length(vertices)-1,2);
 theta_normal_to_side = zeros(length(vertices)-1);
+is_away = zeros(1, length(vertices)-1);
+travel_direction = [1,0];
+away_normals = NaN(length(vertices)-1,2);
+away_angles = NaN(length(vertices)-1,1);
+for i=1:length(vertices)-1
+    is_away(i) = dot(vertex_normal_vectors(i,:),travel_direction);
+    if is_away(i)>0
+        away_normals(i,:) = vertex_normal_vectors(i,:);
+        away_angles(i) = angles(i);
+    end
+end
+away_normals(any(isnan(away_angles),2),:)=[];
+away_angles(any(isnan(away_angles),2),:)=[];
+
 for i=1:length(vertices)-1
     side_vectors(i,1) = vertices(i+1,1)-vertices(i,1);
     side_vectors(i,2) = vertices(i+1,2)-vertices(i,2);
     quiver(vertices(i,1),vertices(i,2),vertices(i+1,1)-vertices(i,1),vertices(i+1,2)-vertices(i,2),'-b');
     % theta = arccos((x dot y)/(mag x * mag y))
-    theta_normal_to_side(i) = rad2deg(acos((dot([side_vectors(i,1),side_vectors(i,2)],[vertex_normal_vectors(i,1),vertex_normal_vectors(i,2)]))/(norm([side_vectors(i,1),side_vectors(i,2)])*norm([vertex_normal_vectors(i,1),vertex_normal_vectors(i,2)]))));
+    % theta_normal_to_side(i) = rad2deg(acos((dot([side_vectors(i,1),side_vectors(i,2)],[vertex_normal_vectors(i,1),vertex_normal_vectors(i,2)]))/(norm([side_vectors(i,1),side_vectors(i,2)])*norm([vertex_normal_vectors(i,1),vertex_normal_vectors(i,2)]))));
 end
 
