@@ -58,7 +58,7 @@ function main()
     % Basic example of vertex calculation
     fig_num = 11;
     fig_num = 12;
-    Halton_range = [1 1000]; % range of Halton points to use to generate the tiling
+    Halton_range = [1 500]; % range of Halton points to use to generate the tiling
     tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
     title('Halton set');
     field_away_normals = [];
@@ -76,7 +76,7 @@ function main()
         mean_vectors = (unit_out_vectors-unit_in_vectors)/2;
         length_mean_vectors = sum(mean_vectors.^2,2).^0.5;
         unit_direction_of_cut = mean_vectors./length_mean_vectors;
-        quiver(vertices(1:end-1,1),vertices(1:end-1,2),unit_direction_of_cut(:,1),unit_direction_of_cut(:,2),'g')
+        vertex_normal_plot = quiver(vertices(1:end-1,1),vertices(1:end-1,2),unit_direction_of_cut(:,1),unit_direction_of_cut(:,2),'g')
         vertex_normal_vectors = [unit_direction_of_cut(:,1),unit_direction_of_cut(:,2)]
         % vertex_normal_vectors = circshift(vertex_normal_vectors,1)
         side_vectors = zeros(length(vertices)-1,2);
@@ -85,35 +85,74 @@ function main()
         is_away = zeros(1, length(vertices)-1);
         travel_direction = [1,0];
         away_normals = NaN(length(vertices)-1,2);
+        away_vertices = NaN(length(vertices)-1,2);
         away_angles = NaN(length(vertices)-1,1);
         away_angle_vertex_normal_to_travel_direction = NaN(length(vertices)-1,1);
         for i=1:length(vertices)-1
             is_away(i) = dot(vertex_normal_vectors(i,:),travel_direction);
             angle_vertex_normal_to_travel_direction(i) = angle_between_vectors(vertex_normal_vectors(i,:),travel_direction);
-            if is_away(i)>0
+            if is_away(i)>0 && angle_vertex_normal_to_travel_direction(i)<(vertices(i)/2)
+                away_vertices(i,:) = vertices(i,:);
                 away_normals(i,:) = vertex_normal_vectors(i,:);
-                away_angles(i) = angles(i);
+                away_angles(i) = pi-angles(i);
                 away_angle_vertex_normal_to_travel_direction(i) =  angle_vertex_normal_to_travel_direction(i);
             end
+            side_vectors(i,1) = vertices(i+1,1)-vertices(i,1);
+            side_vectors(i,2) = vertices(i+1,2)-vertices(i,2);
+            theta_normal_to_side(i) = angle_between_vectors(side_vectors(i,:),vertex_normal_vectors(i,:));
+            side_vec_plot = quiver(vertices(i,1),vertices(i,2),vertices(i+1,1)-vertices(i,1),vertices(i+1,2)-vertices(i,2),'-b');
+            travel_vec_plot = quiver(vertices(i,1),vertices(i,2),travel_direction(1)*0.05,travel_direction(2)*0.05,'-m');
         end
+        % remove data for angles pointing towards travel direction
         away_normals(any(isnan(away_angles),2),:)=[];
         away_angles(any(isnan(away_angles),2),:)=[];
         away_angle_vertex_normal_to_travel_direction(any(isnan(away_angle_vertex_normal_to_travel_direction),2),:)=[];
+        % find large and small choice angles
         small_choice_angles = away_angles./2-away_angle_vertex_normal_to_travel_direction;
         big_choice_angles = away_angles./2+away_angle_vertex_normal_to_travel_direction;
+        % log things for the entire field
         field_away_normals = [field_away_normals;away_normals];
         field_away_angles = [field_away_angles;away_angles];
         field_away_angle_vertex_normal_to_travel_direction = [field_away_angle_vertex_normal_to_travel_direction;away_angle_vertex_normal_to_travel_direction];
         field_small_choice_angles = [field_small_choice_angles;small_choice_angles];
         field_big_choice_angles = [field_big_choice_angles;big_choice_angles];
-        for i=1:length(vertices)-1
-            side_vectors(i,1) = vertices(i+1,1)-vertices(i,1);
-            side_vectors(i,2) = vertices(i+1,2)-vertices(i,2);
-            quiver(vertices(i,1),vertices(i,2),vertices(i+1,1)-vertices(i,1),vertices(i+1,2)-vertices(i,2),'-b');
-            % theta = arccos((x dot y)/(mag x * mag y))
-            theta_normal_to_side(i) = angle_between_vectors(side_vectors(i,:),vertex_normal_vectors(i,:));
+        %plot
+        for i=1:length(away_angles)
+            away_travel_vec_plot = quiver(away_vertices(i,1),away_vertices(i,2),travel_direction(1)*0.05,travel_direction(2)*0.05,'-m');
+        end
+%         for i=1:length(vertices)-1
+%             side_vectors(i,1) = vertices(i+1,1)-vertices(i,1);
+%             side_vectors(i,2) = vertices(i+1,2)-vertices(i,2);
+
+        % theta = arccos((x dot y)/(mag x * mag y))
+%             theta_normal_to_side(i) = angle_between_vectors(side_vectors(i,:),vertex_normal_vectors(i,:));
+        % label large and small sizes
+        size = max(max(vertices)) - min(min(vertices));
+        nudge = size*0.01;
+        % Label the vertices
+        for ith_angle = 1:length(angles)
+            ith_vertex = ith_angle;
+            text(vertices(ith_vertex,1)+nudge,vertices(ith_vertex,2),...
+                sprintf('%.0f deg',180-angles(ith_angle,1)*180/pi));
         end
     end
+    figure;
+    hold on;
+    histogram(field_big_choice_angles*180/pi,'BinWidth',2,'FaceColor','g','FaceAlpha',0.4)
+    histogram(field_small_choice_angles*180/pi,'BinWidth',2,'FaceColor','b','FaceAlpha',0.4)
+    legend('large, unchosen divergence angles','small, chosen divergence angles')
+    xlabel('interior angle [deg]')
+    ylabel('count')
+    title('Histogram of Divergence Angles')
+    figure;
+    hold on;
+    histogram(field_big_choice_angles*180/pi,'BinWidth',2,'FaceColor','g','FaceAlpha',0.4)
+    histogram(field_small_choice_angles*180/pi,'BinWidth',2,'FaceColor','b','FaceAlpha',0.4)
+    histogram(field_away_angles/2*180/pi,'BinWidth',2,'FaceColor','r','FaceAlpha',0.4)
+    legend('large, unchosen divergence angles','small, chosen divergence angles','all away facing polytope angles, halved')
+    xlabel('interior angle [deg]')
+    ylabel('count')
+    title('Histogram of Divergence Angles')
 end
 function ang = angle_between_vectors(a,b)
     % note this function returns [0,180] so is not directional (i.e. a
@@ -122,4 +161,7 @@ function ang = angle_between_vectors(a,b)
     % about to be in the direction of the path
     % ang = atan2(norm(cross([a,0],[b,0])), dot(a,b));
     ang = acos(dot(a,b)/(norm(a)*norm(b)));
+    if a(2)<0
+        ang = ang;
+    end
 end

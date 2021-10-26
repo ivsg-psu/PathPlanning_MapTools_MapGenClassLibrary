@@ -180,7 +180,7 @@ if flag_do_plot
     for ith_angle = 1:Nangles
         ith_vertex = ith_angle;
         text(vertices(ith_vertex,1)+nudge,vertices(ith_vertex,2),...
-            sprintf('%.0f deg',angles(ith_angle,1)*180/pi));
+            sprintf('%.0f deg',180-angles(ith_angle,1)*180/pi));
     end
 
 end
