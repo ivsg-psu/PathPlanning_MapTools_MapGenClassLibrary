@@ -66,6 +66,7 @@ function main()
     field_away_angle_vertex_normal_to_travel_direction = [];
     field_small_choice_angles = [];
     field_big_choice_angles = [];
+    field_chosen_side_length = [];
     for i=1:length(tiled_polytopes)
         shrinker = tiled_polytopes(i);
         [angles, unit_in_vectors, unit_out_vectors] =...
@@ -87,7 +88,10 @@ function main()
         away_normals = NaN(length(vertices)-1,2);
         away_vertices = NaN(length(vertices)-1,2);
         away_angles = NaN(length(vertices)-1,1);
+        chosen_side_lengths = NaN(length(vertices)-1,1);
         away_angle_vertex_normal_to_travel_direction = NaN(length(vertices)-1,1);
+        % make distances array circular by putting the first entry at the end to support end+1 circular indexing
+        shrinker.distances = [shrinker.distances;shrinker.distances(1)];
         for i=1:length(vertices)-1
             is_away(i) = dot(vertex_normal_vectors(i,:),travel_direction);
             angle_vertex_normal_to_travel_direction(i) = angle_between_vectors(vertex_normal_vectors(i,:),travel_direction);
@@ -102,11 +106,19 @@ function main()
             theta_normal_to_side(i) = angle_between_vectors(side_vectors(i,:),vertex_normal_vectors(i,:));
             side_vec_plot = quiver(vertices(i,1),vertices(i,2),vertices(i+1,1)-vertices(i,1),vertices(i+1,2)-vertices(i,2),'-b');
             travel_vec_plot = quiver(vertices(i,1),vertices(i,2),travel_direction(1)*0.05,travel_direction(2)*0.05,'-m');
+            % for the chosen divergence angle, find the length of the side we turned towards
+            if is_left_turn_smaller(vertex_normal_vectors(i,:),travel_direction)
+                 side_length = shrinker.distances(i); % the vertex we're at has the side length associated with it on the left
+             else
+                 side_length = shrinker.distances(i+1); % the vertex we're at has the side length to its right at the next index
+            end
+            chosen_side_length(i) = side_length;
         end
         % remove data for angles pointing towards travel direction
         away_normals(any(isnan(away_angles),2),:)=[];
         away_angles(any(isnan(away_angles),2),:)=[];
         away_angle_vertex_normal_to_travel_direction(any(isnan(away_angle_vertex_normal_to_travel_direction),2),:)=[];
+        chosen_side_length(any(isnan(away_angles),2),:)=[];
         % find large and small choice angles
         small_choice_angles = away_angles./2-away_angle_vertex_normal_to_travel_direction;
         big_choice_angles = away_angles./2+away_angle_vertex_normal_to_travel_direction;
@@ -116,6 +128,7 @@ function main()
         field_away_angle_vertex_normal_to_travel_direction = [field_away_angle_vertex_normal_to_travel_direction;away_angle_vertex_normal_to_travel_direction];
         field_small_choice_angles = [field_small_choice_angles;small_choice_angles];
         field_big_choice_angles = [field_big_choice_angles;big_choice_angles];
+        field_chosen_side_length = [field_chosen_side_length;chosen_side_length];
         %plot
         for i=1:length(away_angles)
             away_travel_vec_plot = quiver(away_vertices(i,1),away_vertices(i,2),travel_direction(1)*0.05,travel_direction(2)*0.05,'-m');
@@ -164,4 +177,8 @@ function ang = angle_between_vectors(a,b)
     if a(2)<0
         ang = ang;
     end
+end
+function left_turn_is_smaller = is_left_turn_smaller(vertex_normal,travel_direction)
+    cross_prod = cross([vertex_normal,0],[travel_direction,0]);
+    left_turn_is_smaller = cross_prod(3)>0;
 end
