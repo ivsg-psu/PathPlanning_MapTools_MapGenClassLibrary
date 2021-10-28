@@ -67,6 +67,7 @@ function main()
     field_small_choice_angles = [];
     field_big_choice_angles = [];
     field_chosen_side_length = [];
+    % begin looping through polytopes in a field
     for i=1:length(tiled_polytopes)
         shrinker = tiled_polytopes(i);
         [angles, unit_in_vectors, unit_out_vectors] =...
@@ -82,8 +83,9 @@ function main()
         % vertex_normal_vectors = circshift(vertex_normal_vectors,1)
         side_vectors = zeros(length(vertices)-1,2);
         theta_normal_to_side = zeros(length(vertices)-1,1);
-        angle_vertex_normal_to_travel_direction = zeros(length(vertices)-1,1);
-        is_away = zeros(1, length(vertices)-1);
+        angle_vertex_normal_to_travel_direction = NaN(length(vertices)-1,1);
+        vertex_is_away = zeros(1, length(vertices)-1);
+        travel_direction_is_within_polytope = zeros(1, length(vertices)-1);
         travel_direction = [1,0];
         away_normals = NaN(length(vertices)-1,2);
         away_vertices = NaN(length(vertices)-1,2);
@@ -92,33 +94,38 @@ function main()
         away_angle_vertex_normal_to_travel_direction = NaN(length(vertices)-1,1);
         % make distances array circular by putting the first entry at the end to support end+1 circular indexing
         shrinker.distances = [shrinker.distances;shrinker.distances(1)];
+        % begin looping through vertices
         for i=1:length(vertices)-1
-            is_away(i) = dot(vertex_normal_vectors(i,:),travel_direction);
             angle_vertex_normal_to_travel_direction(i) = angle_between_vectors(vertex_normal_vectors(i,:),travel_direction);
-            if is_away(i)>0 && angle_vertex_normal_to_travel_direction(i)<(vertices(i)/2)
+            vertex_is_away(i) = dot(vertex_normal_vectors(i,:),travel_direction);
+            travel_direction_is_within_polytope(i) = angle_vertex_normal_to_travel_direction(i)<=(pi-angles(i))/2;
+            % begin looping through away vertices
+            if vertex_is_away(i)>0 && travel_direction_is_within_polytope(i)
                 away_vertices(i,:) = vertices(i,:);
                 away_normals(i,:) = vertex_normal_vectors(i,:);
                 away_angles(i) = pi-angles(i);
                 away_angle_vertex_normal_to_travel_direction(i) =  angle_vertex_normal_to_travel_direction(i);
+            % for the chosen divergence angle, find the length of the side we turned towards
+                if is_left_turn_smaller(vertex_normal_vectors(i,:),travel_direction)
+                     side_length = shrinker.distances(i+1); % the vertex we're at has the side length to its left at the next index
+                 else
+                     side_length = shrinker.distances(i); % the vertex we're at has the side length associated with it on the right
+                end
+                chosen_side_lengths(i) = side_length;
+            % end looping through away vertices
             end
             side_vectors(i,1) = vertices(i+1,1)-vertices(i,1);
             side_vectors(i,2) = vertices(i+1,2)-vertices(i,2);
             theta_normal_to_side(i) = angle_between_vectors(side_vectors(i,:),vertex_normal_vectors(i,:));
             side_vec_plot = quiver(vertices(i,1),vertices(i,2),vertices(i+1,1)-vertices(i,1),vertices(i+1,2)-vertices(i,2),'-b');
             travel_vec_plot = quiver(vertices(i,1),vertices(i,2),travel_direction(1)*0.05,travel_direction(2)*0.05,'-m');
-            % for the chosen divergence angle, find the length of the side we turned towards
-            if is_left_turn_smaller(vertex_normal_vectors(i,:),travel_direction)
-                 side_length = shrinker.distances(i); % the vertex we're at has the side length associated with it on the left
-             else
-                 side_length = shrinker.distances(i+1); % the vertex we're at has the side length to its right at the next index
-            end
-            chosen_side_length(i) = side_length;
+        % end looping through vertices
         end
         % remove data for angles pointing towards travel direction
         away_normals(any(isnan(away_angles),2),:)=[];
         away_angles(any(isnan(away_angles),2),:)=[];
         away_angle_vertex_normal_to_travel_direction(any(isnan(away_angle_vertex_normal_to_travel_direction),2),:)=[];
-        chosen_side_length(any(isnan(away_angles),2),:)=[];
+        chosen_side_lengths(any(isnan(chosen_side_lengths),2),:)=[];
         % find large and small choice angles
         small_choice_angles = away_angles./2-away_angle_vertex_normal_to_travel_direction;
         big_choice_angles = away_angles./2+away_angle_vertex_normal_to_travel_direction;
@@ -128,17 +135,17 @@ function main()
         field_away_angle_vertex_normal_to_travel_direction = [field_away_angle_vertex_normal_to_travel_direction;away_angle_vertex_normal_to_travel_direction];
         field_small_choice_angles = [field_small_choice_angles;small_choice_angles];
         field_big_choice_angles = [field_big_choice_angles;big_choice_angles];
-        field_chosen_side_length = [field_chosen_side_length;chosen_side_length];
-        %plot
-        for i=1:length(away_angles)
-            away_travel_vec_plot = quiver(away_vertices(i,1),away_vertices(i,2),travel_direction(1)*0.05,travel_direction(2)*0.05,'-m');
-        end
-%         for i=1:length(vertices)-1
-%             side_vectors(i,1) = vertices(i+1,1)-vertices(i,1);
-%             side_vectors(i,2) = vertices(i+1,2)-vertices(i,2);
+        field_chosen_side_length = [field_chosen_side_length;chosen_side_lengths];
+        % plot
+        % for i=1:length(away_angles)
+        %     away_travel_vec_plot = quiver(away_vertices(i,1),away_vertices(i,2),travel_direction(1)*0.05,travel_direction(2)*0.05,'-m');
+        % end
+        % for i=1:length(vertices)-1
+        % side_vectors(i,1) = vertices(i+1,1)-vertices(i,1);
+        % side_vectors(i,2) = vertices(i+1,2)-vertices(i,2);
 
         % theta = arccos((x dot y)/(mag x * mag y))
-%             theta_normal_to_side(i) = angle_between_vectors(side_vectors(i,:),vertex_normal_vectors(i,:));
+        % theta_normal_to_side(i) = angle_between_vectors(side_vectors(i,:),vertex_normal_vectors(i,:));
         % label large and small sizes
         size = max(max(vertices)) - min(min(vertices));
         nudge = size*0.01;
@@ -148,6 +155,7 @@ function main()
             text(vertices(ith_vertex,1)+nudge,vertices(ith_vertex,2),...
                 sprintf('%.0f deg',180-angles(ith_angle,1)*180/pi));
         end
+    % end looping through polytopes in a field
     end
     figure;
     hold on;
