@@ -6,6 +6,31 @@
 % -- first written by S. Brennan
 
 function main()
+    clear all; close all;clc;
+    fig_num = 1;
+    r_D = [];
+    for i=10:5:500
+        Halton_range = [1 i]; % range of Halton points to use to generate the tiling
+        tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
+        title('Halton set');
+        fig_num = fig_num+1;
+        % find r_D for this field
+        field_stats = fcn_MapGen_polytopesStatistics(tiled_polytopes);
+        field_avg_r_D = field_stats.avg_r_D;
+        r_D = [r_D, field_avg_r_D];
+        for j=0.001:0.005:0.1
+            try
+                des_rad = j; sigma_radius = 0; min_rad = 0.001;
+                [shrunk_field,mu_final,sigma_final] = fcn_MapGen_polytopesShrinkToRadius(tiled_polytopes,des_rad,sigma_radius,min_rad,fig_num);
+                field_stats = fcn_MapGen_polytopesStatistics(shrunk_field);
+                field_avg_r_D = field_stats.avg_r_D;
+                r_D = [r_D, field_avg_r_D];
+            end
+        end
+    end
+    close all
+    figure
+    plot(r_D,'ko')
     %% Basic example of vertex calculation - a square
     fig_num = 1;
     vertices = [0 0; 1 0; 1 1; 0 1; 0 0];
@@ -56,20 +81,28 @@ function main()
     shrinker = trim_polytopes(rand_poly);
 
     % Basic example of vertex calculation
-    fig_num = 11;
     fig_num = 12;
-    Halton_range = [1 500]; % range of Halton points to use to generate the tiling
+    Halton_range = [1 10]; % range of Halton points to use to generate the tiling
     tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
     title('Halton set');
+    fig_num = fig_num+1;
+    % find r_D for this field
+    field_stats = fcn_MapGen_polytopesStatistics(tiled_polytopes);
+    field_avg_r_D = field_stats.avg_r_D;
     field_away_normals = [];
     field_away_angles = [];
     field_away_angle_vertex_normal_to_travel_direction = [];
     field_small_choice_angles = [];
     field_big_choice_angles = [];
     field_chosen_side_length = [];
+    % initialize path for iterative solution
+    path = NaN(1,2);
+    iterative_chosen_side_lengths = [];
+    iterative_small_choice_angles = [];
+    start_not_found = true;
     % begin looping through polytopes in a field
-    for i=1:length(tiled_polytopes)
-        shrinker = tiled_polytopes(i);
+    for j=1:length(tiled_polytopes)
+        shrinker = tiled_polytopes(j);
         [angles, unit_in_vectors, unit_out_vectors] =...
             fcn_MapGen_polytopeFindVertexAngles(...
             shrinker.vertices,fig_num);
@@ -94,6 +127,7 @@ function main()
         away_angle_vertex_normal_to_travel_direction = NaN(length(vertices)-1,1);
         % make distances array circular by putting the first entry at the end to support end+1 circular indexing
         shrinker.distances = [shrinker.distances;shrinker.distances(1)];
+        % end initialize path for iterative solution
         % begin looping through vertices
         for i=1:length(vertices)-1
             angle_vertex_normal_to_travel_direction(i) = angle_between_vectors(vertex_normal_vectors(i,:),travel_direction);
@@ -101,6 +135,14 @@ function main()
             travel_direction_is_within_polytope(i) = angle_vertex_normal_to_travel_direction(i)<=(pi-angles(i))/2;
             % begin looping through away vertices
             if vertex_is_away(i)>0 && travel_direction_is_within_polytope(i)
+                % pick a point at x=0 y=/= 0 to start iterative solution
+                if vertices(i,1) == 0 && vertices(i,2) ~= 0 && start_not_found
+                    start_location = vertices(i,:);
+                    path = [path; start_location];
+                    path(any(isnan(path),2),:)=[];
+                    start_not_found = false;
+                end
+                % end pick a point at x=0 y=/= 0 to start iterative solution
                 away_vertices(i,:) = vertices(i,:);
                 away_normals(i,:) = vertex_normal_vectors(i,:);
                 away_angles(i) = pi-angles(i);
@@ -112,6 +154,18 @@ function main()
                      side_length = shrinker.distances(i); % the vertex we're at has the side length associated with it on the right
                 end
                 chosen_side_lengths(i) = side_length;
+                % log chosen_side_length and small angle separately for iterative solution
+                if vertices(i,:) == path(end,:)
+                    iterative_chosen_side_lengths = [iterative_chosen_side_lengths, side_length];
+                    iterative_small_choice_angles = [iterative_small_choice_angles, away_angles(i)./2-away_angle_vertex_normal_to_travel_direction(i)];
+                    if is_left_turn_smaller(vertex_normal_vectors(i,:),travel_direction)
+                        next_location = vertices(i-1,:);
+                    else
+                        next_location = vertices(i+1,:);
+                    end
+                    path = [path; next_location];
+                end
+                % end log chosen_side_lengths separately for iterative solution
             % end looping through away vertices
             end
             side_vectors(i,1) = vertices(i+1,1)-vertices(i,1);
@@ -136,6 +190,23 @@ function main()
         field_small_choice_angles = [field_small_choice_angles;small_choice_angles];
         field_big_choice_angles = [field_big_choice_angles;big_choice_angles];
         field_chosen_side_length = [field_chosen_side_length;chosen_side_lengths];
+
+        % TODO: iterative solution
+        % pick a point at x=0 y=/= 0
+        % log the short side and short angle
+        % note the vertex you wind up at
+        % go to next polytope, if the general conditions aren't met AND that vertex is not present, skip
+        % repeat until x=1
+
+        % TODO: add the average solution from lab laptop
+        % TODO: add the max solution from lab laptop
+
+        % TODO: use stats function to get r_D
+
+        % TODO: perform for multiple polytope fields of various shrink OR various density fully tiled
+
+        % TODO: scatter plot results
+
         % plot
         % for i=1:length(away_angles)
         %     away_travel_vec_plot = quiver(away_vertices(i,1),away_vertices(i,2),travel_direction(1)*0.05,travel_direction(2)*0.05,'-m');
@@ -155,7 +226,6 @@ function main()
             text(vertices(ith_vertex,1)+nudge,vertices(ith_vertex,2),...
                 sprintf('%.0f deg',180-angles(ith_angle,1)*180/pi));
         end
-    % end looping through polytopes in a field
     end
     figure;
     hold on;

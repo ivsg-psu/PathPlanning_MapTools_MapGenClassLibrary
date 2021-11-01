@@ -275,6 +275,7 @@ poly_map_stats.std_max_radius = std_max_radius;
 poly_map_stats.average_side_length = average_side_length;
 poly_map_stats.std_side_length = std_side_length;
 poly_map_stats.total_perimeter = total_perimeter;
+poly_map_stats.avg_r_D = avg_r_D;
 
 
 
