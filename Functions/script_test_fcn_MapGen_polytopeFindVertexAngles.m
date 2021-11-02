@@ -10,9 +10,12 @@ function main()
     fig_num = 1;
     % begin r_D range generation
     r_D = [];
+    r_lc_max_all = [];
+    r_lc_avg_all = [];
+    r_lc_iterative_all = [];
     % shrink_distance = [];
-    for i=10:20:500
-        Halton_range = [1 i]; % range of Halton points to use to generate the tiling
+    for tiles=50:10:70%10:80:500
+        Halton_range = [1 tiles]; % range of Halton points to use to generate the tiling
         tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
         title('Halton set');
         fig_num = fig_num+1;
@@ -20,24 +23,37 @@ function main()
         field_stats = fcn_MapGen_polytopesStatistics(tiled_polytopes);
         field_avg_r_D = field_stats.avg_r_D;
         r_D = [r_D, field_avg_r_D];
+        [r_lc_max,r_lc_avg,r_lc_iterative] = do_r_LC(tiled_polytopes)
+        r_lc_max_all = [r_lc_max_all, r_lc_max];
+        r_lc_avg_all = [r_lc_avg_all, r_lc_avg];
+        r_lc_iterative_all = [r_lc_iterative_all, r_lc_iterative];
         % shrink_distance = [shrink_distance, 0];
-        for j=0.001:0.005:0.1
-            try
-                des_rad = j; sigma_radius = 0; min_rad = 0.001;
-                [shrunk_field,mu_final,sigma_final] = fcn_MapGen_polytopesShrinkToRadius(tiled_polytopes,des_rad,sigma_radius,min_rad,fig_num);
-                field_stats = fcn_MapGen_polytopesStatistics(shrunk_field);
-                field_avg_r_D = field_stats.avg_r_D;
-                r_D = [r_D, field_avg_r_D];
-                % avg_max_rad = field_stats.average_max_radius;
-                % shrink_distance = [shrink_distance, avg_max_rad-des_rad];
-            end
-        end
+%         for radii_goals=0.01:0.01:0.1%0.001:0.010:0.1
+%             try
+%                 des_rad = radii_goals; sigma_radius = 0; min_rad = 0.001;
+%                 [shrunk_field,mu_final,sigma_final] = fcn_MapGen_polytopesShrinkToRadius(tiled_polytopes,des_rad,sigma_radius,min_rad,fig_num);
+%                 field_stats = fcn_MapGen_polytopesStatistics(shrunk_field);
+%                 field_avg_r_D = field_stats.avg_r_D;
+%                 r_D = [r_D, field_avg_r_D];
+%                 % avg_max_rad = field_stats.average_max_radius;
+%                 % shrink_distance = [shrink_distance, avg_max_rad-des_rad];
+%                 [r_lc_max,r_lc_avg,r_lc_iterative] = do_r_LC(shrunk_field)
+%                 r_lc_max_all = [r_lc_max_all, r_lc_max];
+%                 r_lc_avg_all = [r_lc_avg_all, r_lc_avg];
+%                 r_lc_iterative_all = [r_lc_iterative_all, r_lc_iterative];
+%             end
+%         end
     end
     close all
     figure
     plot(r_D,'ko')
-    figure
-    plot(shrink_distance,r_D,'go')
+    figure(609)
+    hold on
+    plot(r_lc_max_all,'ro')
+    plot(r_lc_avg_all,'bo')
+    plot(r_lc_iterative_all,'go')
+%     figure
+%     plot(shrink_distance,r_D,'go')
     % end r_D range generation
     % begin basic examples
 %     %% Basic example of vertex calculation - a square
@@ -91,11 +107,15 @@ function main()
 % end basic examples
     % Basic example of vertex calculation
     fig_num = 12;
-    Halton_range = [1 10]; % range of Halton points to use to generate the tiling
+    Halton_range = [1 50]; % range of Halton points to use to generate the tiling
     tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
     title('Halton set');
     fig_num = fig_num+1;
+    [r_lc_max,r_lc_avg,r_lc_iterative] = do_r_LC(tiled_polytopes)
+end
     % find r_D for this field
+function [r_lc_max,r_lc_avg,r_lc_iterative] = do_r_LC(tiled_polytopes)
+    fig_num = 12;
     field_stats = fcn_MapGen_polytopesStatistics(tiled_polytopes);
     field_avg_r_D = field_stats.avg_r_D;
     field_away_normals = [];
@@ -168,7 +188,11 @@ function main()
                     iterative_chosen_side_lengths = [iterative_chosen_side_lengths, side_length];
                     iterative_small_choice_angles = [iterative_small_choice_angles, away_angles(i)./2-away_angle_vertex_normal_to_travel_direction(i)];
                     if is_left_turn_smaller(vertex_normal_vectors(i,:),travel_direction)
-                        next_location = vertices(i-1,:);
+                        try
+                            next_location = vertices(i-1,:);
+                        catch
+                            next_location = vertices(end,:);
+                        end
                     else
                         next_location = vertices(i+1,:);
                     end
@@ -241,7 +265,6 @@ function main()
     r_lc_avg = 1/cos(mean(field_small_choice_angles));
     field_traveled_distance_L = cos(field_small_choice_angles).*field_chosen_side_length;
     field_path_distance_H = field_chosen_side_length;
-    r_lc_iterative = NaN;
     L_E = 0;
     L_P = 0;
     i = 1;
@@ -251,11 +274,11 @@ function main()
         i = i + 1;
     end
     r_lc_iterative = L_P/L_E;
-    figure(607)
-    hold on
-    plot(r_lc_max,'ro')
-    plot(r_lc_avg,'bo')
-    plot(r_lc_iterative,'go')
+%     figure(607)
+%     hold on
+%     plot(r_lc_max,'ro')
+%     plot(r_lc_avg,'bo')
+%     plot(r_lc_iterative,'go')
     % end result plotting
     figure;
     hold on;
