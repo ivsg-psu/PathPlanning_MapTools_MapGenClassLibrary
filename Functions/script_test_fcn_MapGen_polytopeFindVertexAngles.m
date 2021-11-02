@@ -8,8 +8,10 @@
 function main()
     clear all; close all;clc;
     fig_num = 1;
+    % begin r_D range generation
     r_D = [];
-    for i=10:5:500
+    % shrink_distance = [];
+    for i=10:20:500
         Halton_range = [1 i]; % range of Halton points to use to generate the tiling
         tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
         title('Halton set');
@@ -18,6 +20,7 @@ function main()
         field_stats = fcn_MapGen_polytopesStatistics(tiled_polytopes);
         field_avg_r_D = field_stats.avg_r_D;
         r_D = [r_D, field_avg_r_D];
+        % shrink_distance = [shrink_distance, 0];
         for j=0.001:0.005:0.1
             try
                 des_rad = j; sigma_radius = 0; min_rad = 0.001;
@@ -25,61 +28,67 @@ function main()
                 field_stats = fcn_MapGen_polytopesStatistics(shrunk_field);
                 field_avg_r_D = field_stats.avg_r_D;
                 r_D = [r_D, field_avg_r_D];
+                % avg_max_rad = field_stats.average_max_radius;
+                % shrink_distance = [shrink_distance, avg_max_rad-des_rad];
             end
         end
     end
     close all
     figure
     plot(r_D,'ko')
-    %% Basic example of vertex calculation - a square
-    fig_num = 1;
-    vertices = [0 0; 1 0; 1 1; 0 1; 0 0];
-    [angles, unit_in_vectors, unit_out_vectors] =...
-        fcn_MapGen_polytopeFindVertexAngles(...
-        vertices,fig_num);
-    assert(1000*eps>abs(360-sum(angles)*180/pi));
-    mean_vectors = (unit_out_vectors-unit_in_vectors)/2;
-    length_mean_vectors = sum(mean_vectors.^2,2).^0.5;
-    unit_direction_of_cut = mean_vectors./length_mean_vectors;
-    quiver(vertices(1:end-1,1),vertices(1:end-1,2),unit_direction_of_cut(:,1),unit_direction_of_cut(:,2),'g')
-    vertex_normal_vectors = [unit_direction_of_cut(:,1)-vertices(1:end-1,1),unit_direction_of_cut(:,2)-vertices(1:end-1,2)];
-    side_vectors = zeros(length(vertices)-1,2);
-    for i=1:length(vertices)-1
-        side_vectors(i,1) = vertices(i+1,1)-vertices(i,1);
-        side_vectors(i,2) = vertices(i+1,2)-vertices(i,2);
-        quiver(vertices(i,1),vertices(i,2),vertices(i+1,1)-vertices(i,1),vertices(i+1,2)-vertices(i,2),'-b');
-    end
-    %% Basic example of vertex calculation - a triangle
-    fig_num = 2;
-    vertices = [0 0; 1 1; 0 1; 0 0];
-    [angles, unit_in_vectors, unit_out_vectors] =...
-        fcn_MapGen_polytopeFindVertexAngles(...
-        vertices,fig_num);
-    assert(1000*eps>abs(360-sum(angles)*180/pi));
-    mean_vectors = (unit_out_vectors-unit_in_vectors)/2;
-    length_mean_vectors = sum(mean_vectors.^2,2).^0.5;
-    unit_direction_of_cut = mean_vectors./length_mean_vectors;
-    quiver(vertices(1:end-1,1),vertices(1:end-1,2),unit_direction_of_cut(:,1),unit_direction_of_cut(:,2),'g')
-    vertex_normal_vectors = [unit_direction_of_cut(:,1)-vertices(1:end-1,1),unit_direction_of_cut(:,2)-vertices(1:end-1,2)];
-    side_vectors = zeros(length(vertices)-1,2);
-    for i=1:length(vertices)-1
-        side_vectors(i,1) = vertices(i+1,1)-vertices(i,1);
-        side_vectors(i,2) = vertices(i+1,2)-vertices(i,2);
-        quiver(vertices(i,1),vertices(i,2),vertices(i+1,1)-vertices(i,1),vertices(i+1,2)-vertices(i,2),'-b');
-    end
-    %% Random polytope calculation
-    % Set up polytopes
-    polytopes = fcn_MapGen_haltonVoronoiTiling([1 100],[1 1]);
-
-
-    bounding_box = [0,0; 1,1];
-    trim_polytopes = fcn_MapGen_polytopeCropEdges(polytopes,bounding_box);
-
-    % Pick a random polytope
-    Npolys = length(trim_polytopes);
-    rand_poly = 1+floor(rand*Npolys);
-    shrinker = trim_polytopes(rand_poly);
-
+    figure
+    plot(shrink_distance,r_D,'go')
+    % end r_D range generation
+    % begin basic examples
+%     %% Basic example of vertex calculation - a square
+%     fig_num = 1;
+%     vertices = [0 0; 1 0; 1 1; 0 1; 0 0];
+%     [angles, unit_in_vectors, unit_out_vectors] =...
+%         fcn_MapGen_polytopeFindVertexAngles(...
+%         vertices,fig_num);
+%     assert(1000*eps>abs(360-sum(angles)*180/pi));
+%     mean_vectors = (unit_out_vectors-unit_in_vectors)/2;
+%     length_mean_vectors = sum(mean_vectors.^2,2).^0.5;
+%     unit_direction_of_cut = mean_vectors./length_mean_vectors;
+%     quiver(vertices(1:end-1,1),vertices(1:end-1,2),unit_direction_of_cut(:,1),unit_direction_of_cut(:,2),'g')
+%     vertex_normal_vectors = [unit_direction_of_cut(:,1)-vertices(1:end-1,1),unit_direction_of_cut(:,2)-vertices(1:end-1,2)];
+%     side_vectors = zeros(length(vertices)-1,2);
+%     for i=1:length(vertices)-1
+%         side_vectors(i,1) = vertices(i+1,1)-vertices(i,1);
+%         side_vectors(i,2) = vertices(i+1,2)-vertices(i,2);
+%         quiver(vertices(i,1),vertices(i,2),vertices(i+1,1)-vertices(i,1),vertices(i+1,2)-vertices(i,2),'-b');
+%     end
+%     %% Basic example of vertex calculation - a triangle
+%     fig_num = 2;
+%     vertices = [0 0; 1 1; 0 1; 0 0];
+%     [angles, unit_in_vectors, unit_out_vectors] =...
+%         fcn_MapGen_polytopeFindVertexAngles(...
+%         vertices,fig_num);
+%     assert(1000*eps>abs(360-sum(angles)*180/pi));
+%     mean_vectors = (unit_out_vectors-unit_in_vectors)/2;
+%     length_mean_vectors = sum(mean_vectors.^2,2).^0.5;
+%     unit_direction_of_cut = mean_vectors./length_mean_vectors;
+%     quiver(vertices(1:end-1,1),vertices(1:end-1,2),unit_direction_of_cut(:,1),unit_direction_of_cut(:,2),'g')
+%     vertex_normal_vectors = [unit_direction_of_cut(:,1)-vertices(1:end-1,1),unit_direction_of_cut(:,2)-vertices(1:end-1,2)];
+%     side_vectors = zeros(length(vertices)-1,2);
+%     for i=1:length(vertices)-1
+%         side_vectors(i,1) = vertices(i+1,1)-vertices(i,1);
+%         side_vectors(i,2) = vertices(i+1,2)-vertices(i,2);
+%         quiver(vertices(i,1),vertices(i,2),vertices(i+1,1)-vertices(i,1),vertices(i+1,2)-vertices(i,2),'-b');
+%     end
+%     %% Random polytope calculation
+%     % Set up polytopes
+%     polytopes = fcn_MapGen_haltonVoronoiTiling([1 100],[1 1]);
+%
+%
+%     bounding_box = [0,0; 1,1];
+%     trim_polytopes = fcn_MapGen_polytopeCropEdges(polytopes,bounding_box);
+%
+%     % Pick a random polytope
+%     Npolys = length(trim_polytopes);
+%     rand_poly = 1+floor(rand*Npolys);
+%     shrinker = trim_polytopes(rand_poly);
+% end basic examples
     % Basic example of vertex calculation
     fig_num = 12;
     Halton_range = [1 10]; % range of Halton points to use to generate the tiling
@@ -218,15 +227,36 @@ function main()
         % theta = arccos((x dot y)/(mag x * mag y))
         % theta_normal_to_side(i) = angle_between_vectors(side_vectors(i,:),vertex_normal_vectors(i,:));
         % label large and small sizes
-        size = max(max(vertices)) - min(min(vertices));
-        nudge = size*0.01;
-        % Label the vertices
-        for ith_angle = 1:length(angles)
-            ith_vertex = ith_angle;
-            text(vertices(ith_vertex,1)+nudge,vertices(ith_vertex,2),...
-                sprintf('%.0f deg',180-angles(ith_angle,1)*180/pi));
-        end
+%         size = max(max(vertices)) - min(min(vertices));
+%         nudge = size*0.01;
+%         % Label the vertices
+%         for ith_angle = 1:length(angles)
+%             ith_vertex = ith_angle;
+%             text(vertices(ith_vertex,1)+nudge,vertices(ith_vertex,2),...
+%                 sprintf('%.0f deg',180-angles(ith_angle,1)*180/pi));
+%         end
     end
+    % begin result plotting
+    r_lc_max = 1/cos(mean(field_away_angles)/2);
+    r_lc_avg = 1/cos(mean(field_small_choice_angles));
+    field_traveled_distance_L = cos(field_small_choice_angles).*field_chosen_side_length;
+    field_path_distance_H = field_chosen_side_length;
+    r_lc_iterative = NaN;
+    L_E = 0;
+    L_P = 0;
+    i = 1;
+    while L_E < 1
+        L_E = L_E + field_traveled_distance_L(i);
+        L_P = L_P + field_path_distance_H(i);
+        i = i + 1;
+    end
+    r_lc_iterative = L_P/L_E;
+    figure(607)
+    hold on
+    plot(r_lc_max,'ro')
+    plot(r_lc_avg,'bo')
+    plot(r_lc_iterative,'go')
+    % end result plotting
     figure;
     hold on;
     histogram(field_big_choice_angles*180/pi,'BinWidth',2,'FaceColor','g','FaceAlpha',0.4)
