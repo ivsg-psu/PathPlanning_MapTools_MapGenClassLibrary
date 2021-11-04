@@ -30,6 +30,7 @@ for tiles=50:25:75%10:80:500
     for radii_goals=0.02:0.02:0.1%0.001:0.010:0.1
         try
             des_rad = radii_goals; sigma_radius = 0; min_rad = 0.001;
+            % TODO switch this to side shrinking to get gap distance as an output so it can be given to predictor as input
             [shrunk_field,mu_final,sigma_final] = fcn_MapGen_polytopesShrinkToRadius(tiled_polytopes,des_rad,sigma_radius,min_rad,fig_num);
             field_stats = fcn_MapGen_polytopesStatistics(shrunk_field);
             field_avg_r_D = field_stats.avg_r_D;

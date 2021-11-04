@@ -1,5 +1,4 @@
-% script_test_fcn_MapGen_polytopesPredictLengthCostRatio
-% Tests function: fcn_MapGen_polytopesPredictLengthCostRatio
+% fcn_MapGen_polytopesPredictLengthCostRatio
 
 % REVISION HISTORY:
 % 2021_10_22
