@@ -114,7 +114,10 @@ function [r_lc_max,r_lc_avg,r_lc_iterative] = fcn_MapGen_polytopesPredictLengthC
         field_big_choice_angles = [field_big_choice_angles;big_choice_angles];
         field_chosen_side_length = [field_chosen_side_length;chosen_side_lengths];
         % TODO change chosen angle to effective angle based on gap size
+        gap_size = shrink_distance*2;
+        field_small_choice_angles_effective = field_small_choice_angles - atan2(gap_size,field_chosen_side_length);
         % TODO change chosen side length to effective angle side length based on gap size
+        field_chosen_side_length_effective = (field_chosen_side_length.^2+gap_size.^2).^0.5;
 
         % TODO put all plotting code behind debug flag
         % plot
