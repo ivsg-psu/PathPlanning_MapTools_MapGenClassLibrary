@@ -4,7 +4,7 @@
 % 2021_10_22
 % -- first written by S. Harnett
 % TODO add outputs for chosen angle, chosen side length etc
-function [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective] = fcn_MapGen_polytopesPredictLengthCostRatio(tiled_polytopes,shrink_distance)
+function [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective] = fcn_MapGen_polytopesPredictLengthCostRatio(tiled_polytopes,gap_size)
     fig_num = 12;
     field_stats = fcn_MapGen_polytopesStatistics(tiled_polytopes);
     field_avg_r_D = field_stats.avg_r_D;
@@ -113,11 +113,10 @@ function [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective
         field_small_choice_angles = [field_small_choice_angles;small_choice_angles];
         field_big_choice_angles = [field_big_choice_angles;big_choice_angles];
         field_chosen_side_length = [field_chosen_side_length;chosen_side_lengths];
-        % TODO change chosen angle to effective angle based on gap size
-        gap_size = shrink_distance*2;
+        % change chosen angle to effective angle based on gap size
         field_away_angles_effective = field_away_angles - atan2(gap_size,field_chosen_side_length);
         field_small_choice_angles_effective = field_small_choice_angles - atan2(gap_size,field_chosen_side_length);
-        % TODO change chosen side length to effective angle side length based on gap size
+        % change chosen side length to effective angle side length based on gap size
         field_chosen_side_length_effective = (field_chosen_side_length.^2+gap_size.^2).^0.5;
 
         % TODO put all plotting code behind debug flag
@@ -150,6 +149,7 @@ function [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective
     field_traveled_distance_L_effective = cos(field_small_choice_angles_effective).*field_chosen_side_length_effective;
     field_path_distance_H = field_chosen_side_length;
     field_path_distance_H_effective = field_chosen_side_length_effective;
+    % TODO debug here
     L_E = 0;
     L_P = 0;
     L_E_effective = 0;
@@ -165,7 +165,7 @@ function [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective
         % repeat until x=1
     while L_E < 1
         L_E = L_E + field_traveled_distance_L(i);
-        L_E_effective = L_E + field_traveled_distance_L_effective(i);
+        L_E_effective = L_E_effective + field_traveled_distance_L_effective(i);
         L_P = L_P + field_path_distance_H(i);
         L_P_effective = L_P_effective + field_path_distance_H_effective(i);
         i = i + 1;
