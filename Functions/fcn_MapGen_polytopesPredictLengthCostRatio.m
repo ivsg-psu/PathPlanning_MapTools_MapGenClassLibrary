@@ -4,7 +4,7 @@
 % 2021_10_22
 % -- first written by S. Harnett
 % TODO add outputs for chosen angle, chosen side length etc
-function [r_lc_max,r_lc_avg,r_lc_iterative] = fcn_MapGen_polytopesPredictLengthCostRatio(tiled_polytopes,shrink_distance)
+function [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective] = fcn_MapGen_polytopesPredictLengthCostRatio(tiled_polytopes,shrink_distance)
     fig_num = 12;
     field_stats = fcn_MapGen_polytopesStatistics(tiled_polytopes);
     field_avg_r_D = field_stats.avg_r_D;
@@ -115,6 +115,7 @@ function [r_lc_max,r_lc_avg,r_lc_iterative] = fcn_MapGen_polytopesPredictLengthC
         field_chosen_side_length = [field_chosen_side_length;chosen_side_lengths];
         % TODO change chosen angle to effective angle based on gap size
         gap_size = shrink_distance*2;
+        field_away_angles_effective = field_away_angles - atan2(gap_size,field_chosen_side_length);
         field_small_choice_angles_effective = field_small_choice_angles - atan2(gap_size,field_chosen_side_length);
         % TODO change chosen side length to effective angle side length based on gap size
         field_chosen_side_length_effective = (field_chosen_side_length.^2+gap_size.^2).^0.5;
@@ -142,11 +143,17 @@ function [r_lc_max,r_lc_avg,r_lc_iterative] = fcn_MapGen_polytopesPredictLengthC
     end
     % begin results generation
     r_lc_max = 1/cos(mean(field_away_angles)/2);
+    r_lc_max_effective = 1/cos(mean(field_away_angles_effective)/2);
     r_lc_avg = 1/cos(mean(field_small_choice_angles));
+    r_lc_avg_effective = 1/cos(mean(field_small_choice_angles_effective));
     field_traveled_distance_L = cos(field_small_choice_angles).*field_chosen_side_length;
+    field_traveled_distance_L_effective = cos(field_small_choice_angles_effective).*field_chosen_side_length_effective;
     field_path_distance_H = field_chosen_side_length;
+    field_path_distance_H_effective = field_chosen_side_length_effective;
     L_E = 0;
     L_P = 0;
+    L_E_effective = 0;
+    L_P_effective = 0;
     i = 1;
     % this loops through polytopes in left to right order
     % TODO use vertices to loop through polytopes in path order
@@ -158,10 +165,13 @@ function [r_lc_max,r_lc_avg,r_lc_iterative] = fcn_MapGen_polytopesPredictLengthC
         % repeat until x=1
     while L_E < 1
         L_E = L_E + field_traveled_distance_L(i);
+        L_E_effective = L_E + field_traveled_distance_L_effective(i);
         L_P = L_P + field_path_distance_H(i);
+        L_P_effective = L_P_effective + field_path_distance_H_effective(i);
         i = i + 1;
     end
     r_lc_iterative = L_P/L_E;
+    r_lc_iterative_effective = L_P_effective/L_E_effective;
     % end results generation
     figure;
     hold on;
@@ -180,6 +190,26 @@ function [r_lc_max,r_lc_avg,r_lc_iterative] = fcn_MapGen_polytopesPredictLengthC
     xlabel('interior angle [deg]')
     ylabel('count')
     title('Histogram of Divergence Angles')
+    figure;
+    hold on;
+    histogram(field_big_choice_angles*180/pi,'BinWidth',2,'FaceColor','g','FaceAlpha',0.4)
+    histogram(field_small_choice_angles*180/pi,'BinWidth',2,'FaceColor','b','FaceAlpha',0.4)
+    histogram(field_away_angles/2*180/pi,'BinWidth',2,'FaceColor','r','FaceAlpha',0.4)
+    histogram(field_small_choice_angles_effective/2*180/pi,'BinWidth',2,'FaceColor','c','FaceAlpha',0.4)
+    legendstr = sprintf('effective chosen angle for gap size %.1f',gap_size);
+    legend('large, unchosen divergence angles','small, chosen divergence angles','all away facing polytope angles, halved',legendstr)
+    xlabel('interior angle [deg]')
+    ylabel('count')
+    title('Histogram of Divergence Angles')
+    figure;
+    hold on;
+    histogram(field_chosen_side_length,'BinWidth',2,'FaceColor','b','FaceAlpha',0.4)
+    histogram(field_chosen_side_length_effective,'BinWidth',2,'FaceColor','c','FaceAlpha',0.4)
+    legendstr_side = sprintf('effective chosen side length for gap size %.1f',gap_size);
+    legend('chosen side length', legendstr_side)
+    xlabel('side length [m]')
+    ylabel('count')
+    title('Histogram of Traveled Side Lengths')
 end
 % TODO make internal function
 function ang = angle_between_vectors(a,b)

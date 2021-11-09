@@ -174,7 +174,7 @@ projection_vectors = unit_direction.*distances;
 
 
 [new_vertices, new_direction, new_scale_factor] = ...
-    INTERNAL_fcn_findIntersectionOfVertexProjections(vertices,half_angles);
+    INTERNAL_fcn_findIntersectionOfVertexProjections(vertices);%,half_angles);
 
 
 %% Find new vertices based on projection
