@@ -4,7 +4,7 @@
 % 2021_10_22
 % -- first written by S. Harnett
 % TODO add outputs for chosen angle, chosen side length etc
-function [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective] = fcn_MapGen_polytopesPredictLengthCostRatio(tiled_polytopes,gap_size)
+function [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse] = fcn_MapGen_polytopesPredictLengthCostRatio(tiled_polytopes,gap_size)
     fig_num = 12;
     field_stats = fcn_MapGen_polytopesStatistics(tiled_polytopes);
     field_avg_r_D = field_stats.avg_r_D;
@@ -172,6 +172,8 @@ function [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective
     end
     r_lc_iterative = L_P/L_E;
     r_lc_iterative_effective = L_P_effective/L_E_effective;
+    R_i = mean(field_chosen_side_length)*sin(mean(field_small_choice_angles));
+    r_lc_sparse = sqrt(R_i^2+(1/field_stats.linear_density_mean)^2)/(1/field_stats.linear_density_mean);
     % end results generation
     figure;
     hold on;
