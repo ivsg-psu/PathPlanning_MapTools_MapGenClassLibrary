@@ -163,12 +163,17 @@ function [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective
         % note the vertex you wind up at
         % go to next polytope, if the general conditions aren't met AND that vertex is not present, skip
         % repeat until x=1
-    while L_E < 1
-        L_E = L_E + field_traveled_distance_L(i);
-        L_E_effective = L_E_effective + field_traveled_distance_L_effective(i);
-        L_P = L_P + field_path_distance_H(i);
-        L_P_effective = L_P_effective + field_path_distance_H_effective(i);
-        i = i + 1;
+    try
+        while L_E < 1
+            L_E = L_E + field_traveled_distance_L(i);
+            L_E_effective = L_E_effective + field_traveled_distance_L_effective(i);
+            L_P = L_P + field_path_distance_H(i);
+            L_P_effective = L_P_effective + field_path_distance_H_effective(i);
+            i = i + 1;
+        end
+    catch
+        L_E_effective = 1;
+        L_P_effective = 1;
     end
     r_lc_iterative = L_P/L_E;
     r_lc_iterative_effective = L_P_effective/L_E_effective;
