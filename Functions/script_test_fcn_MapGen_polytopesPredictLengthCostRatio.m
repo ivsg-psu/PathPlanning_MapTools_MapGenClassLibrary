@@ -37,7 +37,7 @@ if do_range_test
     r_lc_iterative_effective_all = [];
     r_lc_sparse_all = [];
     shrink_distance = [];
-    for tiles=25:25:100%25:25:125%10:80:500
+    for tiles=25:50:400%25:25:125%10:80:500
         Halton_range = [1 tiles]; % range of Halton points to use to generate the tiling
         tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
         title('Halton set');
@@ -56,7 +56,7 @@ if do_range_test
 %         r_lc_iterative_effective_all = [r_lc_iterative_effective_all, r_lc_iterative_effective];
 %         shrink_distance = [shrink_distance, 0];
 %         for radii_goals=0.25%0.02:0.02:0.1%0.001:0.010:0.1
-        for size_percent = 0.4:0.1:1
+        for size_percent = 0.2:0.2:1
             radii_goals = field_stats.average_max_radius*size_percent;
 %             try
             des_rad = radii_goals; sigma_radius = 0; min_rad = 0.001;
