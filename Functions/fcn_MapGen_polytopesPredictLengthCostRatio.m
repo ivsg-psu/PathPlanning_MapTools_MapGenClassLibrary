@@ -177,8 +177,18 @@ function [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective
     end
     r_lc_iterative = L_P/L_E;
     r_lc_iterative_effective = L_P_effective/L_E_effective;
-    R_i = mean(field_chosen_side_length)*sin(mean(field_small_choice_angles));
-    r_lc_sparse = sqrt(R_i^2+(1/field_stats.linear_density_mean)^2)/(1/field_stats.linear_density_mean);
+    side_and_ang = [field_chosen_side_length, field_small_choice_angles];
+    rounded_side_and_ang = round(side_and_ang,6);
+    % remove zeros (usually from zero angle divergences)
+    rounded_side_and_ang( any(rounded_side_and_ang==0,2), : ) = [];
+    divergence_heights = rounded_side_and_ang(:,1).*sin(rounded_side_and_ang(:,2));
+    linear_density = field_stats.linear_density;
+    linear_density_int = round(linear_density,0);
+    s_divergence_heights = sort(divergence_heights);
+    worst_divergence_heights = s_divergence_heights(end-linear_density_int+1:end);
+    % TODO @sjharnett change /1 to be over L_P
+    r_lc_sparse = sum((worst_divergence_heights.^2+(1/5)^2).^0.5)/1;
+
     % end results generation
     figure;
     hold on;
