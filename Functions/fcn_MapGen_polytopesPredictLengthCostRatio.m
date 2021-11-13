@@ -4,7 +4,7 @@
 % 2021_10_22
 % -- first written by S. Harnett
 % TODO add outputs for chosen angle, chosen side length etc
-function [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse] = fcn_MapGen_polytopesPredictLengthCostRatio(tiled_polytopes,gap_size)
+function [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse_worst,r_lc_sparse_average] = fcn_MapGen_polytopesPredictLengthCostRatio(tiled_polytopes,gap_size)
     fig_num = 12;
     field_stats = fcn_MapGen_polytopesStatistics(tiled_polytopes);
     field_avg_r_D = field_stats.avg_r_D;
@@ -187,7 +187,8 @@ function [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective
     s_divergence_heights = sort(divergence_heights);
     worst_divergence_heights = s_divergence_heights(end-linear_density_int+1:end);
     % TODO @sjharnett change /1 to be over L_P
-    r_lc_sparse = sum((worst_divergence_heights.^2+(1/5)^2).^0.5)/1;
+    r_lc_sparse_worst = sum((worst_divergence_heights.^2+(1/linear_density_int)^2).^0.5)/1;
+    r_lc_sparse_average = linear_density_int*mean((s_divergence_heights.^2+(1/linear_density_int)^2).^0.5)/1;
 
     % end results generation
     figure;

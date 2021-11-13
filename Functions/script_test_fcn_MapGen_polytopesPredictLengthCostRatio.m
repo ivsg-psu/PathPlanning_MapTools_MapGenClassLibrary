@@ -22,7 +22,7 @@ if do_single_test
     field_stats = fcn_MapGen_polytopesStatistics(shrunk_field);
     gap_size = field_stats.average_gap_size_G_bar;
     r_D = field_stats.avg_r_D;
-    [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse] = fcn_MapGen_polytopesPredictLengthCostRatio(shrunk_field,gap_size)
+    [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse_worst,r_lc_sparse_average] = fcn_MapGen_polytopesPredictLengthCostRatio(shrunk_field,gap_size)
 end
 
 do_range_test = true;
@@ -35,9 +35,10 @@ if do_range_test
     r_lc_max_effective_all = [];
     r_lc_avg_effective_all = [];
     r_lc_iterative_effective_all = [];
-    r_lc_sparse_all = [];
+    r_lc_sparse_worst_all = [];
+    r_lc_sparse_average_all = [];
     shrink_distance = [];
-    for tiles=25:50:400%25:25:125%10:80:500
+    for tiles=25:100:425%25:25:125%10:80:500
         Halton_range = [1 tiles]; % range of Halton points to use to generate the tiling
         tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
         title('Halton set');
@@ -56,7 +57,7 @@ if do_range_test
 %         r_lc_iterative_effective_all = [r_lc_iterative_effective_all, r_lc_iterative_effective];
 %         shrink_distance = [shrink_distance, 0];
 %         for radii_goals=0.25%0.02:0.02:0.1%0.001:0.010:0.1
-        for size_percent = 0.2:0.2:1
+        for size_percent = 0.9:0.2:1
             radii_goals = field_stats.average_max_radius*size_percent;
 %             try
             des_rad = radii_goals; sigma_radius = 0; min_rad = 0.001;
@@ -67,14 +68,15 @@ if do_range_test
             field_avg_r_D = field_stats.avg_r_D;
             % avg_max_rad = field_stats.average_max_radius;
             shrink_distance = [shrink_distance, gap_size];%avg_max_rad-des_rad];
-            [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse] = fcn_MapGen_polytopesPredictLengthCostRatio(shrunk_field,gap_size)
+            [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse_worst,r_lc_sparse_average] = fcn_MapGen_polytopesPredictLengthCostRatio(shrunk_field,gap_size)
             r_lc_max_all = [r_lc_max_all, r_lc_max];
             r_lc_max_effective_all = [r_lc_max_effective_all, r_lc_max_effective];
             r_lc_avg_all = [r_lc_avg_all, r_lc_avg];
             r_lc_avg_effective_all = [r_lc_avg_effective_all, r_lc_avg_effective];
             r_lc_iterative_all = [r_lc_iterative_all, r_lc_iterative];
             r_lc_iterative_effective_all = [r_lc_iterative_effective_all, r_lc_iterative_effective];
-            r_lc_sparse_all = [r_lc_sparse_all, r_lc_sparse];
+            r_lc_sparse_worst_all = [r_lc_sparse_worst_all, r_lc_sparse_worst];
+            r_lc_sparse_average_all = [r_lc_sparse_average_all, r_lc_sparse_average];
             r_D = [r_D, field_avg_r_D];
         end
 %         end
@@ -99,7 +101,8 @@ if plot_flag
         plot(r_D,r_lc_max_effective_all,'rx')
         plot(r_D,r_lc_avg_effective_all,'bx')
         plot(r_D,r_lc_iterative_effective_all,'gx')
-        plot(r_D,r_lc_sparse_all,'mx')
+        plot(r_D,r_lc_sparse_worst_all,'md')
+        plot(r_D,r_lc_sparse_average_all,'cd')
     end
     legend('theoretical max from half of average angle',...
         'average from average side length and average angle',...
