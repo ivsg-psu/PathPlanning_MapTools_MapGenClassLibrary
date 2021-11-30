@@ -78,6 +78,7 @@ if do_range_test
             r_lc_sparse_worst_all = [r_lc_sparse_worst_all, r_lc_sparse_worst];
             r_lc_sparse_average_all = [r_lc_sparse_average_all, r_lc_sparse_average];
             r_D = [r_D, field_avg_r_D];
+            close all;
         end
     end
     for tiles=25:25:100%25:25:125%10:80:500
@@ -120,6 +121,7 @@ if do_range_test
                 r_lc_sparse_worst_all = [r_lc_sparse_worst_all, r_lc_sparse_worst];
                 r_lc_sparse_average_all = [r_lc_sparse_average_all, r_lc_sparse_average];
                 r_D = [r_D, field_avg_r_D];
+                close all;
             end
     end
     tiles_failed = [];
@@ -171,6 +173,7 @@ if do_range_test
                 r_lc_sparse_worst_all = [r_lc_sparse_worst_all, r_lc_sparse_worst];
                 r_lc_sparse_average_all = [r_lc_sparse_average_all, r_lc_sparse_average];
                 r_D = [r_D, field_avg_r_D];
+                close all;
            end
    %         end
    %         end
@@ -200,6 +203,18 @@ if plot_flag
         plot(r_D,r_lc_sparse_worst_all,'md')
         plot(r_D,r_lc_sparse_average_all,'cd')
     end
+    x1 = linspace(0,0.65,300);
+    x2=linspace(0.65,.78,100)
+    k1 = 0.4124*x1+41.91*x1.^2;
+    k2 = 0.4124*0.65+41.91*0.65^2-120.3*(x2-0.65)+17.47*(x2-0.65).^2;
+    t1 = 0.0048*x1-0.0016*x1.^2;
+    t2 = 0.0048*0.68-0.0016*0.65^2-0.0009/((0.8118-0.65)^1.25)+0.0009./((0.8118-x2).^1.25);
+    mean1 = k1.*t1 + 1;
+    mode1 = (k1-1).*t1+1;
+    mean2 = k2.*t2 + 1;
+    mode2 = (k2-1).*t2+1;
+    plot(x1,mean1,'k-')
+    plot(x2,mean2,'k-')
     legend('theoretical max',...
         'average from side and angle',...
         'iterative from side and angle',...
@@ -207,6 +222,7 @@ if plot_flag
         'average from effective side and angle',...
         'iterative from effective side and angle',...
         'sparse formula, worst case',...
-        'sparse formula, average case');
+        'sparse formula, average case',...
+        'gamma distribution curve fit');
     figure
 end
