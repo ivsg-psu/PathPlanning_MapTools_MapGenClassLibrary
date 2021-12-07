@@ -210,6 +210,8 @@ if plot_flag
         plot(r_D,r_lc_sparse_worst_all,'md')
         % plot(r_D,r_lc_sparse_average_all,'cd')
         errorbar(r_D,r_lc_sparse_average_all,2*r_lc_sparse_std_all,'cd')
+        % positive only errorbars
+        % errorbar(r_D,r_lc_sparse_average_all,zeros(1,length(r_lc_sparse_average_all)),2*r_lc_sparse_std_all,zeros(1,length(r_lc_sparse_average_all)),zeros(1,length(r_lc_sparse_average_all)),'cd')
     end
     x1 = linspace(0,0.65,300);
     x2=linspace(0.65,.78,100)
