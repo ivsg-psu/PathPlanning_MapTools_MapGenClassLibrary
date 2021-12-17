@@ -174,7 +174,7 @@ projection_vectors = unit_direction.*distances;
 
 
 [new_vertices, new_direction, new_scale_factor] = ...
-    INTERNAL_fcn_findIntersectionOfVertexProjections(vertices);%,half_angles);
+    INTERNAL_fcn_findIntersectionOfVertexProjections(vertices,shrinker);%,half_angles);
 
 
 %% Find new vertices based on projection
@@ -837,10 +837,11 @@ end % Ends flag_do_plot if statement
 
 end % ends fucntion INTERNAL_fcn_findVertexSkeleton
 
-function [new_vertices, new_direction, new_scale_factor] = INTERNAL_fcn_findIntersectionOfVertexProjections(vertices)
-
+function [new_vertices, new_direction, new_scale_factor] = INTERNAL_fcn_findIntersectionOfVertexProjections(vertices,shrinker)
+% creates skeleton of where vertecies shrink to the point of 
 % Finds intersection points between adjacent verticies
 longest_distance = 2*shrinker.max_radius;
+% find vertex projection and store in unit mean vector
 longest_projections = unit_mean_vectors*longest_distance;
 Nangles = length(angles);
 distances_hit = zeros(Nangles,1);

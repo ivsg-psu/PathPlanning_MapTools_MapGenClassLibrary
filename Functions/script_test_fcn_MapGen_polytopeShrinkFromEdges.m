@@ -8,7 +8,8 @@
 
 %% Basic example of vertex calculation - a square
 fig_num = 1;
-vertices = [0 0; 1 0; 1 1; 0 1; 0 0]*5;
+% vertices = [0 0; 1 0; 1 1; 0 1; 0 0]*5;
+vertices = [0 0; 2 0; 1 2; 0 1; 0 0]*5;
 test_polytope.vertices = vertices;
 
 % fill in other fields from the vertices field
