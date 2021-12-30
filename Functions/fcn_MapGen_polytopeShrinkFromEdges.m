@@ -172,11 +172,6 @@ end
 distances = edge_cut.*scale_factor; % distance needed to move each point
 projection_vectors = unit_direction.*distances;
 
-
-[new_vertices, new_direction, new_scale_factor] = ...
-    INTERNAL_fcn_findIntersectionOfVertexProjections(vertices,shrinker);%,half_angles);
-
-
 %% Find new vertices based on projection
 short_new_vertices = vertices(1:end-1,:)+projection_vectors;
 new_vertices = [short_new_vertices; short_new_vertices(1,:)];
@@ -243,6 +238,7 @@ if any(new_angles<0)
     % Find the angles for the self-intersection points.
     self_intersection_angles = fcn_MapGen_polytopeFindVertexAngles(...
         vertices_with_self_intersects);
+    angles = new_angles;
     angles*180/pi
     self_intersection_angles*180/pi
 
@@ -838,7 +834,7 @@ end % Ends flag_do_plot if statement
 end % ends fucntion INTERNAL_fcn_findVertexSkeleton
 
 function [new_vertices, new_direction, new_scale_factor] = INTERNAL_fcn_findIntersectionOfVertexProjections(vertices,shrinker)
-% creates skeleton of where vertecies shrink to the point of 
+% creates skeleton of where vertecies shrink to the point of
 % Finds intersection points between adjacent verticies
 longest_distance = 2*shrinker.max_radius;
 % find vertex projection and store in unit mean vector
