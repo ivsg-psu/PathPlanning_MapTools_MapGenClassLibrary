@@ -14,7 +14,7 @@ function [angles, unit_in_vectors, unit_out_vectors] = ...
 % this is given by INSIDE = pi - OUTSIDE.
 %
 % FORMAT:
-% 
+%
 % [angles, unit_in_vectors, unit_out_vectors] = ...
 %     fcn_MapGen_polytopeFindVertexAngles(...
 %     vertices,...
@@ -23,7 +23,7 @@ function [angles, unit_in_vectors, unit_out_vectors] = ...
 % INPUTS:
 %
 %     vertices: N x 2 vector of vertices, in [x y] format
-%   
+%
 %    (OPTIONAL INPUTS)
 %
 %     fig_num: a figure number to plot results.
@@ -31,21 +31,21 @@ function [angles, unit_in_vectors, unit_out_vectors] = ...
 % OUTPUTS:
 %
 %     angles: an Nx1 column of angles, one for each vertex
-%  
+%
 %     unit_in_vectors: the Nx2 matrix of unit vectors leading into each vertex
-%  
+%
 %     unit_out_vectors: the Nx2 matrix of unit vectors leading out of each vertex
-%   
+%
 % DEPENDENCIES:
-% 
+%
 %     fcn_MapGen_checkInputsToFunctions
-% 
+%
 % EXAMPLES:
 %
 % For additional examples, see: script_test_fcn_MapGen_polytopeFindVertexAngles
 %
 % This function was written on 2021_08_01 by S. Brennan
-% Questions or comments? sbrennan@psu.edu 
+% Questions or comments? sbrennan@psu.edu
 %
 
 % Revision History:
@@ -56,9 +56,28 @@ function [angles, unit_in_vectors, unit_out_vectors] = ...
 % -- (none)
 
 %% Debugging and Input checks
-flag_check_inputs = 1; % Set equal to 1 to check the input arguments
-flag_do_plot = 0;      % Set equal to 1 for plotting
-flag_do_debug = 0;     % Set equal to 1 for debugging
+% set an environment variable on your machine with the getenv function...
+% in the Matlab console.  Char array of '1' will be true and '0' will be false.
+flag_check_inputs = getenv('ENV_FLAG_CHECK_INPUTS');  % '1' will check input args
+flag_do_plot = getenv('ENV_FLAG_DO_PLOT'); % '1' will make plots
+flag_do_debug = getenv('ENV_FLAG_DO_DEBUG'); % '1' will enable debugging
+
+% if the char array has length 0, assume the env var isn't set and default to...
+% dipslaying more information rather than potentially hiding an issue
+if length(flag_check_inputs) = 0
+    flag_check_inputs = '1';
+end
+if length(flag_do_plot) = 0
+    flag_do_plot = '1';
+end
+if length(flag_do_debug) = 0
+    flag_do_debug = '1';
+end
+
+% convert flag from char string to logical
+flag_check_inputs = flag_check_inputs == '1';
+flag_do_plot = flag_do_plot == '1';
+flag_do_debug = flag_do_debug == '1';
 
 if flag_do_debug
     fig_for_debug = 9453;
@@ -78,19 +97,19 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
+
 if flag_check_inputs
     % Are there the right number of inputs?
     if nargin < 1 || nargin > 2
         error('Incorrect number of input arguments')
     end
-    
+
     % Check the vertices input
     fcn_MapGen_checkInputsToFunctions(...
         vertices, '2column_of_numbers');
-    
+
 end
-    
+
 
 % Does user want to show the plots?
 if  2== nargin
@@ -152,14 +171,14 @@ angles(1:Nangles,1)  = angles_dot.*sign(angles_cross);
 
 %% Plot results?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____       _                 
-%  |  __ \     | |                
-%  | |  | | ___| |__  _   _  __ _ 
+%   _____       _
+%  |  __ \     | |
+%  | |  | | ___| |__  _   _  __ _
 %  | |  | |/ _ \ '_ \| | | |/ _` |
 %  | |__| |  __/ |_) | |_| | (_| |
 %  |_____/ \___|_.__/ \__,_|\__, |
 %                            __/ |
-%                           |___/ 
+%                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if flag_do_plot
@@ -168,14 +187,14 @@ if flag_do_plot
     grid on;
     hold on
     axis equal;
-    
+
     % Plot the polytope in red
     plot(vertices(:,1),vertices(:,2),'r-','Linewidth',2);
 
     % Find size of vertices
     size = max(max(vertices)) - min(min(vertices));
     nudge = size*0.01;
-    
+
     % Label the vertices
     for ith_angle = 1:Nangles
         ith_vertex = ith_angle;
@@ -186,7 +205,7 @@ if flag_do_plot
 end
 
 if flag_do_debug
-    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file); 
+    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
 end
 
 end % Ends function
@@ -194,14 +213,14 @@ end % Ends function
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   ______                _   _                 
-%  |  ____|              | | (_)                
-%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___ 
+%   ______                _   _
+%  |  ____|              | | (_)
+%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___
 %  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
 %  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
 %  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
-%                                               
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                                               
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 %% Calculate cross products

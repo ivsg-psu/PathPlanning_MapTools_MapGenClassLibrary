@@ -5,7 +5,7 @@ function [polytopes] = ...
 % the Halton sequence
 %
 % FORMAT:
-% 
+%
 % [polytopes] = ...
 %    fcn_MapGen_mixedSetVoronoiTiling(Halton_range,(stretch),(fig_num))
 %
@@ -28,8 +28,8 @@ function [polytopes] = ...
 %             AABB: the axis-aligned bounding box, defining the low and
 %                   high range for the number generation. The box is
 %                   defined as: [xlow ylow xhigh yhigh]
-%      
-%     
+%
+%
 %    (OPTIONAL INPUTS)
 %
 %    stretch: [x,y] scaling factors to allow the values from the combined
@@ -57,21 +57,40 @@ function [polytopes] = ...
 %      fcn_MapGen_plotPolytopes
 %
 % EXAMPLES:
-%      
+%
 % See the script: script_test_fcn_MapGen_mixedSetVoronoiTiling
 % for a full test suite.
 %
 % This function was written on 2021_07_08 by S. Brennan
-% Questions or comments? sbrennan@psu.edu 
+% Questions or comments? sbrennan@psu.edu
 
 % REVISION HISTORY:
-% 2021_07_08 
+% 2021_07_08
 % -- Created by S. Brennan
 
 %% Debugging and Input checks
-flag_check_inputs = 1; % Set equal to 1 to check the input arguments
-flag_do_plot = 0;      % Set equal to 1 for plotting
-flag_do_debug = 0;     % Set equal to 1 for debugging
+% set an environment variable on your machine with the getenv function...
+% in the Matlab console.  Char array of '1' will be true and '0' will be false.
+flag_check_inputs = getenv('ENV_FLAG_CHECK_INPUTS');  % '1' will check input args
+flag_do_plot = getenv('ENV_FLAG_DO_PLOT'); % '1' will make plots
+flag_do_debug = getenv('ENV_FLAG_DO_DEBUG'); % '1' will enable debugging
+
+% if the char array has length 0, assume the env var isn't set and default to...
+% dipslaying more information rather than potentially hiding an issue
+if length(flag_check_inputs) = 0
+    flag_check_inputs = '1';
+end
+if length(flag_do_plot) = 0
+    flag_do_plot = '1';
+end
+if length(flag_do_debug) = 0
+    flag_do_debug = '1';
+end
+
+% convert flag from char string to logical
+flag_check_inputs = flag_check_inputs == '1';
+flag_do_plot = flag_do_plot == '1';
+flag_do_debug = flag_do_debug == '1';
 
 if flag_do_debug
     fig_for_debug = 9993;
@@ -91,13 +110,13 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
-if flag_check_inputs    
+
+if flag_check_inputs
     % Are there the right number of inputs?
     if nargin < 1 || nargin > 3
         error('Incorrect number of input arguments')
     end
-    
+
     % Check the mixedSet input
     fcn_MapGen_checkInputsToFunctions(...
         mixedSet, 'mixedSet');
@@ -109,11 +128,11 @@ end
 stretch = [1 1]; % default stretch value
 if 2 <= nargin
     stretch = varargin{1};
-    
+
     % Check the stretch input
     fcn_MapGen_checkInputsToFunctions(...
         stretch, '2column_of_numbers',1);
-       
+
 end
 
 
@@ -166,21 +185,21 @@ polytopes = fcn_MapGen_generatePolysFromTiling(all_points,V,C, AABB, stretch);
 
 %% Plot results?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____       _                 
-%  |  __ \     | |                
-%  | |  | | ___| |__  _   _  __ _ 
+%   _____       _
+%  |  __ \     | |
+%  | |  | | ___| |__  _   _  __ _
 %  | |  | |/ _ \ '_ \| | | |/ _` |
 %  | |__| |  __/ |_) | |_| | (_| |
 %  |_____/ \___|_.__/ \__,_|\__, |
 %                            __/ |
-%                           |___/ 
+%                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if flag_do_plot
 
     figure(fig_num);
-    hold on  
- 
+    hold on
+
     % plot the polytopes
     fcn_MapGen_plotPolytopes(polytopes,fig_num,'b',2);
 
@@ -189,18 +208,18 @@ if flag_do_plot
         moved_seed_points = set_points{i_seed}.*stretch;
         plot(moved_seed_points(:,1),moved_seed_points(:,2),'.','Markersize',10);
     end
-    
+
     % plot the means in black
     temp = zeros(length(polytopes),2);
     for ith_poly = 1:length(polytopes)
         temp(ith_poly,:) = polytopes(ith_poly).mean;
     end
     plot(temp(:,1),temp(:,2),'ko','Markersize',3);
-    
+
 end
 
 if flag_do_debug
-    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file); 
+    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
 end
 
 
@@ -209,13 +228,13 @@ end % Ends the function
 
 %% Functions follow
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   ______                _   _                 
-%  |  ____|              | | (_)                
-%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___ 
+%   ______                _   _
+%  |  ____|              | | (_)
+%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___
 %  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
 %  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
 %  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
-%                                               
+%
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
@@ -240,7 +259,7 @@ switch lower(set.name)
     case{'sobolset'} % pull Sobel set
         Sobol_points = sobolset(2);
         points_scrambled = scramble(Sobol_points,'MatousekAffineOwen'); % scramble values
-        
+
         % pick values from Sobol set
         low_pt = set_range(1,1);
         high_pt = set_range(1,2);
@@ -249,20 +268,20 @@ switch lower(set.name)
         % pull latin set
         Npoints = max(set_range) - min(set_range) + 1;
         latin_points = lhsdesign(Npoints,2);
-        
+
         % pick values from latin set
         seed_points = latin_points.*scale + lower_value;
     case{'rand'}
         % pull rand set
         Npoints = max(set_range) - min(set_range) + 1;
         rand_points = rand(Npoints,2);
-        
+
         % pick values from rand set
         seed_points = rand_points.*scale + lower_value;
     case{'randn'}  % pull rand set
         Npoints = max(set_range) - min(set_range) + 1;
         rand_points = 0.15*randn(Npoints*2,1)+0.5;
-        
+
         % Prevent random points from being outside the range. If they are, we
         % resample just those points
         flag_points_are_good = 0;
@@ -276,10 +295,10 @@ switch lower(set.name)
         end
         rand_points = [rand_points(1:Npoints,1),rand_points(Npoints+1:end,1)];
         seed_points = rand_points.*scale + lower_value;
-        
+
     otherwise
         error('Unknown method given');
 end
-        
+
 
 end

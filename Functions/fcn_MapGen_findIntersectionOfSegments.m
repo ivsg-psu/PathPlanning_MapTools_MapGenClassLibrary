@@ -4,7 +4,7 @@ function [distance,location,wall_that_was_hit] = ...
     wall_end,...
     sensor_vector_start,...
     sensor_vector_end,...
-    varargin)   
+    varargin)
 % NOTE: this is a re-naming of fcn_geometry_findIntersectionOfSegments -
 % see the Geometry library for more explanation. The input checking is
 % DISABLED as this function is meant only for internal use.
@@ -13,7 +13,7 @@ function [distance,location,wall_that_was_hit] = ...
 % walls, both specified by start and end points, returning the distance,
 % and location of the hit, and the wall number of each hit.
 %
-% FORMAT: 
+% FORMAT:
 %
 %      [distance,location,wall_that_was_hit] = ...
 %         fcn_geometry_findIntersectionOfSegments(...
@@ -21,7 +21,7 @@ function [distance,location,wall_that_was_hit] = ...
 %         wall_end,...
 %         sensor_vector_start,...
 %         sensor_vector_end,...
-%         (flag_search_type),(fig_num))  
+%         (flag_search_type),(fig_num))
 %
 % INPUTS:
 %
@@ -69,24 +69,43 @@ function [distance,location,wall_that_was_hit] = ...
 %      the first segment, 2 is the second, etc)
 %
 % EXAMPLES:
-%      
+%
 %       See the script: script_test_fcn_geometry_findIntersectionOfSegments.m
-%       for a full test suite. 
+%       for a full test suite.
 %
 % Adopted from https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
 % This function was written on 2021_06_05 by S. Brennan
-% Questions or comments? sbrennan@psu.edu 
+% Questions or comments? sbrennan@psu.edu
 
 % Revision history:
-%      2021_06_05 
+%      2021_06_05
 %      - wrote the code, templated from fcn_geometry_findIntersectionOfSegments
 
 
 
 %% Set up for debugging
-flag_do_debug = 0; % Flag to plot the results for debugging
-flag_do_plot = 0; % Flag to plot the results for debugging
-flag_check_inputs = 0; % Flag to perform input checking
+% set an environment variable on your machine with the getenv function...
+% in the Matlab console.  Char array of '1' will be true and '0' will be false.
+flag_check_inputs = getenv('ENV_FLAG_CHECK_INPUTS');  % '1' will check input args
+flag_do_plot = getenv('ENV_FLAG_DO_PLOT'); % '1' will make plots
+flag_do_debug = getenv('ENV_FLAG_DO_DEBUG'); % '1' will enable debugging
+
+% if the char array has length 0, assume the env var isn't set and default to...
+% dipslaying more information rather than potentially hiding an issue
+if length(flag_check_inputs) = 0
+    flag_check_inputs = '1';
+end
+if length(flag_do_plot) = 0
+    flag_do_plot = '1';
+end
+if length(flag_do_debug) = 0
+    flag_do_debug = '1';
+end
+
+% convert flag from char string to logical
+flag_check_inputs = flag_check_inputs == '1';
+flag_do_plot = flag_do_plot == '1';
+flag_do_debug = flag_do_debug == '1';
 
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
@@ -95,14 +114,14 @@ end
 
 %% check input arguments
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____                   _       
-%  |_   _|                 | |      
-%    | |  _ __  _ __  _   _| |_ ___ 
+%   _____                   _
+%  |_   _|                 | |
+%    | |  _ __  _ __  _   _| |_ ___
 %    | | | '_ \| '_ \| | | | __/ __|
 %   _| |_| | | | |_) | |_| | |_\__ \
 %  |_____|_| |_| .__/ \__,_|\__|___/
-%              | |                  
-%              |_| 
+%              | |
+%              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Set default values
@@ -113,18 +132,18 @@ if flag_check_inputs == 1
     if nargin < 4 || nargin > 6
         error('Incorrect number of input arguments.')
     end
-    
+
     % Check wall_start input
     fcn_geometry_checkInputsToFunctions(wall_start, '2column_of_numbers');
-    
+
     Nwalls = length(wall_start(:,1));
-     
+
     % Check wall_end input
     fcn_geometry_checkInputsToFunctions(wall_end, '2column_of_numbers',Nwalls);
-      
+
     % Check sensor_vector_start input
     fcn_geometry_checkInputsToFunctions(sensor_vector_start, '2column_of_numbers',1);
-     
+
     % Check sensor_vector_end input
     fcn_geometry_checkInputsToFunctions(sensor_vector_end, '2column_of_numbers',1);
 end
@@ -151,13 +170,13 @@ end
 
 %% Calculations begin here
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   __  __       _       
-%  |  \/  |     (_)      
-%  | \  / | __ _ _ _ __  
-%  | |\/| |/ _` | | '_ \ 
+%   __  __       _
+%  |  \/  |     (_)
+%  | \  / | __ _ _ _ __
+%  | |\/| |/ _` | | '_ \
 %  | |  | | (_| | | | | |
 %  |_|  |_|\__,_|_|_| |_|
-% 
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 wall_numbers = (1:length(wall_start(:,1)))';
 
@@ -188,7 +207,7 @@ if any(colinear_indices)
     s_dot_r = sum(s.*r,2);
     t0 = q_minus_p_dot_r./r_dot_r;
     t1 = t0 + s_dot_r./r_dot_r;
-    
+
     % Keep only the good indices
     %     % For debugging:
     %     conditions = [-0.5 -0.4; -0.5 0; -0.5 .2; 0 0.2; 0.2 0.4; 0.2 1; 0.2 1.2; 1 1.2; 1.2 1.3; -0.5 1.2]
@@ -206,7 +225,7 @@ if any(colinear_indices)
     %     [conditions t0_t1_surround]
     %     fprintf(1,'any_wighin flag:\n');
     %     [conditions any_within]
-    
+
     % Check whether there is overlap by seeing of the t0 and t1 values are
     % within the interval of [0 1], endpoint inclusive
     t0_inside = (t0>=0)&(t0<=1);
@@ -215,7 +234,7 @@ if any(colinear_indices)
     any_within = t0_inside | t1_inside | t0_t1_surround;
     good_indices = find(any_within);
     good_colinear_indices = intersect(colinear_indices,good_indices);
-    
+
     % Fix the ranges to be within 0 and 1
     t0(good_colinear_indices) = max(0,t0(good_colinear_indices));
     t0(good_colinear_indices) = min(1,t0(good_colinear_indices));
@@ -243,7 +262,7 @@ if any(colinear_indices)
     % Shut off colinear ones to start
     t(colinear_indices) = inf;
     u(colinear_indices) = inf;
-    
+
     % Correct the t values
     u(good_colinear_indices) = 1;
     t(good_colinear_indices) = t0(good_colinear_indices);
@@ -251,13 +270,13 @@ if any(colinear_indices)
     % Do we need to add more hit points?
     indices_hit_different_point = find(t0~=t1);
     more_indices = intersect(indices_hit_different_point,good_colinear_indices);
-         
+
     % Make p and r, t and u longer so that additional hit points are
     % calculated in special case of overlaps
     p = [p; p(more_indices,:)];
     r = [r; r(more_indices,:)];
     u = [u; u(more_indices)];
-    t = [t; t1(more_indices)];   
+    t = [t; t1(more_indices)];
     wall_numbers = [wall_numbers; wall_numbers(more_indices)];
 
 end
@@ -282,8 +301,8 @@ end
 good_indices = find(good_vector>0);
 
 if ~isempty(good_indices)
-    result = p + t.*r; 
-    intersections(good_indices,:) = result(good_indices,:);    
+    result = p + t.*r;
+    intersections(good_indices,:) = result(good_indices,:);
 end
 
 % Find the distances via Euclidian distance to the sensor's origin
@@ -294,7 +313,7 @@ distances_squared = sum((intersections - sensor_vector_start).^2,2);
 if flag_search_type ~=2
     % Keep just the minimum distance
     [closest_distance_squared,closest_index] = min(distances_squared);
-    
+
     distance = closest_distance_squared^0.5*sign(u(closest_index));
     location = intersections(closest_index,:);
     wall_that_was_hit = wall_numbers(closest_index);
@@ -308,27 +327,27 @@ end
 
 %% Any debugging?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____       _                 
-%  |  __ \     | |                
-%  | |  | | ___| |__  _   _  __ _ 
+%   _____       _
+%  |  __ \     | |
+%  | |  | | ___| |__  _   _  __ _
 %  | |  | |/ _ \ '_ \| | | |/ _` |
 %  | |__| |  __/ |_) | |_| | (_| |
 %  |_____/ \___|_.__/ \__,_|\__, |
 %                            __/ |
-%                           |___/ 
+%                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plot
-    
+
     % Set up the figure
     figure(fig_num);
     clf;
     hold on;
     axis equal;
     grid on; grid minor;
-    
+
     % Calculate the midpoints
     midpoints= (wall_start+wall_end)/2;
-    
+
     % Plot the walls
     Nwalls = length(wall_start(:,1));
     for ith_wall = 1:Nwalls
@@ -341,28 +360,28 @@ if flag_do_plot
         set(handle_text,'Color',line_color);
         set(handle_text,'Fontsize',20);
     end
-       
+
     % Plot the sensor vector
     quiver(q(:,1),q(:,2),s(:,1),s(:,2),'r','Linewidth',3);
     plot(sensor_vector_end(:,1),sensor_vector_end(:,2),'r.','Markersize',10);
-    
+
     handle_text = text(q(:,1),q(:,2),'Sensor');
     set(handle_text,'Color',[1 0 0]);
-    
+
     axis_size = axis;
     y_range = axis_size(4)-axis_size(3);
-        
+
     % Plot any hits in blue
     for i_result = 1:length(distance)
         plot(location(i_result,1),location(i_result,2),'bo','Markersize',30);
         handle_text = text(location(i_result,1),location(i_result,2)-0.05*y_range,sprintf('Hit %.0d at distance: %.2f',wall_that_was_hit(i_result),distance(i_result)));
         set(handle_text,'Color',[0 0 1]);
     end
-    
+
 end
 
 if flag_do_debug
-    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file); 
+    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
 end
 end
 

@@ -7,23 +7,23 @@ variable_type_string, ...
 varargin...
 )
 % fcn_MapGen_checkInputsToFunctions
-% Checks the variable types commonly used in the FuncE codes to ensure 
+% Checks the variable types commonly used in the FuncE codes to ensure
 % they are correctly formed.
-% 
-% This is a template function which is built for each class of functions. 
-% It is typically called at the top of most functions in a particular 
-% class. The input is a variable and a string defining the "type" of the 
-% variable. This function checks to see that they are compatible. For 
-% example, say there is a 'column_vector' type of variables used in the 
-% function that is always a N x 1 array; if someone had a variable called 
-% "test_example", one could check that this fit the 'column_vector' type 
-% by calling 
-% fcn_MapGen_checkInputsToFunctions(test_example,'column_vector'). This 
-% function would then check that the array was N x 1, and if it was not, 
+%
+% This is a template function which is built for each class of functions.
+% It is typically called at the top of most functions in a particular
+% class. The input is a variable and a string defining the "type" of the
+% variable. This function checks to see that they are compatible. For
+% example, say there is a 'column_vector' type of variables used in the
+% function that is always a N x 1 array; if someone had a variable called
+% "test_example", one could check that this fit the 'column_vector' type
+% by calling
+% fcn_MapGen_checkInputsToFunctions(test_example,'column_vector'). This
+% function would then check that the array was N x 1, and if it was not,
 % it would send out an error warning.
-% 
+%
 % FORMAT:
-% 
+%
 %    [ ...
 %    (AllowableInputs) ...
 %    ] = ...
@@ -33,75 +33,93 @@ varargin...
 %    (required_length), ...
 %    (fig_num) ...
 %    )
-% 
+%
 % INPUTS:
-% 
+%
 %     variable: the variable to check
-% 
-%     variable_type_string: a string representing the variable type to 
-%     check. Call the function with any figure number to see allowable 
+%
+%     variable_type_string: a string representing the variable type to
+%     check. Call the function with any figure number to see allowable
 %     options.
-% 
+%
 %     (optional inputs)
 %
-%     required_length: an integer forcing the value of N, giving an error 
-%     if the input variable does not have length N. Another optional input 
-%     is a rwo vector [A B] where, if B is greater than A, then the vector 
-%     must be A or longer. If B is less than A, then the vector must be A 
-%     or shorter. If B = A, then the vector must be length A, and no 
+%     required_length: an integer forcing the value of N, giving an error
+%     if the input variable does not have length N. Another optional input
+%     is a rwo vector [A B] where, if B is greater than A, then the vector
+%     must be A or longer. If B is less than A, then the vector must be A
+%     or shorter. If B = A, then the vector must be length A, and no
 %     shorter or greater.
-% 
-%     fig_num: any number that acts somewhat like a figure number output. 
-%     If given, this forces the variable types to be displayed as output 
+%
+%     fig_num: any number that acts somewhat like a figure number output.
+%     If given, this forces the variable types to be displayed as output
 %     and as well makes the input check process verbose.
-% 
-% 
+%
+%
 % OUTPUTS:
-% 
+%
 %     (optional outputs)
 %
-%     AllowableInputs: This is a structure output that lists all the 
-%     allowable types, and a description of each. As well, if the output 
-%     argument is given, the same information is printed within the 
+%     AllowableInputs: This is a structure output that lists all the
+%     allowable types, and a description of each. As well, if the output
+%     argument is given, the same information is printed within the
 %     workspace.
-% 
-% 
+%
+%
 % DEPENDENCIES:
-% 
+%
 %    (none)
-% 
+%
 % EXAMPLES:
-% 
+%
 % See the script: script_test_fcn_MapGen_checkInputsToFunctions
 % for a full test suite.
-% 
+%
 % This function was written on 2021_06_20 by S. Brennan
 % Questions or comments? contact sbrennan@psu.edu
 
-% 
+%
 % REVISION HISTORY:
-% 
+%
 % 2021_06_20 by S. Brennan
 % -- first write of function
 % 2021_07_07 by S. Brennan
 % -- modified to allow general input types, e.g. 8column_of_integers
-% 
+%
 % TO DO:
-% 
+%
 % -- fill in to-do items here.
 
 return;
 
-%% Debugging and Input checks
-flag_check_inputs = 1; % Set equal to 1 to check the input arguments 
-flag_do_plot = 0;      % Set equal to 1 for plotting 
-flag_do_debug = 0;     % Set equal to 1 for debugging 
+% set an environment variable on your machine with the getenv function...
+% in the Matlab console.  Char array of '1' will be true and '0' will be false.
+flag_check_inputs = getenv('ENV_FLAG_CHECK_INPUTS');  % '1' will check input args
+flag_do_plot = getenv('ENV_FLAG_DO_PLOT'); % '1' will make plots
+flag_do_debug = getenv('ENV_FLAG_DO_DEBUG'); % '1' will enable debugging
+
+% if the char array has length 0, assume the env var isn't set and default to...
+% dipslaying more information rather than potentially hiding an issue
+if length(flag_check_inputs) = 0
+    flag_check_inputs = '1';
+end
+if length(flag_do_plot) = 0
+    flag_do_plot = '1';
+end
+if length(flag_do_debug) = 0
+    flag_do_debug = '1';
+end
+
+% convert flag from char string to logical
+flag_check_inputs = flag_check_inputs == '1';
+flag_do_plot = flag_do_plot == '1';
+flag_do_debug = flag_do_debug == '1';
 
 if flag_do_debug
     fig_for_debug = 159;
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-end 
+end
 
 %% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -128,7 +146,7 @@ if 1 == flag_check_inputs
     if ~ischar(variable_type_string)
        error('The variable_type_string input must be a string type, for example: ''Path'' ');
     end
- 
+
 end
 
 %% Start of main code
@@ -187,7 +205,7 @@ INTERNAL_confirmVariable(flags,variable,variable_name);
 
 if flag_do_plot
     % Nothing to plot here
-end % Ends the flag_do_plot if statement    
+end % Ends the flag_do_plot if statement
 
 if flag_do_debug
     fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
@@ -198,13 +216,13 @@ end % Ends the function
 
 %% Functions follow
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   ______                _   _                 
-%  |  ____|              | | (_)                
-%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___ 
+%   ______                _   _
+%  |  ____|              | | (_)
+%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___
 %  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
 %  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
 %  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
-%                                               
+%
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
@@ -216,7 +234,7 @@ flags.check_if_strictly_positive = 0; % Check to see if number is greater than z
 flags.check_required_columns  = 0; % Check the number of columns
 flags.minNrequiredcolumns  = 0; % No check
 flags.maxNrequiredcolumns  = 0; % No check
-flags.check_if_noNaN = 0; % Check that there are no NaN 
+flags.check_if_noNaN = 0; % Check that there are no NaN
 flags.check_if_integer = 0; % Check that the variable is an integer
 flags.check_requiredRowLength = 0;     % Don't check for required length
 flags.rowLengthRangeRequired = [0 0]; % Set to [x y]. Variable must be x or greater if y>x, =x if y=x, x or less if y<x
@@ -254,20 +272,20 @@ if contains(variable_type_string,pattern)
     else
         ncols_min = ncols_max;
     end
-    
+
     flags.check_if_isnumeric = 1; % Must be a number
     flags.check_required_columns  = 1; % Check the number of columns
     flags.minNrequiredcolumns  = ncols_min; % Must be 1 columns
     flags.maxNrequiredcolumns  = ncols_max; % Must be 1 columns
     flags.check_if_noNaN = 1; % Check that there are no NaN
-    
+
     flag_pattern_was_matched = 1;
 end
 
 % positive_XXX
 pattern = 'positive_';
 if contains(variable_type_string,pattern)
-    flags.check_if_strictly_positive = 1; % Must be a number    
+    flags.check_if_strictly_positive = 1; % Must be a number
 end
 
 % XXX_of_integers
@@ -321,49 +339,49 @@ end % Ends INTERNAL_fcn_setFlagsByType
 function INTERNAL_confirmVariable(flags,variable,variable_name)
 
 % Numeric?
-if flags.check_if_isnumeric   
+if flags.check_if_isnumeric
     if ~isnumeric(variable)
         error('The %s input must be numeric.',variable_name);
     end
 end
 
 % Strictly positive?
-if flags.check_if_strictly_positive   
+if flags.check_if_strictly_positive
     if any(variable<=0)
         error('The %s input must be strictly positive, e.g. greater than zero and not equal to zero.',variable_name);
     end
 end
 
 % NaN?
-if flags.check_if_noNaN   
+if flags.check_if_noNaN
     if any(isnan(variable),'all')
         error('The %s input must have no NaN values.',variable_name);
     end
 end
 
 % Integer?
-if flags.check_if_integer   
+if flags.check_if_integer
     if ~all(round(variable)==variable)
         error('The %s input must be an integer.',variable_name);
     end
 end
 
 % Column length?
-if flags.check_required_columns    
+if flags.check_required_columns
     if flags.minNrequiredcolumns==0
         error('Need to set minimum number of columns for variable type: %s.',variable_name);
     end
     if flags.maxNrequiredcolumns==0
         error('Need to set maximum number of columns for variable type: %s.',variable_name);
     end
-    
+
     % Exactly a number of columns?
     if flags.minNrequiredcolumns==flags.maxNrequiredcolumns
         if length(variable(1,:))~=flags.minNrequiredcolumns
             error('The %s input must have exactly %.0d columns.',variable_name,flags.minNrequiredcolumns);
         end
     end
-    
+
     % A minimum number of columns
     if length(variable(1,:))<flags.minNrequiredcolumns
         error('The %s input must have at least %.0d columns.',variable_name,flags.minNrequiredcolumns);
@@ -373,11 +391,11 @@ if flags.check_required_columns
     if length(variable(1,:))>flags.maxNrequiredcolumns
         error('The %s input must have no more than %.0d columns.',variable_name,flags.maxNrequiredcolumns);
     end
-    
+
 end
 
 % Row length?
-if flags.check_requiredRowLength    
+if flags.check_requiredRowLength
     required_length = flags.rowLengthRangeRequired;
     if length(required_length(1,:))==1  % Exact, given number of rows
         if length(variable(:,1))~=required_length
@@ -404,7 +422,7 @@ if flags.check_requiredRowLength
 end
 
 % Structure?
-if flags.check_likeStructure 
+if flags.check_likeStructure
     template_fields = fieldnames(orderfields(flags.structureToBeLike));
     reference_fields = fieldnames(orderfields(variable));
     if ~isequal(template_fields,reference_fields)
@@ -418,9 +436,9 @@ if flags.check_likeStructure
         end
         error('The %s input must be a structure type. All the fields must be match the reference structure.',variable_name);
     end
-    
-end 
-    
+
+end
+
 
 end % Ends INTERNAL_confirmVariable
 

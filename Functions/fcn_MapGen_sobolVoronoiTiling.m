@@ -6,17 +6,17 @@ function [polytopes] = ...
 % https://www.mathworks.com/help/stats/generating-quasi-random-numbers.html
 %
 % FORMAT:
-% 
+%
 % [polytopes] = ...
 %    fcn_MapGen_sobolVoronoiTiling(Sobol_range,(stretch),(fig_num))
 %
 % INPUTS:
 %
 %    Sobol_range: 1 x 2 vector of integers specifying the [low high] range
-%    of Sobol point indices to use to generate the tiling, where  
+%    of Sobol point indices to use to generate the tiling, where
 %    low: the lowest point index to use in the Sobol sequence
 %    high: the highest point index to use in the Sobol sequence
-%     
+%
 %    (OPTIONAL INPUTS)
 %
 %    stretch: [x,y] scaling factors to allow the values from the Sobol set
@@ -44,15 +44,15 @@ function [polytopes] = ...
 %      fcn_MapGen_plotPolytopes
 %
 % EXAMPLES:
-%      
+%
 % See the script: script_test_fcn_MapGen_sobolVoronoiTiling
 % for a full test suite.
 %
 % This function was written on 2019_06_13 by Seth Tau
-% Questions or comments? sbrennan@psu.edu 
+% Questions or comments? sbrennan@psu.edu
 
 % REVISION HISTORY:
-% 2021_06_06 
+% 2021_06_06
 % -- edited by S. Brennan to put it into MapGen format
 
 % TO DO:
@@ -62,9 +62,28 @@ function [polytopes] = ...
 % -- force correct number of polytopes?
 
 %% Debugging and Input checks
-flag_check_inputs = 1; % Set equal to 1 to check the input arguments
-flag_do_plot = 0;      % Set equal to 1 for plotting
-flag_do_debug = 0;     % Set equal to 1 for debugging
+% set an environment variable on your machine with the getenv function...
+% in the Matlab console.  Char array of '1' will be true and '0' will be false.
+flag_check_inputs = getenv('ENV_FLAG_CHECK_INPUTS');  % '1' will check input args
+flag_do_plot = getenv('ENV_FLAG_DO_PLOT'); % '1' will make plots
+flag_do_debug = getenv('ENV_FLAG_DO_DEBUG'); % '1' will enable debugging
+
+% if the char array has length 0, assume the env var isn't set and default to...
+% dipslaying more information rather than potentially hiding an issue
+if length(flag_check_inputs) = 0
+    flag_check_inputs = '1';
+end
+if length(flag_do_plot) = 0
+    flag_do_plot = '1';
+end
+if length(flag_do_debug) = 0
+    flag_do_debug = '1';
+end
+
+% convert flag from char string to logical
+flag_check_inputs = flag_check_inputs == '1';
+flag_do_plot = flag_do_plot == '1';
+flag_do_debug = flag_do_debug == '1';
 
 if flag_do_debug
     fig_for_debug = 9993;
@@ -84,13 +103,13 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
-if flag_check_inputs    
+
+if flag_check_inputs
     % Are there the right number of inputs?
     if nargin < 1 || nargin > 3
         error('Incorrect number of input arguments')
     end
-    
+
     % Check the Sobol_range input
     fcn_MapGen_checkInputsToFunctions(...
         Sobol_range, '2column_of_integers');
@@ -102,11 +121,11 @@ end
 stretch = [1 1]; % default stretch value
 if 2 == nargin
     stretch = varargin{1};
-    
+
     % Check the stretch input
     fcn_MapGen_checkInputsToFunctions(...
         stretch, '2column_of_numbers',1);
-       
+
 end
 
 
@@ -150,33 +169,33 @@ polytopes = fcn_MapGen_generatePolysFromTiling(seed_points,V,C,AABB, stretch);
 
 %% Plot results?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____       _                 
-%  |  __ \     | |                
-%  | |  | | ___| |__  _   _  __ _ 
+%   _____       _
+%  |  __ \     | |
+%  | |  | | ___| |__  _   _  __ _
 %  | |  | |/ _ \ '_ \| | | |/ _` |
 %  | |__| |  __/ |_) | |_| | (_| |
 %  |_____/ \___|_.__/ \__,_|\__, |
 %                            __/ |
-%                           |___/ 
+%                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if flag_do_plot
 
     figure(fig_num);
-    hold on  
- 
+    hold on
+
     % plot the polytopes
     fcn_MapGen_plotPolytopes(polytopes,fig_num,'b',2,[0 1 0 1]);
 
     % plot the seed points
     plot(seed_points(:,1),seed_points(:,2),'r.','Markersize',10);
 
-    
-    
+
+
 end
 
 if flag_do_debug
-    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file); 
+    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
 end
 
 

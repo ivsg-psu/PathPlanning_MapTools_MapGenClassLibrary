@@ -8,7 +8,7 @@ function [cropped_vertices] = ...
 % on any edge.
 %
 % FORMAT:
-% 
+%
 % [cropped_vertices] = ...
 %    fcn_MapGen_polytopeRemoveColinearVertices(...
 %     vertices,...
@@ -26,18 +26,18 @@ function [cropped_vertices] = ...
 %
 %     cropped_vertices: an Mx2 matrix of [x y] points, where no vertices
 %     are repeated
-%   
+%
 % DEPENDENCIES:
-% 
+%
 %     fcn_MapGen_checkInputsToFunctions
-% 
+%
 % EXAMPLES:
-%      
+%
 % For additional examples, see:
 % script_test_fcn_MapGen_polytopeRemoveColinearVertices
 %
 % This function was written on 2021_08_02 by S. Brennan
-% Questions or comments? sbrennan@psu.edu 
+% Questions or comments? sbrennan@psu.edu
 %
 
 % Revision History:
@@ -48,9 +48,28 @@ function [cropped_vertices] = ...
 % -- none
 
 %% Debugging and Input checks
-flag_check_inputs = 1; % Set equal to 1 to check the input arguments
-flag_do_plot = 0;      % Set equal to 1 for plotting
-flag_do_debug = 0;     % Set equal to 1 for debugging
+% set an environment variable on your machine with the getenv function...
+% in the Matlab console.  Char array of '1' will be true and '0' will be false.
+flag_check_inputs = getenv('ENV_FLAG_CHECK_INPUTS');  % '1' will check input args
+flag_do_plot = getenv('ENV_FLAG_DO_PLOT'); % '1' will make plots
+flag_do_debug = getenv('ENV_FLAG_DO_DEBUG'); % '1' will enable debugging
+
+% if the char array has length 0, assume the env var isn't set and default to...
+% dipslaying more information rather than potentially hiding an issue
+if length(flag_check_inputs) = 0
+    flag_check_inputs = '1';
+end
+if length(flag_do_plot) = 0
+    flag_do_plot = '1';
+end
+if length(flag_do_debug) = 0
+    flag_do_debug = '1';
+end
+
+% convert flag from char string to logical
+flag_check_inputs = flag_check_inputs == '1';
+flag_do_plot = flag_do_plot == '1';
+flag_do_debug = flag_do_debug == '1';
 
 if flag_do_debug
     fig_for_debug = 4564;
@@ -70,19 +89,19 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
+
 if flag_check_inputs
     % Are there the right number of inputs?
     if nargin < 1 || nargin > 2
         error('Incorrect number of input arguments')
     end
-           
+
     % Check the vertices input
     fcn_MapGen_checkInputsToFunctions(...
         vertices, '2column_of_numbers');
-        
+
 end
-    
+
 
 % Does user want to show the plots?
 if  2 == nargin
@@ -115,21 +134,21 @@ Npoints = length(cropped_vertices(:,1));
 good_indices = zeros(Npoints,1);
 
 for ith_point = 1:Npoints
-    
+
     if ith_point>1
         previous_vector = [cropped_vertices(ith_point,:)-cropped_vertices(ith_point-1,:), 0];
     else % must wrap around
         previous_vector = [cropped_vertices(end,:)-cropped_vertices(1,:), 0];
     end
-    
+
     if ith_point<Npoints
         subsequent_vector = [cropped_vertices(ith_point+1,:)-cropped_vertices(ith_point,:), 0];
     else % must wrap around
         subsequent_vector = [cropped_vertices(1,:)-cropped_vertices(Npoints,:), 0];
     end
-    
+
     cross_result = cross(previous_vector,subsequent_vector);
-    
+
     if cross_result(1,3)~=0
         good_indices(ith_point,:) = 1;
     end
@@ -142,14 +161,14 @@ cropped_vertices = cropped_vertices(good_indices>0,:);
 
 %% Plot results?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____       _                 
-%  |  __ \     | |                
-%  | |  | | ___| |__  _   _  __ _ 
+%   _____       _
+%  |  __ \     | |
+%  | |  | | ___| |__  _   _  __ _
 %  | |  | |/ _ \ '_ \| | | |/ _` |
 %  | |__| |  __/ |_) | |_| | (_| |
 %  |_____/ \___|_.__/ \__,_|\__, |
 %                            __/ |
-%                           |___/ 
+%                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if flag_do_plot
@@ -158,17 +177,17 @@ if flag_do_plot
     grid minor
     hold on
     axis equal
-    
+
     % Plot the input vertices
     plot(vertices(:,1),vertices(:,2),'r-');
-    
+
     % Plot the cropped_vertices
-    plot(cropped_vertices(:,1),cropped_vertices(:,2),'ko');    
+    plot(cropped_vertices(:,1),cropped_vertices(:,2),'ko');
 
 end
 
 if flag_do_debug
-    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file); 
+    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
 end
 
 end % Ends function

@@ -9,7 +9,7 @@ function [all_points, flag_was_intersection] = ...
 % [vertex1; crossing; vertex2; (etc)]
 %
 % FORMAT:
-% 
+%
 % [all_points, flag_was_intersection] = ...
 %    fcn_MapGen_polytopeFindSelfIntersections(vertices,...
 %     (fig_num))
@@ -26,21 +26,21 @@ function [all_points, flag_was_intersection] = ...
 %
 %     all_points: an Mx2 matrix of [x y] points, which include the vertices
 %     and point crossings
-%   
+%
 % DEPENDENCIES:
-% 
+%
 %     fcn_MapGen_checkInputsToFunctions
 %     fcn_MapGen_polytopeFindVertexAngles
 %     fcn_MapGen_fillPolytopeFieldsFromVertices
-% 
+%
 % % EXAMPLES:
-%      
+%
 %
 % For additional examples, see:
 % script_test_fcn_MapGen_polytopeFindSelfIntersections
 %
 % This function was written on 2021_08_02 by S. Brennan
-% Questions or comments? sbrennan@psu.edu 
+% Questions or comments? sbrennan@psu.edu
 %
 
 % Revision History:
@@ -51,9 +51,28 @@ function [all_points, flag_was_intersection] = ...
 % -- none
 
 %% Debugging and Input checks
-flag_check_inputs = 1; % Set equal to 1 to check the input arguments
-flag_do_plot = 0;      % Set equal to 1 for plotting
-flag_do_debug = 0;     % Set equal to 1 for debugging
+% set an environment variable on your machine with the getenv function...
+% in the Matlab console.  Char array of '1' will be true and '0' will be false.
+flag_check_inputs = getenv('ENV_FLAG_CHECK_INPUTS');  % '1' will check input args
+flag_do_plot = getenv('ENV_FLAG_DO_PLOT'); % '1' will make plots
+flag_do_debug = getenv('ENV_FLAG_DO_DEBUG'); % '1' will enable debugging
+
+% if the char array has length 0, assume the env var isn't set and default to...
+% dipslaying more information rather than potentially hiding an issue
+if length(flag_check_inputs) = 0
+    flag_check_inputs = '1';
+end
+if length(flag_do_plot) = 0
+    flag_do_plot = '1';
+end
+if length(flag_do_debug) = 0
+    flag_do_debug = '1';
+end
+
+% convert flag from char string to logical
+flag_check_inputs = flag_check_inputs == '1';
+flag_do_plot = flag_do_plot == '1';
+flag_do_debug = flag_do_debug == '1';
 
 if flag_do_debug
     fig_for_debug = 4564;
@@ -73,19 +92,19 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
+
 if flag_check_inputs
     % Are there the right number of inputs?
     if nargin < 1 || nargin > 2
         error('Incorrect number of input arguments')
     end
-    
+
     % Check the vertices input
     fcn_MapGen_checkInputsToFunctions(...
         vertices, '2column_of_numbers');
-    
+
 end
-    
+
 
 % Does user want to show the plots?
 if  2 == nargin
@@ -117,23 +136,23 @@ all_points = [];
 
 start_vertices = vertices(1:end-1,:);
 end_vertices = vertices(2:end,:);
-all_indices = (1:(length(vertices(:,1))-1))'; 
+all_indices = (1:(length(vertices(:,1))-1))';
 
 flag_was_intersection = 0;
 % Find all intersection points
 for ith_point = 1:length(start_vertices(:,1))
     all_points = [all_points; start_vertices(ith_point,:)]; %#ok<AGROW>
-    
+
     % Define start and end of the sensor
     sensor_vector_start = start_vertices(ith_point,:);
     sensor_vector_end = end_vertices(ith_point,:);
-    
+
     % Define the start and end of the walls
     wall_indices = all_indices(all_indices~=ith_point);
-    wall_start   = start_vertices(wall_indices,:);    
+    wall_start   = start_vertices(wall_indices,:);
     wall_end     = end_vertices(wall_indices,:);
     midpoints = (wall_start+wall_end)/2; %#ok<NASGU>
-    
+
     if flag_do_debug
         figure(fig_for_debug);
         clf;
@@ -141,16 +160,16 @@ for ith_point = 1:length(start_vertices(:,1))
         grid on;
         axis equal;
         grid minor;
-        
+
         % Plot the vertices
         plot(vertices(:,1),vertices(:,2),'r-');
-        
+
         % Plot the sensor
         plot(...
             [sensor_vector_start(1,1) sensor_vector_end(1,1)],...
             [sensor_vector_start(1,2) sensor_vector_end(1,2)],...
             'g-');
-        
+
         % Plot the walls, and number them
         Nwalls = length(wall_start(:,1));
         for ith_wall = 1:Nwalls
@@ -174,18 +193,18 @@ for ith_point = 1:length(start_vertices(:,1))
         wall_end,...
         sensor_vector_start,...
         sensor_vector_end,2);
-    
+
     % Sort by distances
     sorting_data = [distance location];
     sorted_data = sortrows(sorting_data,1); % sort by 1st column
     distance = sorted_data(:,1);
     location = sorted_data(:,2:3);
-    
+
     if ~isnan(distance)
         all_points = [all_points; location(distance~=0,:)]; %#ok<AGROW>
         flag_was_intersection = 1;
     end
-    
+
 end
 
 % Get rid of duplicates (occurs when two points are both on edges)
@@ -195,14 +214,14 @@ all_points = all_points(indices_not_repeated>0,:);
 
 %% Plot results?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____       _                 
-%  |  __ \     | |                
-%  | |  | | ___| |__  _   _  __ _ 
+%   _____       _
+%  |  __ \     | |
+%  | |  | | ___| |__  _   _  __ _
 %  | |  | |/ _ \ '_ \| | | |/ _` |
 %  | |__| |  __/ |_) | |_| | (_| |
 %  |_____/ \___|_.__/ \__,_|\__, |
 %                            __/ |
-%                           |___/ 
+%                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if flag_do_plot
@@ -211,17 +230,17 @@ if flag_do_plot
     grid minor
     hold on
     axis equal
-    
+
     % Plot the vertices
     plot(vertices(:,1),vertices(:,2),'r-');
-    
+
     % Plot the all_points
     plot(all_points(:,1),all_points(:,2),'ko');
 
 end
 
 if flag_do_debug
-    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file); 
+    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
 end
 
 end % Ends function

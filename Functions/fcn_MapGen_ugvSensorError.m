@@ -12,19 +12,19 @@ varargin...
 )
 % fcn_MapGen_ugvSensorError
 % calculates error in sensed locations from a UGV perspective
-% 
+%
 %     Detailed description is as follows:
 %     - scanning_results is a Nx3 matrix, N being the number of received
 %     lidar points or sensor scans
 %         -- entry 1: R (range or distance of laser point)
 %         -- entry 2: beta (scanning angle of respective laser point)
 %         -- entry 3: kappa (heading of vehicle wrt Euclidian line)
-%     
+%
 %     - position_uncertainty is a vector of constants
 %         -- entry 1: dx0 (uncertainty of sensor location in x direction)
 %         -- entry 2: dy0 (uncertainty of sensor location in y direction)
 %         -- entry 3: dz0 (uncertainty of sensor location in z direction)
-%     
+%
 %     -angular_uncertainty is a vector of constants
 %         -- entry 1: domega (uncertainty of sensor pointing angle around the
 %         x axis)
@@ -32,13 +32,13 @@ varargin...
 %         y axis)
 %         -- entry 1: dkappa (uncertainty of sensor pointing angle around the
 %         z axis)
-%     
+%
 %     -laser_uncertainty is a vector of constants
 %         -- entry 1: dbeta (uncertainty of scanning angle around x axis)
 %         -- entry 2: dR (uncertainty of scanning range value)
-%     
+%
 % Enter in units of meters and degrees.
-%     
+%
 % This function is designed to output a 'bubble' or 'shadow' of uncertainty
 % that pertains to how well a sensor on a UGV perceives the objects within
 % its scanning range. The inputs to this function are primarily error values
@@ -46,7 +46,7 @@ varargin...
 % to the object or point (e.g. for lidar, consider one reflection from an
 % emitted pulse at a given scanning angle). Error values will be defined on a
 % global (map) coordinate system, not the local (sensor/vehicle) system.
-%     
+%
 % - x,y,z : local coordinate system of sensor, beam origin [meters]
 %     - x : direction of forward travel
 %     - y : direction of sideways travel (i.e. left, right)
@@ -61,7 +61,7 @@ varargin...
 %     line of travel, should include the heading uncertainty [degrees]
 % - beta : scan angle from x0,y0,z0 to X0,Y0,Z0 [degrees]
 % - R : range or distance from perceived object [meters]
-%     
+%
 % Assumptions:
 %     - flat terrain
 %     - rake scanning across y axis (or y-z plane but not considering
@@ -71,22 +71,22 @@ varargin...
 %     negligible distance between each return of the laser within a scan)
 %     - ignoring other error sources: time offset (scanner to clock),
 %     calibration offset or misalignment between sensors, possible errors in
-%     the transformation (post-processing)in the local coordinate system, 
+%     the transformation (post-processing)in the local coordinate system,
 %     number, distribution, and distance of GPS reference stations, quality
 %     of the GPS/INS postprocessing, correction of the relative errors
 %     through block adjustment of the scan strips, etc.
-% 
+%
 % *Total Error is actually magnitude error, calculated by taking the square
 % root of the sum of the square of individual error values.
-% 
-% Ref: 
+%
+% Ref:
 % - Baltsavias 1999 "Airborne Laser Scanning: Basic Relations and
 % Formulas"
 % - Baltsavias 1999 "Airborne Laser Scanning: Existing Systems and Firms and
-% Other Resources"   
-% 
+% Other Resources"
+%
 % FORMAT:
-% 
+%
 %    [ ...
 %    DX_err, ...
 %    DY_err, ...
@@ -99,70 +99,89 @@ varargin...
 %    Laser_Uncertainty, ...
 %    (fig_num) ...
 %    )
-% 
+%
 % INPUTS:
-% 
-%     Scanning_Results: a Nx3 matrix, N being the number of received lidar 
+%
+%     Scanning_Results: a Nx3 matrix, N being the number of received lidar
 %     points or sensor scans
-% 
-%     Position_Uncertainty: a 1x3 vector of constants defining uncertainty 
+%
+%     Position_Uncertainty: a 1x3 vector of constants defining uncertainty
 %     in the x, y, and z directions
-% 
-%     Angular_Uncertainty: a 1x3 vector of constants defining uncertainty 
+%
+%     Angular_Uncertainty: a 1x3 vector of constants defining uncertainty
 %     in the x, y, and z pointing angle (in degrees)
-% 
-%     Laser_Uncertainty: a 1x2 vector of constants defining uncertainty in 
+%
+%     Laser_Uncertainty: a 1x2 vector of constants defining uncertainty in
 %     the LIDAR (see long description)
-% 
+%
 %     (optional inputs)
 %
-%     fig_num: any number that acts as a figure number output, causing a 
+%     fig_num: any number that acts as a figure number output, causing a
 %     figure to be drawn showing results.
-% 
-% 
+%
+%
 % OUTPUTS:
-% 
+%
 %     DX_err: Error in the x position
-% 
+%
 %     DY_err: Error in the y position
-% 
+%
 %     DZ_err: Error in the z position
-% 
-% 
+%
+%
 % DEPENDENCIES:
-% 
+%
 %     fcn_MapGen_checkInputsToFunctions
-% 
-% 
+%
+%
 % EXAMPLES:
-% 
+%
 % See the script: script_test_fcn_MapGen_ugvSensorError
 % for a full test suite.
-% 
+%
 % This function was written on 2021_07_07 by Sean Brennan
 % Questions or comments? contact sbrennan@psu.edu
 
-% 
+%
 % REVISION HISTORY:
-% 
+%
 % 2021_07_07 by Sean Brennan
 % -- first write of function
 
-% 
+%
 % TO DO:
-% 
+%
 % -- fill in to-do items here.
 
 %% Debugging and Input checks
-flag_check_inputs = 1; % Set equal to 1 to check the input arguments 
-flag_do_plot = 0;      % Set equal to 1 for plotting 
-flag_do_debug = 0;     % Set equal to 1 for debugging 
+% set an environment variable on your machine with the getenv function...
+% in the Matlab console.  Char array of '1' will be true and '0' will be false.
+flag_check_inputs = getenv('ENV_FLAG_CHECK_INPUTS');  % '1' will check input args
+flag_do_plot = getenv('ENV_FLAG_DO_PLOT'); % '1' will make plots
+flag_do_debug = getenv('ENV_FLAG_DO_DEBUG'); % '1' will enable debugging
+
+% if the char array has length 0, assume the env var isn't set and default to...
+% dipslaying more information rather than potentially hiding an issue
+if length(flag_check_inputs) = 0
+    flag_check_inputs = '1';
+end
+if length(flag_do_plot) = 0
+    flag_do_plot = '1';
+end
+if length(flag_do_debug) = 0
+    flag_do_debug = '1';
+end
+
+% convert flag from char string to logical
+flag_check_inputs = flag_check_inputs == '1';
+flag_do_plot = flag_do_plot == '1';
+flag_do_debug = flag_do_debug == '1';
 
 if flag_do_debug
     fig_for_debug = 652;
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-end 
+end
 
 %% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -188,7 +207,7 @@ if 1 == flag_check_inputs
     % Check the Scanning_Results input, make sure it is 'positive_3column_of_numbers' type
     %     fcn_MapGen_checkInputsToFunctions(...
     %         Scanning_Results, 'positive_3column_of_numbers');
- 
+
     % Check the Position_Uncertainty input, make sure it is 'positive_3column_of_numbers' type
     %     fcn_MapGen_checkInputsToFunctions(...
     %         Position_Uncertainty, 'positive_3column_of_numbers',[1]);
@@ -196,7 +215,7 @@ if 1 == flag_check_inputs
     % Check the Angular_Uncertainty input, make sure it is 'positive_3column_of_numbers' type
     %     fcn_MapGen_checkInputsToFunctions(...
     %         Angular_Uncertainty, 'positive_3column_of_numbers',[1]);
-    
+
     % Check the Laser_Uncertainty input, make sure it is 'positive_2column_of_numbers' type
     %     fcn_MapGen_checkInputsToFunctions(...
     %         Laser_Uncertainty, 'positive_2column_of_numbers',[1]);
@@ -263,7 +282,7 @@ clear Scanning_Results Position_Uncertainty Angular_Uncertainty Laser_Uncertaint
 %% For 3D Cases (Future Work)
 %{
 
-%% Influence of Roll (domega) 
+%% Influence of Roll (domega)
 % negligible for 2D, flat terrain
 
 dx=0;
@@ -273,7 +292,7 @@ dx=0;
 dy = D*domega;
 
 DX_omega = -dy*sind(kappa);
-DX = [DX , DX_omega]; 
+DX = [DX , DX_omega];
 
 DY_omega = dy*cosd(kappa);
 DY = [DY , DY_omega];
@@ -306,7 +325,7 @@ DZ = [DZ , DZ_psi];
 
 DX_kappa = R.*cosd(beta+dbeta+kappa+dkappa)-R.*cosd(beta+dbeta+kappa);
 % DX = [DX , DX_kappa];
-    
+
 DY_kappa = R.*sind(beta+dbeta+kappa+dkappa)-R.*sind(beta+dbeta+kappa);
 % DY = [DY , DY_kappa];
 
@@ -372,7 +391,7 @@ DZ_err = 0*DX_err; % Placeholder for 3d solution
 % DY_table=table(h, beta, kappa, DY_omega, DY_psi, DY_kappa, DY_beta, DY_R, DY_x0, DY_y0, DY_z0);
 % DZ_table=table(h, beta, kappa, DZ_omega, DZ_psi, DZ_kappa, DZ_beta, DZ_R, DZ_x0, DZ_y0, DZ_z0);
 
-% 
+%
 
 %§
 %% Plot the results (for debugging)?
@@ -391,7 +410,7 @@ DZ_err = 0*DX_err; % Placeholder for 3d solution
 
 if flag_do_plot
     % Nothing to plot here
-end % Ends the flag_do_plot if statement    
+end % Ends the flag_do_plot if statement
 
 if flag_do_debug
     fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
@@ -402,13 +421,13 @@ end % Ends the function
 
 %% Functions follow
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   ______                _   _                 
-%  |  ____|              | | (_)                
-%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___ 
+%   ______                _   _
+%  |  ____|              | | (_)
+%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___
 %  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
 %  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
 %  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
-%                                               
+%
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 

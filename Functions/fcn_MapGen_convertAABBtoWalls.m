@@ -4,65 +4,83 @@ function [walls] = ...
 
 % fcn_MapGen_convertAABBtoWalls
 % converts axis-aligned bounding boxes into equivalent enclosing walls
-% 
+%
 % FORMAT:
-% 
+%
 %    [walls] = ...
 %    fcn_MapGen_convertAABBtoWalls(...
 %    AABB,(fig_num))
-% 
+%
 % INPUTS:
-% 
-%     AABB: the axis-aligned bounding box, in format of 
+%
+%     AABB: the axis-aligned bounding box, in format of
 %     [xmin ymin xmax ymax], wherein the resulting polytopes must be
 %     bounded.
 %
 %     (optional inputs)
 %
-%     fig_num: any number that acts as a figure number output, causing a 
+%     fig_num: any number that acts as a figure number output, causing a
 %     figure to be drawn showing results.
-% 
-% 
+%
+%
 % OUTPUTS:
-% 
+%
 %     walls: the resulting vertices of the walls in [x y] format. Note that
 %     the walls enclose, so the last vertices will be the same as the
 %     first.
-% 
-% 
+%
+%
 % DEPENDENCIES:
-% 
+%
 %     fcn_MapGen_checkInputsToFunctions
-% 
+%
 % EXAMPLES:
-% 
+%
 % See the script: script_test_fcn_MapGen_convertAABBtoWalls
 % for a full test suite.
-% 
+%
 % This function was written on 2021_07_11 by Sean Brennan
 % Questions or comments? contact sbrennan@psu.edu
 
-% 
+%
 % REVISION HISTORY:
-% 
+%
 % 2021_07_17 by Sean Brennan
 % -- first write of function
 
-% 
+%
 % TO DO:
-% 
+%
 
 
 %% Debugging and Input checks
-flag_check_inputs = 1; % Set equal to 1 to check the input arguments 
-flag_do_plot = 0;      % % Set equal to 1 for plotting 
-flag_do_debug = 0;     % Set equal to 1 for debugging 
+% set an environment variable on your machine with the getenv function...
+% in the Matlab console.  Char array of '1' will be true and '0' will be false.
+flag_check_inputs = getenv('ENV_FLAG_CHECK_INPUTS');  % '1' will check input args
+flag_do_plot = getenv('ENV_FLAG_DO_PLOT'); % '1' will make plots
+flag_do_debug = getenv('ENV_FLAG_DO_DEBUG'); % '1' will enable debugging
 
+% if the char array has length 0, assume the env var isn't set and default to...
+% dipslaying more information rather than potentially hiding an issue
+if length(flag_check_inputs) = 0
+    flag_check_inputs = '1';
+end
+if length(flag_do_plot) = 0
+    flag_do_plot = '1';
+end
+if length(flag_do_debug) = 0
+    flag_do_debug = '1';
+end
+
+% convert flag from char string to logical
+flag_check_inputs = flag_check_inputs == '1';
+flag_do_plot = flag_do_plot == '1';
+flag_do_debug = flag_do_debug == '1';
 if flag_do_debug
     fig_for_debug = 4564;
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-end 
+end
 
 %% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -84,7 +102,7 @@ if 1 == flag_check_inputs
     if nargin < 1 || nargin > 2
         error('Incorrect number of input arguments')
     end
-   
+
     % Check the AABB input, make sure it is '4column_of_numbers' type, with
     % 1 row
     fcn_MapGen_checkInputsToFunctions(...
@@ -94,8 +112,8 @@ end
 
 % Does user want to show the plots?
 if  2== nargin
-    fig_num = varargin{end}; 
-    flag_do_plot = 1; 
+    fig_num = varargin{end};
+    flag_do_plot = 1;
 else
     if flag_do_debug
         fig_num = fig_for_debug;
@@ -139,20 +157,20 @@ walls = [...
 
 
 
-if flag_do_plot    
+if flag_do_plot
     figure(fig_num);
     clf;
     hold on;
     grid on;
     grid minor;
-    
+
     scale = max(AABB,[],'all') - min(AABB,[],'all');
     new_axis = [AABB(1)-scale/2 AABB(3)+scale/2 AABB(2)-scale/2 AABB(4)+scale/2];
     axis(new_axis);
-    
+
     % Plot the walls
     plot(walls(:,1),walls(:,2),'b-');
-        
+
 end % Ends the flag_do_plot if statement
 
 if flag_do_debug
@@ -169,13 +187,13 @@ end % Ends the function
 
 %% Functions follow
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   ______                _   _                 
-%  |  ____|              | | (_)                
-%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___ 
+%   ______                _   _
+%  |  ____|              | | (_)
+%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___
 %  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
 %  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
 %  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
-%                                               
+%
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 

@@ -1,21 +1,21 @@
 function [trim_polytopes] = ...
     fcn_MapGen_polytopeCropEdges(polytopes,bounding_box,varargin)
-% fcn_MapGen_polytopeCropEdges removes polytopes that extend 
+% fcn_MapGen_polytopeCropEdges removes polytopes that extend
 % beyond the boundaries specified
 %
 % FORMAT:
-% 
+%
 % [trim_polytopes] = ...
 %     fcn_MapGen_polytopeCropEdges(polytopes,bounding_box,(fig_num))
 %
 % INPUTS:
 %
 %     polytopes: the original polytopes with the same fields as trim_polytopes
-% 
+%
 %     bounding_box: a 2 x 2 matrix of [xlow ylow; xhigh yhigh] in which all
 %     the polytopes must exist, e.g. the corner coordinates of the
 %     axis-aligned bounding box.
-%     
+%
 %    (OPTIONAL INPUTS)
 %
 %     fig_num: a figure number to plot results.
@@ -23,7 +23,7 @@ function [trim_polytopes] = ...
 %
 % OUTPUTS:
 %
-%     TRIM_POLYTOPES: a 1-by-n seven field structure of polytopes within the 
+%     TRIM_POLYTOPES: a 1-by-n seven field structure of polytopes within the
 %     boundaries, where n <= number of polytopes with fields:
 %     vertices: a m+1-by-2 matrix of xy points with row1 = rowm+1, where m is
 %     the number of the individual polytope vertices
@@ -34,9 +34,9 @@ function [trim_polytopes] = ...
 %     mean: centroid xy coordinate of the polytope
 %     area: area of the polytope
 %
-%   
+%
 % EXAMPLES:
-%      
+%
 %   polytopes = fcn_MapGen_haltonVoronoiTiling([1 1000]);
 %   fig = fcn_plot_polytopes(polytopes,[],'b',2,[0 1 0 1]);
 %
@@ -47,7 +47,7 @@ function [trim_polytopes] = ...
 % For additional examples, see: script_test_fcn_MapGen_polytopeCropEdges
 %
 % This function was written on 2019_06_13 by Seth Tau
-% Questions or comments? sat5340@psu.edu 
+% Questions or comments? sat5340@psu.edu
 %
 
 % REVISIONS
@@ -61,9 +61,28 @@ function [trim_polytopes] = ...
 % -- Vectorize the for loop if possible
 
 %% Debugging and Input checks
-flag_check_inputs = 1; % Set equal to 1 to check the input arguments
-flag_do_plot = 0;      % Set equal to 1 for plotting
-flag_do_debug = 0;     % Set equal to 1 for debugging
+% set an environment variable on your machine with the getenv function...
+% in the Matlab console.  Char array of '1' will be true and '0' will be false.
+flag_check_inputs = getenv('ENV_FLAG_CHECK_INPUTS');  % '1' will check input args
+flag_do_plot = getenv('ENV_FLAG_DO_PLOT'); % '1' will make plots
+flag_do_debug = getenv('ENV_FLAG_DO_DEBUG'); % '1' will enable debugging
+
+% if the char array has length 0, assume the env var isn't set and default to...
+% dipslaying more information rather than potentially hiding an issue
+if length(flag_check_inputs) = 0
+    flag_check_inputs = '1';
+end
+if length(flag_do_plot) = 0
+    flag_do_plot = '1';
+end
+if length(flag_do_debug) = 0
+    flag_do_debug = '1';
+end
+
+% convert flag from char string to logical
+flag_check_inputs = flag_check_inputs == '1';
+flag_do_plot = flag_do_plot == '1';
+flag_do_debug = flag_do_debug == '1';
 
 if flag_do_debug
     fig_for_debug = 9993;
@@ -83,23 +102,23 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
+
 if flag_check_inputs
     % Are there the right number of inputs?
     if nargin < 2 || nargin > 3
         error('Incorrect number of input arguments')
     end
-    
+
     % Check the polytopes input
     fcn_MapGen_checkInputsToFunctions(...
         polytopes, 'polytopes');
-    
+
     % Check the bounding_box input
     fcn_MapGen_checkInputsToFunctions(...
         bounding_box, '2column_of_numbers',2);
 
 end
-    
+
 
 % Does user want to show the plots?
 if  3== nargin
@@ -147,30 +166,30 @@ trim_polytopes = trim_polytopes(1:keep); % Save only the ones that were filled
 
 %% Plot results?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____       _                 
-%  |  __ \     | |                
-%  | |  | | ___| |__  _   _  __ _ 
+%   _____       _
+%  |  __ \     | |
+%  | |  | | ___| |__  _   _  __ _
 %  | |  | |/ _ \ '_ \| | | |/ _` |
 %  | |__| |  __/ |_) | |_| | (_| |
 %  |_____/ \___|_.__/ \__,_|\__, |
 %                            __/ |
-%                           |___/ 
+%                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if flag_do_plot
     figure(fig_num);
     hold on
-    
+
     % Plot the input polytopes in red
     fcn_MapGen_plotPolytopes(polytopes,fig_num,'r',2,[xlow xhigh ylow yhigh]);
-    
+
     % plot the tiled_polytopes in blue
     fcn_MapGen_plotPolytopes(trim_polytopes,fig_num,'b',2,[xlow xhigh ylow yhigh]);
 
 end
 
 if flag_do_debug
-    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file); 
+    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
 end
 
 

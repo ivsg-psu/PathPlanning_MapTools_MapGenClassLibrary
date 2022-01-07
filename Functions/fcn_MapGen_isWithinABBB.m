@@ -11,11 +11,11 @@ varargin...
 % AABB, returning a vector of 1' or 0's the same length as the nubmer of
 % rows of points. Each point must be strictly within the AABB - e.g. this
 % function returns "false" if a point is on the "wall" of the AABB.
-% 
-% 
-% 
+%
+%
+%
 % FORMAT:
-% 
+%
 %    [ ...
 %    isInside ...
 %    ] = ...
@@ -24,64 +24,83 @@ varargin...
 %    test_points, ...
 %    (fig_num) ...
 %    )
-% 
+%
 % INPUTS:
-% 
-%     AABB: the Axis-Aligned Bounding Box, defined in form of [xmin ymin 
+%
+%     AABB: the Axis-Aligned Bounding Box, defined in form of [xmin ymin
 %     xmax ymax]
-% 
-%     test_points: the test points to check, in form of [x y] where x and 
+%
+%     test_points: the test points to check, in form of [x y] where x and
 %     y are scalar or column vectors
-% 
+%
 %     (optional inputs)
 %
-%     fig_num: any number that acts somewhat like a figure number output. 
-%     If given, this forces the variable types to be displayed as output 
+%     fig_num: any number that acts somewhat like a figure number output.
+%     If given, this forces the variable types to be displayed as output
 %     and as well makes the input check process verbose.
-% 
-% 
+%
+%
 % OUTPUTS:
-% 
-%     isInside: a column of 1's or 0's, one for each test point, with 1 
+%
+%     isInside: a column of 1's or 0's, one for each test point, with 1
 %     meaning that the test point is within the AABB
-% 
-% 
+%
+%
 % DEPENDENCIES:
-% 
+%
 %     fcn_MapGen_checkInputsToFunctions
-% 
-% 
+%
+%
 % EXAMPLES:
-% 
+%
 % See the script: script_test_fcn_MapGen_isWithinABBB
 % for a full test suite.
-% 
+%
 % This function was written on 2021_07_11 by Sean Brennan
 % Questions or comments? contact sbrennan@psu.edu
 
-% 
+%
 % REVISION HISTORY:
-% 
+%
 % 2021_07_11 by Sean Brennan
 % -- first write of function
 % 2021_07_17 by Sean Brennan
 % -- clarified strictness of the AABB
 
-% 
+%
 % TO DO:
-% 
+%
 % -- fill in to-do items here.
 
 %% Debugging and Input checks
-flag_check_inputs = 1; % Set equal to 1 to check the input arguments 
-flag_do_plot = 0;      % Set equal to 1 for plotting 
-flag_do_debug = 0;     % Set equal to 1 for debugging 
+% set an environment variable on your machine with the getenv function...
+% in the Matlab console.  Char array of '1' will be true and '0' will be false.
+flag_check_inputs = getenv('ENV_FLAG_CHECK_INPUTS');  % '1' will check input args
+flag_do_plot = getenv('ENV_FLAG_DO_PLOT'); % '1' will make plots
+flag_do_debug = getenv('ENV_FLAG_DO_DEBUG'); % '1' will enable debugging
+
+% if the char array has length 0, assume the env var isn't set and default to...
+% dipslaying more information rather than potentially hiding an issue
+if length(flag_check_inputs) = 0
+    flag_check_inputs = '1';
+end
+if length(flag_do_plot) = 0
+    flag_do_plot = '1';
+end
+if length(flag_do_debug) = 0
+    flag_do_debug = '1';
+end
+
+% convert flag from char string to logical
+flag_check_inputs = flag_check_inputs == '1';
+flag_do_plot = flag_do_plot == '1';
+flag_do_debug = flag_do_debug == '1';
 
 if flag_do_debug
     fig_for_debug = 225;
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-end 
+end
 
 %% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -107,11 +126,11 @@ if 1 == flag_check_inputs
     % Check the AABB input, make sure it is '4column_of_numbers' type
     fcn_MapGen_checkInputsToFunctions(...
         AABB, '4column_of_numbers',1);
- 
+
     % Check the test_points input, make sure it is '2column_of_numbers' type
     fcn_MapGen_checkInputsToFunctions(...
         test_points, '2column_of_numbers');
- 
+
 end
 
 % Does user want to show the plots?
@@ -170,24 +189,24 @@ if flag_do_plot
     figure(fig_num);
     clf;
     hold on;
-    
+
     % Convert axis-aligned bounding box to wall format
     walls = [AABB(1,1) AABB(1,2); AABB(1,3) AABB(1,2); AABB(1,3) AABB(1,4); AABB(1,1) AABB(1,4); AABB(1,1) AABB(1,2)];
-    
+
     % Plot the walls
     plot(walls(:,1),walls(:,2),'k-');
-    
+
     % Plot the test_points
-    
+
     % plot(...
     %     [test_points(:,1); test_points(1,1)],...
     %     [test_points(:,2); test_points(1,2)],...
     %     '.-');
     plot(test_points(:,1), test_points(:,2),'k.');
-    
+
     % Plot the interior points with green
     plot(test_points(isInside,1),test_points(isInside,2),'go');
-    
+
 end % Ends the flag_do_plot if statement
 
 if flag_do_debug
@@ -199,13 +218,13 @@ end % Ends the function
 
 %% Functions follow
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   ______                _   _                 
-%  |  ____|              | | (_)                
-%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___ 
+%   ______                _   _
+%  |  ____|              | | (_)
+%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___
 %  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
 %  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
 %  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
-%                                               
+%
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
