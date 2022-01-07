@@ -92,6 +92,7 @@ varargin...
 
 return;
 
+%% Debugging and Input checks
 % set an environment variable on your machine with the getenv function...
 % in the Matlab console.  Char array of '1' will be true and '0' will be false.
 flag_check_inputs = getenv('ENV_FLAG_CHECK_INPUTS');  % '1' will check input args
