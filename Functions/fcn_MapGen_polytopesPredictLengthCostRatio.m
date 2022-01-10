@@ -134,9 +134,15 @@ function [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective
     % begin looping through polytopes in a field
     for j=1:length(tiled_polytopes)
         shrinker = tiled_polytopes(j);
-        [angles, unit_in_vectors, unit_out_vectors] =...
+        if flag_do_plot
+            [angles, unit_in_vectors, unit_out_vectors] =...
             fcn_MapGen_polytopeFindVertexAngles(...
             shrinker.vertices,fig_num);
+        else
+            [angles, unit_in_vectors, unit_out_vectors] =...
+            fcn_MapGen_polytopeFindVertexAngles(...
+            shrinker.vertices);
+        end
         assert(1000*eps>abs(360-sum(angles)*180/pi));
         vertices = shrinker.vertices;
         mean_vectors = (unit_out_vectors-unit_in_vectors)/2;

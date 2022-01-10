@@ -11,14 +11,14 @@ fig_num = 1;
 do_single_test = false;
 if do_single_test
     Halton_range = [1 20];
-    tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
+    tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1]);%,fig_num);
     % field_stats = fcn_MapGen_polytopesStatistics(tiled_polytopes);
     % gap_size = 0;
     % [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse] = fcn_MapGen_polytopesPredictLengthCostRatio(tiled_polytopes,gap_size)
     field_stats = fcn_MapGen_polytopesStatistics(tiled_polytopes);
     radii_goals = field_stats.average_max_radius*.40
     des_rad = radii_goals; sigma_radius = 0; min_rad = 0.001;
-    [shrunk_field,mu_final,sigma_final] = fcn_MapGen_polytopesShrinkToRadius(tiled_polytopes,des_rad,sigma_radius,min_rad,fig_num);
+    [shrunk_field,mu_final,sigma_final] = fcn_MapGen_polytopesShrinkToRadius(tiled_polytopes,des_rad,sigma_radius,min_rad);%,fig_num);
     field_stats = fcn_MapGen_polytopesStatistics(shrunk_field);
     gap_size = field_stats.average_gap_size_G_bar;
     r_D = field_stats.avg_r_D;
@@ -41,7 +41,7 @@ if do_range_test
     shrink_distance = [];
     for tiles=25:25:25%25:25:125%10:80:500
         Halton_range = [1 tiles]; % range of Halton points to use to generate the tiling
-        tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
+        tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1]);%,fig_num);
         title('Halton set');
         fig_num = fig_num+1;
         % find r_D for this field
@@ -64,7 +64,7 @@ if do_range_test
             radii_goals = field_stats.average_max_radius*size_percent;
              des_rad = radii_goals; sigma_radius = 0; min_rad = 0.001;
              % TODO switch this to side shrinking to get gap distance as an output so it can be given to predictor as input
-             [shrunk_field,mu_final,sigma_final] = fcn_MapGen_polytopesShrinkToRadius(tiled_polytopes,des_rad,sigma_radius,min_rad,fig_num);
+             [shrunk_field,mu_final,sigma_final] = fcn_MapGen_polytopesShrinkToRadius(tiled_polytopes,des_rad,sigma_radius,min_rad);%,fig_num);
              field_stats = fcn_MapGen_polytopesStatistics(shrunk_field);
              gap_size = field_stats.average_gap_size_G_bar;
              field_avg_r_D = field_stats.avg_r_D;
@@ -86,7 +86,7 @@ if do_range_test
     end
     for tiles=25:25:100%25:25:125%10:80:500
             Halton_range = [1 tiles]; % range of Halton points to use to generate the tiling
-            tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
+            tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1]);%,fig_num);
             title('Halton set');
             fig_num = fig_num+1;
             % find r_D for this field
@@ -109,7 +109,7 @@ if do_range_test
                 radii_goals = field_stats.average_max_radius*size_percent;
                 des_rad = radii_goals; sigma_radius = 0; min_rad = 0.001;
                 % TODO switch this to side shrinking to get gap distance as an output so it can be given to predictor as input
-                [shrunk_field,mu_final,sigma_final] = fcn_MapGen_polytopesShrinkToRadius(tiled_polytopes,des_rad,sigma_radius,min_rad,fig_num);
+                [shrunk_field,mu_final,sigma_final] = fcn_MapGen_polytopesShrinkToRadius(tiled_polytopes,des_rad,sigma_radius,min_rad);%,fig_num);
                 field_stats = fcn_MapGen_polytopesStatistics(shrunk_field);
                 gap_size = field_stats.average_gap_size_G_bar;
                 field_avg_r_D = field_stats.avg_r_D;
@@ -133,7 +133,7 @@ if do_range_test
     size_percent_failed = [];
     for tiles=25:75:500
             Halton_range = [1 tiles]; % range of Halton points to use to generate the tiling
-            tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
+            tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1]);%,fig_num);
             title('Halton set');
             fig_num = fig_num+1;
             % find r_D for this field
@@ -158,7 +158,7 @@ if do_range_test
     %             try
                 des_rad = radii_goals; sigma_radius = 0; min_rad = 0.001;
                 % TODO switch this to side shrinking to get gap distance as an output so it can be given to predictor as input
-                [shrunk_field,mu_final,sigma_final] = fcn_MapGen_polytopesShrinkToRadius(tiled_polytopes,des_rad,sigma_radius,min_rad,fig_num);
+                [shrunk_field,mu_final,sigma_final] = fcn_MapGen_polytopesShrinkToRadius(tiled_polytopes,des_rad,sigma_radius,min_rad);%,fig_num);
                 field_stats = fcn_MapGen_polytopesStatistics(shrunk_field);
                 gap_size = field_stats.average_gap_size_G_bar;
                 field_avg_r_D = field_stats.avg_r_D;
