@@ -1,10 +1,122 @@
-% fcn_MapGen_polytopesPredictLengthCostRatio
-
-% REVISION HISTORY:
-% 2021_10_22
-% -- first written by S. Harnett
-% TODO add outputs for chosen angle, chosen side length etc
 function [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse_worst,r_lc_sparse_average,r_lc_sparse_std] = fcn_MapGen_polytopesPredictLengthCostRatio(tiled_polytopes,gap_size)
+    % fcn_MapGen_polytopesPredictLengthCostRatio
+    % Given an polytope field, predict the length cost ratio from geometry
+    %
+    %
+    %
+    % FORMAT:
+    %
+    % [r_lc_max,r_lc_avg,r_lc_iterative,...
+    % r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,...
+    % r_lc_sparse_worst,r_lc_sparse_average,r_lc_sparse_std] = ...
+    % fcn_MapGen_polytopesPredictLengthCostRatio(tiled_polytopes,gap_size)
+    %
+    % INPUTS:
+    %
+    %     tiled_polytopes
+    %     gap_size
+    %
+    %
+    % OUTPUTS:
+    %
+    %     r_lc_max
+    %     r_lc_avg
+    %     r_lc_iterative
+    %     r_lc_max_effective
+    %     r_lc_avg_effective
+    %     r_lc_iterative_effective
+    %     r_lc_sparse_worst
+    %     r_lc_sparse_average
+    %     r_lc_sparse_std
+    %
+    % DEPENDENCIES:
+    %
+    %     fcn_MapGen_polytopeFindVertexAngles
+    %     fcn_MapGen_polytopesStatistics
+    %
+    % EXAMPLES:
+    %
+    % See the script: script_fcn_MapGen_polytopesPredictLengthCostRatio.m
+    % for a full test suite.
+    %
+    % Questions or comments? contact sjh6473@psu.edu
+
+    % REVISION HISTORY:
+    % 2021_10_22
+    % -- first written by Steve Harnett
+
+    % TODO add outputs for chosen angle, chosen side length etc
+
+    %% Debugging and Input checks
+
+    % set an environment variable on your machine with the getenv function...
+    % in the Matlab console.  Char array of '1' will be true and '0' will be false.
+    flag_check_inputs = getenv('ENV_FLAG_CHECK_INPUTS');  % '1' will check input args
+    flag_do_plot = getenv('ENV_FLAG_DO_PLOT'); % '1' will make plots
+    flag_do_debug = getenv('ENV_FLAG_DO_DEBUG'); % '1' will enable debugging
+
+    % if the char array has length 0, assume the env var isn't set and default to...
+    % dipslaying more information rather than potentially hiding an issue
+    if length(flag_check_inputs) == 0
+        flag_check_inputs = '1';
+    end
+    if length(flag_do_plot) == 0
+        flag_do_plot = '1';
+    end
+    if length(flag_do_debug) == 0
+        flag_do_debug = '1';
+    end
+
+    % convert flag from char string to logical
+    flag_check_inputs = flag_check_inputs == '1';
+    flag_do_plot = flag_do_plot == '1';
+    flag_do_debug = flag_do_debug == '1';
+
+    if flag_do_debug
+        fig_for_debug = 747;
+        fig_num = 2100;
+        st = dbstack; %#ok<*UNRCH>
+        fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+    end
+
+    %% check input arguments?
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %   _____                   _
+    %  |_   _|                 | |
+    %    | |  _ __  _ __  _   _| |_ ___
+    %    | | | '_ \| '_ \| | | | __/ __|
+    %   _| |_| | | | |_) | |_| | |_\__ \
+    %  |_____|_| |_| .__/ \__,_|\__|___/
+    %              | |
+    %              |_|
+    % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+    if 1 == flag_check_inputs
+
+        % Are there the right number of inputs?
+        if nargin < 2 || nargin > 2
+            error('Incorrect number of input arguments')
+        end
+
+        % Check the test_point input, make sure it is 'positive_1column_of_numbers' type, size 1
+        fcn_MapGen_checkInputsToFunctions(column_of_numbers_test, 'positive_1column_of_numbers',1);
+
+    end
+
+    %% Start of main code
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %   __  __       _
+    %  |  \/  |     (_)
+    %  | \  / | __ _ _ _ __
+    %  | |\/| |/ _` | | '_ \
+    %  | |  | | (_| | | | | |
+    %  |_|  |_|\__,_|_|_| |_|
+    %
+    %See: http://patorjk.com/software/taag/#p=display&f=Big&t=Main
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
+
     fig_num = 12;
     field_stats = fcn_MapGen_polytopesStatistics(tiled_polytopes);
     field_avg_r_D = field_stats.avg_r_D;
@@ -30,8 +142,10 @@ function [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective
         mean_vectors = (unit_out_vectors-unit_in_vectors)/2;
         length_mean_vectors = sum(mean_vectors.^2,2).^0.5;
         unit_direction_of_cut = mean_vectors./length_mean_vectors;
-        vertex_normal_plot = quiver(vertices(1:end-1,1),vertices(1:end-1,2),unit_direction_of_cut(:,1),unit_direction_of_cut(:,2),'g')
-        vertex_normal_vectors = [unit_direction_of_cut(:,1),unit_direction_of_cut(:,2)]
+        if flag_do_plot
+            vertex_normal_plot = quiver(vertices(1:end-1,1),vertices(1:end-1,2),unit_direction_of_cut(:,1),unit_direction_of_cut(:,2),'g');
+        end
+        vertex_normal_vectors = [unit_direction_of_cut(:,1),unit_direction_of_cut(:,2)];
         % vertex_normal_vectors = circshift(vertex_normal_vectors,1)
         side_vectors = zeros(length(vertices)-1,2);
         theta_normal_to_side = zeros(length(vertices)-1,1);
@@ -49,7 +163,7 @@ function [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective
         % end initialize path for iterative solution
         % begin looping through vertices
         for i=1:length(vertices)-1
-            angle_vertex_normal_to_travel_direction(i) = angle_between_vectors(vertex_normal_vectors(i,:),travel_direction);
+            angle_vertex_normal_to_travel_direction(i) = INTERNAL_angle_between_vectors(vertex_normal_vectors(i,:),travel_direction);
             vertex_is_away(i) = dot(vertex_normal_vectors(i,:),travel_direction);
             travel_direction_is_within_polytope(i) = angle_vertex_normal_to_travel_direction(i)<=(pi-angles(i))/2;
             % begin looping through away vertices
@@ -67,7 +181,7 @@ function [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective
                 away_angles(i) = pi-angles(i);
                 away_angle_vertex_normal_to_travel_direction(i) =  angle_vertex_normal_to_travel_direction(i);
             % for the chosen divergence angle, find the length of the side we turned towards
-                if is_left_turn_smaller(vertex_normal_vectors(i,:),travel_direction)
+                if INTERNAL_is_left_turn_smaller(vertex_normal_vectors(i,:),travel_direction)
                      side_length = shrinker.distances(i+1); % the vertex we're at has the side length to its left at the next index
                  else
                      side_length = shrinker.distances(i); % the vertex we're at has the side length associated with it on the right
@@ -77,7 +191,7 @@ function [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective
                 if vertices(i,:) == path(end,:)
                     iterative_chosen_side_lengths = [iterative_chosen_side_lengths, side_length];
                     iterative_small_choice_angles = [iterative_small_choice_angles, away_angles(i)./2-away_angle_vertex_normal_to_travel_direction(i)];
-                    if is_left_turn_smaller(vertex_normal_vectors(i,:),travel_direction)
+                    if INTERNAL_is_left_turn_smaller(vertex_normal_vectors(i,:),travel_direction)
                         try
                             next_location = vertices(i-1,:);
                         catch
@@ -93,9 +207,11 @@ function [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective
             end
             side_vectors(i,1) = vertices(i+1,1)-vertices(i,1);
             side_vectors(i,2) = vertices(i+1,2)-vertices(i,2);
-            theta_normal_to_side(i) = angle_between_vectors(side_vectors(i,:),vertex_normal_vectors(i,:));
-            side_vec_plot = quiver(vertices(i,1),vertices(i,2),vertices(i+1,1)-vertices(i,1),vertices(i+1,2)-vertices(i,2),'-b');
-            travel_vec_plot = quiver(vertices(i,1),vertices(i,2),travel_direction(1)*0.05,travel_direction(2)*0.05,'-m');
+            theta_normal_to_side(i) = INTERNAL_angle_between_vectors(side_vectors(i,:),vertex_normal_vectors(i,:));
+            if flag_do_plot
+                side_vec_plot = quiver(vertices(i,1),vertices(i,2),vertices(i+1,1)-vertices(i,1),vertices(i+1,2)-vertices(i,2),'-b');
+                travel_vec_plot = quiver(vertices(i,1),vertices(i,2),travel_direction(1)*0.05,travel_direction(2)*0.05,'-m');
+            end
         % end looping through vertices
         end
         % remove data for angles pointing towards travel direction
@@ -129,7 +245,7 @@ function [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective
         % side_vectors(i,2) = vertices(i+1,2)-vertices(i,2);
 
         % theta = arccos((x dot y)/(mag x * mag y))
-        % theta_normal_to_side(i) = angle_between_vectors(side_vectors(i,:),vertex_normal_vectors(i,:));
+        % theta_normal_to_side(i) = INTERNAL_angle_between_vectors(side_vectors(i,:),vertex_normal_vectors(i,:));
         % label large and small sizes
 %         size = max(max(vertices)) - min(min(vertices));
 %         nudge = size*0.01;
@@ -191,47 +307,61 @@ function [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective
     r_lc_sparse_average = linear_density_int*mean((s_divergence_heights.^2+(1/linear_density_int)^2).^0.5)/1;
     r_lc_sparse_std = linear_density_int*std((s_divergence_heights.^2+(1/linear_density_int)^2).^0.5)/1;
 
-    % end results generation
-    figure;
-    hold on;
-    histogram(field_big_choice_angles*180/pi,'BinWidth',2,'FaceColor','g','FaceAlpha',0.4)
-    histogram(field_small_choice_angles*180/pi,'BinWidth',2,'FaceColor','b','FaceAlpha',0.4)
-    legend('large, unchosen divergence angles','small, chosen divergence angles')
-    xlabel('interior angle [deg]')
-    ylabel('count')
-    title('Histogram of Divergence Angles')
-    figure;
-    hold on;
-    histogram(field_big_choice_angles*180/pi,'BinWidth',2,'FaceColor','g','FaceAlpha',0.4)
-    histogram(field_small_choice_angles*180/pi,'BinWidth',2,'FaceColor','b','FaceAlpha',0.4)
-    histogram(field_away_angles/2*180/pi,'BinWidth',2,'FaceColor','r','FaceAlpha',0.4)
-    legend('large, unchosen divergence angles','small, chosen divergence angles','all away facing polytope angles, halved')
-    xlabel('interior angle [deg]')
-    ylabel('count')
-    title('Histogram of Divergence Angles')
-    figure;
-    hold on;
-    histogram(field_big_choice_angles*180/pi,'BinWidth',2,'FaceColor','g','FaceAlpha',0.4)
-    histogram(field_small_choice_angles*180/pi,'BinWidth',2,'FaceColor','b','FaceAlpha',0.4)
-    histogram(field_away_angles/2*180/pi,'BinWidth',2,'FaceColor','r','FaceAlpha',0.4)
-    histogram(field_small_choice_angles_effective/2*180/pi,'BinWidth',2,'FaceColor','c','FaceAlpha',0.4)
-    legendstr = sprintf('effective chosen angle for gap size %.1f',gap_size);
-    legend('large, unchosen divergence angles','small, chosen divergence angles','all away facing polytope angles, halved',legendstr)
-    xlabel('interior angle [deg]')
-    ylabel('count')
-    title('Histogram of Divergence Angles')
-    figure;
-    hold on;
-    histogram(field_chosen_side_length,'BinWidth',2,'FaceColor','b','FaceAlpha',0.4)
-    histogram(field_chosen_side_length_effective,'BinWidth',2,'FaceColor','c','FaceAlpha',0.4)
-    legendstr_side = sprintf('effective chosen side length for gap size %.1f',gap_size);
-    legend('chosen side length', legendstr_side)
-    xlabel('side length [m]')
-    ylabel('count')
-    title('Histogram of Traveled Side Lengths')
+    if flag_do_plot
+        % end results generation
+        figure;
+        hold on;
+        histogram(field_big_choice_angles*180/pi,'BinWidth',2,'FaceColor','g','FaceAlpha',0.4)
+        histogram(field_small_choice_angles*180/pi,'BinWidth',2,'FaceColor','b','FaceAlpha',0.4)
+        legend('large, unchosen divergence angles','small, chosen divergence angles')
+        xlabel('interior angle [deg]')
+        ylabel('count')
+        title('Histogram of Divergence Angles')
+        figure;
+        hold on;
+        histogram(field_big_choice_angles*180/pi,'BinWidth',2,'FaceColor','g','FaceAlpha',0.4)
+        histogram(field_small_choice_angles*180/pi,'BinWidth',2,'FaceColor','b','FaceAlpha',0.4)
+        histogram(field_away_angles/2*180/pi,'BinWidth',2,'FaceColor','r','FaceAlpha',0.4)
+        legend('large, unchosen divergence angles','small, chosen divergence angles','all away facing polytope angles, halved')
+        xlabel('interior angle [deg]')
+        ylabel('count')
+        title('Histogram of Divergence Angles')
+        figure;
+        hold on;
+        histogram(field_big_choice_angles*180/pi,'BinWidth',2,'FaceColor','g','FaceAlpha',0.4)
+        histogram(field_small_choice_angles*180/pi,'BinWidth',2,'FaceColor','b','FaceAlpha',0.4)
+        histogram(field_away_angles/2*180/pi,'BinWidth',2,'FaceColor','r','FaceAlpha',0.4)
+        histogram(field_small_choice_angles_effective/2*180/pi,'BinWidth',2,'FaceColor','c','FaceAlpha',0.4)
+        legendstr = sprintf('effective chosen angle for gap size %.1f',gap_size);
+        legend('large, unchosen divergence angles','small, chosen divergence angles','all away facing polytope angles, halved',legendstr)
+        xlabel('interior angle [deg]')
+        ylabel('count')
+        title('Histogram of Divergence Angles')
+        figure;
+        hold on;
+        histogram(field_chosen_side_length,'BinWidth',2,'FaceColor','b','FaceAlpha',0.4)
+        histogram(field_chosen_side_length_effective,'BinWidth',2,'FaceColor','c','FaceAlpha',0.4)
+        legendstr_side = sprintf('effective chosen side length for gap size %.1f',gap_size);
+        legend('chosen side length', legendstr_side)
+        xlabel('side length [m]')
+        ylabel('count')
+        title('Histogram of Traveled Side Lengths')
+    end
 end
-% TODO make internal function
-function ang = angle_between_vectors(a,b)
+
+%% Functions follow
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   ______                _   _
+%  |  ____|              | | (_)
+%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___
+%  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
+%  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
+%  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
+%
+% See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
+
+function ang = INTERNAL_angle_between_vectors(a,b)
     % note this function returns [0,180] so is not directional (i.e. a
     % vector that is rotated 182 deg CCW will return a value of 178 CW
     % this doesn't matter as we expect all vertex normal vectors we care
@@ -242,8 +372,8 @@ function ang = angle_between_vectors(a,b)
         ang = ang;
     end
 end
-% TODO make internal function
-function left_turn_is_smaller = is_left_turn_smaller(vertex_normal,travel_direction)
+
+function left_turn_is_smaller = INTERNAL_is_left_turn_smaller(vertex_normal,travel_direction)
     cross_prod = cross([vertex_normal,0],[travel_direction,0]);
     left_turn_is_smaller = cross_prod(3)>0;
 end
