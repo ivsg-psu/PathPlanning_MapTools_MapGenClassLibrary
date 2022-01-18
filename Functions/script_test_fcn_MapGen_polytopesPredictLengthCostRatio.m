@@ -67,7 +67,7 @@ if do_range_test
             for sd_radius = 0:0.005:0.032
                 des_rad = radii_goals; sigma_radius = sd_radius; min_rad = 0.001;
                 % TODO switch this to side shrinking to get gap distance as an output so it can be given to predictor as input
-                [shrunk_field,mu_final,sigma_final] = fcn_MapGen_polytopesShrinkToRadius(tiled_polytopes,des_rad,sigma_radius,min_rad);%,fig_num);
+                [shrunk_field,mu_final,sigma_final] = fcn_MapGen_polytopesShrinkFromEdges(tiled_polytopes,des_rad,sigma_radius,min_rad);%,fig_num);
                 field_stats = fcn_MapGen_polytopesStatistics(shrunk_field);
                 gap_size = field_stats.average_gap_size_G_bar;
                 field_avg_r_D = field_stats.avg_r_D;
