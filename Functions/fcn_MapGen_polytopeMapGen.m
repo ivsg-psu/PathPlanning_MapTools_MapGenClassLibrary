@@ -8,7 +8,7 @@ function [map_polytopes,all_pts,mu_rad_final,sigma_rad_final] = ...
 % radius.
 %
 % FORMAT:
-%
+% 
 % [map_polytopes,all_pts,mu_rad_final,sigma_rad_final] = ...
 %     fcn_MapGen_polytopeMapGen(...
 %     halton_range,...
@@ -31,7 +31,7 @@ function [map_polytopes,all_pts,mu_rad_final,sigma_rad_final] = ...
 %    min_rad:
 %
 %    shrink_seed:
-%
+%     
 %    (OPTIONAL INPUTS)
 %
 %     fig_num: a figure number to plot results.
@@ -40,7 +40,7 @@ function [map_polytopes,all_pts,mu_rad_final,sigma_rad_final] = ...
 %
 %     map_polytopes: an N x 2 matrix representing the [x y] vector of starting
 %     points of the "walls", where N is # of wall segments
-%
+% 
 %     all_pts: an N x 2 matrix representing the [x y] vector of ending
 %     points of the "walls", where N is # of wall segments
 %
@@ -55,43 +55,24 @@ function [map_polytopes,all_pts,mu_rad_final,sigma_rad_final] = ...
 %      fcn_MapGen_polytopeCropEdges
 %      fcn_MapGen_polytopesShrinkToRadius
 %      fcn_MapGen_plotPolytopes
-%
+%   
 % EXAMPLES:
-%
+%      
 % See the script: script_test_fcn_MapGen_polytopeMapGen
 % for a full test suite.
 %
 % This function was written on 2020_06_06 by S. Brennan by editing
 % fcn_basic_polytope_map_generation written by S. Tau.
-% Questions or comments? sbrennan@psu.edu
+% Questions or comments? sbrennan@psu.edu 
 
 % REVISION HISTORY:
-% 2021_06_06
-% -- first written by S. Brennan.
+% 2021_06_06 
+% -- first written by S. Brennan. 
 
 %% Debugging and Input checks
-% set an environment variable on your machine with the getenv function...
-% in the Matlab console.  Char array of '1' will be true and '0' will be false.
-flag_check_inputs = getenv('ENV_FLAG_CHECK_INPUTS');  % '1' will check input args
-flag_do_plot = getenv('ENV_FLAG_DO_PLOT'); % '1' will make plots
-flag_do_debug = getenv('ENV_FLAG_DO_DEBUG'); % '1' will enable debugging
-
-% if the char array has length 0, assume the env var isn't set and default to...
-% dipslaying more information rather than potentially hiding an issue
-if length(flag_check_inputs) = 0
-    flag_check_inputs = '1';
-end
-if length(flag_do_plot) = 0
-    flag_do_plot = '1';
-end
-if length(flag_do_debug) = 0
-    flag_do_debug = '1';
-end
-
-% convert flag from char string to logical
-flag_check_inputs = flag_check_inputs == '1';
-flag_do_plot = flag_do_plot == '1';
-flag_do_debug = flag_do_debug == '1';
+flag_check_inputs = 1; % Set equal to 1 to check the input arguments
+flag_do_plot = 0;      % Set equal to 1 for plotting
+flag_do_debug = 0;     % Set equal to 1 for debugging
 
 if flag_do_debug
     fig_for_debug = 9993;
@@ -111,23 +92,23 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+    
 if flag_check_inputs
     % Are there the right number of inputs?
     if nargin < 6 || nargin > 7
         error('Incorrect number of input arguments')
     end
-
+    
     % Check the halton_range input
     fcn_MapGen_checkInputsToFunctions(...
         halton_range, '2column_of_integers');
-
+    
     % Check the bounding_box input
     fcn_MapGen_checkInputsToFunctions(...
         bounding_box, '2column_of_numbers',2);
 
 end
-
+    
 
 % Does user want to show the plots?
 if 7 == nargin
@@ -153,11 +134,11 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % generate Voronoi tiling from Halton points
-tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(halton_range);
+tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(halton_range); 
 
 % remove the edge polytopes that extend past the high and low points
 trimmed_polytopes = ...
-    fcn_MapGen_polytopeCropEdges(tiled_polytopes,bounding_box);
+    fcn_MapGen_polytopeCropEdges(tiled_polytopes,bounding_box); 
 
 % shink the polytopes so that they are no longer tiled
 rng(shrink_seed) % set the random number generator with the shrink seed
@@ -180,20 +161,20 @@ all_pts = [[map_polytopes.xv];[map_polytopes.yv];1:point_tot;obs_id;beg_end]'; %
 
 %% Plot results?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____       _
-%  |  __ \     | |
-%  | |  | | ___| |__  _   _  __ _
+%   _____       _                 
+%  |  __ \     | |                
+%  | |  | | ___| |__  _   _  __ _ 
 %  | |  | |/ _ \ '_ \| | | |/ _` |
 %  | |__| |  __/ |_) | |_| | (_| |
 %  |_____/ \___|_.__/ \__,_|\__, |
 %                            __/ |
-%                           |___/
+%                           |___/ 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if flag_do_plot
     figure(fig_num);
     hold on
-
+    
     % plot the tiled_polytopes
     fcn_MapGen_plotPolytopes(tiled_polytopes,fig_num,'b',2,[0 1 0 1]);
 
@@ -206,7 +187,7 @@ if flag_do_plot
 end
 
 if flag_do_debug
-    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
+    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file); 
 end
 
 
