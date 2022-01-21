@@ -111,6 +111,7 @@ else
     if flag_do_debug
         fig_for_debug = 1584;
         flag_do_plot = 1;
+        fig_num = 1684;
     end
 end
 
