@@ -29,6 +29,7 @@ do_range_test = true;
 if do_range_test
     % begin r_D range generation
     r_D = [];
+    r_D_theoretical = [];
     r_lc_max_all = [];
     r_lc_avg_all = [];
     r_lc_iterative_all = [];
@@ -43,70 +44,85 @@ if do_range_test
     size_percent_failed = [];
     for tiles=100%25:25:25%25:25:125%10:80:500
         Halton_range = [1 tiles]; % range of Halton points to use to generate the tiling
-        tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1]);%,fig_num);
-        title('Halton set');
-        fig_num = fig_num+1;
-        % find r_D for this field
-        field_stats = fcn_MapGen_polytopesStatistics(tiled_polytopes);
-        field_avg_r_D = field_stats.avg_r_D;
-        r_D = [r_D, field_avg_r_D];
-        gap_size = 0;
-        [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse_worst,r_lc_sparse_average,r_lc_sparse_std] = fcn_MapGen_polytopesPredictLengthCostRatio(tiled_polytopes,gap_size)
-        r_lc_max_all = [r_lc_max_all, r_lc_max];
-        r_lc_max_effective_all = [r_lc_max_effective_all, r_lc_max_effective];
-        r_lc_avg_all = [r_lc_avg_all, r_lc_avg];
-        r_lc_avg_effective_all = [r_lc_avg_effective_all, r_lc_avg_effective];
-        r_lc_iterative_all = [r_lc_iterative_all, r_lc_iterative];
-        r_lc_iterative_effective_all = [r_lc_iterative_effective_all, r_lc_iterative_effective];
-        r_lc_sparse_worst_all = [r_lc_sparse_worst_all, r_lc_sparse_worst];
-        r_lc_sparse_average_all = [r_lc_sparse_average_all, r_lc_sparse_average];
-        r_lc_sparse_std_all = [r_lc_sparse_std_all, r_lc_sparse_std];
-        shrink_distance = [shrink_distance, 0];
+        % tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1]);%,fig_num);
+        % title('Halton set');
+        % fig_num = fig_num+1;
+        % % find r_D for this field
+        % field_stats = fcn_MapGen_polytopesStatistics(tiled_polytopes);
+        % field_avg_r_D = field_stats.avg_r_D;
+        % r_D = [r_D, field_avg_r_D];
+        % gap_size = 0;
+        % [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse_worst,r_lc_sparse_average,r_lc_sparse_std] = fcn_MapGen_polytopesPredictLengthCostRatio(tiled_polytopes,gap_size)
+        % r_lc_max_all = [r_lc_max_all, r_lc_max];
+        % r_lc_max_effective_all = [r_lc_max_effective_all, r_lc_max_effective];
+        % r_lc_avg_all = [r_lc_avg_all, r_lc_avg];
+        % r_lc_avg_effective_all = [r_lc_avg_effective_all, r_lc_avg_effective];
+        % r_lc_iterative_all = [r_lc_iterative_all, r_lc_iterative];
+        % r_lc_iterative_effective_all = [r_lc_iterative_effective_all, r_lc_iterative_effective];
+        % r_lc_sparse_worst_all = [r_lc_sparse_worst_all, r_lc_sparse_worst];
+        % r_lc_sparse_average_all = [r_lc_sparse_average_all, r_lc_sparse_average];
+        % r_lc_sparse_std_all = [r_lc_sparse_std_all, r_lc_sparse_std];
+        % shrink_distance = [shrink_distance, 0];
         % for radii_goals=0.25%0.02:0.02:0.1%0.001:0.010:0.1
         sd_radius_values = [0, 0.01, 0.02, 0.04, 0.08, 0.16, 0.32];
         for sd_radius_index = 1:1:length(sd_radius_values)
             sd_radius = sd_radius_values(sd_radius_index);
             for radii_goals = 0.001:0.005:0.081
-                des_rad = radii_goals; sigma_radius = sd_radius; min_rad = 0.001;
-                % TODO switch this to side shrinking to get gap distance as an output so it can be given to predictor as input
-                [shrunk_field,mu_final,sigma_final] = fcn_MapGen_polytopesShrinkToRadius(tiled_polytopes,des_rad,sigma_radius,min_rad);%,fig_num);
-                field_stats = fcn_MapGen_polytopesStatistics(shrunk_field);
-                gap_size = field_stats.average_gap_size_G_bar;
-                field_avg_r_D = field_stats.avg_r_D;
-                % avg_max_rad = field_stats.average_max_radius;
-                shrink_distance = [shrink_distance, gap_size];%avg_max_rad-des_rad];
-                try
-                   [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse_worst,r_lc_sparse_average,r_lc_sparse_std] = fcn_MapGen_polytopesPredictLengthCostRatio(shrunk_field,gap_size)
-                catch
-                    tiles_failed = [tiles_failed, tiles];
-                    size_percent_failed = [size_percent_failed, size_percent];
+                % record multiple points at each departure ratio by generating
+                % several maps for this halton tiling and radius
+                r_lc_sparse_worst_this_map = [];
+                r_lc_sparse_average_this_map = [];
+                r_lc_sparse_std_this_map = [];
+                for i = 1:1:5
+                    tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1]);%,fig_num);
+                    des_rad = radii_goals; sigma_radius = sd_radius; min_rad = 0.001;
+                    % TODO switch this to side shrinking to get gap distance as an output so it can be given to predictor as input
+                    [shrunk_field,mu_final,sigma_final] = fcn_MapGen_polytopesShrinkToRadius(tiled_polytopes,des_rad,sigma_radius,min_rad);%,fig_num);
+                    field_stats = fcn_MapGen_polytopesStatistics(shrunk_field);
+                    gap_size = field_stats.average_gap_size_G_bar;
+                    field_avg_r_D = field_stats.avg_r_D;
+                    % avg_max_rad = field_stats.average_max_radius;
+                    shrink_distance = [shrink_distance, gap_size];%avg_max_rad-des_rad];
+                    try
+                       [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse_worst,r_lc_sparse_average,r_lc_sparse_std] = fcn_MapGen_polytopesPredictLengthCostRatio(shrunk_field,gap_size)
+                    catch
+                        tiles_failed = [tiles_failed, tiles];
+                        size_percent_failed = [size_percent_failed, size_percent];
+                    end
+                    % r_lc_max_all = [r_lc_max_all, r_lc_max];
+                    % r_lc_max_effective_all = [r_lc_max_effective_all, r_lc_max_effective];
+                    % r_lc_avg_all = [r_lc_avg_all, r_lc_avg];
+                    % r_lc_avg_effective_all = [r_lc_avg_effective_all, r_lc_avg_effective];
+                    % r_lc_iterative_all = [r_lc_iterative_all, r_lc_iterative];
+                    % r_lc_iterative_effective_all = [r_lc_iterative_effective_all, r_lc_iterative_effective];
+                    r_lc_sparse_worst_this_map = [r_lc_sparse_worst_this_map; r_lc_sparse_worst];
+                    r_lc_sparse_average_this_map = [r_lc_sparse_average_this_map; r_lc_sparse_average];
+                    r_lc_sparse_std_this_map = [r_lc_sparse_std_this_map; r_lc_sparse_std];
+                    r_D = [r_D, field_avg_r_D];
                 end
-%                 r_lc_max_all = [r_lc_max_all, r_lc_max];
-%                 r_lc_max_effective_all = [r_lc_max_effective_all, r_lc_max_effective];
-%                 r_lc_avg_all = [r_lc_avg_all, r_lc_avg];
-%                 r_lc_avg_effective_all = [r_lc_avg_effective_all, r_lc_avg_effective];
-%                 r_lc_iterative_all = [r_lc_iterative_all, r_lc_iterative];
-%                 r_lc_iterative_effective_all = [r_lc_iterative_effective_all, r_lc_iterative_effective];
+                r_lc_sparse_worst = mean(r_lc_sparse_worst_this_map);
+                r_lc_sparse_average = mean(r_lc_sparse_average_this_map);
+                r_lc_sparse_std = mean(r_lc_sparse_std_this_map);
                 r_lc_sparse_worst_all = [r_lc_sparse_worst_all, r_lc_sparse_worst];
                 r_lc_sparse_average_all = [r_lc_sparse_average_all, r_lc_sparse_average];
                 r_lc_sparse_std_all = [r_lc_sparse_std_all, r_lc_sparse_std];
-                r_D = [r_D, field_avg_r_D];
+                r_D_theoretical = [r_D_theoretical, sqrt(tiles)*des_rad];
             end
-            figure(3)
+            figure(609)
             hold on
             try
-%                 plot(r_D,r_lc_max_all,'ro')
-%                 plot(r_D,r_lc_avg_all,'bo')
-%                 plot(r_D,r_lc_iterative_all,'go')
-%                 plot(r_D,r_lc_max_effective_all,'rx')
-%                 plot(r_D,r_lc_avg_effective_all,'bx')
-%                 plot(r_D,r_lc_iterative_effective_all,'gx')
-                plot(r_D,r_lc_sparse_worst_all,'md')
+                % plot(r_D,r_lc_max_all,'ro')
+                % plot(r_D,r_lc_avg_all,'bo')
+                % plot(r_D,r_lc_iterative_all,'go')
+                % plot(r_D,r_lc_max_effective_all,'rx')
+                % plot(r_D,r_lc_avg_effective_all,'bx')
+                % plot(r_D,r_lc_iterative_effective_all,'gx')
+                plot(r_D_theoretical,r_lc_sparse_worst_all,'md')
                 % plot(r_D,r_lc_sparse_average_all,'cd')
                 % positive and negative errorbars
                 % errorbar(r_D,r_lc_sparse_average_all,2*r_lc_sparse_std_all,'cd')
                 % positive only errorbars
-                errorbar(r_D,r_lc_sparse_average_all,zeros(1,length(r_lc_sparse_average_all)),2*r_lc_sparse_std_all,zeros(1,length(r_lc_sparse_average_all)),zeros(1,length(r_lc_sparse_average_all)),'cd')
+                errorbar(r_D_theoretical,r_lc_sparse_average_all,zeros(1,length(r_lc_sparse_average_all)),2*r_lc_sparse_std_all,zeros(1,length(r_lc_sparse_average_all)),zeros(1,length(r_lc_sparse_average_all)),'cd')
             end
             r_lc_sparse_worst_all = [];
             r_lc_sparse_average_all = [];
@@ -116,7 +132,7 @@ if do_range_test
     end
    fprintf('Obstacle fields that could not be predicted:\n')
    fprintf('Num. tiles | Size percent\n')
-   fprintf('%d        | %d\n',tiles_failed,size_percent_failed)
+   fprintf('%d         | %d\n',tiles_failed,size_percent_failed)
 end
 plot_flag = true;
 if plot_flag
