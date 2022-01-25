@@ -41,7 +41,11 @@ if do_range_test
     r_lc_sparse_std_all= [];
     shrink_distance = [];
     tiles_failed = [];
+    N_int_from_density_all = [];
+    N_int_from_shrink_dist_all = [];
     size_percent_failed = [];
+    shrunk_distances = [];
+    linear_unocc = [];
     for tiles=100%25:25:25%25:25:125%10:80:500
         Halton_range = [1 tiles]; % range of Halton points to use to generate the tiling
         % tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1]);%,fig_num);
@@ -73,7 +77,7 @@ if do_range_test
                 r_lc_sparse_worst_this_map = [];
                 r_lc_sparse_average_this_map = [];
                 r_lc_sparse_std_this_map = [];
-                for i = 1:1:5
+                for i = 1:1:1
                     tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1]);%,fig_num);
                     des_rad = radii_goals; sigma_radius = sd_radius; min_rad = 0.001;
                     % TODO switch this to side shrinking to get gap distance as an output so it can be given to predictor as input
@@ -81,6 +85,8 @@ if do_range_test
                     field_stats = fcn_MapGen_polytopesStatistics(shrunk_field);
                     gap_size = field_stats.average_gap_size_G_bar;
                     field_avg_r_D = field_stats.avg_r_D;
+                    field_stats_pre_shrink = fcn_MapGen_polytopesStatistics(tiled_polytopes);
+                    field_avg_r_D_pre_shrink = field_stats_pre_shrink.avg_r_D;
                     % avg_max_rad = field_stats.average_max_radius;
                     shrink_distance = [shrink_distance, gap_size];%avg_max_rad-des_rad];
                     try
@@ -95,10 +101,17 @@ if do_range_test
                     % r_lc_avg_effective_all = [r_lc_avg_effective_all, r_lc_avg_effective];
                     % r_lc_iterative_all = [r_lc_iterative_all, r_lc_iterative];
                     % r_lc_iterative_effective_all = [r_lc_iterative_effective_all, r_lc_iterative_effective];
-                    r_lc_sparse_worst_this_map = [r_lc_sparse_worst_this_map; r_lc_sparse_worst];
-                    r_lc_sparse_average_this_map = [r_lc_sparse_average_this_map; r_lc_sparse_average];
-                    r_lc_sparse_std_this_map = [r_lc_sparse_std_this_map; r_lc_sparse_std];
+                    r_lc_sparse_worst_this_map = [r_lc_sparse_worst_this_map, r_lc_sparse_worst];
+                    r_lc_sparse_average_this_map = [r_lc_sparse_average_this_map, r_lc_sparse_average];
+                    r_lc_sparse_std_this_map = [r_lc_sparse_std_this_map, r_lc_sparse_std];
                     r_D = [r_D, field_avg_r_D];
+                    N_int_from_density = field_stats.linear_density;
+                    N_int_from_density_all = [N_int_from_density_all, N_int_from_density];
+                    linear_unocc = [linear_unocc, sqrt(field_stats.unoccupancy_ratio)];
+                    shrunk_distance = field_avg_r_D_pre_shrink - field_avg_r_D;
+                    shrunk_distances = [shrunk_distances, shrunk_distance];
+                    N_int_from_shrink_dist = (sqrt(field_stats.unoccupancy_ratio)*1)/(2*shrunk_distance);
+                    N_int_from_shrink_dist_all = [N_int_from_shrink_dist_all, N_int_from_shrink_dist];
                 end
                 r_lc_sparse_worst = mean(r_lc_sparse_worst_this_map);
                 r_lc_sparse_average = mean(r_lc_sparse_average_this_map);
@@ -108,34 +121,31 @@ if do_range_test
                 r_lc_sparse_std_all = [r_lc_sparse_std_all, r_lc_sparse_std];
                 r_D_theoretical = [r_D_theoretical, sqrt(tiles)*des_rad];
             end
-            figure(609)
-            hold on
-            try
-                % plot(r_D,r_lc_max_all,'ro')
-                % plot(r_D,r_lc_avg_all,'bo')
-                % plot(r_D,r_lc_iterative_all,'go')
-                % plot(r_D,r_lc_max_effective_all,'rx')
-                % plot(r_D,r_lc_avg_effective_all,'bx')
-                % plot(r_D,r_lc_iterative_effective_all,'gx')
-                plot(r_D_theoretical,r_lc_sparse_worst_all,'md')
-                % plot(r_D,r_lc_sparse_average_all,'cd')
-                % positive and negative errorbars
-                % errorbar(r_D,r_lc_sparse_average_all,2*r_lc_sparse_std_all,'cd')
-                % positive only errorbars
-                errorbar(r_D_theoretical,r_lc_sparse_average_all,zeros(1,length(r_lc_sparse_average_all)),2*r_lc_sparse_std_all,zeros(1,length(r_lc_sparse_average_all)),zeros(1,length(r_lc_sparse_average_all)),'cd')
-            end
-            r_lc_sparse_worst_all = [];
-            r_lc_sparse_average_all = [];
-            r_lc_sparse_std_all = [];
-            r_D = [];
+
+%             r_lc_sparse_worst_all = [];
+%             r_lc_sparse_average_all = [];
+%             r_lc_sparse_std_all = [];
+%             r_D = [];
         end
     end
    fprintf('Obstacle fields that could not be predicted:\n')
    fprintf('Num. tiles | Size percent\n')
    fprintf('%d         | %d\n',tiles_failed,size_percent_failed)
 end
-plot_flag = true;
-if plot_flag
+plot_flag = true; if plot_flag
+    figure(607)
+    hold on;
+    plot(r_D, N_int_from_density_all, 'bo');
+    plot(r_D, N_int_from_shrink_dist_all, 'ro');
+    title('Estimated Number of Encountered Obstalces')
+    legend('estimated from linear point density','estimated from occupancy ratio')
+    xlabel('Mapped Departure Ratio [r_D]')
+    ylabel('Estiamted number of encountered obstacles [N_{int}]')
+    figure(606)
+    hold on;
+    plot(r_D, linear_unocc, 'bo');
+    plot(r_D, shrunk_distances, 'ro');
+    legend('linear unocc','shrunk distances')
     figure(608)
     plot(r_D,'ko')
     title('r_D distribution')
@@ -144,6 +154,20 @@ if plot_flag
     xlabel('r_D from average radius')
     ylabel('r_{LC} from side length and vertex angle')
     hold on
+    try
+        % plot(r_D,r_lc_max_all,'ro')
+        % plot(r_D,r_lc_avg_all,'bo')
+        % plot(r_D,r_lc_iterative_all,'go')
+        % plot(r_D,r_lc_max_effective_all,'rx')
+        % plot(r_D,r_lc_avg_effective_all,'bx')
+        % plot(r_D,r_lc_iterative_effective_all,'gx')
+        plot(r_D_theoretical,r_lc_sparse_worst_all,'md')
+        % plot(r_D,r_lc_sparse_average_all,'cd')
+        % positive and negative errorbars
+        % errorbar(r_D,r_lc_sparse_average_all,2*r_lc_sparse_std_all,'cd')
+        % positive only errorbars
+        errorbar(r_D_theoretical,r_lc_sparse_average_all,zeros(1,length(r_lc_sparse_average_all)),2*r_lc_sparse_std_all,zeros(1,length(r_lc_sparse_average_all)),zeros(1,length(r_lc_sparse_average_all)),'cd')
+    end
 %     x1 = linspace(0,0.65,300);
 %     x2=linspace(0.65,.78,100);
 %     k1 = 0.4124*x1+41.91*x1.^2;
