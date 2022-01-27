@@ -38,7 +38,10 @@ if do_range_test
     r_lc_iterative_effective_all = [];
     r_lc_sparse_worst_all = [];
     r_lc_sparse_average_all = [];
-    r_lc_sparse_std_all= [];
+    r_lc_sparse_std_all = [];
+    r_lc_sparse_worst_all_new = [];
+    r_lc_sparse_average_all_new = [];
+    r_lc_sparse_std_all_new = [];
     shrink_distance = [];
     tiles_failed = [];
     N_int_from_density_all = [];
@@ -77,6 +80,9 @@ if do_range_test
                 r_lc_sparse_worst_this_map = [];
                 r_lc_sparse_average_this_map = [];
                 r_lc_sparse_std_this_map = [];
+                r_lc_sparse_worst_this_map_new = [];
+                r_lc_sparse_average_this_map_new = [];
+                r_lc_sparse_std_this_map_new = [];
                 for i = 1:1:1
                     tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1]);%,fig_num);
                     des_rad = radii_goals; sigma_radius = sd_radius; min_rad = 0.001;
@@ -88,9 +94,9 @@ if do_range_test
                     field_stats_pre_shrink = fcn_MapGen_polytopesStatistics(tiled_polytopes);
                     field_avg_r_D_pre_shrink = field_stats_pre_shrink.avg_r_D;
                     % avg_max_rad = field_stats.average_max_radius;
-                    shrink_distance = [shrink_distance, gap_size];%avg_max_rad-des_rad];
+                    shrunk_distance = field_avg_r_D_pre_shrink - field_avg_r_D;
                     try
-                       [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse_worst,r_lc_sparse_average,r_lc_sparse_std] = fcn_MapGen_polytopesPredictLengthCostRatio(shrunk_field,gap_size)
+                       [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse_worst,r_lc_sparse_average,r_lc_sparse_std,r_lc_sparse_worst_new,r_lc_sparse_average_new,r_lc_sparse_std_new] = fcn_MapGen_polytopesPredictLengthCostRatio(shrunk_field,gap_size,shrunk_distance)
                     catch
                         tiles_failed = [tiles_failed, tiles];
                         size_percent_failed = [size_percent_failed, size_percent];
@@ -104,11 +110,13 @@ if do_range_test
                     r_lc_sparse_worst_this_map = [r_lc_sparse_worst_this_map, r_lc_sparse_worst];
                     r_lc_sparse_average_this_map = [r_lc_sparse_average_this_map, r_lc_sparse_average];
                     r_lc_sparse_std_this_map = [r_lc_sparse_std_this_map, r_lc_sparse_std];
+                    r_lc_sparse_worst_this_map_new = [r_lc_sparse_worst_this_map_new, r_lc_sparse_worst_new];
+                    r_lc_sparse_average_this_map_new = [r_lc_sparse_average_this_map_new, r_lc_sparse_average_new];
+                    r_lc_sparse_std_this_map_new = [r_lc_sparse_std_this_map_new, r_lc_sparse_std_new];
                     r_D = [r_D, field_avg_r_D];
                     N_int_from_density = field_stats.linear_density;
                     N_int_from_density_all = [N_int_from_density_all, N_int_from_density];
                     linear_unocc = [linear_unocc, sqrt(field_stats.unoccupancy_ratio)];
-                    shrunk_distance = field_avg_r_D_pre_shrink - field_avg_r_D;
                     shrunk_distances = [shrunk_distances, shrunk_distance];
                     N_int_from_shrink_dist = (sqrt(field_stats.unoccupancy_ratio)*1)/(2*shrunk_distance);
                     N_int_from_shrink_dist_all = [N_int_from_shrink_dist_all, N_int_from_shrink_dist];
@@ -116,9 +124,15 @@ if do_range_test
                 r_lc_sparse_worst = mean(r_lc_sparse_worst_this_map);
                 r_lc_sparse_average = mean(r_lc_sparse_average_this_map);
                 r_lc_sparse_std = mean(r_lc_sparse_std_this_map);
+                r_lc_sparse_worst_new = mean(r_lc_sparse_worst_this_map_new);
+                r_lc_sparse_average_new = mean(r_lc_sparse_average_this_map_new);
+                r_lc_sparse_std_new = mean(r_lc_sparse_std_this_map_new);
                 r_lc_sparse_worst_all = [r_lc_sparse_worst_all, r_lc_sparse_worst];
                 r_lc_sparse_average_all = [r_lc_sparse_average_all, r_lc_sparse_average];
                 r_lc_sparse_std_all = [r_lc_sparse_std_all, r_lc_sparse_std];
+                r_lc_sparse_worst_all_new = [r_lc_sparse_worst_all_new, r_lc_sparse_worst_new];
+                r_lc_sparse_average_all_new = [r_lc_sparse_average_all_new, r_lc_sparse_average_new];
+                r_lc_sparse_std_all_new = [r_lc_sparse_std_all_new, r_lc_sparse_std_new];
                 r_D_theoretical = [r_D_theoretical, sqrt(tiles)*des_rad];
             end
 
@@ -149,7 +163,7 @@ plot_flag = true; if plot_flag
     figure(608)
     plot(r_D,'ko')
     title('r_D distribution')
-    figure(609)
+    figure(1)
     title('r_D versus r_{LC}')
     xlabel('r_D from average radius')
     ylabel('r_{LC} from side length and vertex angle')
@@ -162,11 +176,13 @@ plot_flag = true; if plot_flag
         % plot(r_D,r_lc_avg_effective_all,'bx')
         % plot(r_D,r_lc_iterative_effective_all,'gx')
         plot(r_D_theoretical,r_lc_sparse_worst_all,'md')
+        plot(r_D_theoretical,r_lc_sparse_worst_all_new,'gd')
         % plot(r_D,r_lc_sparse_average_all,'cd')
         % positive and negative errorbars
         % errorbar(r_D,r_lc_sparse_average_all,2*r_lc_sparse_std_all,'cd')
         % positive only errorbars
         errorbar(r_D_theoretical,r_lc_sparse_average_all,zeros(1,length(r_lc_sparse_average_all)),2*r_lc_sparse_std_all,zeros(1,length(r_lc_sparse_average_all)),zeros(1,length(r_lc_sparse_average_all)),'cd')
+        errorbar(r_D_theoretical,r_lc_sparse_average_all_new,zeros(1,length(r_lc_sparse_average_all_new)),2*r_lc_sparse_std_all_new,zeros(1,length(r_lc_sparse_average_all_new)),zeros(1,length(r_lc_sparse_average_all_new)),'bd')
     end
 %     x1 = linspace(0,0.65,300);
 %     x2=linspace(0.65,.78,100);
