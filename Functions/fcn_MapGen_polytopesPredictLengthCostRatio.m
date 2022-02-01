@@ -1,4 +1,4 @@
-function [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse_worst,r_lc_sparse_average,r_lc_sparse_std,r_lc_sparse_worst_new,r_lc_sparse_average_new,r_lc_sparse_std_new] = fcn_MapGen_polytopesPredictLengthCostRatio(tiled_polytopes,gap_size,shrunk_distance)
+function [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse_worst,r_lc_sparse_average,r_lc_sparse_std,r_lc_sparse_worst_new,r_lc_sparse_average_new,r_lc_sparse_std_new,r_lc_sparse_worst_actual,r_lc_sparse_average_actual,r_lc_sparse_std_actual] = fcn_MapGen_polytopesPredictLengthCostRatio(tiled_polytopes,gap_size,shrunk_distance,shrink_ang) % TODO(@sjharnett) put outputs into struct
     % fcn_MapGen_polytopesPredictLengthCostRatio
     % Given an polytope field, predict the length cost ratio from geometry
     %
@@ -306,10 +306,12 @@ function [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective
     divergence_heights = rounded_side_and_ang(:,1).*sin(rounded_side_and_ang(:,2));
     linear_density = field_stats.linear_density;
     linear_density_int = round(linear_density,0);
-    N_int_from_shrink_dist = (sqrt(field_stats.unoccupancy_ratio)*1)/(2*shrunk_distance);
+    N_int_from_shrink_dist = (sqrt(field_stats.unoccupancy_ratio)*1)/(2*shrunk_distance*sind(shrink_ang/2));
+    N_int_actual = field_stats.linear_density_mean;
     s_divergence_heights = sort(divergence_heights);
     worst_divergence_heights = s_divergence_heights(end-linear_density_int+1:end);
     worst_divergence_heights_new = s_divergence_heights(end-N_int_from_shrink_dist+1:end);
+    worst_divergence_heights_actual = s_divergence_heights(end-N_int_actual+1:end);
     % TODO @sjharnett change /1 to be over L_P
     r_lc_sparse_worst = sum((worst_divergence_heights.^2+(1/linear_density_int)^2).^0.5)/1;
     r_lc_sparse_average = linear_density_int*mean((s_divergence_heights.^2+(1/linear_density_int)^2).^0.5)/1;
@@ -317,6 +319,9 @@ function [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective
     r_lc_sparse_worst_new = sum((worst_divergence_heights_new.^2+(1/N_int_from_shrink_dist)^2).^0.5)/1;
     r_lc_sparse_average_new = N_int_from_shrink_dist*mean((s_divergence_heights.^2+(1/N_int_from_shrink_dist)^2).^0.5)/1;
     r_lc_sparse_std_new = N_int_from_shrink_dist*std((s_divergence_heights.^2+(1/N_int_from_shrink_dist)^2).^0.5)/1;
+    r_lc_sparse_worst_actual = sum((worst_divergence_heights_actual.^2+(1/N_int_actual)^2).^0.5)/1;
+    r_lc_sparse_average_actual = N_int_actual*mean((s_divergence_heights.^2+(1/N_int_actual)^2).^0.5)/1;
+    r_lc_sparse_std_actual = N_int_actual*std((s_divergence_heights.^2+(1/N_int_actual)^2).^0.5)/1;
 
     if flag_do_plot
         % end results generation
