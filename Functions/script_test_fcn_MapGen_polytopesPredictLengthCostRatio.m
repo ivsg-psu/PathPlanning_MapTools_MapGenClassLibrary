@@ -58,6 +58,7 @@ if do_range_test
     debug_sine_all = [];
     N_int_actual_all = [];
     N_int_actual_std_all = [];
+    N_int_linear_all = [];
     for tiles=100%25:25:25%25:25:125%10:80:500
         Halton_range = [1 tiles]; % range of Halton points to use to generate the tiling
         % tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1]);%,fig_num);
@@ -136,7 +137,8 @@ if do_range_test
                     r_lc_sparse_average_this_map_actual = [r_lc_sparse_average_this_map_actual, r_lc_sparse_average_actual];
                     r_lc_sparse_std_this_map_actual = [r_lc_sparse_std_this_map_actual, r_lc_sparse_std_actual];
                     r_D = [r_D, field_avg_r_D];
-                    R_bar_initials = [R_bar_initials, field_stats_pre_shrink.average_max_radius];
+                    R_bar_initial = field_stats_pre_shrink.average_max_radius;
+                    R_bar_initials = [R_bar_initials, R_bar_initial];
                     R_bar_finals = [R_bar_finals, field_stats.average_max_radius];
                     N_int_from_density = field_stats.linear_density;
                     N_int_from_density_all = [N_int_from_density_all, N_int_from_density];
@@ -150,8 +152,10 @@ if do_range_test
                     N_int_from_shrink_dist_all = [N_int_from_shrink_dist_all, N_int_from_shrink_dist];
                     N_int_actual = field_stats.linear_density_mean;
                     N_int_actual_std = field_stats.linear_density_std;
+                    N_int_linear = 1.3*N_int_from_density*(1-shrunk_distance/R_bar_initial);
                     N_int_actual_all = [N_int_actual_all, N_int_actual];
                     N_int_actual_std_all = [N_int_actual_std_all, N_int_actual_std];
+                    N_int_linear_all = [N_int_linear_all, N_int_linear];
                 end
                 r_lc_sparse_worst = mean(r_lc_sparse_worst_this_map);
                 r_lc_sparse_average = mean(r_lc_sparse_average_this_map);
@@ -188,7 +192,7 @@ plot_flag = true; if plot_flag
     plot(r_D, N_int_from_shrink_dist_all, 'ro');
     % errorbar(r_D,N_int_actual_all,2*N_int_actual_std_all,'go')
     plot(r_D,N_int_actual_all,'go');
-    plot(r_D, 1.3*N_int_from_density_all.*(1-shrunk_distances./R_bar_initials),'mo');
+    plot(r_D, N_int_linear_all,'mo');
     title('Estimated Number of Encountered Obstalces')
     legend('estimated from linear point density','estimated from occupancy ratio','estimated from ray cast','estimated from percent shrunk')
     xlabel('Mapped Departure Ratio [r_D]')
