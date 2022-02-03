@@ -102,7 +102,11 @@ if do_range_test
                     tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1]);%,fig_num);
                     des_rad = radii_goals; sigma_radius = sd_radius; min_rad = 0.001;
                     % TODO switch this to side shrinking to get gap distance as an output so it can be given to predictor as input
-                    [shrunk_field,mu_final,sigma_final] = fcn_MapGen_polytopesShrinkToRadius(tiled_polytopes,des_rad,sigma_radius,min_rad);%,fig_num);
+                    try
+                        [shrunk_field,mu_final,sigma_final] = fcn_MapGen_polytopesShrinkToRadius(tiled_polytopes,des_rad,sigma_radius,min_rad);%,fig_num);
+                    catch
+                        fprintf("point for radii goals:%f didn't work",radii_goals);
+                    end
                     field_stats = fcn_MapGen_polytopesStatistics(shrunk_field);
                     gap_size = field_stats.average_gap_size_G_bar;
                     field_avg_r_D = field_stats.avg_r_D;
@@ -111,7 +115,11 @@ if do_range_test
                     % avg_max_rad = field_stats.average_max_radius;
                     shrunk_distance = field_stats_pre_shrink.average_max_radius - field_stats.average_max_radius;
                     shrink_ang = field_stats_pre_shrink.average_vertex_angle;
-                    [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse_worst,r_lc_sparse_average,r_lc_sparse_std,r_lc_sparse_worst_new,r_lc_sparse_average_new,r_lc_sparse_std_new,r_lc_sparse_worst_actual,r_lc_sparse_average_actual,r_lc_sparse_std_actual] = fcn_MapGen_polytopesPredictLengthCostRatio(shrunk_field,gap_size,shrunk_distance,shrink_ang)
+                    try
+                        [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse_worst,r_lc_sparse_average,r_lc_sparse_std,r_lc_sparse_worst_new,r_lc_sparse_average_new,r_lc_sparse_std_new,r_lc_sparse_worst_actual,r_lc_sparse_average_actual,r_lc_sparse_std_actual] = fcn_MapGen_polytopesPredictLengthCostRatio(shrunk_field,gap_size,shrunk_distance,shrink_ang)
+                    catch
+                        fprintf("point for radii goals:%f didn't work",radii_goals);
+                    end
                     % r_lc_max_all = [r_lc_max_all, r_lc_max];
                     % r_lc_max_effective_all = [r_lc_max_effective_all, r_lc_max_effective];
                     % r_lc_avg_all = [r_lc_avg_all, r_lc_avg];
@@ -180,7 +188,7 @@ plot_flag = true; if plot_flag
     plot(r_D, N_int_from_shrink_dist_all, 'ro');
     % errorbar(r_D,N_int_actual_all,2*N_int_actual_std_all,'go')
     plot(r_D,N_int_actual_all,'go');
-    plot(r_D, N_int_from_density_all.*(1-shrunk_distances./R_bar_initials),'mo');
+    plot(r_D, 1.3*N_int_from_density_all.*(1-shrunk_distances./R_bar_initials),'mo');
     title('Estimated Number of Encountered Obstalces')
     legend('estimated from linear point density','estimated from occupancy ratio','estimated from ray cast','estimated from percent shrunk')
     xlabel('Mapped Departure Ratio [r_D]')
@@ -224,8 +232,28 @@ plot_flag = true; if plot_flag
         plot(r_D_theoretical,r_lc_sparse_average_all,'cd')
         plot(r_D_theoretical,r_lc_sparse_average_all_new,'bd')
         plot(r_D_theoretical,r_lc_sparse_average_all_actual,'yd')
-        legend('0','0.01','0.02','0.04','0.08','0.16','0.32','worst case original','worst case new','worst case actual','average original','average new','average actual');
-        legend('worst case original','worst case new','worst case actual','average original','average new','average actual');
+        % plot(r_D_theoretical,r_lc_sparse_average_linear,'LineStyle','none','Color',[0.9290 0.6940 0.1250],'MarkerFaceColor',[0.9290 0.6940 0.1250],'Marker','d')
+        legend('0',...
+            '0.01',...
+            '0.02',...
+            '0.04',...
+            '0.08',...
+            '0.16',...
+            '0.32',...
+            'worst case polytopes, N_{int} from linear density',...
+            'worst case polytopes, N_{int} from gap size and occupancy ratio',...
+            'worst case polytopes, N_{int} from average ray cast',...
+            'average polytope, N_{int} from linear density',...
+            'average polytope, N_{int} from gap size and occupancy ratio',...
+            'average polytope, N_{int} from average ray cast');
+        % legend('worst case polytopes, N_{int} from linear density',...
+        %     'worst case polytopes, N_{int} from gap size and occupancy ratio',...
+        %     'worst case polytopes, N_{int} from average ray cast',...
+        %     'worst case polytopes, N_{int} from percent shrunk',...
+        %     'average polytope, N_{int} from linear density',...
+        %     'average polytope, N_{int} from gap size and occupancy ratio',...
+        %     'average polytope, N_{int} from average ray cast',...
+        %     'average polytope, N_{int} from percent shrunk');
     end
 %     x1 = linspace(0,0.65,300);
 %     x2=linspace(0.65,.78,100);
