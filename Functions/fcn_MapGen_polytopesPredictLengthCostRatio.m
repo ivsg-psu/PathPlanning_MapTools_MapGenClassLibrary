@@ -308,7 +308,9 @@ function [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective
     linear_density_int = round(linear_density,0);
     N_int_from_shrink_dist = (sqrt(field_stats.unoccupancy_ratio)*1)/(2*shrunk_distance*sind(shrink_ang/2));
     N_int_actual = field_stats.linear_density_mean;
-    N_int_linear = 1.3*linear_density*(1-shrunk_distance/R_bar_initial);
+    % uncomment for 30% correction factor
+    % N_int_linear = 1.3*linear_density*(1-shrunk_distance/R_bar_initial);
+    N_int_linear = linear_density*(1-shrunk_distance/R_bar_initial);
     s_divergence_heights = sort(divergence_heights);
     worst_divergence_heights = s_divergence_heights(end-linear_density_int+1:end);
     worst_divergence_heights_new = s_divergence_heights(end-N_int_from_shrink_dist+1:end);

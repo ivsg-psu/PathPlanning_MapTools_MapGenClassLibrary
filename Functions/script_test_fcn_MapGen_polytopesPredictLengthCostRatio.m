@@ -84,7 +84,7 @@ if do_range_test
         % r_lc_sparse_std_all = [r_lc_sparse_std_all, r_lc_sparse_std];
         % shrink_distance = [shrink_distance, 0];
         % for radii_goals=0.25%0.02:0.02:0.1%0.001:0.010:0.1
-        sd_radius_values = [0, 0.01, 0.02, 0.04, 0.08, 0.16, 0.32];
+        sd_radius_values = [0, 0.01, 0.02, 0.04, 0.08, 0.16];%, 0.32];
         for sd_radius_index = 1:1:length(sd_radius_values)
             sd_radius = sd_radius_values(sd_radius_index);
             for radii_goals = 0.001:0.005:0.081
@@ -105,7 +105,7 @@ if do_range_test
                 r_lc_sparse_worst_this_map_linear = [];
                 r_lc_sparse_average_this_map_linear = [];
                 r_lc_sparse_std_this_map_linear = [];
-                for i = 1:1:1
+                for i = 1:1:5
                     tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1]);%,fig_num);
                     des_rad = radii_goals; sigma_radius = sd_radius; min_rad = 0.001;
                     % TODO switch this to side shrinking to get gap distance as an output so it can be given to predictor as input
@@ -126,6 +126,8 @@ if do_range_test
                     try
                         [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse_worst,r_lc_sparse_average,r_lc_sparse_std,r_lc_sparse_worst_new,r_lc_sparse_average_new,r_lc_sparse_std_new,r_lc_sparse_worst_actual,r_lc_sparse_average_actual,r_lc_sparse_std_actual,r_lc_sparse_worst_linear,r_lc_sparse_average_linear,r_lc_sparse_std_linear] = fcn_MapGen_polytopesPredictLengthCostRatio(shrunk_field,gap_size,shrunk_distance,shrink_ang,R_bar_initial)
                     catch
+                        tiles_failed = [tiles_failed, tiles];
+                        size_percent_failed = [size_percent_failed, size_percent];
                         fprintf("point for radii goals:%f didn't work",radii_goals);
                     end
                     % r_lc_max_all = [r_lc_max_all, r_lc_max];
@@ -162,7 +164,9 @@ if do_range_test
                     N_int_from_shrink_dist_all = [N_int_from_shrink_dist_all, N_int_from_shrink_dist];
                     N_int_actual = field_stats.linear_density_mean;
                     N_int_actual_std = field_stats.linear_density_std;
-                    N_int_linear = 1.3*N_int_from_density*(1-shrunk_distance/R_bar_initial);
+                    % uncomment for 30% correction factor
+                    % N_int_linear = 1.3*N_int_from_density*(1-shrunk_distance/R_bar_initial);
+                    N_int_linear = N_int_from_density*(1-shrunk_distance/R_bar_initial);
                     N_int_actual_all = [N_int_actual_all, N_int_actual];
                     N_int_actual_std_all = [N_int_actual_std_all, N_int_actual_std];
                     N_int_linear_all = [N_int_linear_all, N_int_linear];
@@ -173,6 +177,12 @@ if do_range_test
                 r_lc_sparse_worst_new = mean(r_lc_sparse_worst_this_map_new);
                 r_lc_sparse_average_new = mean(r_lc_sparse_average_this_map_new);
                 r_lc_sparse_std_new = mean(r_lc_sparse_std_this_map_new);
+                r_lc_sparse_worst_actual = mean(r_lc_sparse_worst_this_map_actual);
+                r_lc_sparse_average_actual = mean(r_lc_sparse_average_this_map_actual);
+                r_lc_sparse_std_actual = mean(r_lc_sparse_std_this_map_actual);
+                r_lc_sparse_worst_linear = mean(r_lc_sparse_worst_this_map_linear);
+                r_lc_sparse_average_linear = mean(r_lc_sparse_average_this_map_linear);
+                r_lc_sparse_std_linear = mean(r_lc_sparse_std_this_map_linear);
                 r_lc_sparse_worst_all = [r_lc_sparse_worst_all, r_lc_sparse_worst];
                 r_lc_sparse_average_all = [r_lc_sparse_average_all, r_lc_sparse_average];
                 r_lc_sparse_std_all = [r_lc_sparse_std_all, r_lc_sparse_std];
@@ -224,7 +234,7 @@ plot_flag = true; if plot_flag
     figure(608)
     plot(r_D,'ko')
     title('r_D distribution')
-    figure(1)
+    figure(2)
     title('Comparison of Length Cost Ratio versus Departure Ratio from Path Planning and from Geometric Estimate')
     % xlabel('r_D from average radius')
     % ylabel('r_{LC} from side length and vertex angle')
@@ -251,13 +261,13 @@ plot_flag = true; if plot_flag
         plot(r_D_theoretical,r_lc_sparse_average_all_new,'bd')
         plot(r_D_theoretical,r_lc_sparse_average_all_actual,'yd')
         plot(r_D_theoretical,r_lc_sparse_average_all_linear,'LineStyle','none','Color',[0.9290 0.6940 0.1250],'Marker','d')
-        legend('0',...
-            '0.01',...
-            '0.02',...
-            '0.04',...
-            '0.08',...
+        legend('0.32',...
             '0.16',...
-            '0.32',...
+            '0.08',...
+            '0.04',...
+            '0.02',...
+            '0.01',...
+            '0.0',...
             'worst case polytopes, N_{int} from linear density',...
             'worst case polytopes, N_{int} from gap size and occupancy ratio',...
             'worst case polytopes, N_{int} from average ray cast',...
