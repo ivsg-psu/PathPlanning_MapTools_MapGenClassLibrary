@@ -334,35 +334,24 @@ function [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective
         % end results generation
         figure;
         hold on;
-        histogram(field_big_choice_angles*180/pi,'BinWidth',2,'FaceColor','g','FaceAlpha',0.4)
-        histogram(field_small_choice_angles*180/pi,'BinWidth',2,'FaceColor','b','FaceAlpha',0.4)
+        histogram(field_big_choice_angles*180/pi,'BinWidth',2,'FaceColor','r','FaceAlpha',0.4)
+        histogram(field_small_choice_angles*180/pi,'BinWidth',2,'FaceColor','g','FaceAlpha',0.4)
         legend('large, unchosen divergence angles','small, chosen divergence angles')
         xlabel('interior angle [deg]')
         ylabel('count')
         title('Histogram of Divergence Angles')
         figure;
         hold on;
-        histogram(field_big_choice_angles*180/pi,'BinWidth',2,'FaceColor','g','FaceAlpha',0.4)
-        histogram(field_small_choice_angles*180/pi,'BinWidth',2,'FaceColor','b','FaceAlpha',0.4)
-        histogram(field_away_angles/2*180/pi,'BinWidth',2,'FaceColor','r','FaceAlpha',0.4)
+        histogram(field_big_choice_angles*180/pi,'BinWidth',2,'FaceColor','r','FaceAlpha',0.4)
+        histogram(field_small_choice_angles*180/pi,'BinWidth',2,'FaceColor','g','FaceAlpha',0.4)
+        histogram(field_away_angles/2*180/pi,'BinWidth',2,'FaceColor','b','FaceAlpha',0.4)
         legend('large, unchosen divergence angles','small, chosen divergence angles','all away facing polytope angles, halved')
         xlabel('interior angle [deg]')
         ylabel('count')
         title('Histogram of Divergence Angles')
         figure;
         hold on;
-        histogram(field_big_choice_angles*180/pi,'BinWidth',2,'FaceColor','g','FaceAlpha',0.4)
-        histogram(field_small_choice_angles*180/pi,'BinWidth',2,'FaceColor','b','FaceAlpha',0.4)
-        histogram(field_away_angles/2*180/pi,'BinWidth',2,'FaceColor','r','FaceAlpha',0.4)
-        histogram(field_small_choice_angles_effective/2*180/pi,'BinWidth',2,'FaceColor','c','FaceAlpha',0.4)
-        legendstr = sprintf('effective chosen angle for gap size %.1f',gap_size);
-        legend('large, unchosen divergence angles','small, chosen divergence angles','all away facing polytope angles, halved',legendstr)
-        xlabel('interior angle [deg]')
-        ylabel('count')
-        title('Histogram of Divergence Angles')
-        figure;
-        hold on;
-        histogram(field_chosen_side_length,'BinWidth',2,'FaceColor','b','FaceAlpha',0.4)
+        histogram(field_chosen_side_length,'BinWidth',2,'FaceColor','g','FaceAlpha',0.4)
         histogram(field_chosen_side_length_effective,'BinWidth',2,'FaceColor','c','FaceAlpha',0.4)
         legendstr_side = sprintf('effective chosen side length for gap size %.1f',gap_size);
         legend('chosen side length', legendstr_side)

@@ -105,6 +105,9 @@ if do_range_test
                 r_lc_sparse_worst_this_map_linear = [];
                 r_lc_sparse_average_this_map_linear = [];
                 r_lc_sparse_std_this_map_linear = [];
+                N_int_linear_this_map = [];
+                N_int_actual_this_map = [];
+                N_int_from_shrink_dist_all_this_map = [];
                 for i = 1:1:5
                     tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1]);%,fig_num);
                     des_rad = radii_goals; sigma_radius = sd_radius; min_rad = 0.001;
@@ -148,6 +151,9 @@ if do_range_test
                     r_lc_sparse_worst_this_map_linear = [r_lc_sparse_worst_this_map_linear, r_lc_sparse_worst_linear];
                     r_lc_sparse_average_this_map_linear = [r_lc_sparse_average_this_map_linear, r_lc_sparse_average_linear];
                     r_lc_sparse_std_this_map_linear = [r_lc_sparse_std_this_map_linear, r_lc_sparse_std_linear];
+                    N_int_linear_this_map = [];
+                    N_int_actual_this_map = [];
+                    N_int_from_shrink_dist_all_this_map = [];
                     r_D = [r_D, field_avg_r_D];
                     R_bar_initial = field_stats_pre_shrink.average_max_radius;
                     R_bar_initials = [R_bar_initials, R_bar_initial];
