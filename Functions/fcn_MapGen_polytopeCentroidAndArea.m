@@ -66,6 +66,10 @@ varargin...
 % 2021_07_02
 % -- Cleaned up arguments a bit to compactify x,y coordinate convention
 % -- rebased code to MapGen format
+% 2022_02_17 - S. Brennan
+% -- Fixed bug when someone passes a line segment or repeated point
+% sequence, causing Area to be zero. Get a divide-by-zero problem. This is
+% fixed now via an if-statement check which uses the mean of points if A=0.
 
 %
 % TO DO:
@@ -165,9 +169,13 @@ yip1 = vertices(2:end,2);
 A = sum(xi.*yip1 - xip1.*yi)/2;
 
 % Centroid calculation
-Cx = sum((xi+xip1).*(xi.*yip1 - xip1.*yi))/(6*A); % centroid x coordinate
-Cy = sum((yi+yip1).*(xi.*yip1 - xip1.*yi))/(6*A); % centroid x coordinate
-Centroid = [Cx, Cy];
+if A>0
+    Cx = sum((xi+xip1).*(xi.*yip1 - xip1.*yi))/(6*A); % centroid x coordinate
+    Cy = sum((yi+yip1).*(xi.*yip1 - xip1.*yi))/(6*A); % centroid x coordinate
+    Centroid = [Cx, Cy];
+else
+    Centroid = [mean(xi) mean(yi)];
+end
 
 Area = abs(A); % unsigned area
 

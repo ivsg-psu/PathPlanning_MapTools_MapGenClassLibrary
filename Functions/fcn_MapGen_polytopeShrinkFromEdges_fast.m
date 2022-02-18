@@ -1,11 +1,13 @@
 function [shrunk_polytope, new_vertices, new_projection_vectors, cut_distance] = ...
-    fcn_MapGen_polytopeShrinkFromEdges(...
+    fcn_MapGen_polytopeShrinkFromEdges_fast(...
     shrinker,...
     edge_cut,...
     varargin)
-% fcn_MapGen_polytopeShrinkFromEdges cuts edges off the polytopes
+% fcn_MapGen_polytopeShrinkFromEdges_fast cuts edges off the polytopes
 % Each edge is cut so that the entire polytope is trimmed exactly the same
-% amount from each edge.
+% amount from each edge. This fast variant does NOT return the fully
+% populated polytope, nor does it check inputs. It simply calculates the
+% verticies field without updating areas, etc.
 %
 % This is implemented in three steps:
 % 1. Calculate the polytope skeleton, or use the skeleton if the user
@@ -69,7 +71,7 @@ function [shrunk_polytope, new_vertices, new_projection_vectors, cut_distance] =
 %    the function: fcn_MapGen_polytopeFindVertexSkeleton(vertices,fig_num)
 %    or outputs from previous calls, used to speed up code since this
 %    skeleton calculation is by far the slowest part.
-%
+%      
 %
 % DEPENDENCIES:
 %
@@ -91,34 +93,15 @@ function [shrunk_polytope, new_vertices, new_projection_vectors, cut_distance] =
 % -- first write of code
 % 2022_02_13 - S.Brennan
 % -- supress MATLAB's warning about flags
-%
+% 
 
 % TO DO
 % -- none
 
 %% Debugging and Input checks
-% set an environment variable on your machine with the getenv function...
-% in the Matlab console.  Char array of '1' will be true and '0' will be false.
-flag_check_inputs = getenv('ENV_FLAG_CHECK_INPUTS');  % '1' will check input args
-flag_do_plot = getenv('ENV_FLAG_DO_PLOT'); % '1' will make plots
-flag_do_debug = getenv('ENV_FLAG_DO_DEBUG'); % '1' will enable debugging
-
-% if the char array has length 0, assume the env var isn't set and default to...
-% dipslaying more information rather than potentially hiding an issue
-if length(flag_check_inputs) == 0
-    flag_check_inputs = '1';
-end
-if length(flag_do_plot) == 0
-    flag_do_plot = '1';
-end
-if length(flag_do_debug) == 0
-    flag_do_debug = '1';
-end
-
-% convert flag from char string to logical
-flag_check_inputs = flag_check_inputs == '1';
-flag_do_plot = flag_do_plot == '1';
-flag_do_debug = flag_do_debug == '1';
+flag_check_inputs = 0; % Set equal to 1 to check the input arguments
+flag_do_plot = 0;      %#ok<*NASGU> % Set equal to 1 for plotting
+flag_do_debug = 0;     % Set equal to 1 for debugging
 
 if flag_do_debug
     fig_for_debug = 5168;
@@ -161,15 +144,17 @@ if  3 < nargin % Only way this happens is if user specifies skeleton
     if nargin<5
         error('Incorrect number of input arguments');
     end
-
+    
     new_vertices = varargin{1};
     new_projection_vectors = varargin{2};
     cut_distance = varargin{3};
-
-    % Check the cut_distance input
-    fcn_MapGen_checkInputsToFunctions(...
-        new_vertices, '1column_of_numbers');
-
+    
+    if flag_check_inputs
+        % Check the cut_distance input
+        fcn_MapGen_checkInputsToFunctions(...
+            new_vertices, '1column_of_numbers');
+    end
+    
     flag_use_user_skeleton = 1;
 
 end
@@ -182,6 +167,7 @@ else
     if flag_do_debug
         fig_for_debug = 1584;
         flag_do_plot = 1;
+        fig_num = 1684;
     end
 end
 
@@ -198,7 +184,7 @@ end
 % Initialize variables we may need
 vertices = shrinker.vertices;
 
-%% STEP 1. Calculate the polytope skeleton,
+%% STEP 1. Calculate the polytope skeleton, 
 % or use the skeleton if the user provides this as inputs.
 
 % Do we need to calculate skeleton values?
@@ -212,7 +198,7 @@ if 0 == flag_use_user_skeleton
     end
 end
 
-%% STEP 2. Using the cut distance, find the template
+%% STEP 2. Using the cut distance, find the template 
 % We want to use the one that is less than or equal to the cut distance. If
 % less, then calculate the additional cut and project the verticies to
 % their new points based on residual cut.
@@ -231,14 +217,14 @@ additional_cut_distance = edge_cut - template_start_cut;
 % Determine final vertices
 final_vertices = template_vertices + new_projection_vectors{shape_index}*additional_cut_distance;
 
-
+   
 
 %% STEP 3. Convert the resulting verticies into the standard polytope form
 % Fill in the results
 shrunk_polytope.vertices = final_vertices;
 
-% fill in other fields from the vertices field
-shrunk_polytope = fcn_MapGen_fillPolytopeFieldsFromVertices(shrunk_polytope);
+% SKIPPING FOR SPEED: fill in other fields from the vertices field
+% shrunk_polytope = fcn_MapGen_fillPolytopeFieldsFromVertices(shrunk_polytope);
 
 
 
