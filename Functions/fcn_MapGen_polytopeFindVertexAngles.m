@@ -30,7 +30,8 @@ function [angles, unit_in_vectors, unit_out_vectors] = ...
 %
 % OUTPUTS:
 %
-%     angles: an Nx1 column of angles, one for each vertex
+%     angles: an Nx1 column of angles, one for each vertex. Returns NaN if
+%     polytope is degenerate, e.g. a single repeating point.
 %  
 %     unit_in_vectors: the Nx2 matrix of unit vectors leading into each vertex
 %  
@@ -51,6 +52,8 @@ function [angles, unit_in_vectors, unit_out_vectors] = ...
 % Revision History:
 % 2021_08_01 - S. Brennan
 % -- first write of the code
+% 2022_02_17 - S. Brennan
+% -- added comment that NaN results if polytope is a single point
 
 % TO DO
 % -- (none)

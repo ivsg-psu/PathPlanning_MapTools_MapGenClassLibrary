@@ -1,11 +1,13 @@
 function [shrunk_polytope, new_vertices, new_projection_vectors, cut_distance] = ...
-    fcn_MapGen_polytopeShrinkFromEdges(...
+    fcn_MapGen_polytopeShrinkFromEdges_fast(...
     shrinker,...
     edge_cut,...
     varargin)
-% fcn_MapGen_polytopeShrinkFromEdges cuts edges off the polytopes
+% fcn_MapGen_polytopeShrinkFromEdges_fast cuts edges off the polytopes
 % Each edge is cut so that the entire polytope is trimmed exactly the same
-% amount from each edge. 
+% amount from each edge. This fast variant does NOT return the fully
+% populated polytope, nor does it check inputs. It simply calculates the
+% verticies field without updating areas, etc.
 %
 % This is implemented in three steps:
 % 1. Calculate the polytope skeleton, or use the skeleton if the user
@@ -97,7 +99,7 @@ function [shrunk_polytope, new_vertices, new_projection_vectors, cut_distance] =
 % -- none
 
 %% Debugging and Input checks
-flag_check_inputs = 1; % Set equal to 1 to check the input arguments
+flag_check_inputs = 0; % Set equal to 1 to check the input arguments
 flag_do_plot = 0;      %#ok<*NASGU> % Set equal to 1 for plotting
 flag_do_debug = 0;     % Set equal to 1 for debugging
 
@@ -147,10 +149,12 @@ if  3 < nargin % Only way this happens is if user specifies skeleton
     new_projection_vectors = varargin{2};
     cut_distance = varargin{3};
     
-    % Check the cut_distance input
-    fcn_MapGen_checkInputsToFunctions(...
-        new_vertices, '1column_of_numbers');
-       
+    if flag_check_inputs
+        % Check the cut_distance input
+        fcn_MapGen_checkInputsToFunctions(...
+            new_vertices, '1column_of_numbers');
+    end
+    
     flag_use_user_skeleton = 1;
 
 end
@@ -219,8 +223,8 @@ final_vertices = template_vertices + new_projection_vectors{shape_index}*additio
 % Fill in the results
 shrunk_polytope.vertices = final_vertices;
 
-% fill in other fields from the vertices field
-shrunk_polytope = fcn_MapGen_fillPolytopeFieldsFromVertices(shrunk_polytope);
+% SKIPPING FOR SPEED: fill in other fields from the vertices field
+% shrunk_polytope = fcn_MapGen_fillPolytopeFieldsFromVertices(shrunk_polytope);
 
 
 
