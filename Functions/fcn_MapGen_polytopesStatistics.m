@@ -135,6 +135,8 @@ all_angles = nan(Nverticies_per_poly,Npolys);
 all_lengths = nan(Nverticies_per_poly,Npolys);
 all_side_count = zeros(Npolys,1);
 all_max_radius = zeros(Npolys,1);
+all_min_radius = zeros(Npolys,1);
+all_sharpness_ratios = zeros(Npolys,1);
 all_areas = zeros(Npolys,1);
 AABB = [inf inf -inf -inf];
 
@@ -172,6 +174,9 @@ for ith_poly = 1:Npolys
     all_lengths(1:Nangles,ith_poly) = polytopes(ith_poly).distances;
     all_side_count(ith_poly,1) = Nangles;
     all_max_radius(ith_poly,1) = polytopes(ith_poly).max_radius;
+    all_min_radius(ith_poly,1) = polytopes(ith_poly).min_radius;
+    all_sharpness_ratios(ith_poly,1) = ...
+        polytopes(ith_poly).max_radius/polytopes(ith_poly).min_radius;
     all_areas(ith_poly,1) = polytopes(ith_poly).area;
 
     % Plot the input polytopes in red
@@ -192,6 +197,8 @@ std_vertex_angle = nanstd(angle_column_no_nan*180/pi);
 
 % Find the mean and std deviations of the max-radius
 average_max_radius = nanmean(all_max_radius);
+average_min_radius = nanmean(all_min_radius);
+average_sharpness = nanmean(all_sharpness_ratios);
 std_max_radius = nanstd(all_max_radius);
 
 % Find the perimeter of each polytope
@@ -273,6 +280,8 @@ poly_map_stats.average_vertex_angle = average_vertex_angle;
 poly_map_stats.std_vertex_angle = std_vertex_angle;
 
 poly_map_stats.average_max_radius = average_max_radius;
+poly_map_stats.average_min_radius = average_min_radius;
+poly_map_stats.average_sharpness = average_sharpness;
 poly_map_stats.std_max_radius = std_max_radius;
 poly_map_stats.average_side_length = average_side_length;
 poly_map_stats.std_side_length = std_side_length;

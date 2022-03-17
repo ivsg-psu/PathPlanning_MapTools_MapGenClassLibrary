@@ -172,6 +172,8 @@ for ith_poly = 1:num_poly % pull each polytope
         ones(length(filled_polytopes(ith_poly).xv),1)*filled_polytopes(ith_poly).mean).^2,2).^0.5;
     filled_polytopes(ith_poly).max_radius = ...
         max(radii);
+    filled_polytopes(ith_poly).min_radius = ...
+        min(radii);
 end
 
 %§
