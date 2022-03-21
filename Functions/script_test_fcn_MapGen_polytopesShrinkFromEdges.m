@@ -16,37 +16,15 @@ trim_polytopes = fcn_MapGen_polytopeCropEdges(polytopes,bounding_box,fig_num);
 
 %% Basic example of uniform shrinking
 fig_num = 2;
-des_rad = 0.05; sigma_radius = 0; min_rad = 0.001;
+des_gap_size = 0.05;
 shrunk_polytopes1=...
     fcn_MapGen_polytopesShrinkFromEdges(...
-    trim_polytopes,des_rad,sigma_radius,min_rad,fig_num);
+    trim_polytopes,des_gap_size,fig_num);
 field_stats = fcn_MapGen_polytopesStatistics(shrunk_polytopes1);
-% TODO(@sjharnett) failing test.  Why?
-assert(isequal(round(field_stats.average_max_radius,4),round(des_rad,4)));
-
-%% Basic example of non-uniform shrinking
-fig_num = 3;
-des_rad = 0.05; sigma_radius = 0.01; min_rad = 0.001;
-shrunk_polytopes2=fcn_MapGen_polytopesShrinkFromEdges(...
-    trim_polytopes,des_rad,sigma_radius,min_rad,fig_num);
-
-
-%% Warning thrown because of truncation
-% This happens, for example, where there is a large standard deviation with small radius
-fig_num = 4;
-des_rad = 0.001; sigma_radius = 0.01; min_rad = 0.0001;
-shrunk_polytopes1=...
-    fcn_MapGen_polytopesShrinkFromEdges(...
-    trim_polytopes,des_rad,sigma_radius,min_rad,fig_num);
-
-
-%% Error cases follow
-
-if 1==0
-    %% Error thrown because minimum radius less than zero
-    fig_num = 4;
-    des_rad = 0.05; sigma_radius = 0.01; min_rad = -0.001;
-    shrunk_polytopes1=...
-        fcn_MapGen_polytopesShrinkFromEdges(...
-        trim_polytopes,des_rad,sigma_radius,min_rad,fig_num); %#ok<*NASGU>
-end
+r_occ_meas = field_stats.occupancy_ratio; % calculated occupancy ratio
+r_unocc_meas = field_stats.unoccupancy_ratio;
+G_bar = field_stats.average_gap_size_G_bar;
+rho = field_stats.linear_density_mean;
+estimated_unoccupancy_ratio = G_bar^2*rho; % theoretial occupancy ratio from gap size
+assert(isequal(round(G_bar,4),round(des_gap_size,4)));
+assert(isequal(round(r_unocc_meas,4),round(estimated_unoccupancy_ratio,4)));

@@ -220,6 +220,7 @@ occupied_area = sum(all_areas);
 total_area    = (AABB(3)-AABB(1))*(AABB(4)-AABB(2));
 unoccupied_area = total_area-occupied_area;
 unoccupancy_ratio = (total_area - occupied_area)/total_area;
+occupancy_ratio = occupied_area/total_area;
 
 % Determine the density properties
 point_density = length(polytopes)/total_area;
@@ -270,6 +271,7 @@ poly_map_stats.occupied_area = occupied_area;
 poly_map_stats.total_area = total_area;
 poly_map_stats.unoccupied_area = unoccupied_area;
 poly_map_stats.unoccupancy_ratio = unoccupancy_ratio;
+poly_map_stats.occupancy_ratio = occupancy_ratio;
 poly_map_stats.point_density = point_density;
 poly_map_stats.linear_density = linear_density;
 poly_map_stats.average_gap_size_G_bar = average_gap_size_G_bar;
