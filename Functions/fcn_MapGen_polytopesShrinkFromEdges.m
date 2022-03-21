@@ -1,32 +1,23 @@
 function [shrunk_polytopes,mu_final,sigma_final] = ...
     fcn_MapGen_polytopesShrinkFromEdges(...
-    polytopes,...
-    des_radius,...
-    sigma_radius,...
-    min_rad,...
+    des_gap_size,...
     varargin)
 % fcn_MapGen_polytopesShrinkFromEdges shrinks the polytopes to achieve the
-% desired mean radius and specified variance
+% desired gap size between polytopes
 %
 % FORMAT:
 %
-% [shrunk_polytopes,mu_final,sigma_final] = ...
+% [shrunk_polytopes] = ...
 %     fcn_MapGen_polytopesShrinkFromEdges(...
 %     polytopes,...
-%     des_radius,...
-%     sigma_radius,...
-%     min_rad,...
+%     des_gap_size,...
 %     (fig_num))
 %
 % INPUTS:
 %
 %     POLYTOPES: original polytopes with same fields as shrunk_polytopes
 %
-%     DES_RAD: desired average max radius
-%
-%     SIGMA_RADIUS: desired variance in the radii
-%
-%     MIN_RAD: minimum acceptable radius
+%     DES_GAP_SIZE: desired normal gap size between polytopes
 %
 %     (optional inputs)
 %
@@ -46,10 +37,6 @@ function [shrunk_polytopes,mu_final,sigma_final] = ...
 %       mean: centroid xy coordinate of the polytope
 %       area: area of the polytope
 %       max_radius: distance from the mean to the farthest vertex
-%
-%     MU_FINAL: final average maximum radius achieved
-%
-%     SIGMA_FINAL: final variance achieved
 %
 % DEPENDENCIES:
 %
@@ -165,12 +152,6 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-%% find current distribution
-old_max_radii = [polytopes.max_radius]';
-Nradii = length(old_max_radii);
-old_r_mu = mean(old_max_radii);
-old_r_sigma = std(old_max_radii); %#ok<NASGU>
-
 if flag_do_debug
     fprintf(1,'Target distrubution statistics:\n');
     fprintf(1,'\tMean: %.4f\n',des_radius);
@@ -190,9 +171,11 @@ if flag_do_debug
         sigma_radius));
 end
 
+initial_stats = ​fcn_MapGen_polytopesStatistics​(polytopes); 
+​initial_gap_size = initial_stats.average_gap_size_G_bar;
 
-if old_r_mu < des_radius
-    error('cannot achieve the desired radius by shrinking because average radius is already smaller than desired radius')
+if initial_gap_size > des_gap_size
+    error('cannot achieve the desired gap_size by shrinking because average gap_size is already larger than desired gap size')
 end
 
 %% determine desired distribution
