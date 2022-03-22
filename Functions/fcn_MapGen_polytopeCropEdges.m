@@ -151,7 +151,7 @@ yhigh = bounding_box(2,2);
 Npolys = length(polytopes);
 
 % Preallocate the polytopes
-trim_polytopes(Npolys) = struct('vertices',[],'xv',[],'yv',[],'distances',[],'mean',[],'area',[],'max_radius',[]);
+trim_polytopes(Npolys) = struct('vertices',[],'xv',[],'yv',[],'distances',[],'mean',[],'area',[],'max_radius',[],'min_radius',[]);
 
 keep = 0; % number of polytopes to keep
 for poly = 1:Npolys % check each polytope within polytopes

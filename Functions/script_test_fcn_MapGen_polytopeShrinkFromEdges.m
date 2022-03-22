@@ -48,7 +48,7 @@ test_polytope = fcn_MapGen_fillPolytopeFieldsFromVertices(test_polytope);
 interior_angles = 180-angles*180/pi;
 assert(~any(interior_angles>180));
 % perform a large edge shrink
-edge_cut = 3;
+edge_cut = 3.6;
 shrunk = fcn_MapGen_polytopeShrinkFromEdges(...
     test_polytope,edge_cut,fig_num);
 

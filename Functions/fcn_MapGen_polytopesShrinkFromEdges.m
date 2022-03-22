@@ -143,8 +143,8 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-initial_stats = ​fcn_MapGen_polytopesStatistics​(polytopes);
-​initial_gap_size = initial_stats.average_gap_size_G_bar;
+initial_stats = fcn_MapGen_polytopesStatistics(polytopes);
+initial_gap_size = initial_stats.average_gap_size_G_bar;
 initial_average_max_rad = initial_stats.average_max_radius;
 
 if flag_do_debug
@@ -178,14 +178,14 @@ for ith_poly = 1:length(polytopes)
     shrinker = polytopes(ith_poly); % obstacle to be shrunk
 
     % assign to shrunk_polytopes
+    % gap_size over 2 is the normal distance to pull edges in
     shrunk_polytopes(ith_poly) = ...
         fcn_MapGen_polytopeShrinkFromEdges(...
-        % gap_size over 2 is the normal distance to pull edges in
         shrinker,des_gap_size/2);
 end
 
 
-final_stats = ​fcn_MapGen_polytopesStatistics​(shrunk_polytopes);
+final_stats = fcn_MapGen_polytopesStatistics(shrunk_polytopes);
 final_gap_size = final_stats.average_gap_size_G_bar;
 final_average_max_rad = final_stats.average_max_radius;
 if flag_do_debug
