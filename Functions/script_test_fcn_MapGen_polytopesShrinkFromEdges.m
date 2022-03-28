@@ -54,6 +54,43 @@ for i = 0.001:0.001:0.1
     % assert(isequal(round(r_unocc_meas,4),round(estimated_unoccupancy_ratio,4)));
 end
 
+% Defaults for this blog post
+width = 3;     % Width in inches
+height = 3;    % Height in inches
+alw = 0.75;    % AxesLineWidth
+fsz = 11;      % Fontsize
+lw = 1.5;      % LineWidth
+msz = 8;       % MarkerSize
+
+% The new defaults will not take effect if there are any open figures. To
+% use them, we close all figures, and then repeat the first example.
+close all;
+
+% The properties we've been using in the figures
+set(0,'defaultLineLineWidth',lw);   % set the default line width to lw
+set(0,'defaultLineMarkerSize',msz); % set the default line marker size to msz
+set(0,'defaultLineLineWidth',lw);   % set the default line width to lw
+set(0,'defaultLineMarkerSize',msz); % set the default line marker size to msz
+set(0,'defaultAxesFontSize',fsz);
+set(0,'defaultLegendFontSize',fsz);
+set(0,'defaultAxesLineWidth',alw);
+
+% Set the default Size for display
+defpos = get(0,'defaultFigurePosition');
+set(0,'defaultFigurePosition', [defpos(1) defpos(2) width*100, height*100]);
+
+% Set the defaults for saving/printing to a file
+set(0,'defaultFigureInvertHardcopy','on'); % This is the default anyway
+set(0,'defaultFigurePaperUnits','inches'); % This is the default anyway
+defsize = get(gcf, 'PaperSize');
+left = (defsize(1)- width)/2;
+bottom = (defsize(2)- height)/2;
+defsize = [left, bottom, width, height];
+set(0, 'defaultFigurePaperPosition', defsize);
+set(0,'defaultAxesXGrid','on')
+set(0,'defaultAxesYGrid','on')
+set(0,'defaultAxesBox','on')
+
 figure
 hold on
 box on
@@ -63,12 +100,15 @@ plot(des_gap_size_all,(G_bar_all-des_gap_size_all))
 legend('perimeter estimate',...
 'density estimate')
 xlabel('desired or commanded gap size')
-ylabel('error between gap size estimate and commanded gap size')
+ylabel('gap size estimate error')
+print('C:\Users\sjh6473\github\sjharnett\figures\exported\after_gvsets\g_bar_err','-dpng','-r300');
+savefig('C:\Users\sjh6473\github\sjharnett\figures\figs\after_gvsets\g_bar_err')
 
 figure
 hold on
 box on
 grid on
+ylim([-1,0.4])
 plot(des_gap_size_all,(A_unocc_est_density_all - r_unocc_meas_all))
 plot(des_gap_size_all,(A_unocc_est_perim_all - r_unocc_meas_all))
 plot(des_gap_size_all,(A_unocc_est_perim_improved_all - r_unocc_meas_all))
@@ -76,4 +116,6 @@ legend('density estimate',...
 'perimeter estimate without triangles',...
 'perimeter estimate with triangles')
 xlabel('desired or commanded gap size')
-ylabel('error between estimated and measured unnocupancy ratio')
+ylabel('gap size estimate error')
+print('C:\Users\sjh6473\github\sjharnett\figures\exported\after_gvsets\runocc_err','-dpng','-r300');
+savefig('C:\Users\sjh6473\github\sjharnett\figures\figs\after_gvsets\runocc_err')
