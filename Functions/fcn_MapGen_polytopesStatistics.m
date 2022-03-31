@@ -280,6 +280,7 @@ poly_map_stats.perimeter_gap_size = perimeter_gap_size;
 poly_map_stats.Nangles = length(angle_column_no_nan(:,1));
 poly_map_stats.average_vertex_angle = average_vertex_angle;
 poly_map_stats.std_vertex_angle = std_vertex_angle;
+poly_map_stats.angle_column_no_nan = angle_column_no_nan;
 
 poly_map_stats.average_max_radius = average_max_radius;
 poly_map_stats.average_min_radius = average_min_radius;

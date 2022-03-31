@@ -24,6 +24,8 @@ A_unocc_est_density_all = [];
 A_unocc_est_perim_all = [];
 A_unocc_est_perim_improved_all = [];
 r_unocc_meas_all = [];
+A_unocc_est_parallelogram_all = [];
+A_unocc_est_avg_parallelogram_all = [];
 for i = 0.001:0.001:0.1
     fig_num = 2;
     des_gap_size = i;
@@ -50,6 +52,19 @@ for i = 0.001:0.001:0.1
     A_unocc_est_density_all = [A_unocc_est_density_all; A_unocc_est_density];
     A_unocc_est_perim_all = [A_unocc_est_perim_all; A_unocc_est_perim];
     A_unocc_est_perim_improved_all = [A_unocc_est_perim_improved_all; A_unocc_est_perim_improved];
+    % TODO make estimate subtracting one parallelogram from each vertex
+    % TODO make the same code subtracting one parellelogram per angle for the average angle size
+    % note this is interior angles
+    angles = field_stats.angle_column_no_nan;
+    parallelogram_areas = des_gap_size/2*des_gap_size/2*sin(angles);
+    total_parallelogram_area = sum(parallelogram_areas);
+    average_angle = field_stats.average_vertex_angle;
+    total_avg_parallelogram_area = des_gap_size/2*des_gap_size/2*sin(average_angle)*length(parallelogram_areas);
+    A_unocc_est_avg_parallelogram = A_unocc_est_perim + total_parallelogram_area;
+    A_unocc_est_parallelogram = A_unocc_est_perim + total_avg_parallelogram_area;
+    A_unocc_est_avg_parallelogram_all = [A_unocc_est_avg_parallelogram_all; A_unocc_est_avg_parallelogram];
+    A_unocc_est_parallelogram_all = [A_unocc_est_parallelogram_all; A_unocc_est_parallelogram];
+    % TODO if the angle is over 90, 180-the angle forms a roughly isoceles triangle
     % assert(isequal(round(G_bar,4),round(des_gap_size,4)));
     % assert(isequal(round(r_unocc_meas,4),round(estimated_unoccupancy_ratio,4)));
 end
@@ -101,21 +116,25 @@ legend('perimeter estimate',...
 'density estimate')
 xlabel('desired or commanded gap size')
 ylabel('gap size estimate error')
-print('C:\Users\sjh6473\github\sjharnett\figures\exported\after_gvsets\g_bar_err','-dpng','-r300');
-savefig('C:\Users\sjh6473\github\sjharnett\figures\figs\after_gvsets\g_bar_err')
+% print('C:\Users\sjh6473\github\sjharnett\figures\exported\after_gvsets\g_bar_err','-dpng','-r300');
+% savefig('C:\Users\sjh6473\github\sjharnett\figures\figs\after_gvsets\g_bar_err')
 
 figure
 hold on
 box on
 grid on
-ylim([-1,0.4])
+ylim([-1,1.4])
 plot(des_gap_size_all,(A_unocc_est_density_all - r_unocc_meas_all))
 plot(des_gap_size_all,(A_unocc_est_perim_all - r_unocc_meas_all))
 plot(des_gap_size_all,(A_unocc_est_perim_improved_all - r_unocc_meas_all))
+plot(des_gap_size_all,(A_unocc_est_perim_improved_all - A_unocc_est_parallelogram_all))
+plot(des_gap_size_all,(A_unocc_est_perim_improved_all - A_unocc_est_avg_parallelogram_all))
 legend('density estimate',...
 'perimeter estimate without triangles',...
-'perimeter estimate with triangles')
+'perimeter estimate with triangles',...
+'perimeter estimate with verticies',...
+'perimeter estimate with average vertex')
 xlabel('desired or commanded gap size')
 ylabel('gap size estimate error')
-print('C:\Users\sjh6473\github\sjharnett\figures\exported\after_gvsets\runocc_err','-dpng','-r300');
-savefig('C:\Users\sjh6473\github\sjharnett\figures\figs\after_gvsets\runocc_err')
+% print('C:\Users\sjh6473\github\sjharnett\figures\exported\after_gvsets\runocc_err','-dpng','-r300');
+% savefig('C:\Users\sjh6473\github\sjharnett\figures\figs\after_gvsets\runocc_err')
