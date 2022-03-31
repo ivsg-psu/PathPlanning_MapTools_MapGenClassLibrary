@@ -62,11 +62,12 @@ for i = 0.001:0.001:0.1
     total_parallelogram_area = sum(parallelogram_areas);
     average_angle = field_stats.average_vertex_angle;
     total_avg_parallelogram_area = des_gap_size/2*des_gap_size/2*sin(average_angle)*length(parallelogram_areas);
-    A_unocc_est_avg_parallelogram = A_unocc_est_perim + total_parallelogram_area;
-    A_unocc_est_parallelogram = A_unocc_est_perim + total_avg_parallelogram_area;
+    A_unocc_est_avg_parallelogram = A_unocc_est_perim + total_avg_parallelogram_area;
+    A_unocc_est_parallelogram = A_unocc_est_perim + total_parallelogram_area;
     A_unocc_est_avg_parallelogram_all = [A_unocc_est_avg_parallelogram_all; A_unocc_est_avg_parallelogram];
     A_unocc_est_parallelogram_all = [A_unocc_est_parallelogram_all; A_unocc_est_parallelogram];
-    % TODO if the angle is over 90, 180-the angle forms a roughly isoceles triangle
+    % TODO if the angle is over 90, 180-the angle forms a roughly isoceles triangle,
+    % but it actually forms a kite
     % assert(isequal(round(G_bar,4),round(des_gap_size,4)));
     % assert(isequal(round(r_unocc_meas,4),round(estimated_unoccupancy_ratio,4)));
     angles_acute_logical = angles <= pi/2;
@@ -82,8 +83,6 @@ for i = 0.001:0.001:0.1
     a = des_gap_size/2*cos((pi-angles_obtuse)/2);
     b = des_gap_size/2*sin((pi-angles_obtuse)/2);
     c = b/tan(angles_obtuse/2);
-    kite_areas_obtuse = (a+b).*(2*b)/2;
-    total_kite_areas = sum(kite_areas_obtuse);
     a_avg = des_gap_size/2*cos((pi-avg_obtuse)/2);
     b_avg = des_gap_size/2*sin((pi-avg_obtuse)/2);
     c_avg = b_avg/tan(avg_obtuse/2);
