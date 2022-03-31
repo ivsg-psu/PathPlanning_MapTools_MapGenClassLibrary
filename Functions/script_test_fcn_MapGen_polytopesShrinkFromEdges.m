@@ -26,6 +26,8 @@ A_unocc_est_perim_improved_all = [];
 r_unocc_meas_all = [];
 A_unocc_est_parallelogram_all = [];
 A_unocc_est_avg_parallelogram_all = [];
+A_unocc_est_parallelograms_and_kites_avg_all = [];
+A_unocc_est_parallelograms_and_kites_all = [];
 for i = 0.001:0.001:0.1
     fig_num = 2;
     des_gap_size = i;
@@ -67,6 +69,32 @@ for i = 0.001:0.001:0.1
     % TODO if the angle is over 90, 180-the angle forms a roughly isoceles triangle
     % assert(isequal(round(G_bar,4),round(des_gap_size,4)));
     % assert(isequal(round(r_unocc_meas,4),round(estimated_unoccupancy_ratio,4)));
+    angles_acute_logical = angles <= pi/2;
+    angles_acute = nonzeros(angles_acute_logical.*angles)';
+    avg_acute = mean(angles_acute);
+    angles_obtuse_logical = angles > pi/2;
+    angles_obtuse = nonzeros(angles_obtuse_logical.*angles)';
+    avg_obtuse = mean(angles_obtuse);
+    parallelogram_areas_acute = des_gap_size/2*des_gap_size/2*sin(angles_acute);
+    total_parallelogram_area_acute_avg = length(angles_acute)*des_gap_size/2*des_gap_size/2*sin(avg_acute);
+    total_parallelogram_area_acute = sum(parallelogram_areas_acute);
+    % kite area calculation
+    a = des_gap_size/2*cos((pi-angles_obtuse)/2);
+    b = des_gap_size/2*sin((pi-angles_obtuse)/2);
+    c = b/tan(angles_obtuse/2);
+    kite_areas_obtuse = (a+b).*(2*b)/2;
+    total_kite_areas = sum(kite_areas_obtuse);
+    a_avg = des_gap_size/2*cos((pi-avg_obtuse)/2);
+    b_avg = des_gap_size/2*sin((pi-avg_obtuse)/2);
+    c_avg = b_avg/tan(avg_obtuse/2);
+    kite_areas_obtuse = (a+c).*(2*b)/2;
+    kite_areas_obtuse_avg = (a_avg+c_avg).*(2*b_avg)/2;
+    total_kite_areas = sum(kite_areas_obtuse);
+    total_kite_areas_avg = length(angles_obtuse)*kite_areas_obtuse_avg;
+    A_unocc_est_parallelograms_and_kites = A_unocc_est_perim + total_parallelogram_area_acute + total_kite_areas;
+    A_unocc_est_parallelograms_and_kites_all = [A_unocc_est_parallelograms_and_kites_all; A_unocc_est_parallelograms_and_kites];
+    A_unocc_est_parallelograms_and_kites_avg = A_unocc_est_perim + total_parallelogram_area_acute_avg + total_kite_areas_avg;
+    A_unocc_est_parallelograms_and_kites_avg_all = [A_unocc_est_parallelograms_and_kites_avg_all; A_unocc_est_parallelograms_and_kites_avg];
 end
 
 % Defaults for this blog post
@@ -129,11 +157,15 @@ plot(des_gap_size_all,(A_unocc_est_perim_all - r_unocc_meas_all))
 plot(des_gap_size_all,(A_unocc_est_perim_improved_all - r_unocc_meas_all))
 plot(des_gap_size_all,(A_unocc_est_perim_improved_all - A_unocc_est_parallelogram_all))
 plot(des_gap_size_all,(A_unocc_est_perim_improved_all - A_unocc_est_avg_parallelogram_all))
+plot(des_gap_size_all,(A_unocc_est_perim_improved_all - A_unocc_est_parallelograms_and_kites_all))
+plot(des_gap_size_all,(A_unocc_est_perim_improved_all - A_unocc_est_parallelograms_and_kites_avg_all))
 legend('density estimate',...
-'perimeter estimate without triangles',...
+'perimeter estimate',...
 'perimeter estimate with triangles',...
-'perimeter estimate with verticies',...
-'perimeter estimate with average vertex')
+'perimeter estimate with parallelograms',...
+'perimeter estimate with average parallelograms',...
+'perimeter estimate with parllelograms and kites',...
+'perimeter estimate with average parallelograms and kites')
 xlabel('desired or commanded gap size')
 ylabel('gap size estimate error')
 % print('C:\Users\sjh6473\github\sjharnett\figures\exported\after_gvsets\runocc_err','-dpng','-r300');
