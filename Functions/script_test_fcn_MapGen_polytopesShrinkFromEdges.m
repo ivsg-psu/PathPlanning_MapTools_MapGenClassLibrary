@@ -13,6 +13,8 @@ polytopes = fcn_MapGen_haltonVoronoiTiling([1 100]);
 fig_num = 1;
 bounding_box = [0,0; 1,1];
 trim_polytopes = fcn_MapGen_polytopeCropEdges(polytopes,bounding_box,fig_num);
+pre_shrink_stats = fcn_MapGen_polytopesStatistics(trim_polytopes);
+R_bar_initial = pre_shrink_stats.average_max_radius;
 % TODO add a loop and do plots
 %% Basic example of uniform shrinking
 G_bar_all = [];
@@ -150,14 +152,14 @@ figure
 hold on
 box on
 grid on
-ylim([-1,1.4])
-plot(des_gap_size_all,(A_unocc_est_density_all - r_unocc_meas_all))
-plot(des_gap_size_all,(A_unocc_est_perim_all - r_unocc_meas_all))
-plot(des_gap_size_all,(A_unocc_est_perim_improved_all - r_unocc_meas_all))
-plot(des_gap_size_all,(A_unocc_est_perim_improved_all - A_unocc_est_parallelogram_all))
-plot(des_gap_size_all,(A_unocc_est_perim_improved_all - A_unocc_est_avg_parallelogram_all))
-plot(des_gap_size_all,(A_unocc_est_perim_improved_all - A_unocc_est_parallelograms_and_kites_all))
-plot(des_gap_size_all,(A_unocc_est_perim_improved_all - A_unocc_est_parallelograms_and_kites_avg_all))
+ylim([-100,140])
+plot(des_gap_size_all./R_bar_initial*100,(A_unocc_est_density_all - r_unocc_meas_all)./r_unocc_meas_all*100)
+plot(des_gap_size_all./R_bar_initial*100,(A_unocc_est_perim_all - r_unocc_meas_all)./r_unocc_meas_all*100)
+plot(des_gap_size_all./R_bar_initial*100,(A_unocc_est_perim_improved_all - r_unocc_meas_all)./r_unocc_meas_all*100)
+plot(des_gap_size_all./R_bar_initial*100,(A_unocc_est_parallelogram_all - r_unocc_meas_all)./r_unocc_meas_all*100)
+plot(des_gap_size_all./R_bar_initial*100,(A_unocc_est_avg_parallelogram_all - r_unocc_meas_all)./r_unocc_meas_all*100)
+plot(des_gap_size_all./R_bar_initial*100,(A_unocc_est_parallelograms_and_kites_all - r_unocc_meas_all)./r_unocc_meas_all*100)
+plot(des_gap_size_all./R_bar_initial*100,(A_unocc_est_parallelograms_and_kites_avg_all - r_unocc_meas_all)./r_unocc_meas_all*100)
 legend('density estimate',...
 'perimeter estimate',...
 'perimeter estimate with triangles',...
@@ -165,7 +167,7 @@ legend('density estimate',...
 'perimeter estimate with average parallelograms',...
 'perimeter estimate with parllelograms and kites',...
 'perimeter estimate with average parallelograms and kites')
-xlabel('desired or commanded gap size')
-ylabel('gap size estimate error')
+xlabel('desired or commanded gap size as percent of initial average max radius')
+ylabel('unoccpancy ratio estimate percent error')
 % print('C:\Users\sjh6473\github\sjharnett\figures\exported\after_gvsets\runocc_err','-dpng','-r300');
 % savefig('C:\Users\sjh6473\github\sjharnett\figures\figs\after_gvsets\runocc_err')
