@@ -22,7 +22,7 @@ if do_single_test
     field_stats = fcn_MapGen_polytopesStatistics(shrunk_field);
     gap_size = field_stats.average_gap_size_G_bar;
     r_D = field_stats.avg_r_D;
-    [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse_worst,r_lc_sparse_average,r_lc_sparse_std] = fcn_MapGen_polytopesPredictLengthCostRatio(shrunk_field,gap_size)
+    [field_small_choice_angles,field_big_choice_angles,r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse_worst,r_lc_sparse_average,r_lc_sparse_std] = fcn_MapGen_polytopesPredictLengthCostRatio(shrunk_field,gap_size)
 end
 
 do_range_test = true;
@@ -127,7 +127,7 @@ if do_range_test
                     shrink_ang = field_stats_pre_shrink.average_vertex_angle;
                     R_bar_initial = field_stats_pre_shrink.average_max_radius;
                     try
-                        [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse_worst,r_lc_sparse_average,r_lc_sparse_std,r_lc_sparse_worst_new,r_lc_sparse_average_new,r_lc_sparse_std_new,r_lc_sparse_worst_actual,r_lc_sparse_average_actual,r_lc_sparse_std_actual,r_lc_sparse_worst_linear,r_lc_sparse_average_linear,r_lc_sparse_std_linear] = fcn_MapGen_polytopesPredictLengthCostRatio(shrunk_field,gap_size,shrunk_distance,shrink_ang,R_bar_initial)
+                        [field_small_choice_angles,field_big_choice_angles,r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse_worst,r_lc_sparse_average,r_lc_sparse_std,r_lc_sparse_worst_new,r_lc_sparse_average_new,r_lc_sparse_std_new,r_lc_sparse_worst_actual,r_lc_sparse_average_actual,r_lc_sparse_std_actual,r_lc_sparse_worst_linear,r_lc_sparse_average_linear,r_lc_sparse_std_linear] = fcn_MapGen_polytopesPredictLengthCostRatio(shrunk_field,gap_size,shrunk_distance,shrink_ang,R_bar_initial)
                     catch
                         tiles_failed = [tiles_failed, tiles];
                         size_percent_failed = [size_percent_failed, size_percent];
