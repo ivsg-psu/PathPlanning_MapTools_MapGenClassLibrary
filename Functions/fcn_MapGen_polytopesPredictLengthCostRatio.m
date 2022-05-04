@@ -169,12 +169,6 @@ function [field_small_choice_angles,field_big_choice_angles,r_lc_max,r_lc_avg,r_
         % end initialize path for iterative solution
         % begin looping through vertices
         for i=1:length(vertices)-1
-            % TODO call fcn_visibility_self_blocked_pts
-            self_deflections = abs(atan2(self_blocked_pts_x-cur_pt_y, self_blocked_pts_x-cur_pt_x));
-            self_blocked_distances = ((self_blocked_pts_x-cur_pt_y)^2+(self_blocked_pts_x-cur_pt_x)^2)^0.5;
-            self_blocked_distances = self_blocked_distances*(1+polytope.cost);
-            % TODO if self_deflections < small deflection, write self defleciton and its "side length" (really dist*cost)
-            % to the vector instead of outer small angle and its side legnth
             angle_vertex_normal_to_travel_direction(i) = INTERNAL_angle_between_vectors(vertex_normal_vectors(i,:),travel_direction);
             vertex_is_away(i) = dot(vertex_normal_vectors(i,:),travel_direction);
             travel_direction_is_within_polytope(i) = angle_vertex_normal_to_travel_direction(i)<=(pi-angles(i))/2;
