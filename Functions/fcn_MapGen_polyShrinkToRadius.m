@@ -9,7 +9,7 @@ function [shrunk_polytopes,mu_final,sigma_final] = ...
 % desired mean radius and specified variance
 %
 % FORMAT:
-%
+% 
 % [shrunk_polytopes,mu_final,sigma_final] = ...
 %     fcn_MapGen_polytopeShrinkToRadius(...
 %     polytopes,...
@@ -22,16 +22,16 @@ function [shrunk_polytopes,mu_final,sigma_final] = ...
 %
 %     POLYTOPES: original polytopes with same fields as shrunk_polytopes
 %
-%     DES_RAD: desired average max radius
+%     DES_RAD: desired average max radius   
 %
-%     SIGMA_RADIUS: desired variance in the radii
+%     SIGMA_RADIUS: desired variance in the radii 
 %
 %     MIN_RAD: minimum acceptable radius
 %
 %
 % OUTPUTS:
 %
-%     SHRUNK_POLYTOPES: a 1-by-n seven field structure of shrunken polytopes,
+%     SHRUNK_POLYTOPES: a 1-by-n seven field structure of shrunken polytopes, 
 %     where n <= number of polytopes with fields:
 %       vertices: a m+1-by-2 matrix of xy points with row1 = rowm+1, where m is
 %         the number of the individual polytope vertices
@@ -46,20 +46,20 @@ function [shrunk_polytopes,mu_final,sigma_final] = ...
 %     MU_FINAL: final average maximum radius achieved
 %
 %     SIGMA_FINAL: final variance achieved
-%
+%   
 % EXAMPLES:
-%
+%      
 
 %
 % For additional examples, see: script_test_fcn_MapGen_polytopeShrinkToRadius
 %
 % This function was written on 2019_08_29 by Seth Tau
-% Questions or comments? sat5340@psu.edu
+% Questions or comments? sat5340@psu.edu 
 %
 
 % Revision History:
 % 2021-06-08 - S. Brennan
-% -- revised function to prep for MapGen class
+% -- revised function to prep for MapGen class 
 % -- added plotting option
 % -- added comments, added debugging option
 
@@ -69,28 +69,9 @@ function [shrunk_polytopes,mu_final,sigma_final] = ...
 % "positive number" check
 
 %% Debugging and Input checks
-% set an environment variable on your machine with the getenv function...
-% in the Matlab console.  Char array of '1' will be true and '0' will be false.
-flag_check_inputs = getenv('ENV_FLAG_CHECK_INPUTS');  % '1' will check input args
-flag_do_plot = getenv('ENV_FLAG_DO_PLOT'); % '1' will make plots
-flag_do_debug = getenv('ENV_FLAG_DO_DEBUG'); % '1' will enable debugging
-
-% if the char array has length 0, assume the env var isn't set and default to...
-% dipslaying more information rather than potentially hiding an issue
-if length(flag_check_inputs) = 0
-    flag_check_inputs = '1';
-end
-if length(flag_do_plot) = 0
-    flag_do_plot = '1';
-end
-if length(flag_do_debug) = 0
-    flag_do_debug = '1';
-end
-
-% convert flag from char string to logical
-flag_check_inputs = flag_check_inputs == '1';
-flag_do_plot = flag_do_plot == '1';
-flag_do_debug = flag_do_debug == '1';
+flag_check_inputs = 1; % Set equal to 1 to check the input arguments
+flag_do_plot = 0;      % Set equal to 1 for plotting
+flag_do_debug = 0;     % Set equal to 1 for debugging
 
 if flag_do_debug
     fig_for_debug = 9453;
@@ -110,32 +91,32 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+    
 if flag_check_inputs
     % Are there the right number of inputs?
     if nargin < 4 || nargin > 5
         error('Incorrect number of input arguments')
     end
-
+    
     % Check the polytopes input
     fcn_MapGen_checkInputsToFunctions(...
         polytopes, 'polytopes');
-
+    
     % Check the des_radius input
     fcn_MapGen_checkInputsToFunctions(...
         des_radius, 'column_of_numbers',1);
-
+    
     % Check the sigma_radius input
     fcn_MapGen_checkInputsToFunctions(...
         sigma_radius, 'column_of_numbers',1);
-
+ 
     % Check the min_rad input
     fcn_MapGen_checkInputsToFunctions(...
         min_rad, 'column_of_numbers',1);
-
-
+    
+    
 end
-
+    
 
 % Does user want to show the plots?
 if  5== nargin
@@ -166,7 +147,7 @@ radii = [polytopes.max_radius];
 
 if flag_do_debug
     fcn_MapGen_plotPolytopes(polytopes,fig_for_debug,'b',2);
-
+    
     figure(fig_for_debug+1);
     histogram(radii,20)
     title('Histogram of input radii');
@@ -185,7 +166,7 @@ end
 r_dist = normrnd(des_radius,sigma_radius,[r_size,1]);
 
 if flag_do_debug
-   figure(fig_for_debug+2);
+   figure(fig_for_debug+2);  
    histogram(r_dist,20)
 end
 
@@ -208,7 +189,7 @@ sigma_final = std(r_dist);
 
 
 if flag_do_debug
-   figure(fig_for_debug+2);
+   figure(fig_for_debug+2);  
    histogram(r_dist,20)
 end
 
@@ -221,15 +202,15 @@ end
 shrunk_polytopes = polytopes;
 for idx = 1:length(new_rads)
     shrinker = polytopes(ob_ind(idx)); % obstacle to be shrunk
-
+    
     % pull values
     vertices = shrinker.vertices;
     centroid = shrinker.mean;
     rad = shrinker.max_radius;
-
+    
     % determine scale factor
     scale = new_rads(idx)/rad;
-
+    
     if scale < 1 % calculation error can sometimes make this greater than 1
         % find new vertices
         new_vert = centroid + scale*(vertices-centroid);
@@ -239,7 +220,7 @@ for idx = 1:length(new_rads)
         % this, we get rid of one of any vertices that are too close to
         % each other. This is set by a tolerance.
         distance_tolerance = 1e-5;
-
+        
         % combine any vertices within tolerance
         good_ind = sum(abs(new_vert(1:end-1,:)-new_vert(2:end,:)),2)>1e-5;
         if sum(good_ind)>2 % sufficient good points to make a shape
@@ -250,7 +231,7 @@ for idx = 1:length(new_rads)
         else% singular shape (i.e. point) or no shape
             new_vert = [centroid; centroid; centroid];
         end
-
+        
         % adjust polytopes
         shrinker.vertices = new_vert;
         shrinker.xv = new_vert(1:end-1,1)';
@@ -259,37 +240,37 @@ for idx = 1:length(new_rads)
         shrinker.area = shrinker.area*scale^2;
         shrinker.max_radius = shrinker.max_radius*scale;
     end
-
+    
     % assign to shrunk_polytopes
     shrunk_polytopes(ob_ind(idx)) = shrinker;
 end
 
 %% Plot results?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____       _
-%  |  __ \     | |
-%  | |  | | ___| |__  _   _  __ _
+%   _____       _                 
+%  |  __ \     | |                
+%  | |  | | ___| |__  _   _  __ _ 
 %  | |  | |/ _ \ '_ \| | | |/ _` |
 %  | |__| |  __/ |_) | |_| | (_| |
 %  |_____/ \___|_.__/ \__,_|\__, |
 %                            __/ |
-%                           |___/
+%                           |___/ 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if flag_do_plot
     figure(fig_num);
     hold on
-
+    
     % Plot the input polytopes in red
     fcn_MapGen_plotPolytopes(polytopes,fig_num,'r',2,[0 1 0 1]);
-
+    
     % plot the shrunk in blue
     fcn_MapGen_plotPolytopes(shrunk_polytopes,fig_num,'b',2,[0 1 0 1]);
 
 end
 
 if flag_do_debug
-    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
+    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file); 
 end
 
 end % Ends function
@@ -297,14 +278,14 @@ end % Ends function
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   ______                _   _
-%  |  ____|              | | (_)
-%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___
+%   ______                _   _                 
+%  |  ____|              | | (_)                
+%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___ 
 %  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
 %  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
 %  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                               
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                                               
 
 
 function [dist] = ...
@@ -312,7 +293,7 @@ function [dist] = ...
     points1,...
     points2,...
     varargin)
-% fcn_geometry_euclideanPointsToPointsDistance calculates the
+% fcn_geometry_euclideanPointsToPointsDistance calculates the 
 % distance(s) between a vector of points, POINTS1, and another vector of
 % points, POINTS2.
 %
@@ -322,10 +303,10 @@ function [dist] = ...
 %
 % INPUTS:
 %
-%      POINTS1: an Nx2 or Nx3 series of xy or xyz points
+%      POINTS1: an Nx2 or Nx3 series of xy or xyz points 
 %      in the form: [x1 y1 z1; x2 y2 z2; ... ; xn yn zn]
 %
-%      POINTS2: an Nx2 or Nx3 series of xy or xyz points
+%      POINTS2: an Nx2 or Nx3 series of xy or xyz points 
 %      in the form: [x1 y1 z1; x2 y2 z2; ... ; xn yn zn]
 %
 %      (OPTIONAL INPUTS)
@@ -351,11 +332,11 @@ function [dist] = ...
 % for a full test suite.
 %
 % This function was written on 2018_11_17 by Seth Tau
-% Questions or comments? sat5340@psu.edu
+% Questions or comments? sat5340@psu.edu 
 
 % Revision History:
 % 2021-05-28 - S. Brennan
-% -- revised function to prep for geometry class
+% -- revised function to prep for geometry class 
 % -- rewrote function to use vector sum
 % -- added plotting option
 % 2021-06-05
@@ -385,12 +366,12 @@ end
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-if flag_check_inputs
-    % Are there the right number of inputs?
+if flag_check_inputs    
+    % Are there the right number of inputs?    
     if nargin < 2 || nargin > 3
         error('Incorrect number of input arguments')
     end
-
+    
     % Check the points1 input
     fcn_geometry_checkInputsToFunctions(...
         points1, '2or3column_of_numbers');
@@ -400,11 +381,11 @@ end
 Npoints = length(points1(:,1));
 
 if flag_check_inputs
-
+    
     % Check the points2 input, forcing length to match points1
     fcn_geometry_checkInputsToFunctions(...
         points2, '2or3column_of_numbers',Npoints);
-
+    
 end
 
 
@@ -435,14 +416,14 @@ dist = sum((points1-points2).^2,2).^0.5;
 
 %% Plot results?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____       _
-%  |  __ \     | |
-%  | |  | | ___| |__  _   _  __ _
+%   _____       _                 
+%  |  __ \     | |                
+%  | |  | | ___| |__  _   _  __ _ 
 %  | |  | |/ _ \ '_ \| | | |/ _` |
 %  | |__| |  __/ |_) | |_| | (_| |
 %  |_____/ \___|_.__/ \__,_|\__, |
 %                            __/ |
-%                           |___/
+%                           |___/ 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if flag_do_plot
@@ -451,7 +432,7 @@ if flag_do_plot
     clf
     hold on;
     grid on; grid minor;
-
+        
     midpoints = (points1+points2)/2;
     for ith_point=1:Npoints
         % 2D plot?
@@ -460,7 +441,7 @@ if flag_do_plot
             xdata = [points1(ith_point,1) points2(ith_point,1)];
             ydata = [points1(ith_point,2) points2(ith_point,2)];
             plot(xdata,ydata,'.-','Linewidth',3,'Markersize',20);
-
+            
             % Label the midpoints
             text(midpoints(ith_point,1),midpoints(ith_point,2),sprintf('d - %.1f',dist(ith_point,1)));
         else
@@ -472,16 +453,16 @@ if flag_do_plot
 
             % Label the midpoints
             text(midpoints(ith_point,1),midpoints(ith_point,2),midpoints(ith_point,3),sprintf('d - %.1f',dist(ith_point,1)));
-
+            
             % Set to 3D view
             view(3);
         end
-
+        
     end
 end
 
 if flag_do_debug
-    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
+    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file); 
 end
 
 

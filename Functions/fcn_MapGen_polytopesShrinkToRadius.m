@@ -9,7 +9,7 @@ function [shrunk_polytopes,mu_final,sigma_final] = ...
 % desired mean radius and specified variance
 %
 % FORMAT:
-%
+% 
 % [shrunk_polytopes,mu_final,sigma_final] = ...
 %     fcn_MapGen_polytopesShrinkToRadius(...
 %     polytopes,...
@@ -22,9 +22,9 @@ function [shrunk_polytopes,mu_final,sigma_final] = ...
 %
 %     POLYTOPES: original polytopes with same fields as shrunk_polytopes
 %
-%     DES_RAD: desired average max radius
+%     DES_RAD: desired average max radius   
 %
-%     SIGMA_RADIUS: desired variance in the radii
+%     SIGMA_RADIUS: desired variance in the radii 
 %
 %     MIN_RAD: minimum acceptable radius
 %
@@ -35,7 +35,7 @@ function [shrunk_polytopes,mu_final,sigma_final] = ...
 %
 % OUTPUTS:
 %
-%     SHRUNK_POLYTOPES: a 1-by-n seven field structure of shrunken polytopes,
+%     SHRUNK_POLYTOPES: a 1-by-n seven field structure of shrunken polytopes, 
 %     where n <= number of polytopes with fields:
 %       vertices: a m+1-by-2 matrix of xy points with row1 = rowm+1, where m is
 %         the number of the individual polytope vertices
@@ -50,24 +50,24 @@ function [shrunk_polytopes,mu_final,sigma_final] = ...
 %     MU_FINAL: final average maximum radius achieved
 %
 %     SIGMA_FINAL: final variance achieved
-%
+%   
 % DEPENDENCIES:
-%
+% 
 %     fcn_MapGen_checkInputsToFunctions
 %     fcn_MapGen_plotPolytopes
 %     fcn_MapGen_polytopeShrinkToRadius
-%
+% 
 % EXAMPLES:
 %
 % For additional examples, see: script_test_fcn_MapGen_polytopesShrinkToRadius
 %
 % This function was written on 2019_08_29 by Seth Tau
-% Questions or comments? sat5340@psu.edu
+% Questions or comments? sat5340@psu.edu 
 %
 
 % Revision History:
 % 2021-06-08 - S. Brennan
-% -- revised function to prep for MapGen class
+% -- revised function to prep for MapGen class 
 % -- added plotting option
 % -- added comments, added debugging option
 % 2021-06-12
@@ -85,28 +85,9 @@ function [shrunk_polytopes,mu_final,sigma_final] = ...
 % "positive number" check
 
 %% Debugging and Input checks
-% set an environment variable on your machine with the getenv function...
-% in the Matlab console.  Char array of '1' will be true and '0' will be false.
-flag_check_inputs = getenv('ENV_FLAG_CHECK_INPUTS');  % '1' will check input args
-flag_do_plot = getenv('ENV_FLAG_DO_PLOT'); % '1' will make plots
-flag_do_debug = getenv('ENV_FLAG_DO_DEBUG'); % '1' will enable debugging
-
-% if the char array has length 0, assume the env var isn't set and default to...
-% dipslaying more information rather than potentially hiding an issue
-if length(flag_check_inputs) = 0
-    flag_check_inputs = '1';
-end
-if length(flag_do_plot) = 0
-    flag_do_plot = '1';
-end
-if length(flag_do_debug) = 0
-    flag_do_debug = '1';
-end
-
-% convert flag from char string to logical
-flag_check_inputs = flag_check_inputs == '1';
-flag_do_plot = flag_do_plot == '1';
-flag_do_debug = flag_do_debug == '1';
+flag_check_inputs = 1; % Set equal to 1 to check the input arguments
+flag_do_plot = 0;      % Set equal to 1 for plotting
+flag_do_debug = 0;     % Set equal to 1 for debugging
 
 if flag_do_debug
     fig_for_debug = 9453;
@@ -126,31 +107,31 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+    
 if flag_check_inputs
     % Are there the right number of inputs?
     if nargin < 4 || nargin > 5
         error('Incorrect number of input arguments')
     end
-
+    
     % Check the polytopes input
     fcn_MapGen_checkInputsToFunctions(...
         polytopes, 'polytopes');
-
+    
     % Check the des_radius input
     fcn_MapGen_checkInputsToFunctions(...
         des_radius, 'positive_1column_of_numbers',1);
-
+    
     % Check the sigma_radius input
     fcn_MapGen_checkInputsToFunctions(...
         sigma_radius, '1column_of_numbers',1);
-
+ 
     % Check the min_rad input
     fcn_MapGen_checkInputsToFunctions(...
         min_rad, 'positive_1column_of_numbers',1);
 
 end
-
+    
 
 % Does user want to show the plots?
 if  5== nargin
@@ -185,13 +166,13 @@ if flag_do_debug
     fprintf(1,'Target distrubution statistics:\n');
     fprintf(1,'\tMean: %.4f\n',des_radius);
     fprintf(1,'\tStd dev: %.4f\n',sigma_radius);
-
+    
     fprintf(1,'Input distrubution statistics:\n');
     fprintf(1,'\tMean: %.4f\n',old_r_mu);
     fprintf(1,'\tStd dev: %.4f\n',old_r_sigma);
-
+    
     fcn_MapGen_plotPolytopes(polytopes,fig_for_debug,'b',2);
-
+    
     figure(fig_for_debug+1);
     histogram(old_max_radii,20)
     title(sprintf('Histogram of input radii. Mean: %.4f, Std-dev: %.4f. Targets are: %.4f and %.4f',...
@@ -209,7 +190,7 @@ end
 new_r_dist = normrnd(des_radius,sigma_radius,[Nradii,1]);
 
 % adjust to ensure the mean value is mu. SETH: is this necessary?
-new_r_dist = new_r_dist + (des_radius-mean(new_r_dist));
+new_r_dist = new_r_dist + (des_radius-mean(new_r_dist)); 
 
 
 if flag_do_debug
@@ -218,14 +199,14 @@ if flag_do_debug
     fprintf(1,'Ideal distrubution statistics:\n');
     fprintf(1,'\tMean: %.4f\n',new_r_mu);
     fprintf(1,'\tStd dev: %.4f\n',new_r_sigma);
-
+    
     figure(fig_for_debug+2);
     histogram(new_r_dist,20)
     title(sprintf('Histogram of target radii. Mean: %.4f, Std-dev: %.4f. Targets are: %.4f and %.4f',...
         new_r_mu,new_r_sigma,...
         des_radius,...
         sigma_radius));
-
+   
 end
 
 % Check to see if truncation will occur. THis is checked by using the
@@ -277,7 +258,7 @@ if flag_do_debug
     fprintf(1,'\tMean: %.4f\n',mu_final);
     fprintf(1,'\tStd dev: %.4f\n',sigma_final);
 
-   figure(fig_for_debug+2);
+   figure(fig_for_debug+2);  
    hold on;
    histogram(new_r_dist,20)
    title(sprintf('Histogram of bounded target radii. Mean: %.4f, Std-dev: %.4f. Targets are: %.4f and %.4f',...
@@ -306,7 +287,7 @@ end
 % new_radii_sorted = new_r_dist;
 % ob_index = find(new_r_dist>=0);
 
-% Check that the old polytopes are large enough to shrink and
+% Check that the old polytopes are large enough to shrink and 
 % achieve the new radius distribution. Want all the changes to be smaller
 % than -2 times the minimum radius, to ensure we do not get singular
 % polytopes.
@@ -325,7 +306,7 @@ tolerance = 1e-5; % Units are (implied) kilometers
 for ith_radii = 1:length(new_radii_sorted)
     shrinker = polytopes(ob_index(ith_radii)); % obstacle to be shrunk
     des_rad = new_radii_sorted(ith_radii);
-
+        
     % assign to shrunk_polytopes
     shrunk_polytopes(ob_index(ith_radii)) = ...
         fcn_MapGen_polytopeShrinkToRadius(...
@@ -346,30 +327,30 @@ end
 
 %% Plot results?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____       _
-%  |  __ \     | |
-%  | |  | | ___| |__  _   _  __ _
+%   _____       _                 
+%  |  __ \     | |                
+%  | |  | | ___| |__  _   _  __ _ 
 %  | |  | |/ _ \ '_ \| | | |/ _` |
 %  | |__| |  __/ |_) | |_| | (_| |
 %  |_____/ \___|_.__/ \__,_|\__, |
 %                            __/ |
-%                           |___/
+%                           |___/ 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if flag_do_plot
     figure(fig_num);
     hold on
-
+    
     % Plot the input polytopes in red
     fcn_MapGen_plotPolytopes(polytopes,fig_num,'r',2);
-
+    
     % plot the shrunk in blue
     fcn_MapGen_plotPolytopes(shrunk_polytopes,fig_num,'b',2);
 
 end
 
 if flag_do_debug
-    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
+    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file); 
 end
 
 end % Ends function
@@ -377,13 +358,13 @@ end % Ends function
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   ______                _   _
-%  |  ____|              | | (_)
-%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___
+%   ______                _   _                 
+%  |  ____|              | | (_)                
+%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___ 
 %  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
 %  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
 %  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                               
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                                               
 
 

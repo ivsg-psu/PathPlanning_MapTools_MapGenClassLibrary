@@ -3,7 +3,7 @@ function [polytopes,fig]=fcn_MapGen_nameToMap(...
     plot_flag,...
     disp_name,...
     varargin)
-% fcn_MapGen_nameToMap generates a map based on
+% fcn_MapGen_nameToMap generates a map based on 
 % map_name which specifies the map characteristics in a way that allows map
 % to be recreated exactly from the name alone.
 %
@@ -23,20 +23,20 @@ function [polytopes,fig]=fcn_MapGen_nameToMap(...
 %
 % INPUTS:
 %
-%     map_name: string with map characteristic numbers seperated by indicating
+%     map_name: string with map characteristic numbers seperated by indicating 
 %       letters. See details below.
 %
 %     plot_flag: variable determining whether the map should be plotted (1=Yes)
 %
 %     disp_name: variable determining whether the map name is displayed on the plot
 %       (1=Yes), where the name goes (x,y), what color ([r g b]), and the font
-%       size (e.g. 12)
+%       size (e.g. 12) 
 %
 %       Example [Yes, origin, red, size 12] = [1, 0 0, 1 0 0, 12]
 %
 %       If not desired set the first value to anything but 1 and the rest will
 %       be ignored
-%       Example [No, NA, NA, NA] = [0, 1 2, 3 4 5, 6], or 0, or 999
+%       Example [No, NA, NA, NA] = [0, 1 2, 3 4 5, 6], or 0, or 999  
 %
 %    ( OPTIONAL INPUTS)
 %
@@ -72,19 +72,19 @@ function [polytopes,fig]=fcn_MapGen_nameToMap(...
 %       mean: centroid xy coordinate of the polytope
 %       area: area of the polytope
 %       max_radius: distance from the mean to the farthest vertex
-%
+% 
 %     fig: variable containing the figure number of the plot, if plot_flag
 %     is 1
 %
 % CHARACTERISTICS:
-%
+% 
 % %% List of Map Characteristics:
 % %%% Generation:
 %       HST: Halton set voronoi tiling
 %           requires: minimum value and maximum value of Halton set
 %           example: HST 1 1000
 % %%% Trimming
-%       SQT: Square trimming
+%       SQT: Square trimming 
 %           requires: low x value, high x value, low y value, high y value
 %           example: SQT 0 1 0 1
 % %%% Shrinking
@@ -104,58 +104,39 @@ function [polytopes,fig]=fcn_MapGen_nameToMap(...
 % EXAMPLES:
 %
 % Basic Example:
-%   map_name = "HST 1 100 SQT 0 1 0 1 SMV 0.01 0.001 1e-6 1111";
-%   plot_flag = 1; disp_name = 0; fig_num = []; line_style = 'r-';
+%   map_name = "HST 1 100 SQT 0 1 0 1 SMV 0.01 0.001 1e-6 1111"; 
+%   plot_flag = 1; disp_name = 0; fig_num = []; line_style = 'r-'; 
 %   line_width = 2;
 %   [polytopes,fig]=fcn_MapGen_nameToMap(map_name,plot_flag,disp_name,fig_num,line_style,line_width);
-%
+%   
 % Advanced Example
 %   map_name = "HST 30 450 SQT 0 1 0 1 SMV 0.02 0.005 1e-6 1234";
-%   plot_flag = 1; disp_name = [1, 0.05 -0.05, 0.5 0.5 0.5, 10];
-%   fig_num = 999; line_style = '-'; line_width = 2; color = [0 0 1];
-%   axis_limits = [0 1 -0.1 1]; axis_style = 'square';
+%   plot_flag = 1; disp_name = [1, 0.05 -0.05, 0.5 0.5 0.5, 10]; 
+%   fig_num = 999; line_style = '-'; line_width = 2; color = [0 0 1]; 
+%   axis_limits = [0 1 -0.1 1]; axis_style = 'square'; 
 %   fill_info = [1 1 0 1 0.5];
 %   [polytopes,fig]=fcn_MapGen_nameToMap(map_name,plot_flag,disp_name,fig_num,line_style,line_width,color,axis_limits,axis_style,fill_info);
-%
-%
+% 
+% 
 % See the script: script_test_fcn_MapGen_nameToMap
 % for a full test suite.
 %
 % This function was written on 2020_07_02 by Seth Tau
 % Comments added on 2021_02_23 by Seth Tau
-% Questions or comments? sat5340@psu.edu
+% Questions or comments? sat5340@psu.edu 
 
 
 % Revision History:
 % 2021-06-08 - S. Brennan
-% -- revised function to prep for MapGen class
+% -- revised function to prep for MapGen class 
 
 % TO DO:
 % -- (none)
 
 %% Debugging and Input checks
-% set an environment variable on your machine with the getenv function...
-% in the Matlab console.  Char array of '1' will be true and '0' will be false.
-flag_check_inputs = getenv('ENV_FLAG_CHECK_INPUTS');  % '1' will check input args
-flag_do_plot = getenv('ENV_FLAG_DO_PLOT'); % '1' will make plots
-flag_do_debug = getenv('ENV_FLAG_DO_DEBUG'); % '1' will enable debugging
-
-% if the char array has length 0, assume the env var isn't set and default to...
-% dipslaying more information rather than potentially hiding an issue
-if length(flag_check_inputs) = 0
-    flag_check_inputs = '1';
-end
-if length(flag_do_plot) = 0
-    flag_do_plot = '1';
-end
-if length(flag_do_debug) = 0
-    flag_do_debug = '1';
-end
-
-% convert flag from char string to logical
-flag_check_inputs = flag_check_inputs == '1';
-flag_do_plot = flag_do_plot == '1';
-flag_do_debug = flag_do_debug == '1';
+flag_check_inputs = 1; % Set equal to 1 to check the input arguments
+flag_do_plot = plot_flag;      % Set equal to 1 for plotting
+flag_do_debug = 0;     % Set equal to 1 for debugging
 
 if flag_do_debug
     fig_for_debug = 9993;
@@ -175,14 +156,14 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-if flag_check_inputs
-    % Are there the right number of inputs?
+    
+if flag_check_inputs    
+    % Are there the right number of inputs?    
     %  not enough   plotting but not enough   too many
     if (nargin<3)||((nargin>3)&&(nargin<6))||(nargin>10)
         error('Incorrect number of arguments.')
     end
-
+    
     % Check the map_name input
     if ~isstring(map_name) % input must be a string
         if ischar(map_name) % convert to string if a character
@@ -191,10 +172,10 @@ if flag_check_inputs
             error('map_name must be a string.')
         end
     end
-
+    
     % Check the plot_flag input
     fcn_MapGen_checkInputsToFunctions(...
-        plot_flag, '1column_of_numbers',1);
+        plot_flag, '1column_of_numbers',1);       
 
 end
 
@@ -206,7 +187,7 @@ if 4 <= nargin
         figure(fig_num);
         flag_do_plot = 1;
     end
-
+        
 else
     if flag_do_debug
         fig = figure;
@@ -229,7 +210,7 @@ end
 split_name = split(map_name); % split name string at each space
 
 %% Base Map Generation
-if sum(split_name=="HST")>0 % Check for Halton Set Tiling (HST)
+if sum(split_name=="HST")>0 % Check for Halton Set Tiling (HST) 
     HST_index = find(split_name=="HST"); % index of the HST string
     if length(HST_index)>1 % more than one instance of HST
         error('HST is repeated in map_name.')
@@ -238,7 +219,7 @@ if sum(split_name=="HST")>0 % Check for Halton Set Tiling (HST)
     halton_range = ...
         [str2double(split_name(HST_index+1)),str2double(split_name(HST_index+2))];
     base_polytopes = fcn_MapGen_haltonVoronoiTiling(halton_range);
-
+    
 % elseif % check for other generating methods
 
     % generate using other method
@@ -252,12 +233,12 @@ if sum(split_name=="SQT")>0 % check for square triming (SQT)
     if length(SQT_index)>1 % more than one instance of SQT
         error('SQT is repeated in map_name')
     end
-
+    
     % trim the base polytopes based on the values following SQT
     bounding_box = ...
         [str2double(split_name(SQT_index+1)),str2double(split_name(SQT_index+3));
         str2double(split_name(SQT_index+2)),str2double(split_name(SQT_index+4))];
-
+    
     trim_polytopes = fcn_MapGen_polytopeCropEdges(...
         base_polytopes,bounding_box);
 % elseif % check for other trim methods
@@ -289,14 +270,14 @@ fig = []; % set value empty to return as default. Value is filled below if plott
 
 %% Plot results?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____       _
-%  |  __ \     | |
-%  | |  | | ___| |__  _   _  __ _
+%   _____       _                 
+%  |  __ \     | |                
+%  | |  | | ___| |__  _   _  __ _ 
 %  | |  | |/ _ \ '_ \| | | |/ _` |
 %  | |__| |  __/ |_) | |_| | (_| |
 %  |_____/ \___|_.__/ \__,_|\__, |
 %                            __/ |
-%                           |___/
+%                           |___/ 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if flag_do_plot
@@ -306,7 +287,7 @@ if flag_do_plot
     else % basic plotting
         [fig] = fcn_MapGen_plotPolytopes(polytopes,varargin{1},varargin{2},varargin{3});
     end
-
+    
     % Show the name
     if disp_name(1) == 1 % add map_name to plot
         text(disp_name(2),disp_name(3),map_name,'color',disp_name(4:6),'FontSize',disp_name(7));
@@ -314,7 +295,7 @@ if flag_do_plot
 end
 
 if flag_do_debug
-    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
+    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file); 
 end
 
 

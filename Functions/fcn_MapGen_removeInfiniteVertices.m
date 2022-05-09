@@ -69,28 +69,9 @@ function [bounded_vertices] = ...
 
 
 %% Debugging and Input checks
-% set an environment variable on your machine with the getenv function...
-% in the Matlab console.  Char array of '1' will be true and '0' will be false.
-flag_check_inputs = getenv('ENV_FLAG_CHECK_INPUTS');  % '1' will check input args
-flag_do_plot = getenv('ENV_FLAG_DO_PLOT'); % '1' will make plots
-flag_do_debug = getenv('ENV_FLAG_DO_DEBUG'); % '1' will enable debugging
-
-% if the char array has length 0, assume the env var isn't set and default to...
-% dipslaying more information rather than potentially hiding an issue
-if length(flag_check_inputs) = 0
-    flag_check_inputs = '1';
-end
-if length(flag_do_plot) = 0
-    flag_do_plot = '1';
-end
-if length(flag_do_debug) = 0
-    flag_do_debug = '1';
-end
-
-% convert flag from char string to logical
-flag_check_inputs = flag_check_inputs == '1';
-flag_do_plot = flag_do_plot == '1';
-flag_do_debug = flag_do_debug == '1';
+flag_check_inputs = 1; % Set equal to 1 to check the input arguments
+flag_do_plot = 0;      % % Set equal to 1 for plotting
+flag_do_debug = 0;     % Set equal to 1 for debugging
 
 if flag_do_debug
     fig_for_debug = 846;
@@ -113,32 +94,32 @@ end
 
 
 if 1 == flag_check_inputs
-
+    
     % Are there the right number of inputs?
     if nargin < 4 || nargin > 5
         error('Incorrect number of input arguments')
     end
-
+    
     % Check the all_vertices input, make sure it has 3 columns, and can be
     % mixed NaN with numeric values
     fcn_MapGen_checkInputsToFunctions(...
         all_vertices, '3column_of_mixed');
-
+    
     % Check the Nvertices_per_poly input, make sure it has 1 column, 1 row
     fcn_MapGen_checkInputsToFunctions(...
         Nvertices_per_poly, '1column_of_numbers',1);
-
+    
     % Check the seed_points input, make sure it is '2column_of_numbers'
     % type, with correct number of rows
     fcn_MapGen_checkInputsToFunctions(...
         seed_points, '2column_of_numbers',...
         round(length(all_vertices(:,1))/Nvertices_per_poly));
-
+    
     % Check the AABB input, make sure it is '4column_of_numbers' type, with
     % 1 row
     fcn_MapGen_checkInputsToFunctions(...
         AABB, '4column_of_numbers',1);
-
+    
 end
 
 % Does user want to show the plots?
@@ -174,15 +155,15 @@ if flag_do_debug
     figure(fig_for_debug);
     clf;
     hold on;
-
+    
     scale = max(AABB,[],'all') - min(AABB,[],'all');
     new_axis = [AABB(1)-scale/2 AABB(3)+scale/2 AABB(2)-scale/2 AABB(4)+scale/2];
     axis(new_axis);
-
-
+    
+    
     % Plot the vertices
     plot(all_vertices(:,2),all_vertices(:,3),'r.-');
-
+    
     % Plot the walls
     plot(walls(:,1),walls(:,2),'k-');
 end
@@ -200,17 +181,17 @@ sorted_all_vertices = unique(sorted_all_vertices,'rows','stable');
 
 bounded_vertices = all_vertices; % Initialize the array
 if any(isinf(all_vertices),'all') % Are there any infinite vertices
-
+    
     % Find the bad indices
     bad_indices = isinf(all_vertices(:,2));
-
+    
     % Grab the polytope IDs
     bad_polytopes = all_vertices(bad_indices,1);
-
+        
     % Loop through bad indices
     for ith_poly = 1:length(bad_polytopes)
         bad_poly = bad_polytopes(ith_poly);
-
+        
         %         % FOR DEBUGGING:
         %         interior_point = seed_points(bad_poly,:);
         %         tolerance = 0.001;
@@ -223,24 +204,24 @@ if any(isinf(all_vertices),'all') % Are there any infinite vertices
         %             disp('stop here');
         %         end
 
-
+        
         % Grab this bad polytope
         row_offset = (bad_poly-1)*Nvertices_per_poly;
         this_poly = all_vertices(row_offset+1:row_offset+Nvertices_per_poly,:);
 
-        if flag_do_debug
+        if flag_do_debug           
             % Plot the vertices
             plot(this_poly(:,2),this_poly(:,3),'b.-');
         end
-
+        
         % Grab vertices out of this polytope, removing nan values
         vertices = this_poly(:,2:3);
         vertices = vertices(~isnan(vertices(:,1)),:);
-
+        
         % Check how many infinities are in this polytope
         bad_indices = find(isinf(vertices(:,1)));
 
-
+        
         % Check to see if this value has already been fixed
         if ~any(isinf(this_poly),'all')
             break;
@@ -260,7 +241,7 @@ if any(isinf(all_vertices),'all') % Are there any infinite vertices
         else
             vertices_no_repeats = vertices(1:end-1,:);
         end
-
+        
         bad_index = bad_indices(1);
         % Rearrange the points so that the infinite index is the first one.
         % Makes things easier in later steps since we don't have to carry
@@ -268,12 +249,12 @@ if any(isinf(all_vertices),'all') % Are there any infinite vertices
         vertex_string = ...
             [vertices_no_repeats(bad_index+1:end,:); ...
             vertices_no_repeats(1:bad_index-1,:)];
-
+        
         if flag_do_debug
             % Plot the vertex_string
             plot(vertex_string(:,1),vertex_string(:,2),'b.-');
         end
-
+        
         %         [cropped_vertices,~] = ...
         %             fcn_MapGen_cropVerticesByWallIntersections(vertex_string,walls);
         %
@@ -287,7 +268,7 @@ if any(isinf(all_vertices),'all') % Are there any infinite vertices
         %         next_point = cropped_vertices(1,:);
         %         start_data = [];
         %         end_data = cropped_vertices(1:end,:);
-
+        
         % Find the prior and next points relative to the bad index point
         % The prior_point and next_point are not used as vertices themselves,
         % but rather to create new vertices by snapping to the bounding polygon
@@ -299,27 +280,27 @@ if any(isinf(all_vertices),'all') % Are there any infinite vertices
         next_point_lead_in = vertex_string(2,:);
         start_data = [];
         end_data = vertex_string(1:end,:);
-
+        
         % If prior or next points are inside the AABB, need to push them
         % out to the boundaries. This is a bit challenging since these
         % represent cases where the Vornoi boundary is missing, so
         % basically it means we have to calculate the boundary ourselves.
-        isInside = fcn_MapGen_isWithinABBB(AABB, [prior_point; next_point]);
+        isInside = fcn_MapGen_isWithinABBB(AABB, [prior_point; next_point]);        
         if isInside(1)
             new_prior = INTERNAL_fcn_MapGen_findMissingBoundaryPoint(...
                 prior_point,prior_point_lead_in, bad_poly,AABB,sorted_all_vertices,seed_points);
         else
             new_prior = prior_point;
         end
-
+        
         if isInside(2)
             new_next = INTERNAL_fcn_MapGen_findMissingBoundaryPoint(...
                 next_point,next_point_lead_in, bad_poly,AABB,sorted_all_vertices,seed_points);
         else
             new_next = next_point;
         end
-
-
+        
+        
         %         % Substitute data in, removing the infinite value
         %         resulting_vertices = [start_data; new_prior; new_next; end_data];
         %
@@ -327,13 +308,13 @@ if any(isinf(all_vertices),'all') % Are there any infinite vertices
         %             % Plot the resulting_vertices
         %             plot(resulting_vertices(:,1),resulting_vertices(:,2),'g.-');
         %         end
-
+        
         if flag_do_debug
             % Plot the resulting_vertices
             plot(new_prior(:,1),new_prior(:,2),'g.');
             plot(new_next(1,1),new_next(1,2),'go');
         end
-
+        
         % Is the point is in a corner? If so, add an extra point for the
         % corner
         extra_point = [];
@@ -370,18 +351,18 @@ if any(isinf(all_vertices),'all') % Are there any infinite vertices
         %                 extra_point = [AABB(3) AABB(4)];
         %             end
         %         end
-
+        
         % Shuffle data into result
         % Make a fresh nan_vector
         non_repeating_resulting_vertices = nan(Nvertices_per_poly,3);
-
+        
         % Create data
         fill_vertices = [start_data; new_prior; extra_point; new_next; end_data];
-
+        
         % Close off vertices
         closed_fill_vertices = ...
             [fill_vertices; fill_vertices(1,:)];
-
+        
         % Push into format for all_vertices
         non_repeating_resulting_vertices(1:length(closed_fill_vertices(:,1)),1) = ...
             bad_poly;
@@ -390,9 +371,9 @@ if any(isinf(all_vertices),'all') % Are there any infinite vertices
 
 
         bounded_vertices(row_offset+1:row_offset+Nvertices_per_poly,:) = ...
-            non_repeating_resulting_vertices;
+            non_repeating_resulting_vertices;        
     end % Ends loop through bad indices
-
+     
 end
 
 %§
@@ -416,24 +397,24 @@ if flag_do_plot
     hold on;
     grid on;
     grid minor;
-
+    
     scale = max(AABB,[],'all') - min(AABB,[],'all');
     new_axis = [AABB(1)-scale/2 AABB(3)+scale/2 AABB(2)-scale/2 AABB(4)+scale/2];
     axis(new_axis);
-
-
+    
+    
     % Plot the vertices
     plot(all_vertices(:,2),all_vertices(:,3),'r.-','Linewidth',3);
-
+    
     % Plot the walls
     plot(walls(:,1),walls(:,2),'k-');
-
+    
     % Plot the seed_points
     plot(seed_points(:,1),seed_points(:,2),'r.','Markersize',10);
-
+    
     % Plot the cropped_vertices locations
     plot(bounded_vertices(:,2),bounded_vertices(:,3),'g-','Linewidth',2);
-
+    
 end % Ends the flag_do_plot if statement
 
 if flag_do_debug
@@ -484,14 +465,14 @@ end
 
 if flag_do_debug
     figure(fig_for_debug);
-
+    
     % Plot the current_seed
     plot(current_seed(:,1),current_seed(:,2),'g.','Markersize',20);
     plot(current_seed(:,1),current_seed(:,2),'b.','Markersize',10);
     plot(test_point(:,1),test_point(:,2),'bo','Markersize',10);
     plot(incoming_point(:,1),incoming_point(:,2),'bo','Markersize',5);
 
-end
+end 
 
 % Each point can be connected to only three other polytopes. If there's an
 % infinity there, then one of the connections is missing. To find the
@@ -532,10 +513,10 @@ midpoint = (current_seed+missing_neighbors_seed)/2;
 
 if flag_do_debug
     figure(fig_for_debug);
-
+       
     % Plot the neighbors_prior_seeds
     plot(missing_neighbors_seed(:,1),missing_neighbors_seed(:,2),'g.','Markersize',20);
-
+    
     % Plot the midpoint
     plot(midpoint(:,1),midpoint(:,2),'k.','Markersize',10);
 
@@ -552,13 +533,13 @@ sorted_points_for_vector = points_for_vector(sort_index,:);
 
 if flag_do_debug
     figure(fig_for_debug);
-
+    
     % Plot the vote
     plot(nominal_new_boundary_point(:,1),nominal_new_boundary_point(:,2),'mo','Markersize',10);
 
     % Plot the tail of the vector small
     plot(sorted_points_for_vector(1,1),sorted_points_for_vector(1,2),'k.','Markersize',20);
-
+    
     % Plot the head of the vector big
     plot(sorted_points_for_vector(2,1),sorted_points_for_vector(2,2),'k.','Markersize',30);
 
@@ -570,7 +551,7 @@ new_point = fcn_MapGen_snapToAABB(AABB,sorted_points_for_vector,snap_type);
 
 
 if flag_do_debug
-
+    
     % Plot the new_point
     plot(new_point(:,1),new_point(:,2),'k.','Markersize',40);
 

@@ -7,16 +7,16 @@ tolerance, ...
 varargin...
 )
 % fcn_MapGen_polytopeRemoveTightVerticies
-% removes verticies of polytopes that are too close to each other,
+% removes verticies of polytopes that are too close to each other, 
 % measured by a tolerance
-%
-% Sometimes, when shrinking, the new verticies are particularly close to
-% each other to where an edge has a trivial length. To prevent this, we
-% get rid of one of any vertices that are too close to each other. This
+% 
+% Sometimes, when shrinking, the new verticies are particularly close to 
+% each other to where an edge has a trivial length. To prevent this, we 
+% get rid of one of any vertices that are too close to each other. This 
 % proximity is set by a user-defined tolerance.
-%
+% 
 % FORMAT:
-%
+% 
 %    [ ...
 %    cleaned_polytope ...
 %    ] = ...
@@ -25,81 +25,63 @@ varargin...
 %    tolerance, ...
 %    (fig_num) ...
 %    )
-%
+% 
 % INPUTS:
-%
-%     polytope: an individual structure or structure array of 'polytopes'
+% 
+%     polytope: an individual structure or structure array of 'polytopes' 
 %     type that stores the polytopes to be evaluated
-%
-%     tolerance: a numeric value that defines how close points should be
+% 
+%     tolerance: a numeric value that defines how close points should be 
 %     to be removed
-%
+% 
 %     (optional inputs)
 %
-%     fig_num: any number that acts as a figure number output, causing a
+%     fig_num: any number that acts as a figure number output, causing a 
 %     figure to be drawn showing results.
-%
-%
+% 
+% 
 % OUTPUTS:
-%
-%     cleaned_polytope: the resulting polytope after close edges are
+% 
+%     cleaned_polytope: the resulting polytope after close edges are 
 %     removed.
-%
-%
+% 
+% 
 % DEPENDENCIES:
-%
+% 
 %     fcn_MapGen_checkInputsToFunctions
-%
+% 
 %     fcn_MapGen_fillPolytopeFieldsFromVerticies
-%
-%
+% 
+% 
 % EXAMPLES:
-%
+% 
 % See the script: script_test_fcn_MapGen_polytopeRemoveTightVerticies
 % for a full test suite.
-%
+% 
 % This function was written on 2021_07_02 by Sean Brennan
 % Questions or comments? contact sbrennan@psu.edu
 
-%
+% 
 % REVISION HISTORY:
-%
+% 
 % 2021_07_02 by Sean Brennan
 % -- first write of function
 
-%
+% 
 % TO DO:
-%
+% 
 % -- fill in to-do items here.
 
 %% Debugging and Input checks
-% set an environment variable on your machine with the getenv function...
-% in the Matlab console.  Char array of '1' will be true and '0' will be false.
-flag_check_inputs = getenv('ENV_FLAG_CHECK_INPUTS');  % '1' will check input args
-flag_do_plot = getenv('ENV_FLAG_DO_PLOT'); % '1' will make plots
-flag_do_debug = getenv('ENV_FLAG_DO_DEBUG'); % '1' will enable debugging
+flag_check_inputs = 1; % Set equal to 1 to check the input arguments 
+flag_do_plot = 0;      % Set equal to 1 for plotting 
+flag_do_debug = 0;     % Set equal to 1 for debugging 
 
-% if the char array has length 0, assume the env var isn't set and default to...
-% dipslaying more information rather than potentially hiding an issue
-if length(flag_check_inputs) = 0
-    flag_check_inputs = '1';
-end
-if length(flag_do_plot) = 0
-    flag_do_plot = '1';
-end
-if length(flag_do_debug) = 0
-    flag_do_debug = '1';
-end
-
-% convert flag from char string to logical
-flag_check_inputs = flag_check_inputs == '1';
-flag_do_plot = flag_do_plot == '1';
-flag_do_debug = flag_do_debug == '1';
 if flag_do_debug
     fig_for_debug = 7;
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-end
+end 
 
 %% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -125,12 +107,12 @@ if 1 == flag_check_inputs
     % Check the polytopes input, make sure it is 'polytopes' type
     fcn_MapGen_checkInputsToFunctions(...
         polytope, 'polytopes');
-
+ 
     % Check the tolerance input, make sure it is '1column_of_numbers' type,
     % e.g. 1x1 numerical data.
     fcn_MapGen_checkInputsToFunctions(...
         tolerance, '1column_of_numbers',[1 1]);
-
+ 
 end
 
 % Does user want to show the plots?
@@ -180,7 +162,7 @@ if sum(good_ind)>2 % sufficient good points to make a shape
     new_vert = vertices(good_ind,:);
 elseif sum(good_ind)==2 % line shape
     new_vert = vertices(good_ind,:);
-
+    
     % The line may not go through the centroid, which is odd. We force
     % this by removing the point closest to the centroid
     distances_to_centroid = sum((new_vert-centroid).^2,2).^0.5;
@@ -189,7 +171,7 @@ elseif sum(good_ind)==2 % line shape
     else
         new_vert(1,:)=centroid;
     end
-
+    
     new_vert = [new_vert; flipud(new_vert)];
 else % singular shape (i.e. point) or no shape
     new_vert = [centroid; centroid; centroid];
@@ -215,17 +197,17 @@ cleaned_polytope = fcn_MapGen_fillPolytopeFieldsFromVertices(cleaned_polytope);
 if flag_do_plot
     figure(fig_num);
     hold on
-
+    
     % Plot the cetroid in black
     plot(centroid(:,1),centroid(:,2),'ko','Markersize',10);
-
+    
     % Plot the input polytope in red
     fcn_MapGen_plotPolytopes(polytope,fig_num,'r',2);
-
+    
     % plot the output polytope in blue
     fcn_MapGen_plotPolytopes(cleaned_polytope,fig_num,'b',2);
-
-end % Ends the flag_do_plot if statement
+    
+end % Ends the flag_do_plot if statement    
 
 if flag_do_debug
     fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
@@ -236,13 +218,13 @@ end % Ends the function
 
 %% Functions follow
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   ______                _   _
-%  |  ____|              | | (_)
-%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___
+%   ______                _   _                 
+%  |  ____|              | | (_)                
+%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___ 
 %  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
 %  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
 %  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
-%
+%                                               
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 

@@ -74,28 +74,9 @@ function [ ...
 % -- fill in to-do items here.
 
 %% Debugging and Input checks
-% set an environment variable on your machine with the getenv function...
-% in the Matlab console.  Char array of '1' will be true and '0' will be false.
-flag_check_inputs = getenv('ENV_FLAG_CHECK_INPUTS');  % '1' will check input args
-flag_do_plot = getenv('ENV_FLAG_DO_PLOT'); % '1' will make plots
-flag_do_debug = getenv('ENV_FLAG_DO_DEBUG'); % '1' will enable debugging
-
-% if the char array has length 0, assume the env var isn't set and default to...
-% dipslaying more information rather than potentially hiding an issue
-if length(flag_check_inputs) = 0
-    flag_check_inputs = '1';
-end
-if length(flag_do_plot) = 0
-    flag_do_plot = '1';
-end
-if length(flag_do_debug) = 0
-    flag_do_debug = '1';
-end
-
-% convert flag from char string to logical
-flag_check_inputs = flag_check_inputs == '1';
-flag_do_plot = flag_do_plot == '1';
-flag_do_debug = flag_do_debug == '1';
+flag_check_inputs = 1; % Set equal to 1 to check the input arguments
+flag_do_plot = 0;      % Set equal to 1 for plotting
+flag_do_debug = 0;     % Set equal to 1 for debugging
 
 if flag_do_debug
     fig_for_debug = 128;
@@ -118,20 +99,20 @@ end
 
 
 if 1 == flag_check_inputs
-
+    
     % Are there the right number of inputs?
     if nargin < 2 || nargin > 4
         error('Incorrect number of input arguments')
     end
-
+    
     % Check the axis_aligned_bounding_box input, make sure it is '4column_of_numbers' type
     fcn_MapGen_checkInputsToFunctions(...
         axis_aligned_bounding_box, '4column_of_numbers',1);
-
+    
     % Check the test_point input, make sure it is '2column_of_numbers' type
     fcn_MapGen_checkInputsToFunctions(...
         projection_vector, '2column_of_numbers',1);
-
+    
 end
 
 flag_snap_type = 0;
@@ -175,7 +156,7 @@ angle = atan2(vector(2),vector(1));
 
 % Is the point within the AABB?
 if fcn_MapGen_isWithinABBB(axis_aligned_bounding_box,projection_vector)
-
+    
     % Snap via projection, or nearest wall?
     if flag_snap_type==0
         % Use projection
@@ -186,7 +167,7 @@ if fcn_MapGen_isWithinABBB(axis_aligned_bounding_box,projection_vector)
             center,...
             projection_vector,...
             3);
-
+        
     else
         % Use nearest wall
         snap_point = projection_vector;
@@ -230,21 +211,21 @@ if flag_do_plot
     hold on;
     axis equal
     grid on;
-
+    
     % Plot the bounding box
     box_outline = [axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,2); axis_aligned_bounding_box(1,3) axis_aligned_bounding_box(1,2); axis_aligned_bounding_box(1,3) axis_aligned_bounding_box(1,4); axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,4); axis_aligned_bounding_box(1,1) axis_aligned_bounding_box(1,2)];
     plot(box_outline(:,1),box_outline(:,2),'-');
-
+    
     % Plot the test point
     plot(projection_vector(:,1),projection_vector(:,2),'o');
-
+    
     % Plot the snap point
     plot(snap_point(:,1),snap_point(:,2),'x');
-
+    
     % Plot the snap point
     plot([projection_vector(:,1) snap_point(1,1)],[projection_vector(:,2) snap_point(:,2)],'-');
     %
-
+    
 end % Ends the flag_do_plot if statement
 
 if flag_do_debug
@@ -392,18 +373,18 @@ if flag_check_inputs == 1
     if nargin < 4 || nargin > 6
         error('Incorrect number of input arguments.')
     end
-
+    
     % Check wall_start input
     fcn_geometry_checkInputsToFunctions(wall_start, '2column_of_numbers');
-
+    
     Nwalls = length(wall_start(:,1));
-
+    
     % Check wall_end input
     fcn_geometry_checkInputsToFunctions(wall_end, '2column_of_numbers',Nwalls);
-
+    
     % Check sensor_vector_start input
     fcn_geometry_checkInputsToFunctions(sensor_vector_start, '2column_of_numbers',1);
-
+    
     % Check sensor_vector_end input
     fcn_geometry_checkInputsToFunctions(sensor_vector_end, '2column_of_numbers',1);
 end
@@ -467,7 +448,7 @@ if any(colinear_indices)
     s_dot_r = sum(s.*r,2);
     t0 = q_minus_p_dot_r./r_dot_r;
     t1 = t0 + s_dot_r./r_dot_r;
-
+    
     % Keep only the good indices
     %     % For debugging:
     %     conditions = [-0.5 -0.4; -0.5 0; -0.5 .2; 0 0.2; 0.2 0.4; 0.2 1; 0.2 1.2; 1 1.2; 1.2 1.3; -0.5 1.2]
@@ -485,7 +466,7 @@ if any(colinear_indices)
     %     [conditions t0_t1_surround]
     %     fprintf(1,'any_wighin flag:\n');
     %     [conditions any_within]
-
+    
     % Check whether there is overlap by seeing of the t0 and t1 values are
     % within the interval of [0 1], endpoint inclusive
     t0_inside = (t0>=0)&(t0<=1);
@@ -494,14 +475,14 @@ if any(colinear_indices)
     any_within = t0_inside | t1_inside | t0_t1_surround;
     good_indices = find(any_within);
     good_colinear_indices = intersect(colinear_indices,good_indices);
-
+    
     % Fix the ranges to be within 0 and 1
     t0(good_colinear_indices) = max(0,t0(good_colinear_indices));
     t0(good_colinear_indices) = min(1,t0(good_colinear_indices));
-
+    
     t1(good_colinear_indices) = max(0,t1(good_colinear_indices));
     t1(good_colinear_indices) = min(1,t1(good_colinear_indices));
-
+    
 end
 
 % Calculate t and u, where t is distance along the path, and u is distance
@@ -522,15 +503,15 @@ if any(colinear_indices)
     % Shut off colinear ones to start
     t(colinear_indices) = inf;
     u(colinear_indices) = inf;
-
+    
     % Correct the t values
     u(good_colinear_indices) = 1;
     t(good_colinear_indices) = t0(good_colinear_indices);
-
+    
     % Do we need to add more hit points?
     indices_hit_different_point = find(t0~=t1);
     more_indices = intersect(indices_hit_different_point,good_colinear_indices);
-
+    
     % Make p and r, t and u longer so that additional hit points are
     % calculated in special case of overlaps
     p = [p; p(more_indices,:)];
@@ -538,7 +519,7 @@ if any(colinear_indices)
     u = [u; u(more_indices)];
     t = [t; t1(more_indices)];
     wall_numbers = [wall_numbers; wall_numbers(more_indices)];
-
+    
 end
 
 % Initialize all intersections to infinity
@@ -575,7 +556,7 @@ distances_squared = sum((intersections - sensor_vector_start).^2,2);
 if flag_search_type ~=2
     % Keep just the minimum distance
     [closest_distance_squared,closest_index] = min(distances_squared);
-
+    
     distance = closest_distance_squared^0.5*sign(u(closest_index));
     location = intersections(closest_index,:);
     wall_that_was_hit = wall_numbers(closest_index);
@@ -599,17 +580,17 @@ end
 %                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plot
-
+    
     % Set up the figure
     figure(fig_num);
     clf;
     hold on;
     axis equal;
     grid on; grid minor;
-
+    
     % Calculate the midpoints
     midpoints= (wall_start+wall_end)/2;
-
+    
     % Plot the walls
     for ith_wall = 1:Nwalls
         handle_plot = plot(...
@@ -621,24 +602,24 @@ if flag_do_plot
         set(handle_text,'Color',line_color);
         set(handle_text,'Fontsize',20);
     end
-
+    
     % Plot the sensor vector
     quiver(q(:,1),q(:,2),s(:,1),s(:,2),'r','Linewidth',3);
     plot(sensor_vector_end(:,1),sensor_vector_end(:,2),'r.','Markersize',10);
-
+    
     handle_text = text(q(:,1),q(:,2),'Sensor');
     set(handle_text,'Color',[1 0 0]);
-
+    
     axis_size = axis;
     y_range = axis_size(4)-axis_size(3);
-
+    
     % Plot any hits in blue
     for i_result = 1:length(distance)
         plot(location(i_result,1),location(i_result,2),'bo','Markersize',30);
         handle_text = text(location(i_result,1),location(i_result,2)-0.05*y_range,sprintf('Hit %.0d at distance: %.2f',wall_that_was_hit(i_result),distance(i_result)));
         set(handle_text,'Color',[0 0 1]);
     end
-
+    
 end
 
 if flag_do_debug
