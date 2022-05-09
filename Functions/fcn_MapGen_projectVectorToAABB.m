@@ -82,13 +82,13 @@ flag_do_debug = getenv('ENV_FLAG_DO_DEBUG'); % '1' will enable debugging
 
 % if the char array has length 0, assume the env var isn't set and default to...
 % dipslaying more information rather than potentially hiding an issue
-if length(flag_check_inputs) == 0
+if length(flag_check_inputs) = 0
     flag_check_inputs = '1';
 end
-if length(flag_do_plot) == 0
+if length(flag_do_plot) = 0
     flag_do_plot = '1';
 end
-if length(flag_do_debug) == 0
+if length(flag_do_debug) = 0
     flag_do_debug = '1';
 end
 
