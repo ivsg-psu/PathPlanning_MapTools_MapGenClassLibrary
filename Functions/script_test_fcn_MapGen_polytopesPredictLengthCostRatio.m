@@ -51,7 +51,7 @@ if do_range_test
     r_lc_sparse_average_all_linear = [];
     r_lc_sparse_std_all_linear = [];
     shrink_distance = [];
-    tiles_failed = [];
+    radii_goals_failed = [];
     N_int_from_density_all = [];
     N_int_from_shrink_dist_all = [];
     size_percent_failed = [];
@@ -126,13 +126,13 @@ if do_range_test
                     shrunk_distance = field_stats_pre_shrink.average_max_radius - field_stats.average_max_radius;
                     shrink_ang = field_stats_pre_shrink.average_vertex_angle;
                     R_bar_initial = field_stats_pre_shrink.average_max_radius;
-                    try
-                        [field_small_choice_angles,field_big_choice_angles,r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse_worst,r_lc_sparse_average,r_lc_sparse_std,r_lc_sparse_worst_new,r_lc_sparse_average_new,r_lc_sparse_std_new,r_lc_sparse_worst_actual,r_lc_sparse_average_actual,r_lc_sparse_std_actual,r_lc_sparse_worst_linear,r_lc_sparse_average_linear,r_lc_sparse_std_linear] = fcn_MapGen_polytopesPredictLengthCostRatio(shrunk_field,gap_size,shrunk_distance,shrink_ang,R_bar_initial)
-                    catch
-                        tiles_failed = [tiles_failed, tiles];
-                        size_percent_failed = [size_percent_failed, size_percent];
-                        fprintf("point for radii goals:%f didn't work",radii_goals);
-                    end
+%                     try
+                        [field_small_choice_angles,field_big_choice_angles,r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse_worst,r_lc_sparse_average,r_lc_sparse_std,r_lc_sparse_worst_new,r_lc_sparse_average_new,r_lc_sparse_std_new,r_lc_sparse_worst_actual,r_lc_sparse_average_actual,r_lc_sparse_std_actual,r_lc_sparse_worst_linear,r_lc_sparse_average_linear,r_lc_sparse_std_linear] = ...
+                            fcn_MapGen_polytopesPredictLengthCostRatio(shrunk_field,gap_size,shrunk_distance,shrink_ang,R_bar_initial)
+%                     catch
+%                         radii_goals_failed = [radii_goals_failed, radii_goals];
+%                         fprintf("point for radii goals:%f didn't work",radii_goals);
+%                     end
                     % r_lc_max_all = [r_lc_max_all, r_lc_max];
                     % r_lc_max_effective_all = [r_lc_max_effective_all, r_lc_max_effective];
                     % r_lc_avg_all = [r_lc_avg_all, r_lc_avg];
@@ -212,7 +212,7 @@ if do_range_test
     end
    fprintf('Obstacle fields that could not be predicted:\n')
    fprintf('Num. tiles | Size percent\n')
-   fprintf('%d         | %d\n',tiles_failed,size_percent_failed)
+   fprintf('%d         | %d\n',radii_goals_failed,size_percent_failed)
 end
 plot_flag = true; if plot_flag
     figure(607)

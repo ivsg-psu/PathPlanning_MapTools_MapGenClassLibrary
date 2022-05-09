@@ -96,12 +96,9 @@ function [field_small_choice_angles,field_big_choice_angles,r_lc_max,r_lc_avg,r_
     if 1 == flag_check_inputs
 
         % Are there the right number of inputs?
-        if nargin < 2 || nargin > 2
+        if nargin < 5 || nargin > 5
             error('Incorrect number of input arguments')
         end
-
-        % Check the test_point input, make sure it is 'positive_1column_of_numbers' type, size 1
-        fcn_MapGen_checkInputsToFunctions(column_of_numbers_test, 'positive_1column_of_numbers',1);
 
     end
 
