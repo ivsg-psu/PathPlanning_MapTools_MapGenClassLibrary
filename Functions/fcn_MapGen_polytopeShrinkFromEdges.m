@@ -91,6 +91,69 @@ function [shrunk_polytope, new_vertices, new_projection_vectors, cut_distance] =
 % -- first write of code
 % 2022_02_13 - S.Brennan
 % -- supress MATLAB's warning about flags
+
+% TO DO
+% -- none
+
+%% Debugging and Input checks
+flag_check_inputs = 1; % Set equal to 1 to check the input arguments
+flag_do_plot = 0;      % Set equal to 1 for plotting
+flag_do_debug = 1;     % Set equal to 1 for debugging
+
+if flag_do_debug
+    fig_for_debug = 5168;
+    st = dbstack; %#ok<*UNRCH>
+    fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+end
+
+%% check input arguments?
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   _____                   _
+%  |_   _|                 | |
+%    | |  _ __  _ __  _   _| |_ ___
+%    | | | '_ \| '_ \| | | | __/ __|
+%   _| |_| | | | |_) | |_| | |_\__ \
+%  |_____|_| |_| .__/ \__,_|\__|___/
+%              | |
+%              |_|
+% See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+if flag_check_inputs
+    % Are there the right number of inputs?
+    if nargin < 2 || nargin > 3
+        error('Incorrect number of input arguments')
+    end
+
+    % Check the shrinker input
+    fcn_MapGen_checkInputsToFunctions(...
+        shrinker, 'polytopes');
+
+    % Check the edge_cut input
+    fcn_MapGen_checkInputsToFunctions(...
+        edge_cut, 'positive_1column_of_numbers',1);
+
+end
+
+
+% Does user want to show the plots?
+if  3 == nargin
+    fig_num = varargin{end};
+    flag_do_plot = 1;
+else
+    if flag_do_debug
+        fig_for_debug = 1584;
+        flag_do_plot = 1;
+    end
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   __  __       _
+%  |  \/  |     (_)
+%  | \  / | __ _ _ _ __
+%  | |\/| |/ _` | | '_ \
+%  | |  | | (_| | | | | |
+%  |_|  |_|\__,_|_|_| |_|
 %
 
 % TO DO
