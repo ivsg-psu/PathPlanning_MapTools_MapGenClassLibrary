@@ -181,7 +181,7 @@ for ith_poly = 1:length(polytopes)
     % gap_size over 2 is the normal distance to pull edges in
     shrunk_polytopes(ith_poly) = ...
         fcn_MapGen_polytopeShrinkFromEdges(...
-        shrinker,des_gap_size/2);
+        shrinker,des_gap_size/2,34);
 end
 
 

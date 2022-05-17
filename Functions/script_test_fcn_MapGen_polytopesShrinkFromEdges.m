@@ -30,7 +30,7 @@ A_unocc_est_parallelogram_all = [];
 A_unocc_est_avg_parallelogram_all = [];
 A_unocc_est_parallelograms_and_kites_avg_all = [];
 A_unocc_est_parallelograms_and_kites_all = [];
-for i = 0.001:0.001:0.1
+for i = linspace(0.001,0.1,100)
     fig_num = 2;
     des_gap_size = i;
     shrunk_polytopes1=...
@@ -118,7 +118,6 @@ set(0,'defaultLineMarkerSize',msz); % set the default line marker size to msz
 set(0,'defaultAxesFontSize',fsz);
 set(0,'defaultLegendFontSize',fsz);
 set(0,'defaultAxesLineWidth',alw);
-
 % Set the default Size for display
 defpos = get(0,'defaultFigurePosition');
 set(0,'defaultFigurePosition', [defpos(1) defpos(2) width*100, height*100]);
