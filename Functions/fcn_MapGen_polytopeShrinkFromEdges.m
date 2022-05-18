@@ -162,7 +162,7 @@ end
 %% Debugging and Input checks
 flag_check_inputs = 1; % Set equal to 1 to check the input arguments
 flag_do_plot = 0;      % Set equal to 1 for plotting
-flag_do_debug = 1;     % Set equal to 1 for debugging
+flag_do_debug = 0;     % Set equal to 1 for debugging
 
 if flag_do_debug
     fig_for_debug = 5168;

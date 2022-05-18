@@ -65,26 +65,9 @@ function [shrunk_polytopes,mu_final,sigma_final] = ...
 %% Debugging and Input checks
 % set an environment variable on your machine with the getenv function...
 % in the Matlab console.  Char array of '1' will be true and '0' will be false.
-flag_check_inputs = getenv('ENV_FLAG_CHECK_INPUTS');  % '1' will check input args
-flag_do_plot = getenv('ENV_FLAG_DO_PLOT'); % '1' will make plots
-flag_do_debug = getenv('ENV_FLAG_DO_DEBUG'); % '1' will enable debugging
-
-% if the char array has length 0, assume the env var isn't set and default to...
-% dipslaying more information rather than potentially hiding an issue
-if length(flag_check_inputs) == 0
-    flag_check_inputs = '1';
-end
-if length(flag_do_plot) == 0
-    flag_do_plot = '1';
-end
-if length(flag_do_debug) == 0
-    flag_do_debug = '1';
-end
-
-% convert flag from char string to logical
-flag_check_inputs = flag_check_inputs == '1';
-flag_do_plot = flag_do_plot == '1';
-flag_do_debug = flag_do_debug == '1';
+flag_check_inputs = 1; % Set equal to 1 to check the input arguments
+flag_do_plot = 0;      % Set equal to 1 for plotting
+flag_do_debug = 0;     % Set equal to 1 for debugging
 
 if flag_do_debug
     fig_for_debug = 9453;
@@ -181,7 +164,7 @@ for ith_poly = 1:length(polytopes)
     % gap_size over 2 is the normal distance to pull edges in
     shrunk_polytopes(ith_poly) = ...
         fcn_MapGen_polytopeShrinkFromEdges(...
-        shrinker,des_gap_size/2,34);
+        shrinker,des_gap_size/2);
 end
 
 

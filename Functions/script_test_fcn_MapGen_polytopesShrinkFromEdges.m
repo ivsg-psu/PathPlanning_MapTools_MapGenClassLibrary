@@ -15,7 +15,6 @@ bounding_box = [0,0; 1,1];
 trim_polytopes = fcn_MapGen_polytopeCropEdges(polytopes,bounding_box,fig_num);
 pre_shrink_stats = fcn_MapGen_polytopesStatistics(trim_polytopes);
 R_bar_initial = pre_shrink_stats.average_max_radius;
-% TODO add a loop and do plots
 %% Basic example of uniform shrinking
 G_bar_all = [];
 G_perim_all = [];
@@ -30,12 +29,12 @@ A_unocc_est_parallelogram_all = [];
 A_unocc_est_avg_parallelogram_all = [];
 A_unocc_est_parallelograms_and_kites_avg_all = [];
 A_unocc_est_parallelograms_and_kites_all = [];
-for i = linspace(0.001,0.1,100)
+for i = linspace(0.001,0.08,20)
     fig_num = 2;
     des_gap_size = i;
     shrunk_polytopes1=...
         fcn_MapGen_polytopesShrinkFromEdges(...
-        trim_polytopes,des_gap_size,fig_num);
+        trim_polytopes,des_gap_size);
     field_stats = fcn_MapGen_polytopesStatistics(shrunk_polytopes1);
     r_occ_meas = field_stats.occupancy_ratio; % calculated occupancy ratio
     r_unocc_meas = field_stats.unoccupancy_ratio;
@@ -170,3 +169,26 @@ xlabel('desired or commanded gap size as percent of initial average max radius')
 ylabel('unoccpancy ratio estimate percent error')
 % print('C:\Users\sjh6473\github\sjharnett\figures\exported\after_gvsets\runocc_err','-dpng','-r300');
 % savefig('C:\Users\sjh6473\github\sjharnett\figures\figs\after_gvsets\runocc_err')
+
+figure
+hold on
+box on
+grid on
+plot(des_gap_size_all./R_bar_initial*100,r_unocc_meas_all,'k-');
+plot(des_gap_size_all./R_bar_initial*100,A_unocc_est_density_all);
+plot(des_gap_size_all./R_bar_initial*100,A_unocc_est_perim_all);
+plot(des_gap_size_all./R_bar_initial*100,A_unocc_est_perim_improved_all);
+plot(des_gap_size_all./R_bar_initial*100,A_unocc_est_parallelogram_all);
+plot(des_gap_size_all./R_bar_initial*100,A_unocc_est_avg_parallelogram_all);
+plot(des_gap_size_all./R_bar_initial*100,A_unocc_est_parallelograms_and_kites_all);
+plot(des_gap_size_all./R_bar_initial*100,A_unocc_est_parallelograms_and_kites_avg_all);
+legend('measured unoccupancy ratio',...
+'density estimate',...
+'perimeter estimate',...
+'perimeter estimate with triangles',...
+'perimeter estimate with parallelograms',...
+'perimeter estimate with average parallelograms',...
+'perimeter estimate with parllelograms and kites',...
+'perimeter estimate with average parallelograms and kites')
+xlabel('desired or commanded gap size as percent of initial average max radius')
+ylabel('unoccpancy ratio')
