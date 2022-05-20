@@ -13,7 +13,7 @@ function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(polytopes,des_
     %% simple A_unocc estimates: perimeter
     unocc_ests.A_unocc_est_density = des_gap_size^2*rho; % theoretial occupancy ratio from gap size
     unocc_ests.A_unocc_est_perim = 1/2*des_gap_size*P_tot;
-    unocc_ests.A_unocc_est_perim_improved = A_unocc_est_perim + N_vert/3*des_gap_size^2*sqrt(3)/4;
+    unocc_ests.A_unocc_est_perim_improved = unocc_ests.A_unocc_est_perim + N_vert/3*des_gap_size^2*sqrt(3)/4;
 
     %% advanced A_unocc estimates: parallelograms
     % modify perimieter estimate by subtracting one parallelogram from each vertex
@@ -24,8 +24,8 @@ function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(polytopes,des_
     total_parallelogram_area = sum(parallelogram_areas);
     average_angle = field_stats.average_vertex_angle;
     total_avg_parallelogram_area = des_gap_size/2*des_gap_size/2*sin(average_angle)*length(parallelogram_areas);
-    unocc_ests.A_unocc_est_avg_parallelogram = A_unocc_est_perim + total_avg_parallelogram_area;
-    unocc_ests.A_unocc_est_parallelogram = A_unocc_est_perim + total_parallelogram_area;
+    unocc_ests.A_unocc_est_avg_parallelogram = unocc_ests.A_unocc_est_perim + total_avg_parallelogram_area;
+    unocc_ests.A_unocc_est_parallelogram = unocc_ests.A_unocc_est_perim + total_parallelogram_area;
 
     %% advanced A_unocc estimates: parallelograms and kites
     % if the angle is over 90, 180-the angle forms a kite rather than a parallelogram
@@ -49,6 +49,6 @@ function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(polytopes,des_
     kite_areas_obtuse_avg = (a_avg+c_avg).*(2*b_avg)/2;
     total_kite_areas = sum(kite_areas_obtuse);
     total_kite_areas_avg = length(angles_obtuse)*kite_areas_obtuse_avg;
-    unocc_ests.A_unocc_est_parallelograms_and_kites = A_unocc_est_perim + total_parallelogram_area_acute + total_kite_areas;
-    unocc_ests.A_unocc_est_parallelograms_and_kites_avg = A_unocc_est_perim + total_parallelogram_area_acute_avg + total_kite_areas_avg;
+    unocc_ests.A_unocc_est_parallelograms_and_kites = unocc_ests.A_unocc_est_perim + total_parallelogram_area_acute + total_kite_areas;
+    unocc_ests.A_unocc_est_parallelograms_and_kites_avg = unocc_ests.A_unocc_est_perim + total_parallelogram_area_acute_avg + total_kite_areas_avg;
 end

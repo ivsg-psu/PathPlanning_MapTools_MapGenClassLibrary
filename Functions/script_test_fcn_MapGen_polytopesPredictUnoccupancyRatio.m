@@ -35,6 +35,7 @@ for i = linspace(0.001,0.08,20)
     shrunk_polytopes=...
         fcn_MapGen_polytopesShrinkFromEdges(...
         trim_polytopes,des_gap_size);
+    field_stats = fcn_MapGen_polytopesStatistics(shrunk_polytopes);
     G_bar = field_stats.average_gap_size_G_bar;
     G_perim = field_stats.perimeter_gap_size;
     rho = field_stats.linear_density_mean;
