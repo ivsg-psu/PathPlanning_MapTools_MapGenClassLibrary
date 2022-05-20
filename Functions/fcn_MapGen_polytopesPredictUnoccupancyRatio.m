@@ -16,8 +16,8 @@ function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(polytopes,des_
     unocc_ests.A_unocc_est_perim_improved = A_unocc_est_perim + N_vert/3*des_gap_size^2*sqrt(3)/4;
 
     %% advanced A_unocc estimates: parallelograms
-    % TODO make estimate subtracting one parallelogram from each vertex
-    % TODO make the same code subtracting one parellelogram per angle for the average angle size
+    % modify perimieter estimate by subtracting one parallelogram from each vertex
+    % we can do this with one parellelogram per angle for the average angle size instead of a unique parallelogram
     % note this is interior angles
     angles = field_stats.angle_column_no_nan;
     parallelogram_areas = des_gap_size/2*des_gap_size/2*sin(angles);
@@ -28,10 +28,7 @@ function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(polytopes,des_
     unocc_ests.A_unocc_est_parallelogram = A_unocc_est_perim + total_parallelogram_area;
 
     %% advanced A_unocc estimates: parallelograms and kites
-    % TODO if the angle is over 90, 180-the angle forms a roughly isoceles triangle,
-    % but it actually forms a kite
-    % assert(isequal(round(G_bar,4),round(des_gap_size,4)));
-    % assert(isequal(round(r_unocc_meas,4),round(estimated_unoccupancy_ratio,4)));
+    % if the angle is over 90, 180-the angle forms a kite rather than a parallelogram
     angles_acute_logical = angles <= pi/2;
     angles_acute = nonzeros(angles_acute_logical.*angles)';
     avg_acute = mean(angles_acute);
