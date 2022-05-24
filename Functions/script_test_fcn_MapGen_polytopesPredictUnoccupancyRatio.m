@@ -29,6 +29,8 @@ A_unocc_est_parallelogram_all = [];
 A_unocc_est_avg_parallelogram_all = [];
 A_unocc_est_parallelograms_and_kites_avg_all = [];
 A_unocc_est_parallelograms_and_kites_all = [];
+P_tot_all = [];
+average_angle_all = [];
 for i = linspace(0.001,0.08,20)
     fig_num = 2;
     des_gap_size = i;
@@ -55,6 +57,10 @@ for i = linspace(0.001,0.08,20)
     A_unocc_est_parallelogram_all = [A_unocc_est_parallelogram_all; unocc_ests.A_unocc_est_parallelogram];
     A_unocc_est_parallelograms_and_kites_all = [A_unocc_est_parallelograms_and_kites_all; unocc_ests.A_unocc_est_parallelograms_and_kites];
     A_unocc_est_parallelograms_and_kites_avg_all = [A_unocc_est_parallelograms_and_kites_avg_all; unocc_ests.A_unocc_est_parallelograms_and_kites_avg];
+    average_angle = field_stats.average_vertex_angle;
+    P_tot = field_stats.total_perimeter;
+    P_tot_all = [P_tot_all; P_tot];
+    average_angle_all = [average_angle_all; average_angle];
 end
 
 % Defaults for this blog post
@@ -152,3 +158,27 @@ legend('measured unoccupancy ratio',...
 'perimeter estimate with average parallelograms and kites')
 xlabel('desired or commanded gap size as percent of initial average max radius')
 ylabel('unoccpancy ratio')
+
+figure
+hold on
+box on
+grid on
+plot(des_gap_size_all./R_bar_initial*100,P_tot_all,'x');
+xlabel('desired or commanded gap size as percent of initial average max radius')
+ylabel('total perimeter')
+
+figure
+hold on
+box on
+grid on
+plot(des_gap_size_all./R_bar_initial*100,average_angle_all,'x');
+xlabel('desired or commanded gap size as percent of initial average max radius')
+ylabel('average vertex angle')
+
+figure
+hold on
+box on
+grid on
+plot(des_gap_size_all./R_bar_initial*100,sin(average_angle_all),'x');
+xlabel('desired or commanded gap size as percent of initial average max radius')
+ylabel('sine of average vertex angle')
