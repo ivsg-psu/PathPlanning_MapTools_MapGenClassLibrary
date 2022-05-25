@@ -31,6 +31,7 @@ A_unocc_est_parallelograms_and_kites_avg_all = [];
 A_unocc_est_parallelograms_and_kites_all = [];
 P_tot_all = [];
 average_angle_all = [];
+sum_sines_all = [];
 for i = linspace(0.001,0.08,20)
     fig_num = 2;
     des_gap_size = i;
@@ -61,8 +62,12 @@ for i = linspace(0.001,0.08,20)
     P_tot = field_stats.total_perimeter;
     P_tot_all = [P_tot_all; P_tot];
     average_angle_all = [average_angle_all; average_angle];
+    angles = field_stats.angle_column_no_nan;
+    sins_angles = sin(angles);
+    sum_sins_angles = sum(sins_angles);
+    sum_sines_all = [sum_sines_all; sum_sins_angles];
 end
-
+% TODO remove gap size calculations
 % Defaults for this blog post
 width = 3;     % Width in inches
 height = 3;    % Height in inches
@@ -182,3 +187,19 @@ grid on
 plot(des_gap_size_all./R_bar_initial*100,sin(average_angle_all),'x');
 xlabel('desired or commanded gap size as percent of initial average max radius')
 ylabel('sine of average vertex angle')
+
+figure
+hold on
+box on
+grid on
+plot(des_gap_size_all./R_bar_initial*100,sum_sines_all,'x');
+xlabel('desired or commanded gap size as percent of initial average max radius')
+ylabel('sum of sines of angles for entire field')
+
+figure
+hold on
+box on
+grid on
+plot(des_gap_size_all./R_bar_initial*100,des_gap_size_all,'x');
+xlabel('desired or commanded gap size as percent of initial average max radius')
+ylabel('des gap size')

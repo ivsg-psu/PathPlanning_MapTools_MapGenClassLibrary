@@ -24,6 +24,8 @@ function poly_map_stats = fcn_MapGen_polytopesStatistics(...
 %
 %     poly_map_stats: a structure whose fields contain the polytope map's
 %     statistics
+%     each of the fields in the struct are as follows:
+%     AABB is the axis aligned bounding box for the polytope field, bounding all polytopes
 %
 % DEPENDENCIES:
 %
@@ -119,7 +121,14 @@ all_max_radius = zeros(Npolys,1);
 all_min_radius = zeros(Npolys,1);
 all_sharpness_ratios = zeros(Npolys,1);
 all_areas = zeros(Npolys,1);
-AABB = [inf inf -inf -inf];
+
+all_x_vertices = extractfield(polytopes,'xv');
+all_y_vertices = extractfield(polytopes,'yv');
+% Update the AABB to fit vertices (make it bigger/smaller as needed)
+AABB(1) = min(all_x_vertices);
+AABB(2) = min(all_y_vertices);
+AABB(3) = max(all_x_vertices);
+AABB(4) = max(all_y_vertices);
 
 % Loop through the polytopes
 for ith_poly = 1:Npolys
@@ -136,11 +145,6 @@ for ith_poly = 1:Npolys
     all_walls_end(rows_to_fill,3) = ith_poly;
 
 
-    % Update the AABB to fit vertices (make it bigger/smaller as needed)
-    AABB(1) = min(AABB(1),min(vertices(:,1)));
-    AABB(2) = min(AABB(2),min(vertices(:,2)));
-    AABB(3) = max(AABB(3),max(vertices(:,1)));
-    AABB(4) = max(AABB(4),max(vertices(:,2)));
 
     % Determine number of verticies
     Nangles = length(vertices(:,1))-1;
@@ -198,10 +202,8 @@ std_perimeter = nanstd(all_perimeters);
 
 % Determine the area properties of the map
 occupied_area = sum(all_areas);
+
 total_area    = (AABB(3)-AABB(1))*(AABB(4)-AABB(2));
-unoccupied_area = total_area-occupied_area;
-unoccupancy_ratio = (total_area - occupied_area)/total_area;
-occupancy_ratio = occupied_area/total_area;
 
 % Determine the density properties
 point_density = length(polytopes)/total_area;
@@ -210,8 +212,6 @@ linear_density = point_density.^0.5;
 % Determine the average gap sizes between polytopes. Do this using 2
 % methods: one is Seth Tau's thesis derivation. The other is to assume the
 % gaps are all associated with the perimeters.
-average_gap_size_G_bar = (unoccupancy_ratio/point_density)^0.5; % See Eq. (4.24 in Seth Tau's thesis)
-perimeter_gap_size = 2*unoccupied_area/(total_perimeter);
 avg_r_D = average_max_radius*linear_density;
 std_r_D = std_max_radius*linear_density;
 L_E = total_area^0.5;
@@ -247,12 +247,9 @@ poly_map_stats.min_x = AABB(1);
 poly_map_stats.max_x = AABB(3);
 poly_map_stats.min_y = AABB(2);
 poly_map_stats.max_y = AABB(4);
-
+% TODO make sure all references to AABB are updated
 poly_map_stats.occupied_area = occupied_area;
 poly_map_stats.total_area = total_area;
-poly_map_stats.unoccupied_area = unoccupied_area;
-poly_map_stats.unoccupancy_ratio = unoccupancy_ratio;
-poly_map_stats.occupancy_ratio = occupancy_ratio;
 poly_map_stats.point_density = point_density;
 poly_map_stats.linear_density = linear_density;
 poly_map_stats.average_gap_size_G_bar = average_gap_size_G_bar;

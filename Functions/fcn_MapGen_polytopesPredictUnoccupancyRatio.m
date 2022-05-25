@@ -1,6 +1,9 @@
-function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(polytopes,des_gap_size)
+function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(pre_shrink_polytopes,polytopes,des_gap_size)
 
     %% extract necessary stats from polytopes
+    pre_shrink_stats = fcn_MapGen_polytopesStatistics(pre_shrink_polytopes);
+    pre_shrink_stats.total_area;
+    % TODO finish occupancy ratio measured calc using pre shrink total area and post shrink polytope area
     field_stats = fcn_MapGen_polytopesStatistics(polytopes);
     r_occ_meas = field_stats.occupancy_ratio; % calculated occupancy ratio
     r_unocc_meas = field_stats.unoccupancy_ratio;
@@ -19,13 +22,19 @@ function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(polytopes,des_
     % modify perimieter estimate by subtracting one parallelogram from each vertex
     % we can do this with one parellelogram per angle for the average angle size instead of a unique parallelogram
     % note this is interior angles
+    % parallelogram
     angles = field_stats.angle_column_no_nan;
     parallelogram_areas = des_gap_size/2*des_gap_size/2*sin(angles);
     total_parallelogram_area = sum(parallelogram_areas);
-    average_angle = field_stats.average_vertex_angle;
-    total_avg_parallelogram_area = des_gap_size/2*des_gap_size/2*sin(average_angle)*length(parallelogram_areas);
-    unocc_ests.A_unocc_est_avg_parallelogram = unocc_ests.A_unocc_est_perim + total_avg_parallelogram_area;
     unocc_ests.A_unocc_est_parallelogram = unocc_ests.A_unocc_est_perim + total_parallelogram_area;
+    % average parallelogram legacy
+    % average_angle = field_stats.average_vertex_angle;
+    % total_avg_parallelogram_area = des_gap_size/2*des_gap_size/2*sin(average_angle)*length(parallelogram_areas);
+    % unocc_ests.A_unocc_est_avg_parallelogram = unocc_ests.A_unocc_est_perim + total_avg_parallelogram_area;
+    % average parallelogram
+    average_sine = mean(sin(angles));
+    total_avg_parallelogram_area = des_gap_size/2*des_gap_size/2*average_sine*length(parallelogram_areas);
+    unocc_ests.A_unocc_est_avg_parallelogram = unocc_ests.A_unocc_est_perim + total_avg_parallelogram_area;
 
     %% advanced A_unocc estimates: parallelograms and kites
     % if the angle is over 90, 180-the angle forms a kite rather than a parallelogram
