@@ -2,20 +2,23 @@ function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(pre_shrink_pol
 
     %% extract necessary stats from polytopes
     pre_shrink_stats = fcn_MapGen_polytopesStatistics(pre_shrink_polytopes);
-    pre_shrink_stats.total_area;
-    % TODO finish occupancy ratio measured calc using pre shrink total area and post shrink polytope area
+    total_area = pre_shrink_stats.total_area;
+    R_bar_initial = pre_shrink_stats.average_max_radius;
     field_stats = fcn_MapGen_polytopesStatistics(polytopes);
-    r_occ_meas = field_stats.occupancy_ratio; % calculated occupancy ratio
-    r_unocc_meas = field_stats.unoccupancy_ratio;
-    G_bar = field_stats.average_gap_size_G_bar;
-    G_perim = field_stats.perimeter_gap_size;
-    rho = field_stats.linear_density_mean;
+    occ_area = field_stats.occupied_area;
+    r_occ_meas = occ_area/total_area; % calculated occupancy ratio
+    r_unocc_meas = 1-r_occ_meas;
+    lambda = field_stats.linear_density_mean;
     P_tot = field_stats.total_perimeter;
+    P_tot_orig = pre_shrink_stats.total_perimeter;
     N_vert = field_stats.NtotalVertices;
+    % write out measured unoccupancy ratio to return struct
+    unocc_ests.A_unocc_meas = r_unocc_meas;
 
     %% simple A_unocc estimates: perimeter
-    unocc_ests.A_unocc_est_density = des_gap_size^2*rho; % theoretial occupancy ratio from gap size
+    unocc_ests.A_unocc_est_density = des_gap_size^2*lambda; % theoretial occupancy ratio from gap size
     unocc_ests.A_unocc_est_perim = 1/2*des_gap_size*P_tot;
+    unocc_ests.A_unocc_est_orig_perim = 1/2*des_gap_size*P_tot_orig;
     unocc_ests.A_unocc_est_perim_improved = unocc_ests.A_unocc_est_perim + N_vert/3*des_gap_size^2*sqrt(3)/4;
 
     %% advanced A_unocc estimates: parallelograms
@@ -60,4 +63,11 @@ function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(pre_shrink_pol
     total_kite_areas_avg = length(angles_obtuse)*kite_areas_obtuse_avg;
     unocc_ests.A_unocc_est_parallelograms_and_kites = unocc_ests.A_unocc_est_perim + total_parallelogram_area_acute + total_kite_areas;
     unocc_ests.A_unocc_est_parallelograms_and_kites_avg = unocc_ests.A_unocc_est_perim + total_parallelogram_area_acute_avg + total_kite_areas_avg;
+
+    %% poly fit estimate
+    A = -0.0000615365;
+    B = 0.101206/6.26521;
+    C = 0;
+    x = des_gap_size/R_bar_initial*100;
+    unocc_ests.A_unocc_est_poly_fit = A*x^2+B*x+C;
 end

@@ -18,7 +18,10 @@ function [shrunk_polytopes,mu_final,sigma_final] = ...
 %
 %     POLYTOPES: original polytopes with same fields as shrunk_polytopes
 %
-%     DES_GAP_SIZE: desired normal gap size between polytopes
+%     DES_GAP_SIZE: desired normal gap size between polytopes, note this is relative, not absolute
+%     e.g. if the input polytopes have no gap and a des_gap_size of 0.005 km is input, the resulting
+%     gap size will be 0.005 km.  However if hte input polytopes already have a gap size of 0.002 km
+%     the resulting gap size will be 0.007 km for a des_gap_size of 0.005 km.
 %
 %     (optional inputs)
 %
@@ -127,7 +130,6 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 initial_stats = fcn_MapGen_polytopesStatistics(polytopes);
-initial_gap_size = initial_stats.average_gap_size_G_bar;
 initial_average_max_rad = initial_stats.average_max_radius;
 
 if flag_do_debug
@@ -135,13 +137,9 @@ if flag_do_debug
     fprintf(1,'\tGap size: %.4f\n',des_gap_size);
 
     fprintf(1,'Input field statistics:\n');
-    fprintf(1,'\tGap size: %.4f\n',initial_gap_size);
     fprintf(1,'\tAvg Max Rad: %.4f\n',initial_average_max_rad);
 
     fcn_MapGen_plotPolytopes(polytopes,fig_for_debug,'b',2);
-end
-if initial_gap_size > des_gap_size
-    error('cannot achieve the desired gap_size by shrinking because average gap_size is already larger than desired gap size')
 end
 
 %% shrink polytopes to achieve the distribution
@@ -149,7 +147,6 @@ end
 % achieve the new radius distribution. Want all the changes to be smaller
 % than -2 times the minimum radius, to ensure we do not get singular
 % polytopes.
-change_in_gap = des_gap_size - initial_gap_size;
 
 % Initialize the shrunk polytopes structure array, and tolerance for
 % distance between vertices, below which vertices are merged into one.
@@ -169,11 +166,9 @@ end
 
 
 final_stats = fcn_MapGen_polytopesStatistics(shrunk_polytopes);
-final_gap_size = final_stats.average_gap_size_G_bar;
 final_average_max_rad = final_stats.average_max_radius;
 if flag_do_debug
     fprintf(1,'Final distrubution statistics:\n');
-    fprintf(1,'\tGap size: %.4f\n',final_gap_size);
     fprintf(1,'\tAvg mag rad: %.4f\n',final_average_max_rad);
 end
 

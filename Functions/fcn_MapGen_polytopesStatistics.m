@@ -217,43 +217,16 @@ std_r_D = std_max_radius*linear_density;
 L_E = total_area^0.5;
 N_int = L_E*linear_density;
 all_max_radius_sorted = sort(all_max_radius);
-avg_r_LC_from_avg_gap = linear_density*2*(average_gap_size_G_bar.^2+average_side_length.^2).^0.5; % TODO(@sjharnett) debug to determine why produces complex values
-std_r_LC_from_avg_gap = linear_density*2*(average_gap_size_G_bar.^2+std_side_length.^2).^0.5; % TODO(@sjharnett) debug to determine why produces complex values
-% linear model
-r_LC_linear1 = (L_E + 2*(average_max_radius.^2+average_max_radius.^2.*tan(average_vertex_angle./2)).^0.5-2*average_max_radius.*tan(average_vertex_angle./2))./L_E;
-% linear model II
-r_LC_linear2 = (point_density^0.5*L_E*(2*sqrt((avg_r_D./point_density).^2+(avg_r_D./point_density).^2.*(tan(average_vertex_angle./2)).^2)-2*avg_r_D./point_density.*tan(average_vertex_angle./2))+L_E)./L_E;
-% vary theta variation as tan(theta/2)=1/r_D, 1D example where theta is directly from R
-r_LC_1d_density_variation = (L_E + 2*(average_max_radius.^2+average_max_radius.^2.*1./(2*average_max_radius)).^0.5-2*average_max_radius.*1./(2*average_max_radius))./L_E;
-
-%% varying horizontal and vertical density, may be a mistake on using 1/lambda
-base = 1./linear_density;
-height = 2*average_max_radius-1./(linear_density);
-hypotenuse = (base.^2+height.^2).^0.5;
-L_P = L_E + N_int.*(2*hypotenuse-2*base);
-r_LC_2d_density_variation1= L_P./L_E; % TODO(@sjharnett) add std deviation for this
-% rewriting the above to be a proper expression for r_LC in terms of r_D
-r_LC_2d_density_variation2 = 1+(avg_r_D./(average_max_radius)).*sqrt((avg_r_D./average_max_radius).^(-2)+(2*average_max_radius-(avg_r_D./average_max_radius)).^2);
-
-% changing the horizontal and vertical lambda model to do 2R-1/lambda_v for height
-base = 1./linear_density;
-height = 2.*average_max_radius - linear_density.^(-1);
-hypotenuse = (base.^2+height.^2).^0.5;
-L_P = L_E + N_int.*(2*hypotenuse-2*base);
-r_LC_2d_density_variation3 = L_P./L_E;
 
 % AREA METRICS
 poly_map_stats.min_x = AABB(1);
 poly_map_stats.max_x = AABB(3);
 poly_map_stats.min_y = AABB(2);
 poly_map_stats.max_y = AABB(4);
-% TODO make sure all references to AABB are updated
 poly_map_stats.occupied_area = occupied_area;
 poly_map_stats.total_area = total_area;
 poly_map_stats.point_density = point_density;
 poly_map_stats.linear_density = linear_density;
-poly_map_stats.average_gap_size_G_bar = average_gap_size_G_bar;
-poly_map_stats.perimeter_gap_size = perimeter_gap_size;
 
 poly_map_stats.Nangles = length(angle_column_no_nan(:,1));
 poly_map_stats.average_vertex_angle = average_vertex_angle;
