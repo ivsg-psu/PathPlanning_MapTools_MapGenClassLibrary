@@ -65,6 +65,7 @@ function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(pre_shrink_pol
     unocc_ests.A_unocc_est_parallelograms_and_kites_avg = unocc_ests.A_unocc_est_perim + total_parallelogram_area_acute_avg + total_kite_areas_avg;
 
     %% poly fit estimate
+    % for explanation of these magic numbers, please see slide deck in /Documentation
     A = -0.0000615365;
     B = 0.101206/6.26521;
     C = 0;

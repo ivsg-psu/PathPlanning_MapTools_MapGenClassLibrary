@@ -1,4 +1,4 @@
-function [field_small_choice_angles,field_big_choice_angles,r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse_worst,r_lc_sparse_average,r_lc_sparse_std,r_lc_sparse_worst_new,r_lc_sparse_average_new,r_lc_sparse_std_new,r_lc_sparse_worst_actual,r_lc_sparse_average_actual,r_lc_sparse_std_actual,r_lc_sparse_worst_linear,r_lc_sparse_average_linear,r_lc_sparse_std_linear] = fcn_MapGen_polytopesPredictLengthCostRatio(tiled_polytopes,gap_size,shrunk_distance,shrink_ang,R_bar_initial) % TODO(@sjharnett) put outputs into struct
+function [field_small_choice_angles,field_big_choice_angles,r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse_worst,r_lc_sparse_average,r_lc_sparse_std,r_lc_sparse_worst_new,r_lc_sparse_average_new,r_lc_sparse_std_new,r_lc_sparse_worst_actual,r_lc_sparse_average_actual,r_lc_sparse_std_actual,r_lc_sparse_worst_linear,r_lc_sparse_average_linear,r_lc_sparse_std_linear] = fcn_MapGen_polytopesPredictLengthCostRatio(pre_shrink_polytopes,tiled_polytopes,gap_size,shrunk_distance,shrink_ang,R_bar_initial) % TODO(@sjharnett) put outputs into struct
     % fcn_MapGen_polytopesPredictLengthCostRatio
     % Given an polytope field, predict the length cost ratio from geometry
     %
@@ -75,7 +75,7 @@ flag_do_debug = 0;     % Set equal to 1 for debugging
     if 1 == flag_check_inputs
 
         % Are there the right number of inputs?
-        if nargin < 5 || nargin > 5
+        if nargin < 6 || nargin > 6
             error('Incorrect number of input arguments')
         end
 
@@ -282,7 +282,8 @@ flag_do_debug = 0;     % Set equal to 1 for debugging
     divergence_heights = rounded_side_and_ang(:,1).*sin(rounded_side_and_ang(:,2));
     linear_density = field_stats.linear_density;
     linear_density_int = round(linear_density,0);
-    N_int_from_shrink_dist = (sqrt(field_stats.unoccupancy_ratio)*1)/(2*shrunk_distance*sind(shrink_ang/2));
+    unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(pre_shrink_polytopes,tiled_polytopes,gap_size);
+    N_int_from_shrink_dist = (sqrt(unocc_ests.A_unocc_est_poly_fit)*1)/(2*shrunk_distance*sind(shrink_ang/2));
     N_int_actual = field_stats.linear_density_mean;
     % uncomment for 30% correction factor
     % N_int_linear = 1.3*linear_density*(1-shrunk_distance/R_bar_initial);
