@@ -71,4 +71,16 @@ function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(pre_shrink_pol
     C = 0;
     x = des_gap_size/R_bar_initial*100;
     unocc_ests.A_unocc_est_poly_fit = A*x^2+B*x+C;
+
+    %% r_L,unocc estimates
+    %% r_L,unocc from N_int and average polytope width
+    N_int = field_stats.linear_density_mean;
+    R_bar = field_stats.average_max_radius;
+    unocc_ests.L_unocc_est_avg_width = 1-N_int*R_bar;
+
+    %% r_L,unocc from gap width and side angle
+    num_spaces = N_int + 1;
+
+    L_space = des_gap_size/cos(pi-theta_side);
+    unocc_ests.L_unocc_est_gap_width = num_spaces*L_space;
 end
