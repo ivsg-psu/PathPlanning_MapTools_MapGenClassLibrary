@@ -8,7 +8,7 @@
 
 %% Set up variables
 close all;clear all;
-polytopes = fcn_MapGen_haltonVoronoiTiling([1 100]);
+polytopes = fcn_MapGen_haltonVoronoiTiling([1 4000]);
 %% big shrink
 fig_num = 1;
 bounding_box = [0,0; 1,1];
@@ -32,7 +32,7 @@ A_unocc_est_poly_fit_all = [];
 P_tot_all = [];
 average_angle_all = [];
 sum_sines_all = [];
-for i = linspace(0.001,0.08,20)
+for i = linspace(0.001,0.08,2)
     fig_num = 2;
     des_gap_size = i;
     shrunk_polytopes=...

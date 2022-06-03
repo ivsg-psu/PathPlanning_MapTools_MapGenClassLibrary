@@ -1,4 +1,5 @@
 function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(pre_shrink_polytopes,polytopes,des_gap_size)
+    flag_do_plot = 0;
 
     %% extract necessary stats from polytopes
     pre_shrink_stats = fcn_MapGen_polytopesStatistics(pre_shrink_polytopes);
@@ -73,14 +74,44 @@ function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(pre_shrink_pol
     unocc_ests.A_unocc_est_poly_fit = A*x^2+B*x+C;
 
     %% r_L,unocc estimates
-    %% r_L,unocc from N_int and average polytope width
-    N_int = field_stats.linear_density_mean;
-    R_bar = field_stats.average_max_radius;
-    unocc_ests.L_unocc_est_avg_width = 1-N_int*R_bar;
 
     %% r_L,unocc from gap width and side angle
     num_spaces = N_int + 1;
-
+    side_angles = [];
+    AABBs = [];
+    for j=1:length(polytopes)
+        poly = polytopes(j);
+        [angles, unit_in_vectors, unit_out_vectors] =...
+            fcn_MapGen_polytopeFindVertexAngles(...
+            poly.vertices);
+        side_angles_this_poly = atan2(unit_in_vectors(:,2),unit_in_vectors(:,1));
+        side_angles = [side_angles; side_angles_this_poly];
+        min_x = min(poly.xv);
+        max_x = max(poly.xv);
+        min_y = min(poly.yv);
+        max_y = max(poly.yv);
+        AABBs = [AABBs; min_x, min_y, max_x, max_y]
+    end
+    if flag_do_plot
+        figure;
+        hold on;
+        histogram(side_angles*180/pi,'BinWidth',2,'FaceColor','r','FaceAlpha',0.4)
+        xlabel('polytope side angle from horizontal [deg]')
+        ylabel('count')
+        title('Histogram of Side Angles')
+        box on;
+    end
+    theta_side = prctile(side_angles,75);
     L_space = des_gap_size/cos(pi-theta_side);
     unocc_ests.L_unocc_est_gap_width = num_spaces*L_space;
+
+    %% r_L,unocc from N_int and average polytope width
+    poly_widths = AABBs(:,3) - AABBs(:,1);
+    avg_poly_width = mean(poly_widths);
+    N_int = field_stats.linear_density_mean;
+    unocc_ests.L_unocc_est_avg_width = 1-N_int*avg_poly_width;
+
+    %% r_L,unocc from gap width assuming side angle is 90deg
+    unocc_ests.L_unocc_est_gap_width_normal = num_spaces*des_gap_size;
+
 end
