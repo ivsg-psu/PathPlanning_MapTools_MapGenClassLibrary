@@ -6,6 +6,7 @@ function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(pre_shrink_pol
     total_area = pre_shrink_stats.total_area;
     R_bar_initial = pre_shrink_stats.average_max_radius;
     field_stats = fcn_MapGen_polytopesStatistics(polytopes);
+    field_avg_r_D = field_stats.avg_r_D;
     occ_area = field_stats.occupied_area;
     r_occ_meas = occ_area/total_area; % calculated occupancy ratio
     r_unocc_meas = 1-r_occ_meas;
@@ -110,16 +111,25 @@ function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(pre_shrink_pol
     end
     theta_side = prctile(side_angles,75);
     L_space = des_gap_size/cos(pi-theta_side);
-    unocc_ests.L_unocc_est_gap_width = num_spaces*L_space;
+    unocc_ests.L_unocc_est_gap_size = num_spaces*L_space;
 
     %% r_L,unocc from N_int and average polytope width
     poly_widths = AABBs(:,3) - AABBs(:,1);
     slant_poly_widths = slant_AABBs(:,3) - slant_AABBs(:,1);
     avg_poly_width = mean(poly_widths);
     avg_slant_poly_width = mean(slant_poly_widths);
-    unocc_ests.L_unocc_est_avg_width = 1-N_int*avg_poly_width;
-    unocc_ests.L_unocc_est_avg_slant_width = 1-N_int*avg_slant_poly_width;
-    %% r_L,unocc from gap width assuming side angle is 90deg
-    unocc_ests.L_unocc_est_gap_width_normal = num_spaces*des_gap_size;
+    unocc_ests.L_unocc_est_AABB_width = 1-N_int*avg_poly_width;
+    unocc_ests.L_unocc_est_slant_AABB_width = 1-N_int*avg_slant_poly_width;
 
+    %% r_L,unocc from gap width assuming side angle is 90deg
+    unocc_ests.L_unocc_est_gap_size_normal = num_spaces*des_gap_size;
+
+    %% poly fit estimate
+    % for explanation of these magic numbers, please see slide deck in /Documentation
+    A = 1.07439;
+    B = 0.0106664/0.0405198;
+    C = 0;
+    x = field_avg_r_D;
+    L_occ_est_poly_fit = A*x^2+B*x+C;
+    unocc_ests.L_unocc_est_poly_fit = 1 - L_occ_est_poly_fit;
 end
