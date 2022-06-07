@@ -109,8 +109,22 @@ function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(pre_shrink_pol
         title('Histogram of Side Angles')
         box on;
     end
-    theta_side = prctile(side_angles,75);
-    L_space = des_gap_size/cos(pi-theta_side);
+    % remove negative numbers
+    side_angles = side_angles(side_angles >= 0);
+    % do trig to get gap scaling based on side angle
+    effective_gap_scaling = 1/cos(pi-side_angles);
+    if flag_do_plot
+        figure;
+        hold on;
+        histogram(effective_gap_scaling,'FaceColor','g','FaceAlpha',0.4)
+        xlabel('effective scaling of gap length based on side angle')
+        ylabel('count')
+        title('Histogram of Side Angles')
+        box on;
+    end
+    % use average gap scaling for L_unocc estimate
+    avg_effective_gap_scaling = mean(effective_gap_scaling);
+    L_space = des_gap_size*avg_effective_gap_scaling;
     unocc_ests.L_unocc_est_gap_size = num_spaces*L_space;
 
     %% r_L,unocc from N_int and average polytope width
