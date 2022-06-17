@@ -84,7 +84,13 @@ function r_lc_straight_through = fcn_MapGen_polytopesPredictLengthCostRatioStrai
 
     % find area unoccupancy ratio
     unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(pre_shrink_polytopes,polytopes,des_gap_size);
-    L_unocc = unocc_ests.L_unocc_est_slant_AABB_width;
+    map_stats = fcn_MapGen_polytopesStatistics(polytopes);
+    r_D = map_stats.avg_r_D;
+    if r_D < 0.15 || r_D >= 0.53
+        L_unocc = unocc_ests.L_unocc_est_poly_fit;
+    else
+        L_unocc = unocc_ests.L_unocc_est_slant_AABB_width;
+    end
     % convert to occupancy ratio
     L_occ = 1-L_unocc;
     % find average cost for polytope field
