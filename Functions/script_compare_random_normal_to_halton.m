@@ -7,7 +7,7 @@ std_all = [];
 sharpness_all = [];
 for tiles=25:25:1000
     Halton_range = [1 tiles]; % range of Halton points to use to generate the tiling
-    tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1]);%,fig_num);
+    tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1]);
     field_stats = fcn_MapGen_polytopesStatistics(tiled_polytopes);
     N_int_actual = field_stats.linear_density_mean;
     rd = field_stats.avg_r_D;
@@ -21,7 +21,7 @@ for tiles=25:25:1000
     std_all = [std_all, std];
     sharpness_all = [sharpness_all, sharpness];
 end
-% repeat with random stuff
+% repeat with random set instead of Halton set
 N_int_actual_all_rand = [];
 rd_all_rand= [];
 tiles_all_rand = [];
@@ -29,8 +29,8 @@ rad_all_rand = [];
 std_all_rand = [];
 sharpness_all_rand = [];
 for tiles=25:25:1000
-    Halton_range = [1 tiles]; % range of Halton points to use to generate the tiling
-    tiled_polytopes = fcn_MapGen_randomNormalVoronoiTiling(Halton_range,[1 1]);%,fig_num);
+    tile_range = [1 tiles];
+    tiled_polytopes = fcn_MapGen_randomNormalVoronoiTiling(tile_range,[1 1]);
     field_stats = fcn_MapGen_polytopesStatistics(tiled_polytopes);
     N_int_actual = field_stats.linear_density_mean;
     rd = field_stats.avg_r_D;

@@ -44,7 +44,8 @@ function poly_map_stats = fcn_MapGen_polytopesStatistics(...
 % Revision History:
 % 2021_07_11 - S. Brennan
 % -- first write of function
-
+% 2022_06_17 - S. Harnett
+% -- numerous features added to support length cost ratio prediction
 
 % TO DO
 % -- TBD
@@ -160,6 +161,8 @@ for ith_poly = 1:Npolys
     all_side_count(ith_poly,1) = Nangles;
     all_max_radius(ith_poly,1) = polytopes(ith_poly).max_radius;
     all_min_radius(ith_poly,1) = polytopes(ith_poly).min_radius;
+    % note that sharpness is the ratio of max radius to min radius
+    % this is not the same thing as aspect ratio which is AABB width to height
     all_sharpness_ratios(ith_poly,1) = ...
         polytopes(ith_poly).max_radius/polytopes(ith_poly).min_radius;
     all_areas(ith_poly,1) = polytopes(ith_poly).area;
@@ -180,16 +183,11 @@ angle_column_no_nan = angle_column(~isnan(angle_column));
 average_vertex_angle = nanmean(angle_column_no_nan*180/pi);
 std_vertex_angle = nanstd(angle_column_no_nan*180/pi);
 
-% Find the mean and std deviations of the max-radius
+% Find the mean and std deviations of radii metrics
 average_max_radius = nanmean(all_max_radius);
 average_min_radius = nanmean(all_min_radius);
 average_sharpness = nanmean(all_sharpness_ratios);
 std_max_radius = nanstd(all_max_radius);
-
-% Find the perimeter of each polytope
-all_lengths_zeroes = all_lengths;
-all_lengths_zeroes(isnan(all_lengths_zeroes)) = 0;
-all_perimeters = sum(all_lengths_zeroes,1);
 
 % Determine the length properties related to sides of polytopes
 length_column = reshape(all_lengths,Nverticies_per_poly*Npolys,1);
@@ -198,20 +196,18 @@ total_perimeter = sum(length_column_no_nan);
 average_side_length = nanmean(length_column_no_nan);
 std_side_length = nanstd(length_column_no_nan);
 average_perimeter = total_perimeter/Npolys;
-std_perimeter = nanstd(all_perimeters);
 
 % Determine the area properties of the map
 occupied_area = sum(all_areas);
-
 total_area    = (AABB(3)-AABB(1))*(AABB(4)-AABB(2));
 
 % Determine the density properties
 point_density = length(polytopes)/total_area;
 linear_density = point_density.^0.5;
 
-% Determine the average gap sizes between polytopes. Do this using 2
-% methods: one is Seth Tau's thesis derivation. The other is to assume the
-% gaps are all associated with the perimeters.
+
+poly_map_stats.Npolys = Npolys;
+poly_map_stats.NtotalVertices = NrealVertices;
 avg_r_D = average_max_radius*linear_density;
 std_r_D = std_max_radius*linear_density;
 L_E = total_area^0.5;
@@ -223,6 +219,7 @@ poly_map_stats.min_x = AABB(1);
 poly_map_stats.max_x = AABB(3);
 poly_map_stats.min_y = AABB(2);
 poly_map_stats.max_y = AABB(4);
+
 poly_map_stats.occupied_area = occupied_area;
 poly_map_stats.total_area = total_area;
 poly_map_stats.point_density = point_density;
@@ -246,22 +243,6 @@ poly_map_stats.NtotalVertices = NrealVertices;
 
 
 if flag_do_debug
-    figure(1);
-    % errorbar(avg_r_D,avg_r_LC_from_avg_gap,std_r_LC_from_avg_gap,'ro')
-    plot(avg_r_D,avg_r_LC_from_avg_gap,'ro')
-    % plot(avg_r_D,r_LC_linear1,'go')
-    % plot(avg_r_D,r_LC_linear2,'ko')
-    % plot(avg_r_D,r_LC_1d_density_variation,'bo')
-    % plot(avg_r_D,r_LC_2d_density_variation1,'co')
-    % plot(avg_r_D,r_LC_2d_density_variation2,'mo')
-    % plot(avg_r_D,r_LC_2d_density_variation3,'ro')
-    % legend('linear','linear2','1d density variation','2d density variation1','2d density variation2','2d density variation3');
-    % legend('length cost ratio from average gap size','length cost ratio from linear density');
-    xlabel('r_D');
-    ylabel('predicted r_{LC}');
-    % Fill in results
-    poly_map_stats.Npolys = Npolys;
-    poly_map_stats.NtotalVertices = NrealVertices;
     figure(fig_for_debug);
     clf;
     hold on
