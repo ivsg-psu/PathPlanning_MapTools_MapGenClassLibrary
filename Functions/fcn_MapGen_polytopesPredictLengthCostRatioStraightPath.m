@@ -37,15 +37,12 @@ function r_lc_straight_through = fcn_MapGen_polytopesPredictLengthCostRatioStrai
     % 2022_05_20
     % -- first written by Steve Harnett
 
-    % TODO you are here
 
     %% Debugging and Input checks
-flag_check_inputs = 1; % Set equal to 1 to check the input arguments
-flag_do_plot = 0;      % Set equal to 1 for plotting
-flag_do_debug = 0;     % Set equal to 1 for debugging
+    flag_check_inputs = 1; % Set equal to 1 to check the input arguments
+    flag_do_plot = 0;      % Set equal to 1 for plotting
+    flag_do_debug = 0;     % Set equal to 1 for debugging
     if flag_do_debug
-        fig_for_debug = 747;
-        fig_num = 2100;
         st = dbstack; %#ok<*UNRCH>
         fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
     end
@@ -67,7 +64,7 @@ flag_do_debug = 0;     % Set equal to 1 for debugging
     if 1 == flag_check_inputs
 
         % Are there the right number of inputs?
-        if nargin < 6 || nargin > 6
+        if nargin < 7 || nargin > 7
             error('Incorrect number of input arguments')
         end
 
