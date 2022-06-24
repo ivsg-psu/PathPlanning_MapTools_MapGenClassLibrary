@@ -1,38 +1,36 @@
-function [field_small_choice_angles,field_big_choice_angles,r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse_worst,r_lc_sparse_average,r_lc_sparse_std,r_lc_sparse_worst_new,r_lc_sparse_average_new,r_lc_sparse_std_new,r_lc_sparse_worst_actual,r_lc_sparse_average_actual,r_lc_sparse_std_actual,r_lc_sparse_worst_linear,r_lc_sparse_average_linear,r_lc_sparse_std_linear] = fcn_MapGen_polytopesPredictLengthCostRatio(pre_shrink_polytopes,polytopes,gap_size,shrunk_distance,shrink_ang,R_bar_initial) % TODO(@sjharnett) put outputs into struct
+function [field_small_choice_angles,field_big_choice_angles,r_lc_estimates] =...
+    fcn_MapGen_polytopesPredictLengthCostRatio(pre_shrink_polytopes,polytopes,gap_size,travel_direction,L_E)
     % fcn_MapGen_polytopesPredictLengthCostRatio
     % Given an polytope field, predict the length cost ratio from geometry
     %
     %
     %
     % FORMAT:
-    %
-    % [r_lc_max,r_lc_avg,r_lc_iterative,...
-    % r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,...
-    % r_lc_sparse_worst,r_lc_sparse_average,r_lc_sparse_std] = ...
-    % fcn_MapGen_polytopesPredictLengthCostRatio(tiled_polytopes,gap_size)
+    % [field_small_choice_angles,field_big_choice_angles,r_lc_estimates] =...
+    %  fcn_MapGen_polytopesPredictLengthCostRatio(pre_shrink_polytopes,polytopes,gap_size,travel_direction)
     %
     % INPUTS:
-    %
-    %     tiled_polytopes
-    %     gap_size
+    %     pre_shrink_polytopes - the fully tiled field
+    %     polytopes - the field after shrinking has been applied
+    %     gap_size - the commanded gap size used when shrinking was applied
+    %     travel_direction - the unit vectory pointing in the direciton of travel
+    %         commonly [1,0] for a path from left to right
+    %     L_E - Euclidean distance from start to goal.  The quantity in the denomonator of length cost ratio
     %
     %
     % OUTPUTS:
     %
-    %     r_lc_max
-    %     r_lc_avg
-    %     r_lc_iterative
-    %     r_lc_max_effective
-    %     r_lc_avg_effective
-    %     r_lc_iterative_effective
-    %     r_lc_sparse_worst
-    %     r_lc_sparse_average
-    %     r_lc_sparse_std
+    %
+    %     field_small_choice_angles - array of all smaller (likely chosen) deflection angles for the field
+    %     field_big_choice_angles - array of all larger (likely unchosen) deflection angles for the field
+    %     r_lc_estimates - struct of different cost ratio estimation methods
+    %     r_lc_estimates - struct of different cost ratio estimation methods
     %
     % DEPENDENCIES:
     %
     %     fcn_MapGen_polytopeFindVertexAngles
     %     fcn_MapGen_polytopesStatistics
+    %     fcn_MapGen_polytopesPredictUnoccupancyRatio
     %
     % EXAMPLES:
     %
@@ -45,7 +43,6 @@ function [field_small_choice_angles,field_big_choice_angles,r_lc_max,r_lc_avg,r_
     % 2021_10_22
     % -- first written by Steve Harnett
 
-    % TODO add outputs for chosen angle, chosen side length etc
 
     %% Debugging and Input checks
     flag_check_inputs = 1; % Set equal to 1 to check the input arguments
@@ -75,7 +72,7 @@ function [field_small_choice_angles,field_big_choice_angles,r_lc_max,r_lc_avg,r_
     if 1 == flag_check_inputs
 
         % Are there the right number of inputs?
-        if nargin < 6 || nargin > 6
+        if nargin < 3 || nargin > 3
             error('Incorrect number of input arguments')
         end
 
@@ -94,7 +91,10 @@ function [field_small_choice_angles,field_big_choice_angles,r_lc_max,r_lc_avg,r_
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
     fig_num = 12;
-    field_stats = fcn_MapGen_polytopesStatistics(tiled_polytopes);
+    field_stats_pre_shrink = fcn_MapGen_polytopesStatistics(pre_shrink_polytopes);
+    R_bar_initial = field_stats_pre_shrink.average_max_radius;
+    shrink_ang = field_stats_pre_shrink.average_vertex_angle;
+    field_stats = fcn_MapGen_polytopesStatistics(polytopes);
     field_avg_r_D = field_stats.avg_r_D;
     field_away_normals = [];
     field_away_angles = [];
@@ -102,8 +102,8 @@ function [field_small_choice_angles,field_big_choice_angles,r_lc_max,r_lc_avg,r_
     field_small_choice_angles = [];
     field_big_choice_angles = [];
     field_chosen_side_length = [];
-    for j=1:length(tiled_polytopes)
-        shrinker = tiled_polytopes(j);
+    for j=1:length(polytopes)
+        shrinker = polytopes(j);
         vertices = shrinker.vertices;
         if flag_do_plot
             [angles, unit_in_vectors, unit_out_vectors] =...
@@ -133,8 +133,6 @@ function [field_small_choice_angles,field_big_choice_angles,r_lc_max,r_lc_avg,r_
         vertex_is_away = zeros(1, length(vertices)-1);
         % a boolean determining if this vertex "blocks" the direction of travel
         travel_direction_is_within_polytope = zeros(1, length(vertices)-1);
-        % travel direction is assumed to be left ot right, 0 degrees from horizontal
-        travel_direction = [1,0];
         % these will store normals, vertices, and angles that block travel and are valid decision points
         away_normals = NaN(length(vertices)-1,2);
         away_vertices = NaN(length(vertices)-1,2);
@@ -228,30 +226,28 @@ function [field_small_choice_angles,field_big_choice_angles,r_lc_max,r_lc_avg,r_
     divergence_heights = rounded_side_and_ang(:,1).*sin(rounded_side_and_ang(:,2));
     linear_density = field_stats.linear_density;
     linear_density_int = round(linear_density,0);
-    unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(pre_shrink_polytopes,tiled_polytopes,gap_size);
-    N_int_from_shrink_dist = (sqrt(unocc_ests.A_unocc_est_poly_fit)*1)/(2*shrunk_distance*sind(shrink_ang/2));
+    unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(pre_shrink_polytopes,polytopes,gap_size);
+    N_int_from_shrink_dist = (sqrt(unocc_ests.A_unocc_est_poly_fit)*1)/(gap_size*sind(shrink_ang/2));
     N_int_actual = field_stats.linear_density_mean;
-    % uncomment for 30% correction factor
-    % N_int_linear = 1.3*linear_density*(1-shrunk_distance/R_bar_initial);
-    N_int_linear = linear_density*(1-shrunk_distance/R_bar_initial);
+    N_int_linear = linear_density*(1-(gap_size/2)/R_bar_initial);
     s_divergence_heights = sort(divergence_heights);
     worst_divergence_heights = s_divergence_heights(end-linear_density_int+1:end);
     worst_divergence_heights_new = s_divergence_heights(end-N_int_from_shrink_dist+1:end);
     worst_divergence_heights_actual = s_divergence_heights(end-N_int_actual+1:end);
     worst_divergence_heights_linear = s_divergence_heights(end-N_int_linear+1:end);
-    % TODO @sjharnett change /1 to be over L_P
-    r_lc_sparse_worst = sum((worst_divergence_heights.^2+(1/linear_density_int)^2).^0.5)/1;
-    r_lc_sparse_average = linear_density_int*mean((s_divergence_heights.^2+(1/linear_density_int)^2).^0.5)/1;
-    r_lc_sparse_std = linear_density_int*std((s_divergence_heights.^2+(1/linear_density_int)^2).^0.5)/1;
-    r_lc_sparse_worst_new = sum((worst_divergence_heights_new.^2+(1/N_int_from_shrink_dist)^2).^0.5)/1;
-    r_lc_sparse_average_new = N_int_from_shrink_dist*mean((s_divergence_heights.^2+(1/N_int_from_shrink_dist)^2).^0.5)/1;
-    r_lc_sparse_std_new = N_int_from_shrink_dist*std((s_divergence_heights.^2+(1/N_int_from_shrink_dist)^2).^0.5)/1;
-    r_lc_sparse_worst_actual = sum((worst_divergence_heights_actual.^2+(1/N_int_actual)^2).^0.5)/1;
-    r_lc_sparse_average_actual = N_int_actual*mean((s_divergence_heights.^2+(1/N_int_actual)^2).^0.5)/1;
-    r_lc_sparse_std_actual = N_int_actual*std((s_divergence_heights.^2+(1/N_int_actual)^2).^0.5)/1;
-    r_lc_sparse_worst_linear = sum((worst_divergence_heights_linear.^2+(1/N_int_linear)^2).^0.5)/1;
-    r_lc_sparse_average_linear = N_int_linear*mean((s_divergence_heights.^2+(1/N_int_linear)^2).^0.5)/1;
-    r_lc_sparse_std_linear = N_int_linear*std((s_divergence_heights.^2+(1/N_int_linear)^2).^0.5)/1;
+
+    r_lc_estimates.r_lc_sparse_worst = sum((worst_divergence_heights.^2+(1/linear_density_int)^2).^0.5)/L_E;
+    r_lc_estimates.r_lc_sparse_average = linear_density_int*mean((s_divergence_heights.^2+(1/linear_density_int)^2).^0.5)/L_E;
+    r_lc_estimates.r_lc_sparse_std = linear_density_int*std((s_divergence_heights.^2+(1/linear_density_int)^2).^0.5)/L_E;
+    r_lc_estimates.r_lc_sparse_worst_new = sum((worst_divergence_heights_new.^2+(1/N_int_from_shrink_dist)^2).^0.5)/L_E;
+    r_lc_estimates.r_lc_sparse_average_new = N_int_from_shrink_dist*mean((s_divergence_heights.^2+(1/N_int_from_shrink_dist)^2).^0.5)/L_E;
+    r_lc_estimates.r_lc_sparse_std_new = N_int_from_shrink_dist*std((s_divergence_heights.^2+(1/N_int_from_shrink_dist)^2).^0.5)/L_E;
+    r_lc_estimates.r_lc_sparse_worst_actual = sum((worst_divergence_heights_actual.^2+(1/N_int_actual)^2).^0.5)/L_E;
+    r_lc_estimates.r_lc_sparse_average_actual = N_int_actual*mean((s_divergence_heights.^2+(1/N_int_actual)^2).^0.5)/L_E;
+    r_lc_estimates.r_lc_sparse_std_actual = N_int_actual*std((s_divergence_heights.^2+(1/N_int_actual)^2).^0.5)/L_E;
+    r_lc_estimates.r_lc_sparse_worst_linear = sum((worst_divergence_heights_linear.^2+(1/N_int_linear)^2).^0.5)/L_E;
+    r_lc_estimates.r_lc_sparse_average_linear = N_int_linear*mean((s_divergence_heights.^2+(1/N_int_linear)^2).^0.5)/L_E;
+    r_lc_estimates.r_lc_sparse_std_linear = N_int_linear*std((s_divergence_heights.^2+(1/N_int_linear)^2).^0.5)/L_E;
 
     if flag_do_plot
         % end results generation

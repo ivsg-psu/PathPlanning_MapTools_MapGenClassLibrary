@@ -117,27 +117,30 @@ if do_range_test
                     R_bar_initial = field_stats_pre_shrink.average_max_radius;
                     avg_max_rad = field_stats.average_max_radius;
                     shrunk_distance = R_bar_initial - avg_max_rad;
-                    gap_size = 2*shrink_distance;
-                    shrink_ang = field_stats_pre_shrink.average_vertex_angle;
+                    gap_size = 2*shrunk_distance;
+                    % travel direction is assumed to be left ot right, 0 degrees from horizontal
+                    travel_direction = [1,0];
+                    % traversal crosses the entire field from left to right, going unit length
+                    L_E = 1;
 %                     try
-                        [field_small_choice_angles,field_big_choice_angles,r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse_worst,r_lc_sparse_average,r_lc_sparse_std,r_lc_sparse_worst_new,r_lc_sparse_average_new,r_lc_sparse_std_new,r_lc_sparse_worst_actual,r_lc_sparse_average_actual,r_lc_sparse_std_actual,r_lc_sparse_worst_linear,r_lc_sparse_average_linear,r_lc_sparse_std_linear] = ...
-                            fcn_MapGen_polytopesPredictLengthCostRatio(shrunk_field,gap_size,shrunk_distance,shrink_ang,R_bar_initial)
+                        [field_small_choice_angles,field_big_choice_angles,r_lc_estimates] = ...
+                            fcn_MapGen_polytopesPredictLengthCostRatio(tiled_polytopes,shrunk_field,gap_size,travel_direction,L_E)
 %                     catch
 %                         radii_goals_failed = [radii_goals_failed, radii_goals];
 %                         fprintf("point for radii goals:%f didn't work",radii_goals);
 %                     end
-                    r_lc_sparse_worst_this_map = [r_lc_sparse_worst_this_map, r_lc_sparse_worst];
-                    r_lc_sparse_average_this_map = [r_lc_sparse_average_this_map, r_lc_sparse_average];
-                    r_lc_sparse_std_this_map = [r_lc_sparse_std_this_map, r_lc_sparse_std];
-                    r_lc_sparse_worst_this_map_new = [r_lc_sparse_worst_this_map_new, r_lc_sparse_worst_new];
-                    r_lc_sparse_average_this_map_new = [r_lc_sparse_average_this_map_new, r_lc_sparse_average_new];
-                    r_lc_sparse_std_this_map_new = [r_lc_sparse_std_this_map_new, r_lc_sparse_std_new];
-                    r_lc_sparse_worst_this_map_actual = [r_lc_sparse_worst_this_map_actual, r_lc_sparse_worst_actual];
-                    r_lc_sparse_average_this_map_actual = [r_lc_sparse_average_this_map_actual, r_lc_sparse_average_actual];
-                    r_lc_sparse_std_this_map_actual = [r_lc_sparse_std_this_map_actual, r_lc_sparse_std_actual];
-                    r_lc_sparse_worst_this_map_linear = [r_lc_sparse_worst_this_map_linear, r_lc_sparse_worst_linear];
-                    r_lc_sparse_average_this_map_linear = [r_lc_sparse_average_this_map_linear, r_lc_sparse_average_linear];
-                    r_lc_sparse_std_this_map_linear = [r_lc_sparse_std_this_map_linear, r_lc_sparse_std_linear];
+                    r_lc_sparse_worst_this_map = [r_lc_sparse_worst_this_map, r_lc_estimates.r_lc_sparse_worst];
+                    r_lc_sparse_average_this_map = [r_lc_sparse_average_this_map, r_lc_estimates.r_lc_sparse_average];
+                    r_lc_sparse_std_this_map = [r_lc_sparse_std_this_map, r_lc_estimates.r_lc_sparse_std];
+                    r_lc_sparse_worst_this_map_new = [r_lc_sparse_worst_this_map_new, r_lc_estimates.r_lc_sparse_worst_new];
+                    r_lc_sparse_average_this_map_new = [r_lc_sparse_average_this_map_new, r_lc_estimates.r_lc_sparse_average_new];
+                    r_lc_sparse_std_this_map_new = [r_lc_sparse_std_this_map_new, r_lc_estimates.r_lc_sparse_std_new];
+                    r_lc_sparse_worst_this_map_actual = [r_lc_sparse_worst_this_map_actual, r_lc_estimates.r_lc_sparse_worst_actual];
+                    r_lc_sparse_average_this_map_actual = [r_lc_sparse_average_this_map_actual, r_lc_estimates.r_lc_sparse_average_actual];
+                    r_lc_sparse_std_this_map_actual = [r_lc_sparse_std_this_map_actual, r_lc_estimates.r_lc_sparse_std_actual];
+                    r_lc_sparse_worst_this_map_linear = [r_lc_sparse_worst_this_map_linear, r_lc_estimates.r_lc_sparse_worst_linear];
+                    r_lc_sparse_average_this_map_linear = [r_lc_sparse_average_this_map_linear, r_lc_estimates.r_lc_sparse_average_linear];
+                    r_lc_sparse_std_this_map_linear = [r_lc_sparse_std_this_map_linear, r_lc_estimates.r_lc_sparse_std_linear];
                     N_int_linear_this_map = [];
                     N_int_actual_this_map = [];
                     N_int_from_shrink_dist_all_this_map = [];
@@ -147,9 +150,10 @@ if do_range_test
                     R_bar_finals = [R_bar_finals, field_stats.average_max_radius];
                     N_int_from_density = field_stats.linear_density;
                     N_int_from_density_all = [N_int_from_density_all, N_int_from_density];
-                    linear_unocc = [linear_unocc, sqrt(field_stats.unoccupancy_ratio)];
+                    unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(tiled_polytopes,shrunk_field,gap_size);
+                    linear_unocc = [linear_unocc, unocc_ests.L_unocc_est_poly_fit];
                     shrunk_distances = [shrunk_distances, shrunk_distance];
-                    N_int_from_shrink_dist = (sqrt(field_stats.unoccupancy_ratio)*1)/(2*shrunk_distance*sind(field_stats_pre_shrink.average_vertex_angle/2));
+                    N_int_from_shrink_dist = (sqrt(unocc_ests.L_unocc_est_poly_fit)*1)/(2*shrunk_distance*sind(field_stats_pre_shrink.average_vertex_angle/2));
                     debug_ang = field_stats_pre_shrink.average_vertex_angle;
                     debug_sine = sind(debug_ang/2);
                     debug_ang_all = [debug_ang_all, debug_ang];
