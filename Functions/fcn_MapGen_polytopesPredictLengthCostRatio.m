@@ -102,12 +102,6 @@ function [field_small_choice_angles,field_big_choice_angles,r_lc_max,r_lc_avg,r_
     field_small_choice_angles = [];
     field_big_choice_angles = [];
     field_chosen_side_length = [];
-    % initialize path for iterative solution
-    path = NaN(1,2);
-    iterative_chosen_side_lengths = [];
-    iterative_small_choice_angles = [];
-    start_not_found = true;
-    % begin looping through polytopes in a field
     for j=1:length(tiled_polytopes)
         shrinker = tiled_polytopes(j);
         vertices = shrinker.vertices;
@@ -158,14 +152,6 @@ function [field_small_choice_angles,field_big_choice_angles,r_lc_max,r_lc_avg,r_
             travel_direction_is_within_polytope(i) = angle_vertex_normal_to_travel_direction(i)<=(pi-angles(i))/2;
             % begin looping through away vertices that block travel direction
             if vertex_is_away(i)>0 && travel_direction_is_within_polytope(i)
-                % pick a point at x=0, y~=0 to start iterative solution
-                if vertices(i,1) == 0 && vertices(i,2) ~= 0 && start_not_found
-                    start_location = vertices(i,:);
-                    path = [path; start_location];
-                    path(any(isnan(path),2),:)=[];
-                    start_not_found = false;
-                end
-                % end pick a point at x=0 y=/= 0 to start iterative solution
                 away_vertices(i,:) = vertices(i,:);
                 away_normals(i,:) = vertex_normal_vectors(i,:);
                 % angles need to be subtracted from 180 deg to get interior angles
@@ -181,22 +167,6 @@ function [field_small_choice_angles,field_big_choice_angles,r_lc_max,r_lc_avg,r_
                 end
                 chosen_side_lengths(i) = side_length;
 
-                % log chosen_side_length and small angle separately for iterative solution
-                if vertices(i,:) == path(end,:)
-                    iterative_chosen_side_lengths = [iterative_chosen_side_lengths, side_length];
-                    iterative_small_choice_angles = [iterative_small_choice_angles, away_angles(i)./2-away_angle_vertex_normal_to_travel_direction(i)];
-                    if INTERNAL_is_left_turn_smaller(vertex_normal_vectors(i,:),travel_direction)
-                        try
-                            next_location = vertices(i-1,:);
-                        catch
-                            next_location = vertices(end,:);
-                        end
-                    else
-                        next_location = vertices(i+1,:);
-                    end
-                    path = [path; next_location];
-                end
-                % end log chosen_side_lengths separately for iterative solution
             % end looping through away vertices
             end
             side_vectors(i,1) = vertices(i+1,1)-vertices(i,1);
@@ -255,42 +225,7 @@ function [field_small_choice_angles,field_big_choice_angles,r_lc_max,r_lc_avg,r_
         end
     end
     % begin results generation
-    r_lc_max = 1/cos(mean(field_away_angles)/2);
-    r_lc_max_effective = 1/cos(mean(field_away_angles_effective)/2);
-    r_lc_avg = 1/cos(mean(field_small_choice_angles));
-    r_lc_avg_effective = 1/cos(mean(field_small_choice_angles_effective));
-    field_traveled_distance_L = cos(field_small_choice_angles).*field_chosen_side_length;
-    field_traveled_distance_L_effective = cos(field_small_choice_angles_effective).*field_chosen_side_length_effective;
-    field_path_distance_H = field_chosen_side_length;
-    field_path_distance_H_effective = field_chosen_side_length_effective;
-    % TODO debug here
-    L_E = 0;
-    L_P = 0;
-    L_E_effective = 0;
-    L_P_effective = 0;
-    i = 1;
-    % this loops through polytopes in left to right order
-    % TODO use vertices to loop through polytopes in path order
-        % iterative solution
-        % pick a point at x=0 y=/= 0
-        % log the short side and short angle
-        % note the vertex you wind up at
-        % go to next polytope, if the general conditions aren't met AND that vertex is not present, skip
-        % repeat until x=1
-    try
-        while L_E < 1
-            L_E = L_E + field_traveled_distance_L(i);
-            L_E_effective = L_E_effective + field_traveled_distance_L_effective(i);
-            L_P = L_P + field_path_distance_H(i);
-            L_P_effective = L_P_effective + field_path_distance_H_effective(i);
-            i = i + 1;
-        end
-    catch
-        L_E_effective = 1;
-        L_P_effective = 1;
-    end
-    r_lc_iterative = L_P/L_E;
-    r_lc_iterative_effective = L_P_effective/L_E_effective;
+
     side_and_ang = [field_chosen_side_length, field_small_choice_angles];
     rounded_side_and_ang = round(side_and_ang,6);
     % remove zeros (usually from zero angle divergences)
