@@ -250,7 +250,6 @@ function [field_small_choice_angles,field_big_choice_angles,r_lc_estimates] =...
     r_lc_estimates.r_lc_sparse_std_linear = N_int_linear*std((s_divergence_heights.^2+(1/N_int_linear)^2).^0.5)/L_E;
 
     if flag_do_plot
-        % end results generation
         figure;
         hold on;
         histogram(field_big_choice_angles*180/pi,'BinWidth',2,'FaceColor','r','FaceAlpha',0.4)
@@ -304,6 +303,9 @@ function ang = INTERNAL_angle_between_vectors(a,b)
 end
 
 function left_turn_is_smaller = INTERNAL_is_left_turn_smaller(vertex_normal,travel_direction)
+    % leverage the right hand rule (RHR) to determine the position of the
+    % smaller deflection angle relative to
+    % an actor looking in the direciton of travel
     cross_prod = cross([vertex_normal,0],[travel_direction,0]);
     left_turn_is_smaller = cross_prod(3)>0;
 end
