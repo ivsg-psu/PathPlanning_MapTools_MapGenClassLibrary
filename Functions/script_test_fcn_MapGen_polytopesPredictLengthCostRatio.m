@@ -32,12 +32,6 @@ if do_range_test
     R_bar_initials = [];
     R_bar_finals = [];
     r_D_theoretical = [];
-    r_lc_max_all = [];
-    r_lc_avg_all = [];
-    r_lc_iterative_all = [];
-    r_lc_max_effective_all = [];
-    r_lc_avg_effective_all = [];
-    r_lc_iterative_effective_all = [];
     r_lc_sparse_worst_all = [];
     r_lc_sparse_average_all = [];
     r_lc_sparse_std_all = [];
@@ -68,7 +62,6 @@ if do_range_test
         % title('Halton set');
         % fig_num = fig_num+1;
         % % find r_D for this field
-        % field_stats = fcn_MapGen_polytopesStatistics(tiled_polytopes);
         % field_avg_r_D = field_stats.avg_r_D;
         % r_D = [r_D, field_avg_r_D];
         % gap_size = 0;
@@ -118,14 +111,14 @@ if do_range_test
                         fprintf("point for radii goals:%f didn't work",radii_goals);
                     end
                     field_stats = fcn_MapGen_polytopesStatistics(shrunk_field);
-                    gap_size = field_stats.average_gap_size_G_bar;
                     field_avg_r_D = field_stats.avg_r_D;
                     field_stats_pre_shrink = fcn_MapGen_polytopesStatistics(tiled_polytopes);
                     field_avg_r_D_pre_shrink = field_stats_pre_shrink.avg_r_D;
-                    % avg_max_rad = field_stats.average_max_radius;
-                    shrunk_distance = field_stats_pre_shrink.average_max_radius - field_stats.average_max_radius;
-                    shrink_ang = field_stats_pre_shrink.average_vertex_angle;
                     R_bar_initial = field_stats_pre_shrink.average_max_radius;
+                    avg_max_rad = field_stats.average_max_radius;
+                    shrunk_distance = R_bar_initial - avg_max_rad;
+                    gap_size = 2*shrink_distance;
+                    shrink_ang = field_stats_pre_shrink.average_vertex_angle;
 %                     try
                         [field_small_choice_angles,field_big_choice_angles,r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse_worst,r_lc_sparse_average,r_lc_sparse_std,r_lc_sparse_worst_new,r_lc_sparse_average_new,r_lc_sparse_std_new,r_lc_sparse_worst_actual,r_lc_sparse_average_actual,r_lc_sparse_std_actual,r_lc_sparse_worst_linear,r_lc_sparse_average_linear,r_lc_sparse_std_linear] = ...
                             fcn_MapGen_polytopesPredictLengthCostRatio(shrunk_field,gap_size,shrunk_distance,shrink_ang,R_bar_initial)
@@ -133,12 +126,6 @@ if do_range_test
 %                         radii_goals_failed = [radii_goals_failed, radii_goals];
 %                         fprintf("point for radii goals:%f didn't work",radii_goals);
 %                     end
-                    % r_lc_max_all = [r_lc_max_all, r_lc_max];
-                    % r_lc_max_effective_all = [r_lc_max_effective_all, r_lc_max_effective];
-                    % r_lc_avg_all = [r_lc_avg_all, r_lc_avg];
-                    % r_lc_avg_effective_all = [r_lc_avg_effective_all, r_lc_avg_effective];
-                    % r_lc_iterative_all = [r_lc_iterative_all, r_lc_iterative];
-                    % r_lc_iterative_effective_all = [r_lc_iterative_effective_all, r_lc_iterative_effective];
                     r_lc_sparse_worst_this_map = [r_lc_sparse_worst_this_map, r_lc_sparse_worst];
                     r_lc_sparse_average_this_map = [r_lc_sparse_average_this_map, r_lc_sparse_average];
                     r_lc_sparse_std_this_map = [r_lc_sparse_std_this_map, r_lc_sparse_std];
@@ -203,11 +190,6 @@ if do_range_test
                 r_lc_sparse_std_all_linear = [r_lc_sparse_std_all_linear, r_lc_sparse_std_linear];
                 r_D_theoretical = [r_D_theoretical, sqrt(tiles)*des_rad];
             end
-
-%             r_lc_sparse_worst_all = [];
-%             r_lc_sparse_average_all = [];
-%             r_lc_sparse_std_all = [];
-%             r_D = [];
         end
     end
    fprintf('Obstacle fields that could not be predicted:\n')

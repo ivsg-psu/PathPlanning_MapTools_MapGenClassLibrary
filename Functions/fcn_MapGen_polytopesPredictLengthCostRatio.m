@@ -1,4 +1,4 @@
-function [field_small_choice_angles,field_big_choice_angles,r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse_worst,r_lc_sparse_average,r_lc_sparse_std,r_lc_sparse_worst_new,r_lc_sparse_average_new,r_lc_sparse_std_new,r_lc_sparse_worst_actual,r_lc_sparse_average_actual,r_lc_sparse_std_actual,r_lc_sparse_worst_linear,r_lc_sparse_average_linear,r_lc_sparse_std_linear] = fcn_MapGen_polytopesPredictLengthCostRatio(pre_shrink_polytopes,tiled_polytopes,gap_size,shrunk_distance,shrink_ang,R_bar_initial) % TODO(@sjharnett) put outputs into struct
+function [field_small_choice_angles,field_big_choice_angles,r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse_worst,r_lc_sparse_average,r_lc_sparse_std,r_lc_sparse_worst_new,r_lc_sparse_average_new,r_lc_sparse_std_new,r_lc_sparse_worst_actual,r_lc_sparse_average_actual,r_lc_sparse_std_actual,r_lc_sparse_worst_linear,r_lc_sparse_average_linear,r_lc_sparse_std_linear] = fcn_MapGen_polytopesPredictLengthCostRatio(pre_shrink_polytopes,polytopes,gap_size,shrunk_distance,shrink_ang,R_bar_initial) % TODO(@sjharnett) put outputs into struct
     % fcn_MapGen_polytopesPredictLengthCostRatio
     % Given an polytope field, predict the length cost ratio from geometry
     %
@@ -195,11 +195,6 @@ function [field_small_choice_angles,field_big_choice_angles,r_lc_max,r_lc_avg,r_
         field_big_choice_angles = [field_big_choice_angles;big_choice_angles];
         field_chosen_side_length = [field_chosen_side_length;chosen_side_lengths];
 
-        % change chosen angle to effective angle based on gap size
-        field_away_angles_effective = field_away_angles - atan2(gap_size,field_chosen_side_length);
-        field_small_choice_angles_effective = field_small_choice_angles - atan2(gap_size,field_chosen_side_length);
-        % change chosen side length to effective angle side length based on gap size
-        field_chosen_side_length_effective = (field_chosen_side_length.^2+gap_size.^2).^0.5;
         if flag_do_plot
             % code to plot travel directions on each relevant vertex with angle labels
             % with labels
@@ -280,7 +275,6 @@ function [field_small_choice_angles,field_big_choice_angles,r_lc_max,r_lc_avg,r_
         figure;
         hold on;
         histogram(field_chosen_side_length,'BinWidth',2,'FaceColor','g','FaceAlpha',0.4)
-        histogram(field_chosen_side_length_effective,'BinWidth',2,'FaceColor','c','FaceAlpha',0.4)
         legendstr_side = sprintf('effective chosen side length for gap size %.1f',gap_size);
         legend('chosen side length', legendstr_side)
         xlabel('side length [m]')
