@@ -64,6 +64,8 @@ function [shrunk_polytopes,mu_final,sigma_final] = ...
 % -- Vectorize the for loop if possible
 % -- check inputs are positive numbers where appropriate (e.g. make a
 % "positive number" check
+% -- add non uniform shrinking and allow specification of a gap size variance,
+%    similar to how a radius variance is allowed in fcn_MapGen_polytopesShrinkToRadius.m
 
 %% Debugging and Input checks
 % set an environment variable on your machine with the getenv function...

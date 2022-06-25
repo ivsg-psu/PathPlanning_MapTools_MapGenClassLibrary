@@ -1,21 +1,29 @@
 % script_fcn_MapGen_polytopeShrinkFromEdges
 % Tests function: fcn_MapGen_polytopeShrinkFromEdges
+% note this script only tests the area unoccupancy/occupancy estimates
+% for a test of the linear unoccupancy/occupancy estiamtes (which depends on a path planner
+% to measure ground truth as a means of comparison) please see the file:
+% script_planning_performed_at_multiple_costs.m
+% in the repo PathPlanning_GridFreePathPlanners_BoundedAStar
+%
 
 % REVISION HISTORY:
 % 2022_01_17
-% -- first written by S. Harnett using
-% script_test_fcn_MapGen_polytopesShrinkToRadius as a template
+% -- first written by S. Harnett
 
 %% Set up variables
 close all;clear all;
+%% Debugging and Input checks
+flag_check_inputs = 1; % Set equal to 1 to check the input arguments
+flag_do_plot = 0;      % Set equal to 1 for plotting
+flag_do_debug = 0;     % Set equal to 1 for debugging
+
 polytopes = fcn_MapGen_haltonVoronoiTiling([1 4000]);
-%% big shrink
 fig_num = 1;
 bounding_box = [0,0; 1,1];
 trim_polytopes = fcn_MapGen_polytopeCropEdges(polytopes,bounding_box,fig_num);
 pre_shrink_stats = fcn_MapGen_polytopesStatistics(trim_polytopes);
 R_bar_initial = pre_shrink_stats.average_max_radius;
-%% Basic example of uniform shrinking
 des_gap_size_all = [];
 r_occ_meas_all = [];
 lambda_all = [];
@@ -65,45 +73,6 @@ for i = linspace(0.001,0.08,2)
     sum_sins_angles = sum(sins_angles);
     sum_sines_all = [sum_sines_all; sum_sins_angles];
 end
-% TODO remove gap size calculations
-% Defaults for this blog post
-width = 3;     % Width in inches
-height = 3;    % Height in inches
-alw = 0.75;    % AxesLineWidth
-fsz = 11;      % Fontsize
-lw = 1.5;      % LineWidth
-msz = 8;       % MarkerSize
-
-% The new defaults will not take effect if there are any open figures. To
-% use them, we close all figures, and then repeat the first example.
-close all;
-
-% The properties we've been using in the figures
-set(0,'defaultLineLineWidth',lw);   % set the default line width to lw
-set(0,'defaultLineMarkerSize',msz); % set the default line marker size to msz
-set(0,'defaultLineLineWidth',lw);   % set the default line width to lw
-set(0,'defaultLineMarkerSize',msz); % set the default line marker size to msz
-set(0,'defaultAxesFontSize',fsz);
-set(0,'defaultLegendFontSize',fsz);
-set(0,'defaultAxesLineWidth',alw);
-% Set the default Size for display
-defpos = get(0,'defaultFigurePosition');
-set(0,'defaultFigurePosition', [defpos(1) defpos(2) width*100, height*100]);
-
-% Set the defaults for saving/printing to a file
-set(0,'defaultFigureInvertHardcopy','on'); % This is the default anyway
-set(0,'defaultFigurePaperUnits','inches'); % This is the default anyway
-defsize = get(gcf, 'PaperSize');
-left = (defsize(1)- width)/2;
-bottom = (defsize(2)- height)/2;
-defsize = [left, bottom, width, height];
-set(0, 'defaultFigurePaperPosition', defsize);
-set(0,'defaultAxesXGrid','on')
-set(0,'defaultAxesYGrid','on')
-set(0,'defaultAxesBox','on')
-
-% print('C:\Users\sjh6473\github\sjharnett\figures\exported\after_gvsets\g_bar_err','-dpng','-r300');
-% savefig('C:\Users\sjh6473\github\sjharnett\figures\figs\after_gvsets\g_bar_err')
 
 figure
 hold on
@@ -130,8 +99,6 @@ legend('density estimate',...
 'poly fit')
 xlabel('desired or commanded gap size as percent of initial average max radius')
 ylabel('unoccpancy ratio estimate percent error')
-% print('C:\Users\sjh6473\github\sjharnett\figures\exported\after_gvsets\runocc_err','-dpng','-r300');
-% savefig('C:\Users\sjh6473\github\sjharnett\figures\figs\after_gvsets\runocc_err')
 
 figure
 hold on

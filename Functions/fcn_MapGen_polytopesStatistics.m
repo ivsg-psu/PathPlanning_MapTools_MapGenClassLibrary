@@ -209,10 +209,6 @@ linear_density = point_density.^0.5;
 poly_map_stats.Npolys = Npolys;
 poly_map_stats.NtotalVertices = NrealVertices;
 avg_r_D = average_max_radius*linear_density;
-std_r_D = std_max_radius*linear_density;
-L_E = total_area^0.5;
-N_int = L_E*linear_density;
-all_max_radius_sorted = sort(all_max_radius);
 
 % AREA METRICS
 poly_map_stats.min_x = AABB(1);
@@ -239,7 +235,7 @@ poly_map_stats.std_side_length = std_side_length;
 poly_map_stats.total_perimeter = total_perimeter;
 poly_map_stats.avg_r_D = avg_r_D;
 poly_map_stats.NtotalVertices = NrealVertices;
-
+poly_map_stats.average_perimeter = average_perimeter;
 
 
 if flag_do_debug

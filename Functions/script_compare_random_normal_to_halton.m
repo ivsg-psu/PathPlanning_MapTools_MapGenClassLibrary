@@ -1,4 +1,13 @@
+% script_compare_random_normal_to_halton.m
+% looks at various polytope field statistics for maps generated from Halton set
+% compared to maps generated from random normal set
+%
+% REVISION HISTORY:
+% 2022_03_09
+% -- first written by S. Harnett
+
 close all; clear all; clc;
+
 N_int_actual_all = [];
 rd_all= [];
 tiles_all = [];
