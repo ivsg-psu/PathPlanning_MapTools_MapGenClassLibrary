@@ -1,4 +1,5 @@
-function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(pre_shrink_polytopes,polytopes,des_gap_size)
+function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(...
+    pre_shrink_polytopes,polytopes,des_gap_size)
     flag_do_plot = 0;
 
     %% extract necessary stats from polytopes
