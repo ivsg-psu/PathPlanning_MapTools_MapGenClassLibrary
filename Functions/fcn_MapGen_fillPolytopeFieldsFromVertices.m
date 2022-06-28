@@ -155,6 +155,9 @@ for ith_poly = 1:num_poly % pull each polytope
         max(radii);
     filled_polytopes(ith_poly).min_radius = ...
         min(radii);
+    filled_polytopes(ith_poly).mean_radius = ...
+        mean(radii);
+    filled_polytopes(ith_poly).radii = radii;
     filled_polytopes(ith_poly).cost = rand;
 end
 

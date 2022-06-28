@@ -136,6 +136,16 @@ function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(...
     unocc_ests.L_unocc_est_AABB_width = 1-N_int*avg_poly_width;
     unocc_ests.L_unocc_est_slant_AABB_width = 1-N_int*avg_slant_poly_width;
 
+    %% r_L,unocc from N_int and statistics on polytope radius
+    avg_radii = field_stats.all_average_radius;
+    all_radii = field_stats.all_radii;
+    unocc_ests.L_unocc_est_mean_all_rad = 1-N_int*2*mean(all_radii);
+    unocc_ests.L_unocc_est_mean_mean_rad = 1-N_int*2*mean(avg_radii);
+    unocc_ests.L_unocc_est_med_all_rad = 1-N_int*2*median(all_radii);
+    unocc_ests.L_unocc_est_med_mean_rad = 1-N_int*2*median(avg_radii);
+    unocc_ests.L_unocc_est_mod_all_rad = 1-N_int*2*mode(all_radii);
+    unocc_ests.L_unocc_est_mod_mean_rad = 1-N_int*2*mode(avg_radii);
+
     %% r_L,unocc from gap width assuming side angle is 90deg
     unocc_ests.L_unocc_est_gap_size_normal = num_spaces*des_gap_size;
 

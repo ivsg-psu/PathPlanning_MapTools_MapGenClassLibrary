@@ -120,6 +120,8 @@ all_lengths = nan(Nverticies_per_poly,Npolys);
 all_side_count = zeros(Npolys,1);
 all_max_radius = zeros(Npolys,1);
 all_min_radius = zeros(Npolys,1);
+all_radii = [];
+all_mean_radius = zeros(Npolys,1);
 all_sharpness_ratios = zeros(Npolys,1);
 all_areas = zeros(Npolys,1);
 
@@ -161,6 +163,9 @@ for ith_poly = 1:Npolys
     all_side_count(ith_poly,1) = Nangles;
     all_max_radius(ith_poly,1) = polytopes(ith_poly).max_radius;
     all_min_radius(ith_poly,1) = polytopes(ith_poly).min_radius;
+    all_min_radius(ith_poly,1) = polytopes(ith_poly).min_radius;
+    all_mean_radius(ith_poly,1) = polytopes(ith_poly).mean_radius;
+    all_radii = [all_radii; polytopes(ith_poly).radii];
     % note that sharpness is the ratio of max radius to min radius
     % this is not the same thing as aspect ratio which is AABB width to height
     all_sharpness_ratios(ith_poly,1) = ...
@@ -186,6 +191,8 @@ std_vertex_angle = nanstd(angle_column_no_nan*180/pi);
 % Find the mean and std deviations of radii metrics
 average_max_radius = nanmean(all_max_radius);
 average_min_radius = nanmean(all_min_radius);
+average_mean_radius = nanmean(all_mean_radius);
+average_radius = nanmean(all_radii);
 average_sharpness = nanmean(all_sharpness_ratios);
 std_max_radius = nanstd(all_max_radius);
 
@@ -228,6 +235,10 @@ poly_map_stats.angle_column_no_nan = angle_column_no_nan;
 
 poly_map_stats.average_max_radius = average_max_radius;
 poly_map_stats.average_min_radius = average_min_radius;
+poly_map_stats.average_mean_radius = average_mean_radius;
+poly_map_stats.average_radius = average_radius;
+poly_map_stats.all_average_radius = all_mean_radius;
+poly_map_stats.all_radii = all_radii;
 poly_map_stats.average_sharpness = average_sharpness;
 poly_map_stats.std_max_radius = std_max_radius;
 poly_map_stats.average_side_length = average_side_length;
@@ -329,13 +340,9 @@ if flag_do_plot
     fprintf(1,'\t Max_y: %.2f\n',poly_map_stats.max_y);
     fprintf(1,'\t Occupied Area: %.2f\n',occupied_area);
     fprintf(1,'\t Total Area: %.2f\n',total_area);
-    fprintf(1,'\t Unoccupied Area: %.2f\n',unoccupied_area);
-    fprintf(1,'\t Unoccupancy ratio: %.2f\n',unoccupancy_ratio);
     fprintf(1,'\t Point density: %.2f\n',point_density);
     fprintf(1,'\t Theoretical Linear density: %.2f\n',linear_density);
     fprintf(1,'\t Calculated Linear density: %.2f +/- %.4f\n',poly_map_stats.linear_density_mean,2*poly_map_stats.linear_density_std);
-    fprintf(1,'\t Average gap size, G-bar: %.5f\n',average_gap_size_G_bar);
-    fprintf(1,'\t Perimeter gap size: %.5f\n',perimeter_gap_size);
 
     fprintf(1,'\n\t ANGLE METRICS:\n');
     fprintf(1,'\t Total number of vertices: %.2f\n',poly_map_stats.Nangles);
@@ -398,6 +405,27 @@ if flag_do_plot
     xlabel('Range of deviation');
     title('% Similarity of polytopes hit versus range of deviation');
     legend('Similarity','+/- ave max radius');
+
+    figure;
+    box on;
+    subplot(2,2,1);
+    histogram(all_radii);
+    title(sprintf("Distribution of All Polytope Radii.\nMean: %.4f, Median: %.4f, Mode: %.4f",mean(all_radii),mode(all_radii),mode(all_radii)));
+
+    subplot(2,2,2);
+    box on;
+    histogram(all_min_radius);
+    title(sprintf("Distribution of Min Polytope Radii.\nMean: %.4f, Median: %.4f, Mode: %.4f",mean(all_min_radius),mode(all_min_radius),mode(all_min_radius)));
+
+    subplot(2,2,3);
+    box on;
+    histogram(all_max_radius);
+    title(sprintf("Distribution of Max Polytope Radii.\nMean: %.4f, Median: %.4f, Mode: %.4f",mean(all_max_radius),mode(all_max_radius),mode(all_max_radius)));
+
+    subplot(2,2,4);
+    box on;
+    histogram(all_mean_radius);
+    title(sprintf("Distribution of Mean Radius per Polytope.\nMean: %.4f, Median: %.4f, Mode: %.4f",mean(all_mean_radius),mode(all_mean_radius),mode(all_mean_radius)));
 end
 
 if flag_do_debug
