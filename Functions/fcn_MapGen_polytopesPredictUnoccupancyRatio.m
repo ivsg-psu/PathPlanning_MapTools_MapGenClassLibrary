@@ -1,5 +1,46 @@
 function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(...
     pre_shrink_polytopes,polytopes,des_gap_size)
+    % fcn_MapGen_polytopesPredictUnoccupancyRatio
+    % Given a polytope field, both before and after shrinking, use different
+    % methods to predict linear and area unoccupancy (which is 1-occupancy)
+    %
+    %
+    %
+    % FORMAT:
+    % unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(...
+    %     pre_shrink_polytopes,polytopes,des_gap_size)
+    %
+    % INPUTS:
+    %     pre_shrink_polytopes - the fully tiled field
+    %     polytopes - the field after shrinking has been applied
+    %     gap_size - the commanded gap size used when shrinking was applied
+    %
+    %
+    % OUTPUTS:
+    %
+    %
+    %     unocc_ests - struct of different unooccupancy ratio estimation methods
+    %
+    % DEPENDENCIES:
+    %
+    %     fcn_MapGen_polytopeFindVertexAngles
+    %     fcn_MapGen_polytopesStatistics
+    %
+    % EXAMPLES:
+    %
+    % See the script: script_fcn_MapGen_polytopesPredictUnoccupancyRatio.m
+    % for tests of area unoccupancy methods compared to calculated area unoccupancy
+    % for a test of the linear unoccupancy/occupancy estiamtes (which depends on a path planner
+    % to measure ground truth as a means of comparison) please see the file:
+    % script_test_linear_occupancy.m
+    % in the repo PathPlanning_GridFreePathPlanners_BoundedAStar
+    %
+    % Questions or comments? contact sjh6473@psu.edu
+
+    % REVISION HISTORY:
+    % 2022_01_17
+    % -- first written by Steve Harnett
+
     flag_do_plot = 0;
 
     %% extract necessary stats from polytopes
@@ -143,8 +184,8 @@ function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(...
     unocc_ests.L_unocc_est_mean_mean_rad = 1-N_int*2*mean(avg_radii);
     unocc_ests.L_unocc_est_med_all_rad = 1-N_int*2*median(all_radii);
     unocc_ests.L_unocc_est_med_mean_rad = 1-N_int*2*median(avg_radii);
-    unocc_ests.L_unocc_est_mod_all_rad = 1-N_int*2*mode(all_radii);
-    unocc_ests.L_unocc_est_mod_mean_rad = 1-N_int*2*mode(avg_radii);
+    unocc_ests.L_unocc_est_25th_all_rad = 1-N_int*2*prctile(all_radii,25);
+    unocc_ests.L_unocc_est_25th_mean_rad = 1-N_int*2*prctile(avg_radii,25);
 
     %% r_L,unocc from gap width assuming side angle is 90deg
     unocc_ests.L_unocc_est_gap_size_normal = num_spaces*des_gap_size;

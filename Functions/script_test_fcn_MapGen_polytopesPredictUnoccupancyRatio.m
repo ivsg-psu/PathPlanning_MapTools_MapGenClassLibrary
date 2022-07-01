@@ -3,7 +3,7 @@
 % note this script only tests the area unoccupancy/occupancy estimates
 % for a test of the linear unoccupancy/occupancy estiamtes (which depends on a path planner
 % to measure ground truth as a means of comparison) please see the file:
-% script_planning_performed_at_multiple_costs.m
+% script_test_linear_occupancy.m
 % in the repo PathPlanning_GridFreePathPlanners_BoundedAStar
 %
 
