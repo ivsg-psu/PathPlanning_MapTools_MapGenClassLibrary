@@ -181,12 +181,15 @@ function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(...
     avg_radii = field_stats.all_average_radius;
     all_radii = field_stats.all_radii;
     min_radius = field_stats.average_min_radius;
+    avg_vertex = field_stats.average_vertex_angle;
+    min_radius_est = min_radius*sind(avg_vertex/2);
+    min_radius_est2 = min_radius*sind((180-avg_vertex)/2);
     unocc_ests.L_unocc_est_mean_all_rad = 1-N_int*2*pi/4*mean(min_radius);
     unocc_ests.L_unocc_est_mean_mean_rad = 1-N_int*pi/4*mean(min_radius);
-    unocc_ests.L_unocc_est_med_all_rad = 1-N_int*pi/4*median(all_radii);
-    unocc_ests.L_unocc_est_med_mean_rad = 1-N_int*pi/4*median(avg_radii);
-    unocc_ests.L_unocc_est_25th_all_rad = 1-N_int*pi/4*prctile(all_radii,25);
-    unocc_ests.L_unocc_est_25th_mean_rad = 1-N_int*pi/4*prctile(avg_radii,25);
+    unocc_ests.L_unocc_est_med_all_rad = 1-N_int*2*pi/4*median(min_radius_est);
+    unocc_ests.L_unocc_est_med_mean_rad = 1-N_int*pi/4*median(min_radius_est);
+    unocc_ests.L_unocc_est_25th_all_rad = 1-N_int*2*pi/4*mean(min_radius_est2);
+    unocc_ests.L_unocc_est_25th_mean_rad = 1-N_int*pi/4*mean(min_radius_est2);
 
     %% r_L,unocc from gap width assuming side angle is 90deg
     unocc_ests.L_unocc_est_gap_size_normal = num_spaces*des_gap_size;
