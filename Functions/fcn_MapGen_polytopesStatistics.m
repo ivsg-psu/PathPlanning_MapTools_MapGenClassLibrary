@@ -195,6 +195,8 @@ average_mean_radius = nanmean(all_mean_radius);
 average_radius = nanmean(all_radii);
 average_sharpness = nanmean(all_sharpness_ratios);
 std_max_radius = nanstd(all_max_radius);
+all_mean_radii = extractfield(polytopes,'true_mean_radius');
+average_mean_radius = nanmean(all_mean_radii);
 
 % Determine the length properties related to sides of polytopes
 length_column = reshape(all_lengths,Nverticies_per_poly*Npolys,1);

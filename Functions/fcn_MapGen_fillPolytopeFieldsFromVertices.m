@@ -135,7 +135,6 @@ filled_polytopes = polytopes;
 num_poly = length(polytopes);
 
 for ith_poly = 1:num_poly % pull each polytope
-
     % adjust polytopes
     filled_polytopes(ith_poly).xv        = (polytopes(ith_poly).vertices(1:end-1,1)');
     filled_polytopes(ith_poly).yv        = (polytopes(ith_poly).vertices(1:end-1,2)');
@@ -159,6 +158,37 @@ for ith_poly = 1:num_poly % pull each polytope
         mean(radii);
     filled_polytopes(ith_poly).radii = radii;
     filled_polytopes(ith_poly).cost = rand;
+
+    %% find average radius from calculus
+    % gather information for this polytope
+    poly = filled_polytopes(ith_poly);
+    centroid = poly.mean;
+    n_sides = length(poly.xv);
+    % translate polytope so centroid is at (0,0)
+    vertices_recentered = [poly.vertices(:,1)-centroid(1),poly.vertices(:,2)-centroid(2)]
+    % initialize array for storing r(theta) function for polytope sides
+    r_of_theta_all_sides = [];
+    % loop through all sides on this polytope
+    for ith_side = 1:n_sides
+        % need to find the equation for a line representing this side
+        x1 = vertices_recentered(ith_side,1);
+        x2 = vertices_recentered(ith_side+1,1);
+        y1 = vertices_recentered(ith_side,2);
+        y2 = vertices_recentered(ith_side+1,2);
+        % find slope of this line
+        m = (y2-y1)/(x2-x1);
+        % find the angle from the centroid to the first and second vertecies
+        theta1 = atan2d(y1,x1);
+        theta2 = atan2d(y2,x2);
+        % find range of angles covered by this side
+        theta_range = theta1:0.25:theta2;
+        % convert our y(x) formula for a line to r(theta), then find r for the appropriate theta
+        r_of_theta = (-1*m*x2+y2)./(sind(theta_range)-m*cosd(theta_range));
+        % add the r(theta) data for this side to the vector for the whole shape
+        r_of_theta_all_sides = [r_of_theta_all_sides, r_of_theta];
+    end
+    % the average distance from centroid to sides is the average value of r(theta) from 0 to 360
+    filled_polytopes(ith_poly).true_mean_radius = mean(r_of_theta_all_sides);
 end
 
 %§
