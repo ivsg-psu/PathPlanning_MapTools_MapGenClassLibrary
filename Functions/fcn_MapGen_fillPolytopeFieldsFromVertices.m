@@ -168,6 +168,8 @@ for ith_poly = 1:num_poly % pull each polytope
     vertices_recentered = [poly.vertices(:,1)-centroid(1),poly.vertices(:,2)-centroid(2)]
     % initialize array for storing r(theta) function for polytope sides
     r_of_theta_all_sides = [];
+    % althought we know the range is 0 to 360 we don't know where it staarts and ends
+    theta_range_ordered = [];
     % loop through all sides on this polytope
     for ith_side = 1:n_sides
         % need to find the equation for a line representing this side
