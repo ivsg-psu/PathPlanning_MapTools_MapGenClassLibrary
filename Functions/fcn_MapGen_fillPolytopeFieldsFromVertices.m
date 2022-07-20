@@ -64,7 +64,7 @@ varargin...
 
 %% Debugging and Input checks
 flag_check_inputs = 1; % Set equal to 1 to check the input arguments
-flag_do_plot = 0;      % Set equal to 1 for plotting
+flag_do_plot = 1;      % Set equal to 1 for plotting
 flag_do_debug = 0;     % Set equal to 1 for debugging
 
 if flag_do_debug
@@ -165,7 +165,22 @@ for ith_poly = 1:num_poly % pull each polytope
     centroid = poly.mean;
     n_sides = length(poly.xv);
     % translate polytope so centroid is at (0,0)
-    vertices_recentered = [poly.vertices(:,1)-centroid(1),poly.vertices(:,2)-centroid(2)]
+    vertices_recentered = [poly.vertices(:,1)-centroid(1),poly.vertices(:,2)-centroid(2)];
+    if flag_do_plot
+        % plot original polytope
+        figure(12345321)
+        clf;
+        plot(poly.vertices(:,1),poly.vertices(:,2))
+        hold on
+        plot(centroid(1),centroid(2),'kd')
+        figure(12345322)
+        clf;
+       % plot recentered sides
+        plot(vertices_recentered(:,1),vertices_recentered(:,2))
+        hold on
+        % plot recentered centroid
+        plot(0,0,'kd')
+    end
     % initialize array for storing r(theta) function for polytope sides
     r_of_theta_all_sides = [];
     % althought we know the range is 0 to 360 we don't know where it staarts and ends
@@ -182,12 +197,39 @@ for ith_poly = 1:num_poly % pull each polytope
         % find the angle from the centroid to the first and second vertecies
         theta1 = atan2d(y1,x1);
         theta2 = atan2d(y2,x2);
-        % find range of angles covered by this side
-        theta_range = theta1:0.25:theta2;
+        if theta1 < 0
+            theta1 = theta1 + 360;
+        end
+        if theta2 < 0
+            theta2 = theta2 + 360;
+        end
+        % check to see if this is the point crossing 0 degrees
+        if theta1 > theta2
+            % if it is we want to go to theta1 to 0, then from 0 to theta2
+            theta_range1 = ceil(theta1):0.25:359;
+            theta_range2 = 0:0.25:floor(theta2);
+            theta_range = [theta_range1, theta_range2];
+        else
+            theta_range = ceil(theta1):0.25:floor(theta2);
+        end
         % convert our y(x) formula for a line to r(theta), then find r for the appropriate theta
         r_of_theta = (-1*m*x2+y2)./(sind(theta_range)-m*cosd(theta_range));
         % add the r(theta) data for this side to the vector for the whole shape
         r_of_theta_all_sides = [r_of_theta_all_sides, r_of_theta];
+        theta_range_ordered = [theta_range_ordered, theta_range];
+        if flag_do_plot
+            figure(12345322)
+            % plot vertices of interest
+            plot(x1,y1,'ro')
+            plot(x2,y2,'ro')
+            % check that polar form of line forming side matches rectangular
+            plot(r_of_theta.*cosd(theta_range),r_of_theta.*sind(theta_range),'kx')
+        end
+    end
+    if flag_do_plot
+        figure(12345323)
+        % plot r(theta) for whole polytope on rectangular axes
+        plot(theta_range_ordered,r_of_theta_all_sides,'kx')
     end
     % the average distance from centroid to sides is the average value of r(theta) from 0 to 360
     filled_polytopes(ith_poly).true_mean_radius = mean(r_of_theta_all_sides);
