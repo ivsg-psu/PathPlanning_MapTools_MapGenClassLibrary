@@ -228,12 +228,23 @@ for ith_poly = 1:num_poly % pull each polytope
     end
     if flag_do_plot
         figure(12345323)
+        clf;
         % plot r(theta) for whole polytope on rectangular axes
         plot(theta_range_ordered,r_of_theta_all_sides,'kx')
     end
     % the average distance from centroid to sides is the average value of r(theta) from 0 to 360
     filled_polytopes(ith_poly).true_mean_radius = mean(r_of_theta_all_sides);
+    filled_polytopes(ith_poly).radii_dist = r_of_theta_all_sides;
+    if flag_do_plot
+        histogram(r_of_theta_all_sides)
+    end
 end
+
+r_of_theta_all_polytopes = extractfield(filled_polytopes,'radii_dist');
+if flag_do_plot
+    histogram(r_of_theta_all_polytopes)
+end
+
 
 %§
 %% Plot the results (for debugging)?
