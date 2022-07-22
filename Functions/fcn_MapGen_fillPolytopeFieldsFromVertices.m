@@ -134,6 +134,8 @@ end
 filled_polytopes = polytopes;
 num_poly = length(polytopes);
 
+fig_idx = 1;
+
 for ith_poly = 1:num_poly % pull each polytope
     % adjust polytopes
     filled_polytopes(ith_poly).xv        = (polytopes(ith_poly).vertices(1:end-1,1)');
@@ -220,31 +222,78 @@ for ith_poly = 1:num_poly % pull each polytope
         if flag_do_plot
             figure(12345322)
             % plot vertices of interest
-            plot(x1,y1,'ro')
-            plot(x2,y2,'ro')
-            % check that polar form of line forming side matches rectangular
-            plot(r_of_theta.*cosd(theta_range),r_of_theta.*sind(theta_range),'kx')
+            plot(1000*x1,1000*y1,'ro')
+            plot(1000*x2,1000*y2,'ro')
+            % plot polytope to check that polar form of line forming side matches rectangular
+            plot(1000*r_of_theta.*cosd(theta_range),1000*r_of_theta.*sind(theta_range),'kx')
+            xlabel('x [m]')
+            ylabel('y [m]')
+            title('polytope, plotted from Cartesian and Polar coordinates')
+            legend('Cartesian','centroid','','','polar')
+            savefig(sprintf('poly_rect_and_polar_%d',fig_idx))
         end
     end
     if flag_do_plot
         figure(12345323)
         clf;
         % plot r(theta) for whole polytope on rectangular axes
-        plot(theta_range_ordered,r_of_theta_all_sides,'kx')
+        plot(theta_range_ordered,1000*r_of_theta_all_sides,'kx')
+        xlabel('\theta [deg]')
+        ylabel('R (\theta) [m]')
+        title('Radius, R, as a function of angle from centroid to wall, \theta, for one polytope')
+        savefig(sprintf('r_of_theta_%d',fig_idx))
     end
     % the average distance from centroid to sides is the average value of r(theta) from 0 to 360
     filled_polytopes(ith_poly).true_mean_radius = mean(r_of_theta_all_sides);
     filled_polytopes(ith_poly).radii_dist = r_of_theta_all_sides;
+    filled_polytopes(ith_poly).theta_dist = r_of_theta_all_sides;
     if flag_do_plot
-        histogram(r_of_theta_all_sides)
+        figure(12345324)
+        clf;
+        % plot histogram (pdf) of single polytope
+        h = histogram(1000*r_of_theta_all_sides)
+        xlabel('radius value, R [m]')
+        ylabel('count')
+        title(sprintf('Histogram of Polytope Radius Values,\n measured from a single polytope'))
+        savefig(sprintf('r_hist_%d',fig_idx))
+        h.BinWidth = 0.2;
+        savefig(sprintf('r_hist_narrow_%d',fig_idx))
+        figure(12345325)
+        clf;
+        h2 = histogram(1000*r_of_theta_all_sides,'Normalization','cdf');
+        [N,edges] = histcounts(1000*r_of_theta_all_sides,'Normalization','cdf')
+        bin_center = (edges(1:end-1)+edges(2:end))/2;
+        [N,edges] = histcounts(1000*r_of_theta_all_sides,'Normalization','pdf')
+        h2.BinWidth = 0.2;
+        bin_edges = 0:0.1:20;
+        [N,edges] = histcounts(1000*r_of_theta_all_sides,bin_edges,'Normalization','cdf')
+        bin_center = (edges(1:end-1)+edges(2:end))/2;
+        plot(bin_center,1-N)
+        title(sprintf('Empirical CDF of Polytope Radius Values,\n measured from a single polytope'))
+        xlabel('radius value, R [m]')
+        ylabel('P(R_0<=R)')
+        savefig(sprintf('r_cdf_narrow_%d',fig_idx))
+        figure(12345326)
+        clf;
+        h3 = histogram(1000*r_of_theta_all_sides,'Normalization','pdf');
+        h3.BinWidth = 0.2;
+        title(sprintf('Empirical PDF of Polytope Radius Values,\n measured from a single polytope'))
+        xlabel('radius value, R [m]')
+        ylabel('P(R_0=R)')
+        savefig(sprintf('r_pdf_narrow_%d',fig_idx))
+        fig_idx = fig_idx + 1;
     end
 end
 
 r_of_theta_all_polytopes = extractfield(filled_polytopes,'radii_dist');
 if flag_do_plot
-    histogram(r_of_theta_all_polytopes)
+    % plot histogram (pdf) of all polytopes
+    figure(12345327)
+    clf;
+    histogram(1000*r_of_theta_all_polytopes)
+    savefig(sprintf('all_r_hist'))
 end
-
+save('workspace')
 
 %§
 %% Plot the results (for debugging)?
