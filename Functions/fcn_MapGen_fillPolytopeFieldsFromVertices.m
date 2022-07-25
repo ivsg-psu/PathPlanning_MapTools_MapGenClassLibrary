@@ -172,13 +172,13 @@ for ith_poly = 1:num_poly % pull each polytope
         % plot original polytope
         figure(12345321)
         clf;
-        plot(poly.vertices(:,1),poly.vertices(:,2))
+        plot(1000*poly.vertices(:,1),1000*poly.vertices(:,2))
         hold on
         plot(centroid(1),centroid(2),'kd')
         figure(12345322)
         clf;
        % plot recentered sides
-        plot(vertices_recentered(:,1),vertices_recentered(:,2))
+        plot(1000*vertices_recentered(:,1),1000*vertices_recentered(:,2))
         hold on
         % plot recentered centroid
         plot(0,0,'kd')
