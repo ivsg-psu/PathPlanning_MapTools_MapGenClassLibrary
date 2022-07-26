@@ -303,11 +303,13 @@ for ith_poly = 1:num_poly % pull each polytope
             effective_depth = 0;
             % integrate over all probabilities
             % TODO @sjharnett should this be looping from 1 to d(o)?
-            for i = 1:1:(length(bin_center)-1)
+            % want to go from 0 to the maximum d(o) which is r_max
+            delta_d = 0.1;
+            d_max = sqrt(max(1000*r_of_theta_all_sides)^2-offset^2);
+            for i = 0:delta_d:d_max
                 % expected value is P(R)*delta_R
-                delta_d = 0.1;
-                delta_R = bin_center(i+1)-bin_center(i);
-                current_d = delta_d*(i-1);
+                % delta_R = bin_center(i+1)-bin_center(i);
+                current_d = i;%delta_d*(i-1);
                 R_at_current_d = sqrt(current_d^2+offset^2);
                 % the r we're at may not be have an associated probability
                 % so let's find the closest R we have prob for
