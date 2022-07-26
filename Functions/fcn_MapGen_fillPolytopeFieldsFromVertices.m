@@ -292,13 +292,17 @@ for ith_poly = 1:num_poly % pull each polytope
         hold on;
         plot([expected_radius, expected_radius],[-0.1,1.1],'-k')
         legend('probability of occupation','expected value of R')
-        % find effective depth for d at some offset, o
+        %% find effective depth for d at some offset, o
         % create offset range, to R_max
         o = 0:0.2:max(1000*r_of_theta_all_sides);
         effective_depths = [];
+        % loop through all possible offets (i.e. strike positions)
         for j = 1:1:length(o)
             offset = o(j);
+            % initialize effective depth
             effective_depth = 0;
+            % integrate over all probabilities
+            % TODO @sjharnett should this be looping from 1 to d(o)?
             for i = 1:1:(length(bin_center)-1)
                 % expected value is P(R)*delta_R
                 delta_d = 0.1;
