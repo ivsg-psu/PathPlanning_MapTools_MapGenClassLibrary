@@ -80,6 +80,7 @@ for ith_poly = 1:length(polytopes)
         figure(12345321)
         clf;
         plot(1000*poly.vertices(:,1),1000*poly.vertices(:,2))
+        box on
         hold on
         plot(centroid(1),centroid(2),'kd')
         figure(12345322)
@@ -87,6 +88,7 @@ for ith_poly = 1:length(polytopes)
         % plot recentered sides
         plot(1000*vertices_recentered(:,1),1000*vertices_recentered(:,2))
         hold on
+        box on
         % plot recentered centroid
         plot(0,0,'kd')
     end
@@ -133,6 +135,7 @@ for ith_poly = 1:length(polytopes)
             plot(1000*x2,1000*y2,'ro')
             % plot polytope to check that polar form of line forming side matches rectangular
             plot(1000*r_of_theta.*cosd(theta_range),1000*r_of_theta.*sind(theta_range),'kx')
+            box on
             xlabel('x [m]')
             ylabel('y [m]')
             title('polytope, plotted from Cartesian and Polar coordinates')
@@ -143,6 +146,7 @@ for ith_poly = 1:length(polytopes)
         figure(12345323)
         clf;
         % plot r(theta) for whole polytope on rectangular axes
+        box on
         plot(theta_range_ordered,1000*r_of_theta_all_sides,'kx')
         xlabel('\theta [deg]')
         ylabel('R (\theta) [m]')
@@ -161,6 +165,7 @@ for ith_poly = 1:length(polytopes)
         clf;
         % plot histogram of single polytope
         h = histogram(1000*r_of_theta_all_sides)
+        box on
         xlabel('radius value, R [m]')
         ylabel('count')
         title(sprintf('Histogram of Polytope Radius Values,\n measured from a single polytope'))
@@ -171,6 +176,7 @@ for ith_poly = 1:length(polytopes)
         clf;
         h2 = histogram(1000*r_of_theta_all_sides,'Normalization','pdf');
         h2.BinWidth = 0.2;
+        box on
         title(sprintf('Empirical PDF of Polytope Radius Values,\n measured from a single polytope'))
         xlabel('radius value, R [m]')
         ylabel('P(R_0 = R)')
@@ -180,6 +186,7 @@ for ith_poly = 1:length(polytopes)
         clf;
         h3 = histogram(1000*r_of_theta_all_sides,'Normalization','cdf');
         h3.BinWidth = 0.2;
+        box on
         title(sprintf('Empirical CDF of Polytope Radius Values,\n measured from a single polytope'))
         xlabel('radius value, R [m]')
         ylabel('P(R_0 \geq R)')
@@ -196,6 +203,7 @@ for ith_poly = 1:length(polytopes)
         plot(bin_center,1-N)
         poly_size_stats.N_all_polys = [poly_size_stats.N_all_polys; 1-N];
         poly_size_stats.bin_edges_all_polys = [poly_size_stats.bin_edges_all_polys; bin_center];
+        box on
         title(sprintf('Probability of occupation at a given radius\n measured from a single polytope'))
         xlabel('radius value, R [m]')
         ylabel('P that space is occupied by obstacle at R')
@@ -217,6 +225,7 @@ for ith_poly = 1:length(polytopes)
         % show expected radius on probability of occupation plot
         figure(123453256)
         hold on;
+        box on
         plot([expected_radius, expected_radius],[-0.1,1.1],'-k')
         leg2 = sprintf('expected value of R = %.2f',expected_radius);
         legend('probability of occupation',leg2)
@@ -225,8 +234,6 @@ for ith_poly = 1:length(polytopes)
     end
     %% find effective depth for d at some offset, o
     % create offset range, to R_max
-    % TODO @sjharnett see if you can make o range from 0 to a giant
-    % number so it will align for all curves
     o = 0:0.2:1000*max_radius_field*1.2;
     effective_depths = [];
     % loop through all possible offets (i.e. strike positions)
@@ -235,8 +242,6 @@ for ith_poly = 1:length(polytopes)
         % initialize effective depth
         effective_depth = 0;
         % integrate over all probabilities
-        % TODO @sjharnett should this be looping from 1 to d(o)?
-        % want to go from 0 to the maximum d(o) which is r_max
         delta_d = 0.1;
         d_max = sqrt(max(1000*r_of_theta_all_sides)^2-offset^2);
         for i = 0:delta_d:d_max
@@ -260,20 +265,36 @@ for ith_poly = 1:length(polytopes)
     if flag_do_plot
         figure(12345327)
         hold on
+        box on
         plot(o,effective_depths)
         xlabel('offset from centroid, o [m]')
         ylabel('effective depth, d_{eff} [m]')
-        title('Effective depth of a polytope as a function of offset, d(o)')
+        title('Effective depth of a polytope as a function of offset, d_{eff}(o)')
     end
 % end loop through all polys
 end
-% TODO @sjharnett inspect poly_size_stats to see if N and O match for all polys,
-% TODO @sjharnett if so, averaging can be performed
-% TODO @sjharnett loop that shows 1 cdf and 1 d(o), then the average of 2,
-% then 10, then 20, then 50 etc. saving figures accordingly for a gif
-% and titling figures based on number of iterations
-savefig(sprintf('r_pdf_narrow_%d',fig_idx))
-fig_idx = fig_idx + 1;
+mean_d_eff = mean(poly_size_stats.effective_depths,1);
+poly_size_stats.mean_d_eff = mean_d_eff;
+plot(o,mean_d_eff,'LineWidth',3,'Color','k')
+mean(poly_size_stats.effective_depths(5,:),1);
+num_curves = [1,5,20,50,100,500];
+for i = 1:1:length(num_curves)
+    figure(12345329)
+    clf
+    hold on
+    box on
+    avg_curve = mean(poly_size_stats.effective_depths(1:num_curves(i),:),1);
+    plot(o,avg_curve,'LineWidth',3,'Color','k')
+    xlabel('offset from centroid, o [m]')
+    ylabel('effective depth, d_{eff} [m]')
+    title(sprintf('Effective depth of a polytope as a function of offset, d_{eff}(o) from %.0d curves',num_curves(i)))
+    savefig(sprintf('d_eff_%d',i))
+end
 % find average of average scalar value of average d_eff curve
-% build this expected value of avg d_eff curve into predictions
+poly_size_stats.mean_d_eff_scalar = mean(mean_d_eff(mean_d_eff>0.1));
+if flag_do_plot
+    figure(12345327)
+    hold on
+    plot([0,max(o)],[poly_size_stats.mean_d_eff_scalar,poly_size_stats.mean_d_eff_scalar],'k-')
+end
 save('workspace')
