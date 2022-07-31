@@ -194,6 +194,10 @@ for ith_poly = 1:length(polytopes)
     % instead of probability of radius having that value or less
     % max bin should be factor of safety of 1.2 over max_radius in m
     bin_edges = 0:0.1:1000*max_radius_field*1.2;
+    if max_radius_field == 0
+        sprintf('field average max radius is 0')
+        break
+    end
     % plot 1-CDF of single polytope (probability of occupation
     [N,edges] = histcounts(1000*r_of_theta_all_sides,bin_edges,'Normalization','cdf');
     bin_center = (edges(1:end-1)+edges(2:end))/2;
