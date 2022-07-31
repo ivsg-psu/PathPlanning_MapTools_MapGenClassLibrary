@@ -32,7 +32,7 @@ function poly_size_stats = fcn_MapGen_polytopesRadiusDistributions(polytopes)
 %
 %% Debugging and Input checks
 flag_check_inputs = 0; % Set equal to 1 to check the input arguments
-flag_do_plot = 1;      % Set equal to 1 for plotting
+flag_do_plot = 0;      % Set equal to 1 for plotting
 flag_do_debug = 0;     % Set equal to 1 for debugging
 
 if flag_do_debug
@@ -190,19 +190,20 @@ for ith_poly = 1:length(polytopes)
         title(sprintf('Empirical CDF of Polytope Radius Values,\n measured from a single polytope'))
         xlabel('radius value, R [m]')
         ylabel('P(R_0 \geq R)')
-
+    end
+    % instead of probability of radius having that value or less
+    % max bin should be factor of safety of 1.2 over max_radius in m
+    bin_edges = 0:0.1:1000*max_radius_field*1.2;
+    % plot 1-CDF of single polytope (probability of occupation
+    [N,edges] = histcounts(1000*r_of_theta_all_sides,bin_edges,'Normalization','cdf');
+    bin_center = (edges(1:end-1)+edges(2:end))/2;
+    poly_size_stats.N_all_polys = [poly_size_stats.N_all_polys; 1-N];
+    poly_size_stats.bin_edges_all_polys = [poly_size_stats.bin_edges_all_polys; bin_center];
+    if flag_do_plot
         % plot 1-CDF of a single polytope - this is probability of occupation
         figure(123453256)
         clf;
-        % instead of probability of radius having that value or less
-        % max bin should be factor of safety of 1.2 over max_radius in m
-        bin_edges = 0:0.1:1000*max_radius_field*1.2;
-        % plot 1-CDF of single polytope (probability of occupation
-        [N,edges] = histcounts(1000*r_of_theta_all_sides,bin_edges,'Normalization','cdf');
-        bin_center = (edges(1:end-1)+edges(2:end))/2;
         plot(bin_center,1-N)
-        poly_size_stats.N_all_polys = [poly_size_stats.N_all_polys; 1-N];
-        poly_size_stats.bin_edges_all_polys = [poly_size_stats.bin_edges_all_polys; bin_center];
         box on
         title(sprintf('Probability of occupation at a given radius\n measured from a single polytope'))
         xlabel('radius value, R [m]')

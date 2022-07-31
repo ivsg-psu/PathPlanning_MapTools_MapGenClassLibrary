@@ -199,4 +199,10 @@ function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(...
     x = field_avg_r_D;
     L_occ_est_poly_fit = A*x^2+B*x+C;
     unocc_ests.L_unocc_est_poly_fit = 1 - L_occ_est_poly_fit;
+
+    %% estimate using effective depth from calculus
+    poly_size_stats = fcn_MapGen_polytopesRadiusDistributions(polytopes);
+    d_eff = poly_size_stats.mean_d_eff_scalar;
+    L_occ_est_d_eff = N_int*d_eff*2;
+    unocc_ests.L_unocc_est_d_eff = 1 - L_occ_est_d_eff;
 end
