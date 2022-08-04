@@ -62,6 +62,7 @@ poly_size_stats.expected_radii = [];
 % effective depths as a function of offset for all polys (vectors per poly)
 poly_size_stats.offsets = [];
 poly_size_stats.effective_depths = [];
+poly_size_stats.effective_depth_scalars = [];
 % max radius of all polys in the field
 max_radius_field = max(extractfield(polytopes,'max_radius'));
 
@@ -267,6 +268,7 @@ for ith_poly = 1:length(polytopes)
     end
     poly_size_stats.offsets = [poly_size_stats.offsets; o];
     poly_size_stats.effective_depths = [poly_size_stats.effective_depths;effective_depths];
+    poly_size_stats.effective_depth_scalars = [poly_size_stats.effective_depth_scalars,mean(effective_depths(effective_depths>0.1))];
     if flag_do_plot
         figure(12345327)
         hold on
@@ -280,20 +282,22 @@ for ith_poly = 1:length(polytopes)
 end
 mean_d_eff = mean(poly_size_stats.effective_depths,1);
 poly_size_stats.mean_d_eff = mean_d_eff;
-plot(o,mean_d_eff,'LineWidth',3,'Color','k')
-mean(poly_size_stats.effective_depths(5,:),1);
-num_curves = [1,5,20,50,100,500];
-for i = 1:1:length(num_curves)
-    figure(12345329)
-    clf
-    hold on
-    box on
-    avg_curve = mean(poly_size_stats.effective_depths(1:num_curves(i),:),1);
-    plot(o,avg_curve,'LineWidth',3,'Color','k')
-    xlabel('offset from centroid, o [m]')
-    ylabel('effective depth, d_{eff} [m]')
-    title(sprintf('Effective depth of a polytope as a function of offset, d_{eff}(o) from %.0d curves',num_curves(i)))
-    savefig(sprintf('d_eff_%d',i))
+if flag_do_plot
+    plot(o,mean_d_eff,'LineWidth',3,'Color','k')
+    mean(poly_size_stats.effective_depths(5,:),1);
+    num_curves = [1,5,20,50,100,500];
+    for i = 1:1:length(num_curves)
+        figure(12345329)
+        clf
+        hold on
+        box on
+        avg_curve = mean(poly_size_stats.effective_depths(1:num_curves(i),:),1);
+        plot(o,avg_curve,'LineWidth',3,'Color','k')
+        xlabel('offset from centroid, o [m]')
+        ylabel('effective depth, d_{eff} [m]')
+        title(sprintf('Effective depth of a polytope as a function of offset, d_{eff}(o) from %.0d curves',num_curves(i)))
+        savefig(sprintf('d_eff_%d',i))
+    end
 end
 % find average of average scalar value of average d_eff curve
 poly_size_stats.mean_d_eff_scalar = mean(mean_d_eff(mean_d_eff>0.1));
