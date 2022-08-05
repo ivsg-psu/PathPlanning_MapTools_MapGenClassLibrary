@@ -65,6 +65,8 @@ poly_size_stats.effective_depths = [];
 
 poly_size_stats.effective_depth_scalars = [];
 
+poly_size_stats.d_eff_i_at_middle_o = [];
+
 poly_size_stats.a_d_eff_i_eval_at_o_i = [];
 poly_size_stats.a_d_eff_i_eval_at_o_avg = [];
 
@@ -75,7 +77,7 @@ field_avg_r_D = field_stats.avg_r_D;
 N_int = field_stats.linear_density_mean;
 D_L = field_avg_r_D;
 D_L_i_avg = D_L/N_int*1000;
-o_avg = max_radius_field*1000-D_L_i_avg;
+o_avg = mean(extractfield(polytopes,'max_radius'))*1000-D_L_i_avg;
 if o_avg < 0
     o_avg = 0;
 end
@@ -289,6 +291,10 @@ for ith_poly = 1:length(polytopes)
     [~,closest_index] = min(abs(o-o_this_poly));
     d_eff_i_eval_at_o_i = effective_depths(closest_index);
     poly_size_stats.a_d_eff_i_eval_at_o_i = [poly_size_stats.a_d_eff_i_eval_at_o_i, d_eff_i_eval_at_o_i];
+
+    middle_o_this_poly = o(floor(length(effective_depths(effective_depths>0.1))/2));
+    [~,closest_index] = min(abs(o-middle_o_this_poly));
+    poly_size_stats.d_eff_i_at_middle_o = [poly_size_stats.d_eff_i_at_middle_o, effective_depths(closest_index)];
     % find the closest o to the estimate o for all polys
     [~,closest_index] = min(abs(o-o_avg));
     d_eff_i_eval_at_o_avg = effective_depths(closest_index);
@@ -337,6 +343,9 @@ if flag_do_plot
 end
 % find average of average scalar value of average d_eff curve
 poly_size_stats.mean_d_eff_scalar = mean(mean_d_eff(mean_d_eff>0.1));
+middle_o_avg_curve = o(floor(length(mean_d_eff(mean_d_eff>0.1))/2));
+[~,closest_index] = min(abs(o-middle_o_avg_curve));
+poly_size_stats.mean_d_eff_at_middle_o = mean_d_eff(closest_index);
 if flag_do_plot
     figure(12345327)
     hold on

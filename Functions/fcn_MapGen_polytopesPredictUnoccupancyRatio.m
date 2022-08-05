@@ -206,6 +206,9 @@ function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(...
     L_occ_est_d_eff = N_int*d_eff/1000*2;
     unocc_ests.L_unocc_est_d_eff = 1 - L_occ_est_d_eff;
 
+    d_eff = mean(poly_size_stats.effective_depth_scalars);
+    unocc_ests.L_unocc_est_d_eff5 = 1 - N_int*d_eff/1000*2;
+
     %% estimate using expected radius form calculus
     expected_rad = mean(poly_size_stats.expected_radii);
     unocc_ests.mean_exp_rad = expected_rad;
@@ -215,4 +218,6 @@ function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(...
     unocc_ests.L_unocc_est_d_eff2 = 1 - N_int/1000*2*mean(poly_size_stats.a_d_eff_i_eval_at_o_i);
     unocc_ests.L_unocc_est_d_eff3 = 1 - N_int/1000*2*mean(poly_size_stats.a_d_eff_i_eval_at_o_avg);
     unocc_ests.L_unocc_est_d_eff4 = 1 - N_int/1000*2*poly_size_stats.d_eff_avg_eval_at_o_avg;
+    unocc_ests.L_unocc_est_d_eff6 = 1 - N_int/1000*2*poly_size_stats.mean_d_eff_at_middle_o;
+    unocc_ests.L_unocc_est_d_eff7 = 1 - N_int/1000*2*mean(poly_size_stats.d_eff_i_at_middle_o);
 end
