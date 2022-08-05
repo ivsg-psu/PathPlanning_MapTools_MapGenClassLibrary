@@ -62,9 +62,23 @@ poly_size_stats.expected_radii = [];
 % effective depths as a function of offset for all polys (vectors per poly)
 poly_size_stats.offsets = [];
 poly_size_stats.effective_depths = [];
+
 poly_size_stats.effective_depth_scalars = [];
+
+poly_size_stats.a_d_eff_i_eval_at_o_i = [];
+poly_size_stats.a_d_eff_i_eval_at_o_avg = [];
+
 % max radius of all polys in the field
 max_radius_field = max(extractfield(polytopes,'max_radius'));
+field_stats = fcn_MapGen_polytopesStatistics(polytopes);
+field_avg_r_D = field_stats.avg_r_D;
+N_int = field_stats.linear_density_mean;
+D_L = field_avg_r_D;
+D_L_i_avg = D_L/N_int*1000;
+o_avg = max_radius_field*1000-D_L_i_avg;
+if o_avg < 0
+    o_avg = 0;
+end
 
 for ith_poly = 1:length(polytopes)
 
@@ -160,7 +174,7 @@ for ith_poly = 1:length(polytopes)
     r_and_theta_all_sides = r_and_theta_all_sides(:,idx);
     % now we can store the r-curve for this all polys, knowing they all are ordered
     % from 0 degrees to 359 with 1 degree increments
-    poly_size_stats.r_of_theta_all_polys = [poly_size_stats.r_of_theta_all_polys; r_and_theta_all_sides(2,:)];
+%     poly_size_stats.r_of_theta_all_polys = [poly_size_stats.r_of_theta_all_polys; r_and_theta_all_sides(2,:)];
     if flag_do_plot
         figure(12345324)
         clf;
@@ -238,6 +252,10 @@ for ith_poly = 1:length(polytopes)
         xlim([0,1000*max_radius_field*1.1])
         ylim([-0.05,1.05])
     end
+    o_this_poly = max(r_of_theta_all_sides)*1000-D_L_i_avg;
+    if o_this_poly < 0
+        o_this_poly = 0;
+    end
     %% find effective depth for d at some offset, o
     % create offset range, to R_max
     o = 0:0.2:1000*max_radius_field*1.2;
@@ -266,6 +284,16 @@ for ith_poly = 1:length(polytopes)
         end
         effective_depths = [effective_depths,effective_depth];
     end
+
+    % find the closest o to the estiamted o for this poly
+    [~,closest_index] = min(abs(o-o_this_poly));
+    d_eff_i_eval_at_o_i = effective_depths(closest_index);
+    poly_size_stats.a_d_eff_i_eval_at_o_i = [poly_size_stats.a_d_eff_i_eval_at_o_i, d_eff_i_eval_at_o_i];
+    % find the closest o to the estimate o for all polys
+    [~,closest_index] = min(abs(o-o_avg));
+    d_eff_i_eval_at_o_avg = effective_depths(closest_index);
+    poly_size_stats.a_d_eff_i_eval_at_o_avg = [poly_size_stats.a_d_eff_i_eval_at_o_avg, d_eff_i_eval_at_o_avg];
+
     poly_size_stats.offsets = [poly_size_stats.offsets; o];
     poly_size_stats.effective_depths = [poly_size_stats.effective_depths;effective_depths];
     poly_size_stats.effective_depth_scalars = [poly_size_stats.effective_depth_scalars,mean(effective_depths(effective_depths>0.1))];
@@ -282,6 +310,12 @@ for ith_poly = 1:length(polytopes)
 end
 mean_d_eff = mean(poly_size_stats.effective_depths,1);
 poly_size_stats.mean_d_eff = mean_d_eff;
+
+% find the closest o to the estimate o for all polys
+[~,closest_index] = min(abs(o-o_avg));
+d_eff_avg_eval_at_o_avg = mean_d_eff(closest_index);
+poly_size_stats.d_eff_avg_eval_at_o_avg = d_eff_avg_eval_at_o_avg;
+
 if flag_do_plot
     plot(o,mean_d_eff,'LineWidth',3,'Color','k')
     mean(poly_size_stats.effective_depths(5,:),1);
@@ -292,11 +326,13 @@ if flag_do_plot
         hold on
         box on
         avg_curve = mean(poly_size_stats.effective_depths(1:num_curves(i),:),1);
-        plot(o,avg_curve,'LineWidth',3,'Color','k')
-        xlabel('offset from centroid, o [m]')
-        ylabel('effective depth, d_{eff} [m]')
-        title(sprintf('Effective depth of a polytope as a function of offset, d_{eff}(o) from %.0d curves',num_curves(i)))
-        savefig(sprintf('d_eff_%d',i))
+        if flag_do_plot
+            plot(o,avg_curve,'LineWidth',3,'Color','k')
+            xlabel('offset from centroid, o [m]')
+            ylabel('effective depth, d_{eff} [m]')
+            title(sprintf('Effective depth of a polytope as a function of offset, d_{eff}(o) from %.0d curves',num_curves(i)))
+            savefig(sprintf('d_eff_%d',i))
+        end
     end
 end
 % find average of average scalar value of average d_eff curve
