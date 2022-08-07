@@ -88,6 +88,9 @@ for ith_poly = 1:length(polytopes)
     % gather information for this polytope
     poly = polytopes(ith_poly);
     centroid = poly.mean;
+    if poly.area == 0
+        continue
+    end
     n_sides = length(poly.xv);
     delta_theta = 1;
     % translate polytope so centroid is at (0,0)
@@ -260,7 +263,7 @@ for ith_poly = 1:length(polytopes)
     end
     %% find effective depth for d at some offset, o
     % create offset range, to R_max
-    o = 0:0.2:1000*max_radius_field*1.2;
+    o = 0:0.2:1000*max_radius_field*1.2; % TODO
     effective_depths = [];
     % loop through all possible offets (i.e. strike positions)
     for j = 1:1:length(o)
@@ -269,7 +272,7 @@ for ith_poly = 1:length(polytopes)
         effective_depth = 0;
         % integrate over all probabilities
         delta_d = 0.1;
-        d_max = sqrt(max(1000*r_of_theta_all_sides)^2-offset^2);
+        d_max = sqrt(max(1000*max(r_of_theta_all_sides))^2-offset^2); % TODO
         for i = 0:delta_d:d_max
             % expected value is P(R)*delta_R
             % delta_R = bin_center(i+1)-bin_center(i);
@@ -292,9 +295,9 @@ for ith_poly = 1:length(polytopes)
     d_eff_i_eval_at_o_i = effective_depths(closest_index);
     poly_size_stats.a_d_eff_i_eval_at_o_i = [poly_size_stats.a_d_eff_i_eval_at_o_i, d_eff_i_eval_at_o_i];
 
-    middle_o_this_poly = o(floor(length(effective_depths(effective_depths>0.1))/2));
-    [~,closest_index] = min(abs(o-middle_o_this_poly));
-    poly_size_stats.d_eff_i_at_middle_o = [poly_size_stats.d_eff_i_at_middle_o, effective_depths(closest_index)];
+%     middle_o_this_poly = o(floor(length(effective_depths(effective_depths>0.0001))/2)); % TODO
+%     [~,closest_index] = min(abs(o-middle_o_this_poly));
+%     poly_size_stats.d_eff_i_at_middle_o = [poly_size_stats.d_eff_i_at_middle_o, effective_depths(closest_index)];
     % find the closest o to the estimate o for all polys
     [~,closest_index] = min(abs(o-o_avg));
     d_eff_i_eval_at_o_avg = effective_depths(closest_index);
@@ -302,7 +305,7 @@ for ith_poly = 1:length(polytopes)
 
     poly_size_stats.offsets = [poly_size_stats.offsets; o];
     poly_size_stats.effective_depths = [poly_size_stats.effective_depths;effective_depths];
-    poly_size_stats.effective_depth_scalars = [poly_size_stats.effective_depth_scalars,mean(effective_depths(effective_depths>0.1))];
+    poly_size_stats.effective_depth_scalars = [poly_size_stats.effective_depth_scalars,mean(effective_depths(effective_depths>0.0001))];
     if flag_do_plot
         figure(12345327)
         hold on
@@ -342,10 +345,10 @@ if flag_do_plot
     end
 end
 % find average of average scalar value of average d_eff curve
-poly_size_stats.mean_d_eff_scalar = mean(mean_d_eff(mean_d_eff>0.1));
-middle_o_avg_curve = o(floor(length(mean_d_eff(mean_d_eff>0.1))/2));
-[~,closest_index] = min(abs(o-middle_o_avg_curve));
-poly_size_stats.mean_d_eff_at_middle_o = mean_d_eff(closest_index);
+poly_size_stats.mean_d_eff_scalar = mean(mean_d_eff(mean_d_eff>0.0001));
+% middle_o_avg_curve = o(floor(length(mean_d_eff(mean_d_eff>0.0001))/2));
+% [~,closest_index] = min(abs(o-middle_o_avg_curve));
+% poly_size_stats.mean_d_eff_at_middle_o = mean_d_eff(closest_index);
 if flag_do_plot
     figure(12345327)
     hold on
