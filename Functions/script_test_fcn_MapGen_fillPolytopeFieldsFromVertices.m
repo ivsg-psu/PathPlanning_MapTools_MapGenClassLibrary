@@ -22,3 +22,7 @@ assert(isequal(round(polytopes.distances,4),[4.4721;2.8284;4.4721]));
 assert(isequal(polytopes.mean,[2,2]));
 assert(isequal(polytopes.area,6));
 assert(isequal(round(polytopes.max_radius,4),2.8284));
+
+polytopes(2).vertices = [10 10; 14 21; 12 41; 10 10];
+polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes);
+fcn_MapGen_plotPolytopes(polytopes,1,'r-',2)
