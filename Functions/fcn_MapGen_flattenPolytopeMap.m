@@ -41,6 +41,7 @@ p2_new = simplify(p2_new)
 p1_new = rmslivers(p1_new,0.001)
 p2_new = rmslivers(p2_new,0.001)
 p3 = simplify(p3)
+% TODO p3 has to have cost of p1.cost + p2.cost
 % triangulation code
 p1_tri = triangulation(p1_new)
 figure
