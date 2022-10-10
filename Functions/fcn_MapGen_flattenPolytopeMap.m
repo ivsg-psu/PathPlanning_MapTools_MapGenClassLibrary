@@ -1,9 +1,9 @@
 clear all; close all; clc
 function flattened_polytopes = fcn_MapGen_flattenPolytopeMap(polytopes)
     % convert polytopes to polyshapes
-    polyshapes = NaN(1,length(polytopes));
+    polyshapes = [];
     for i = 1:length(polytopes)
-        polyshapes(i) = polyshape(polytopes(i).xv,polytopes(i).yv);
+        polyshapes = [polyshapes, polyshape(polytopes(i).xv,polytopes(i).yv)];
     end
     % check each other polytope for overlap
     overlap_truth_table = overlaps(polyshapes);
@@ -35,11 +35,16 @@ function flattened_polytopes = fcn_MapGen_flattenPolytopeMap(polytopes)
         p1_new_tris = INTERNAL_fcn_triangulatePolyshape(p1_new);
         p2_new_tris = INTERNAL_fcn_triangulatePolyshape(p2_new);
         p3_new_tris = INTERNAL_fcn_triangulatePolyshape(p3);
+        % when making them triangles, set an ID field that the planner can use,
+        % to know that when planning between two tris from the same parent poly,
+        % the traversal counts as being interior
         % make p1_new_tris into list of polytopes (do this below in internal function)
         % set cost to cost of p1
         % repeat for p2_new_tris and p3_new_tris
         % remove p1 and p2 from polytope list
         % append p1_new_tris, p2_new_tris, and p3_new_tris to polytopes list
+        % remove r(1), c(1) from truth table by subtracting a zero matrix with only that
+        % set to 1
         % recursively call this function again becaus the initial polytope list is
         % effectively different now
     % if there are no intersections the loop will exit
