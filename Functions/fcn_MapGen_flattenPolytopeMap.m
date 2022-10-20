@@ -2,14 +2,19 @@ function flattened_polytopes = fcn_MapGen_flattenPolytopeMap(polytopes)
     flag_do_plot = 1;
     % convert polytopes to polyshapes
     if flag_do_plot
-        fig1 = fcn_MapGen_plotPolytopes(polytopes,[],'-',2);
+        fcn_MapGen_plotPolytopes(polytopes,[],'-',2);
     end
     polyshapes = [];
+    if flag_do_plot
+        figure(1)
+        clf
+    end
     for i = 1:length(polytopes)
         polyshapes = [polyshapes, polyshape(polytopes(i).xv,polytopes(i).yv)];
         if flag_do_plot
             figure(1)
             hold on
+            title('Polyshapes before subtraction')
             plot(polyshapes(i))
         end
     end
@@ -33,23 +38,29 @@ function flattened_polytopes = fcn_MapGen_flattenPolytopeMap(polytopes)
         p1_new = subtract(p1,p3);
         p2_new = subtract(p2,p3);
         % tidy them
-        p1_new = simplify(p1_new)
-        p2_new = simplify(p2_new)
-        p1_new = rmslivers(p1_new,0.001)
-        p2_new = rmslivers(p2_new,0.001)
-        p3 = simplify(p3)
-        p3 = rmslivers(p3,0.001)
+        p1_new = simplify(p1_new);
+        p2_new = simplify(p2_new);
+        p1_new = rmslivers(p1_new,0.001);
+        p2_new = rmslivers(p2_new,0.001);
+        p3 = simplify(p3);
+        p3 = rmslivers(p3,0.001);
         if flag_do_plot
             figure(2)
+            clf
             hold on
             plot(p1_new)
             plot(p2_new)
             plot(p3)
+            title('overlapping polyshapes')
         end
         % make the polygonal polyshapes into series of triangular polyshapes
         % and triangular polytopes
-        [~, p1_new_tris] = INTERNAL_fcn_triangulatePolyshape(p1_new,flag_do_plot);
-        [~, p2_new_tris] = INTERNAL_fcn_triangulatePolyshape(p2_new,flag_do_plot);
+        if p1_new.area > eps
+            [~, p1_new_tris] = INTERNAL_fcn_triangulatePolyshape(p1_new,flag_do_plot);
+        end
+        if p2_new.area > eps
+            [~, p2_new_tris] = INTERNAL_fcn_triangulatePolyshape(p2_new,flag_do_plot);
+        end
         [~, p3_new_tris] = INTERNAL_fcn_triangulatePolyshape(p3,flag_do_plot);
 
         % TODO when making them triangles, set an ID field that the planner can use,
@@ -58,19 +69,37 @@ function flattened_polytopes = fcn_MapGen_flattenPolytopeMap(polytopes)
 
         % set cost to cost of triangles making up p1 and p2 to their original costs
         % set cost of intersection (p3) triangles to the sum of p1's and p2's costs
-        p1_new_tris = fcn_polytope_editing_set_all_costs(p1_new_tris,cost_of_p1)
-        p2_new_tris = fcn_polytope_editing_set_all_costs(p2_new_tris,cost_of_p2)
+        if p1_new.area > eps
+            p1_new_tris = fcn_polytope_editing_set_all_costs(p1_new_tris,cost_of_p1);
+        end
+        if p2_new.area > eps
+            p2_new_tris = fcn_polytope_editing_set_all_costs(p2_new_tris,cost_of_p2);
+        end
         p3_new_tris = fcn_polytope_editing_set_all_costs(p3_new_tris,cost_of_p1+cost_of_p2)
         % remove p1 and p2 from polytope list
         polytopes(r(1)) = [];
         polytopes(c(1)) = [];
         % append p1_new_tris, p2_new_tris, and p3_new_tris to polytopes list
-        polytopes = [polytopes, p1_new_tris, p2_new_tris, p3_new_tris];
+        if p1_new.area > eps
+            polytopes = [polytopes, p1_new_tris];
+        end
+        if p2_new.area > eps
+            polytopes = [polytopes, p2_new_tris];
+        end
+        polytopes = [polytopes, p3_new_tris];
         if flag_do_plot
-            fig1 = fcn_MapGen_plotPolytopes(polytopes,[],'-',2);
-            fig1 = fcn_MapGen_plotPolytopes(p1_new_tris,[],'-',2);
-            fig1 = fcn_MapGen_plotPolytopes(p2_new_tris,[],'-',2);
-            fig1 = fcn_MapGen_plotPolytopes(p3_new_tris,[],'-',2);
+            fcn_MapGen_plotPolytopes(polytopes,[],'-',2);
+            title('originaly polytopes')
+            if p1_new.area > eps
+                fcn_MapGen_plotPolytopes(p1_new_tris,[],'-',2);
+                title('triangulated parent 1, less, intersection')
+            end
+            if p2_new.area > eps
+                fcn_MapGen_plotPolytopes(p2_new_tris,[],'-',2);
+                title('triangulated parent 2, less intersection')
+            end
+            fcn_MapGen_plotPolytopes(p3_new_tris,[],'-',2);
+            title('triangulated intersection')
         end
         % remove r(1), c(1) from truth table
         overlap_truth_table(r(1),c(1)) = 0;
@@ -81,14 +110,15 @@ function flattened_polytopes = fcn_MapGen_flattenPolytopeMap(polytopes)
     end
     % if there are no intersections the loop will exit
     flattened_polytopes = polytopes;
-    if flag_do_plot
-        fig2 = fcn_MapGen_plotPolytopes(flattened_polytopes,[],'-',2);
+    if true
+        fcn_MapGen_plotPolytopes(flattened_polytopes,1,'b',2)
+        title('final obstacle field')
     end
 end
 
 function [p_tri_polyshapes, p_tri_polytopes] = INTERNAL_fcn_triangulatePolyshape(my_polyshape,flag_do_plot)
     % make polyshape into triangulation
-    p_tri = triangulation(my_polyshape)
+    p_tri = triangulation(my_polyshape);
     if flag_do_plot
         figure
         hold on
@@ -100,12 +130,12 @@ function [p_tri_polyshapes, p_tri_polytopes] = INTERNAL_fcn_triangulatePolyshape
     p_tri_polytopes = [];
     % go through each set of connected triangle vertecies
     for i=1:size(p_tri.ConnectivityList,1)
-        x1 = p_tri.Points(p_tri.ConnectivityList(i,1),1)
-        y1 = p_tri.Points(p_tri.ConnectivityList(i,1),2)
-        x2 = p_tri.Points(p_tri.ConnectivityList(i,2),1)
-        y2 = p_tri.Points(p_tri.ConnectivityList(i,2),2)
-        x3 = p_tri.Points(p_tri.ConnectivityList(i,3),1)
-        y3 = p_tri.Points(p_tri.ConnectivityList(i,3),2)
+        x1 = p_tri.Points(p_tri.ConnectivityList(i,1),1);
+        y1 = p_tri.Points(p_tri.ConnectivityList(i,1),2);
+        x2 = p_tri.Points(p_tri.ConnectivityList(i,2),1);
+        y2 = p_tri.Points(p_tri.ConnectivityList(i,2),2);
+        x3 = p_tri.Points(p_tri.ConnectivityList(i,3),1);
+        y3 = p_tri.Points(p_tri.ConnectivityList(i,3),2);
 %         if norm(([x1, y1] - [x2, y2]) == [0, 0]) == 0 || norm(([x1, y1] - [x3, y3]) == [0, 0]) == 0 || norm(([x2, y2] - [x3, y3]) == [0, 0]) == 0
 %             continue
 %         end

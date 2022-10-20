@@ -48,7 +48,7 @@ function [fig] = fcn_MapGen_plotPolytopes(polytopes,fig_num,line_spec,line_width
 % order after LINE_WIDTH
 %
 % Examples:
-%      
+%
 %      % BASIC example
 %      mapx = 1;
 %      mapy = 1;
@@ -64,11 +64,11 @@ function [fig] = fcn_MapGen_plotPolytopes(polytopes,fig_num,line_spec,line_width
 %      fcn_MapGen_plotPolytopes(polytopes2,fig2,'b--',2,[0 mapx 0 mapy])
 %      fcn_MapGen_plotPolytopes(polytopes2,fig3,'g-',3,[0 mapx 0 mapy],'square')
 %      fcn_MapGen_plotPolytopes(polytopes2,fig4,'k-',3,[0 mapx 0 mapy],'square',[1 0 0 0 0.5])
-%       
+%
 % For more examples, see: script_test_fcn_MapGen_plotPolytopes.m
 %
 % This function was written on 2018_12_10 by Seth Tau
-% Questions or comments? sat5340@psu.edu 
+% Questions or comments? sat5340@psu.edu
 %
 
 
@@ -102,7 +102,7 @@ hold on % allow multiple plot calls
 
 %% determine color and axis values
 plots = 1; % basic plot
-color = []; axis_limits = []; axis_style = []; fill_info = [0 0 0 0 0]; % initialize empty values    
+color = []; axis_limits = []; axis_style = []; fill_info = [0 0 0 0 0]; % initialize empty values
 if nargin > 4
     for arg = 1:nargin-4
         argument = varargin{arg};
@@ -121,7 +121,7 @@ if nargin > 4
         end
     end
 end
-            
+
 
 % if nargin == 4
 %     plots = 1; % basic plot
@@ -151,7 +151,7 @@ end
 %             axis_style = varargin{2}; % axis style (ie square or equal)
 %         end
 %     else % first optional argument is fill info
-%         
+%
 %     end
 % end
 
@@ -159,7 +159,7 @@ end
 if fill_info(1) == 1
     for polys = 1:size(polytopes,2)
         filler = fill(polytopes(polys).vertices(:,1)',polytopes(polys).vertices(:,2)',fill_info(2:4));
-        filler.FaceAlpha = fill_info(5);
+        filler.FaceAlpha = polytopes(polys).cost;
     end
 end
 
@@ -198,7 +198,7 @@ function [map_polytopes,all_pts,mu_rad_final,sigma_rad_final] = ...
 % radius.
 %
 % FORMAT:
-% 
+%
 % [map_polytopes,all_pts,mu_rad_final,sigma_rad_final] = ...
 %     fcn_MapGen_polytopeMapGen(...
 %     low_pt,high_pt,...
@@ -225,7 +225,7 @@ function [map_polytopes,all_pts,mu_rad_final,sigma_rad_final] = ...
 %    min_rad:
 %
 %    shrink_seed:
-%     
+%
 %    (OPTIONAL INPUTS)
 %
 %     fig_num: a figure number to plot results.
@@ -234,26 +234,26 @@ function [map_polytopes,all_pts,mu_rad_final,sigma_rad_final] = ...
 %
 %     map_polytopes: an N x 2 matrix representing the [x y] vector of starting
 %     points of the "walls", where N is # of wall segments
-% 
+%
 %     all_pts: an N x 2 matrix representing the [x y] vector of ending
 %     points of the "walls", where N is # of wall segments
 %
 %     mu_rad_final:
 %
 %     sigma_rad_final
-%   
+%
 % EXAMPLES:
-%      
+%
 % See the script: script_test_fcn_MapGen_polytopeMapGen
 % for a full test suite.
 %
 % This function was written on 2020_06_06 by S. Brennan by editing
 % fcn_basic_polytope_map_generation written by S. Tau.
-% Questions or comments? sbrennan@psu.edu 
+% Questions or comments? sbrennan@psu.edu
 
 % REVISION HISTORY:
-% 2021_06_06 
-% -- first written by S. Brennan. 
+% 2021_06_06
+% -- first written by S. Brennan.
 
 %% Debugging and Input checks
 flag_check_inputs = 1; % Set equal to 1 to check the input arguments
@@ -278,13 +278,13 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
-if flag_check_inputs    
-%     % Are there the right number of inputs?    
+
+if flag_check_inputs
+%     % Are there the right number of inputs?
 %     if nargin < 0 || nargin > 1
 %         error('Incorrect number of input arguments')
 %     end
-    
+
     %     % Check the wall_start input
     %     fcn_vis_checkInputsToFunctions(...
     %         wall_start, '2column_of_numbers');
@@ -300,8 +300,8 @@ if flag_check_inputs
     %     fcn_vis_checkInputsToFunctions(...
     %         sensor_location, '2column_of_numbers',[1 1]);
 end
-    
-% 
+
+%
 % % Does user want to show the plots?
 % if 1 == nargin
 %     fig_num = varargin{end};
@@ -328,9 +328,9 @@ end
 %Halton_range = [low_pt, high_pt];
 
 % generate Voronoi tiling from Halton points
-tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(low_pt,high_pt); 
+tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(low_pt,high_pt);
 % remove the edge polytope that extend past the high and low points
-trim_polytopes = fcn_polytope_editing_remove_edge_polytopes(tiled_polytopes,xlow,xhigh,ylow,yhigh); 
+trim_polytopes = fcn_polytope_editing_remove_edge_polytopes(tiled_polytopes,xlow,xhigh,ylow,yhigh);
 % shink the polytopes so that they are no longer tiled
 rng(shrink_seed) % set the random number generator with the shrink seed
 [map_polytopes,mu_rad_final,sigma_rad_final] = fcn_MapGen_polytopeShrinkToRadius(trim_polytopes,des_radius,sigma_radius,min_rad);
@@ -350,24 +350,24 @@ all_pts = [[map_polytopes.xv];[map_polytopes.yv];1:point_tot;obs_id;beg_end]'; %
 
 %% Plot results?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____       _                 
-%  |  __ \     | |                
-%  | |  | | ___| |__  _   _  __ _ 
+%   _____       _
+%  |  __ \     | |
+%  | |  | | ___| |__  _   _  __ _
 %  | |  | |/ _ \ '_ \| | | |/ _` |
 %  | |__| |  __/ |_) | |_| | (_| |
 %  |_____/ \___|_.__/ \__,_|\__, |
 %                            __/ |
-%                           |___/ 
+%                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % if flag_do_plot
 %     fcn_Vis_plotWalls(...
 %         wall_start,wall_end,...
-%         fig_num);    
+%         fig_num);
 % end
-% 
+%
 % if flag_do_debug
-%     fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file); 
+%     fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
 % end
 
 
