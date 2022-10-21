@@ -1,8 +1,71 @@
 function flattened_polytopes = fcn_MapGen_flattenPolytopeMap(polytopes)
-    flag_do_plot = 1;
+    % fcn_MapGen_flattenPolytopeMap
+    % Given a structure array of polytopes that may overlap and/or be concave,
+    % return a structure array of equivalent polytopes with overlapping regions
+    % broken into new polytopes with traversal cost equal to the sum of the
+    % traversal costs of the overlapping polytopes that created the region
+    % additionally all polytopes will be broken up into triangles to enforce
+    % convexity
+    %
+    %
+    %
+    % FORMAT:
+    % flattened_polytopes = fcn_MapGen_flattenPolytopeMap(polytopes)
+    %
+    % INPUTS:
+    %     polytopes - the initial polytope field, potentially containing concave
+    %       and/or overlapping polytopes
+    %
+    %
+    % OUTPUTS:
+    %
+    %
+    %     flattened_polytopes - a polytope field with neither overlapping nor
+    %       concave polytopes, that is equivalent to the oroginal polytope field
+    %
+    % DEPENDENCIES:
+    %
+    %     fcn_MapGen_plotPolytopes
+    %     fcn_MapGen_fillPolytopeFieldsFromVertices
+    %
+    % EXAMPLES:
+    %
+    % See the script: script_fcn_MapGen_flattenPolytopeMap.m
+    % for a full test suite.
+    %
+    % Questions or comments? contact sjh6473@psu.edu
+
+    % REVISION HISTORY:
+    % 2021_10_07
+    % -- first written by Steve Harnett
+
+
+    %% Debugging and Input checks
+    flag_check_inputs = 1; % Set equal to 1 to check the input arguments
+    flag_do_plot = 1;      % Set equal to 1 for plotting
+    flag_do_debug = 0;     % Set equal to 1 for debugging
+    if flag_do_debug
+        fig_for_debug = 747;
+        fig_num = 2100;
+        st = dbstack; %#ok<*UNRCH>
+        fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+    end
+
+    %% Start of main code
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %   __  __       _
+    %  |  \/  |     (_)
+    %  | \  / | __ _ _ _ __
+    %  | |\/| |/ _` | | '_ \
+    %  | |  | | (_| | | | | |
+    %  |_|  |_|\__,_|_|_| |_|
+    %
+    %See: http://patorjk.com/software/taag/#p=display&f=Big&t=Main
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
+
     % convert polytopes to polyshapes
     if flag_do_plot
-        fcn_MapGen_plotPolytopes(polytopes,[],'-',2);
+        fcn_MapGen_plotPolytopes(polytopes,1000,'-',2,[0 0 0],[],'square',[1 0 0 0 0.5]);
     end
     polyshapes = [];
     if flag_do_plot
@@ -88,17 +151,17 @@ function flattened_polytopes = fcn_MapGen_flattenPolytopeMap(polytopes)
         end
         polytopes = [polytopes, p3_new_tris];
         if flag_do_plot
-            fcn_MapGen_plotPolytopes(polytopes,[],'-',2);
+            fcn_MapGen_plotPolytopes(polytopes,1000,'-',2,[0 0 0],[],'square',[1 0 0 0 0.5]);
             title('originaly polytopes')
             if p1_new.area > eps
-                fcn_MapGen_plotPolytopes(p1_new_tris,[],'-',2);
+                fcn_MapGen_plotPolytopes(polytopes,1000,'-',2,[0 0 0],[],'square',[1 0 0 0 0.5]);
                 title('triangulated parent 1, less, intersection')
             end
             if p2_new.area > eps
-                fcn_MapGen_plotPolytopes(p2_new_tris,[],'-',2);
+                fcn_MapGen_plotPolytopes(polytopes,1000,'-',2,[0 0 0],[],'square',[1 0 0 0 0.5]);
                 title('triangulated parent 2, less intersection')
             end
-            fcn_MapGen_plotPolytopes(p3_new_tris,[],'-',2);
+            fcn_MapGen_plotPolytopes(polytopes,1000,'-',2,[0 0 0],[],'square',[1 0 0 0 0.5]);
             title('triangulated intersection')
         end
         % remove r(1), c(1) from truth table
@@ -110,11 +173,27 @@ function flattened_polytopes = fcn_MapGen_flattenPolytopeMap(polytopes)
     end
     % if there are no intersections the loop will exit
     flattened_polytopes = polytopes;
+    % check for very small polytopes
+    small_poly_logical = extractfield(flattened_polytopes,'area')<1e-10;
+    [small_poly_indecies] = find(small_poly_logical==1);
+    flattened_polytopes(small_poly_indecies) = [];
     if true
-        fcn_MapGen_plotPolytopes(flattened_polytopes,1,'b',2)
+        fcn_MapGen_plotPolytopes(polytopes,1000,'-',2,[0 0 0],[],'square',[1 0 0 0 0.5])
         title('final obstacle field')
     end
 end
+
+%% Functions follow
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   ______                _   _
+%  |  ____|              | | (_)
+%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___
+%  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
+%  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
+%  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
+%
+% See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
 function [p_tri_polyshapes, p_tri_polytopes] = INTERNAL_fcn_triangulatePolyshape(my_polyshape,flag_do_plot)
     % make polyshape into triangulation
