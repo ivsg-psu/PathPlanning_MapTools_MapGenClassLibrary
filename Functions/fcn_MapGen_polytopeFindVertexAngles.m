@@ -32,7 +32,11 @@ function [angles, unit_in_vectors, unit_out_vectors] = ...
 %
 %     angles: an Nx1 column of angles, one for each vertex. Returns NaN if
 %     polytope is degenerate, e.g. a single repeating point.
+<<<<<<< HEAD
 %  
+=======
+%
+>>>>>>> origin/steveh/documentation_updates
 %     unit_in_vectors: the Nx2 matrix of unit vectors leading into each vertex
 %  
 %     unit_out_vectors: the Nx2 matrix of unit vectors leading out of each vertex

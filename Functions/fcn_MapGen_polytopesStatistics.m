@@ -24,6 +24,8 @@ function poly_map_stats = fcn_MapGen_polytopesStatistics(...
 %
 %     poly_map_stats: a structure whose fields contain the polytope map's
 %     statistics
+%     each of the fields in the struct are as follows:
+%     AABB is the axis aligned bounding box for the polytope field, bounding all polytopes
 %
 % DEPENDENCIES:
 %
@@ -42,7 +44,8 @@ function poly_map_stats = fcn_MapGen_polytopesStatistics(...
 % Revision History:
 % 2021_07_11 - S. Brennan
 % -- first write of function
-
+% 2022_06_17 - S. Harnett
+% -- numerous features added to support length cost ratio prediction
 
 % TO DO
 % -- TBD
@@ -116,8 +119,19 @@ all_angles = nan(Nverticies_per_poly,Npolys);
 all_lengths = nan(Nverticies_per_poly,Npolys);
 all_side_count = zeros(Npolys,1);
 all_max_radius = zeros(Npolys,1);
+all_min_radius = zeros(Npolys,1);
+all_radii = [];
+all_mean_radius = zeros(Npolys,1);
+all_sharpness_ratios = zeros(Npolys,1);
 all_areas = zeros(Npolys,1);
-AABB = [inf inf -inf -inf];
+
+all_x_vertices = extractfield(polytopes,'xv');
+all_y_vertices = extractfield(polytopes,'yv');
+% Update the AABB to fit vertices (make it bigger/smaller as needed)
+AABB(1) = min(all_x_vertices);
+AABB(2) = min(all_y_vertices);
+AABB(3) = max(all_x_vertices);
+AABB(4) = max(all_y_vertices);
 
 % Loop through the polytopes
 for ith_poly = 1:Npolys
@@ -134,11 +148,6 @@ for ith_poly = 1:Npolys
     all_walls_end(rows_to_fill,3) = ith_poly;
 
 
-    % Update the AABB to fit vertices (make it bigger/smaller as needed)
-    AABB(1) = min(AABB(1),min(vertices(:,1)));
-    AABB(2) = min(AABB(2),min(vertices(:,2)));
-    AABB(3) = max(AABB(3),max(vertices(:,1)));
-    AABB(4) = max(AABB(4),max(vertices(:,2)));
 
     % Determine number of verticies
     Nangles = length(vertices(:,1))-1;
@@ -153,6 +162,14 @@ for ith_poly = 1:Npolys
     all_lengths(1:Nangles,ith_poly) = polytopes(ith_poly).distances;
     all_side_count(ith_poly,1) = Nangles;
     all_max_radius(ith_poly,1) = polytopes(ith_poly).max_radius;
+    all_min_radius(ith_poly,1) = polytopes(ith_poly).min_radius;
+    all_min_radius(ith_poly,1) = polytopes(ith_poly).min_radius;
+    all_mean_radius(ith_poly,1) = polytopes(ith_poly).mean_radius;
+    all_radii = [all_radii; polytopes(ith_poly).radii];
+    % note that sharpness is the ratio of max radius to min radius
+    % this is not the same thing as aspect ratio which is AABB width to height
+    all_sharpness_ratios(ith_poly,1) = ...
+        polytopes(ith_poly).max_radius/polytopes(ith_poly).min_radius;
     all_areas(ith_poly,1) = polytopes(ith_poly).area;
 
     % Plot the input polytopes in red
@@ -171,14 +188,15 @@ angle_column_no_nan = angle_column(~isnan(angle_column));
 average_vertex_angle = nanmean(angle_column_no_nan*180/pi);
 std_vertex_angle = nanstd(angle_column_no_nan*180/pi);
 
-% Find the mean and std deviations of the max-radius
+% Find the mean and std deviations of radii metrics
 average_max_radius = nanmean(all_max_radius);
+average_min_radius = nanmean(all_min_radius);
+average_mean_radius = nanmean(all_mean_radius);
+average_radius = nanmean(all_radii);
+average_sharpness = nanmean(all_sharpness_ratios);
 std_max_radius = nanstd(all_max_radius);
-
-% Find the perimeter of each polytope
-all_lengths_zeroes = all_lengths;
-all_lengths_zeroes(isnan(all_lengths_zeroes)) = 0;
-all_perimeters = sum(all_lengths_zeroes,1);
+% all_mean_radii = extractfield(polytopes,'true_mean_radius');
+% average_mean_radius = nanmean(all_mean_radii);
 
 % Determine the length properties related to sides of polytopes
 length_column = reshape(all_lengths,Nverticies_per_poly*Npolys,1);
@@ -187,52 +205,19 @@ total_perimeter = sum(length_column_no_nan);
 average_side_length = nanmean(length_column_no_nan);
 std_side_length = nanstd(length_column_no_nan);
 average_perimeter = total_perimeter/Npolys;
-std_perimeter = nanstd(all_perimeters);
 
 % Determine the area properties of the map
 occupied_area = sum(all_areas);
 total_area    = (AABB(3)-AABB(1))*(AABB(4)-AABB(2));
-unoccupied_area = total_area-occupied_area;
-unoccupancy_ratio = (total_area - occupied_area)/total_area;
 
 % Determine the density properties
 point_density = length(polytopes)/total_area;
 linear_density = point_density.^0.5;
 
-% Determine the average gap sizes between polytopes. Do this using 2
-% methods: one is Seth Tau's thesis derivation. The other is to assume the
-% gaps are all associated with the perimeters.
-average_gap_size_G_bar = (unoccupancy_ratio/point_density)^0.5; % See Eq. (4.24 in Seth Tau's thesis)
-perimeter_gap_size = 2*unoccupied_area/(total_perimeter);
+
+poly_map_stats.Npolys = Npolys;
+poly_map_stats.NtotalVertices = NrealVertices;
 avg_r_D = average_max_radius*linear_density;
-std_r_D = std_max_radius*linear_density;
-L_E = total_area^0.5;
-N_int = L_E*linear_density;
-all_max_radius_sorted = sort(all_max_radius);
-avg_r_LC_from_avg_gap = linear_density*2*(average_gap_size_G_bar.^2+average_side_length.^2).^0.5; % TODO(@sjharnett) debug to determine why produces complex values
-std_r_LC_from_avg_gap = linear_density*2*(average_gap_size_G_bar.^2+std_side_length.^2).^0.5; % TODO(@sjharnett) debug to determine why produces complex values
-% linear model
-r_LC_linear1 = (L_E + 2*(average_max_radius.^2+average_max_radius.^2.*tan(average_vertex_angle./2)).^0.5-2*average_max_radius.*tan(average_vertex_angle./2))./L_E;
-% linear model II
-r_LC_linear2 = (point_density^0.5*L_E*(2*sqrt((avg_r_D./point_density).^2+(avg_r_D./point_density).^2.*(tan(average_vertex_angle./2)).^2)-2*avg_r_D./point_density.*tan(average_vertex_angle./2))+L_E)./L_E;
-% vary theta variation as tan(theta/2)=1/r_D, 1D example where theta is directly from R
-r_LC_1d_density_variation = (L_E + 2*(average_max_radius.^2+average_max_radius.^2.*1./(2*average_max_radius)).^0.5-2*average_max_radius.*1./(2*average_max_radius))./L_E;
-
-%% varying horizontal and vertical density, may be a mistake on using 1/lambda
-base = 1./linear_density;
-height = 2*average_max_radius-1./(linear_density);
-hypotenuse = (base.^2+height.^2).^0.5;
-L_P = L_E + N_int.*(2*hypotenuse-2*base);
-r_LC_2d_density_variation1= L_P./L_E; % TODO(@sjharnett) add std deviation for this
-% rewriting the above to be a proper expression for r_LC in terms of r_D
-r_LC_2d_density_variation2 = 1+(avg_r_D./(average_max_radius)).*sqrt((avg_r_D./average_max_radius).^(-2)+(2*average_max_radius-(avg_r_D./average_max_radius)).^2);
-
-% changing the horizontal and vertical lambda model to do 2R-1/lambda_v for height
-base = 1./linear_density;
-height = 2.*average_max_radius - linear_density.^(-1);
-hypotenuse = (base.^2+height.^2).^0.5;
-L_P = L_E + N_int.*(2*hypotenuse-2*base);
-r_LC_2d_density_variation3 = L_P./L_E;
 
 figure(1);
 % errorbar(avg_r_D,avg_r_LC_from_avg_gap,std_r_LC_from_avg_gap,'ro')
@@ -259,28 +244,35 @@ poly_map_stats.max_y = AABB(4);
 
 poly_map_stats.occupied_area = occupied_area;
 poly_map_stats.total_area = total_area;
-poly_map_stats.unoccupied_area = unoccupied_area;
-poly_map_stats.unoccupancy_ratio = unoccupancy_ratio;
 poly_map_stats.point_density = point_density;
 poly_map_stats.linear_density = linear_density;
-poly_map_stats.average_gap_size_G_bar = average_gap_size_G_bar;
-poly_map_stats.perimeter_gap_size = perimeter_gap_size;
 
 poly_map_stats.Nangles = length(angle_column_no_nan(:,1));
 poly_map_stats.average_vertex_angle = average_vertex_angle;
 poly_map_stats.std_vertex_angle = std_vertex_angle;
+poly_map_stats.angle_column_no_nan = angle_column_no_nan;
 
 poly_map_stats.average_max_radius = average_max_radius;
+poly_map_stats.average_min_radius = average_min_radius;
+poly_map_stats.average_mean_radius = average_mean_radius;
+poly_map_stats.average_radius = average_radius;
+poly_map_stats.all_average_radius = all_mean_radius;
+poly_map_stats.all_radii = all_radii;
+poly_map_stats.average_sharpness = average_sharpness;
 poly_map_stats.std_max_radius = std_max_radius;
 poly_map_stats.average_side_length = average_side_length;
 poly_map_stats.std_side_length = std_side_length;
 poly_map_stats.total_perimeter = total_perimeter;
 poly_map_stats.avg_r_D = avg_r_D;
-
+poly_map_stats.NtotalVertices = NrealVertices;
+poly_map_stats.average_perimeter = average_perimeter;
 
 
 if flag_do_debug
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/steveh/documentation_updates
     figure(fig_for_debug);
     clf;
     hold on
@@ -371,13 +363,9 @@ if flag_do_plot
     fprintf(1,'\t Max_y: %.2f\n',poly_map_stats.max_y);
     fprintf(1,'\t Occupied Area: %.2f\n',occupied_area);
     fprintf(1,'\t Total Area: %.2f\n',total_area);
-    fprintf(1,'\t Unoccupied Area: %.2f\n',unoccupied_area);
-    fprintf(1,'\t Unoccupancy ratio: %.2f\n',unoccupancy_ratio);
     fprintf(1,'\t Point density: %.2f\n',point_density);
     fprintf(1,'\t Theoretical Linear density: %.2f\n',linear_density);
     fprintf(1,'\t Calculated Linear density: %.2f +/- %.4f\n',poly_map_stats.linear_density_mean,2*poly_map_stats.linear_density_std);
-    fprintf(1,'\t Average gap size, G-bar: %.5f\n',average_gap_size_G_bar);
-    fprintf(1,'\t Perimeter gap size: %.5f\n',perimeter_gap_size);
 
     fprintf(1,'\n\t ANGLE METRICS:\n');
     fprintf(1,'\t Total number of vertices: %.2f\n',poly_map_stats.Nangles);
@@ -440,6 +428,27 @@ if flag_do_plot
     xlabel('Range of deviation');
     title('% Similarity of polytopes hit versus range of deviation');
     legend('Similarity','+/- ave max radius');
+
+    figure;
+    box on;
+    subplot(2,2,1);
+    histogram(all_radii);
+    title(sprintf("Distribution of All Polytope Radii.\nMean: %.4f, Median: %.4f, Mode: %.4f",mean(all_radii),mode(all_radii),mode(all_radii)));
+
+    subplot(2,2,2);
+    box on;
+    histogram(all_min_radius);
+    title(sprintf("Distribution of Min Polytope Radii.\nMean: %.4f, Median: %.4f, Mode: %.4f",mean(all_min_radius),mode(all_min_radius),mode(all_min_radius)));
+
+    subplot(2,2,3);
+    box on;
+    histogram(all_max_radius);
+    title(sprintf("Distribution of Max Polytope Radii.\nMean: %.4f, Median: %.4f, Mode: %.4f",mean(all_max_radius),mode(all_max_radius),mode(all_max_radius)));
+
+    subplot(2,2,4);
+    box on;
+    histogram(all_mean_radius);
+    title(sprintf("Distribution of Mean Radius per Polytope.\nMean: %.4f, Median: %.4f, Mode: %.4f",mean(all_mean_radius),mode(all_mean_radius),mode(all_mean_radius)));
 end
 
 if flag_do_debug
