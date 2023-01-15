@@ -63,15 +63,9 @@ varargin...
 % -- fill in to-do items here.
 
 %% Debugging and Input checks
-<<<<<<< HEAD
-flag_check_inputs = 1; % Set equal to 1 to check the input arguments 
-flag_do_plot = 0;      % Set equal to 1 for plotting 
-flag_do_debug = 0;     % Set equal to 1 for debugging 
-=======
 flag_check_inputs = 1; % Set equal to 1 to check the input arguments
 flag_do_plot = 0;      % Set equal to 1 for plotting
 flag_do_debug = 0;     % Set equal to 1 for debugging
->>>>>>> origin/steveh/documentation_updates
 
 if flag_do_debug
     fig_for_debug = 3;
@@ -140,11 +134,9 @@ end
 filled_polytopes = polytopes;
 num_poly = length(polytopes);
 
-for ith_poly = 1:num_poly % pull each polytope
-<<<<<<< HEAD
-    
-=======
->>>>>>> origin/steveh/documentation_updates
+% Loop over each polytope, filling in data for each
+for ith_poly = 1:num_poly 
+
     % adjust polytopes
     filled_polytopes(ith_poly).xv        = (polytopes(ith_poly).vertices(1:end-1,1)');
     filled_polytopes(ith_poly).yv        = (polytopes(ith_poly).vertices(1:end-1,2)');

@@ -18,10 +18,12 @@ function [shrunk_polytopes,mu_final,sigma_final] = ...
 %
 %     POLYTOPES: original polytopes with same fields as shrunk_polytopes
 %
-%     DES_GAP_SIZE: desired normal gap size between polytopes, note this is relative, not absolute
-%     e.g. if the input polytopes have no gap and a des_gap_size of 0.005 km is input, the resulting
-%     gap size will be 0.005 km.  However if hte input polytopes already have a gap size of 0.002 km
-%     the resulting gap size will be 0.007 km for a des_gap_size of 0.005 km.
+%     DES_GAP_SIZE: desired normal gap size between polytopes, note this is
+%     relative, not absolute e.g. if the input polytopes have no gap and a
+%     des_gap_size of 0.005 km is input, the resulting gap size will be
+%     0.005 km.  However if the input polytopes already have a gap size of
+%     0.002 km the resulting gap size will be 0.007 km for a des_gap_size
+%     of 0.005 km.
 %
 %     (optional inputs)
 %

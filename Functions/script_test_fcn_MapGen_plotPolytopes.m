@@ -6,6 +6,17 @@
 % -- first written by S. Brennan.
 
 %% BASIC example
+clear polytopes;
+
+polytopes(1).vertices = [0 0; 4 2; 2 4; 0 0];
+fig_num = 1;
+line_spec = '-';
+line_width = 3;
+line_color = [0.5 0 0];
+
+fcn_MapGen_plotPolytopes(polytopes,fig_num,line_spec,line_width,line_color);
+
+%% Advanced example
 axis_box = [0 1 0 1];
 halton_range = [1 100]; % Sets the indices to use from halton set
 [polytopes] = fcn_MapGen_haltonVoronoiTiling(halton_range);

@@ -2,7 +2,7 @@ function [fig] = fcn_MapGen_plotPolytopes(polytopes,fig_num,line_spec,line_width
 % fcn_MapGen_plotPolytopes plots a set of polytopes given user-defined
 % inputs
 %
-% [FIG]=fcn_MapGen_plotPolytopes(POLYTOPES,FIG_NUM,LINE_SPEC,LINE_WIDTH)
+% [FIG_HANDLE]=fcn_MapGen_plotPolytopes(POLYTOPES,FIG_NUM,LINE_SPEC,LINE_WIDTH)
 % returns:
 % a figure with the polytopes plotted as specified
 %
@@ -79,14 +79,14 @@ function [fig] = fcn_MapGen_plotPolytopes(polytopes,fig_num,line_spec,line_width
 % 2021_06_07 - S.Brennan
 % -- updated examples in header
 % -- added test script for function
+% 2023_01_15 - S.Brennan
+% -- uses narginchk now
+
 
 %% chec input arguments
-if nargin < 4 || nargin > 8
-    error('Incorrect number of input arguments')
-end
+narginchk(4,8);
 
 %% open figures
-is_axes = 0;
 if isempty(fig_num)
     fig = figure; % create new figure with next default index
 else
