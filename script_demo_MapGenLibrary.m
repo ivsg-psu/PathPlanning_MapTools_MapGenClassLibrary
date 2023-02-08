@@ -29,10 +29,10 @@ close all
 clear flag_was_run_before  % Force init to always run?
 
 if ~exist('flag_was_run_before','var')
-    
+
     clc
     close all
-    
+
     % add necessary directories
     addpath([pwd '\Functions'])
     %     addpath([pwd '\GeomClassLibrary\Functions'])
@@ -41,7 +41,7 @@ if ~exist('flag_was_run_before','var')
     %     addpath([pwd '\Map_Generation\polytope_generation'])
     %     addpath([pwd '\Map_Generation\polytope_editing'])
     %     addpath([pwd '\Map_Generation\polytope_calculation'])
-    
+
     flag_was_run_before = 1;
 end
 
@@ -139,12 +139,12 @@ polytopes = fcn_MapGen_mixedSetVoronoiTiling(mixedSet,stretch,fig_num);
 for i=1:100:10000
     fig_num = 21+i;
     figure(fig_num); clf;
-    
+
     Halton_range = [i i+100]; % range of Halton points to use to generate the tiling
     % Halton_range = [1801 1901];
-           
+
     polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
-    
+
     % Do statistics, checking that the area is always fully filled and we
     % get 101 polytopes each time
     temp = fcn_MapGen_polytopesStatistics(...
@@ -175,7 +175,7 @@ trimmed_polytopes = ...
 
 % Shrink to radius
 fig_num = 24;
-des_rad = 0.03; sigma_radius = 0; min_rad = 0.001;
+des_rad = 0.01; sigma_radius = 0; min_rad = 0.001;
 shrunk_polytopes2=fcn_MapGen_polytopesShrinkToRadius(...
     trimmed_polytopes,des_rad,sigma_radius,min_rad,fig_num);
 
@@ -184,9 +184,9 @@ fig_num = 555;
 
 % Generate polytopes from the Halton set
 Halton_range = [5401 5501];
-           
+
 tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
-    
+
 % Grab statistics on original map
 fcn_MapGen_polytopesStatistics(...
     tiled_polytopes,...
@@ -254,7 +254,7 @@ plot_flag = 1; disp_name = [1, 0.05 -0.05, 0.5 0.5 0.5, 10];
 line_style = '-'; line_width = 2; color = [0 0 1];
 axis_limits = [0 1 -0.1 1]; axis_style = 'square';
 fill_info = [1 1 0 1 0.5];
-fig_num = 7; 
+fig_num = 7;
 
 [polytopes,fig]=fcn_MapGen_nameToMap(...
     map_name,...
@@ -291,7 +291,7 @@ tolerance = 0.01;
 cleaned_polytopes = polytopes;
 for ith_poly = 1:length(polytopes)
     cleaned_polytopes(ith_poly) = fcn_MapGen_polytopeRemoveTightVerticies(...
-        polytopes(ith_poly), tolerance);    
+        polytopes(ith_poly), tolerance);
 end
 
 fig_num = 20;

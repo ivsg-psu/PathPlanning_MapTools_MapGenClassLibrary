@@ -70,4 +70,4 @@ for i = 1:length(polytopes)
     polytopes_flattened = [polytopes_flattened,polytopes{i}]
 end
 
-flattened_polytopes = fcn_MapGen_flattenPolytopeMap(polytopes)
+flattened_polytopes = fcn_MapGen_flattenPolytopeMap(polytopes_flattened)
