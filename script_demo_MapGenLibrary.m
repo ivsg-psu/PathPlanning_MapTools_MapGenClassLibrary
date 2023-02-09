@@ -175,7 +175,7 @@ trimmed_polytopes = ...
 
 % Shrink to radius
 fig_num = 24;
-des_rad = 0.01; sigma_radius = 0; min_rad = 0.001;
+des_rad = 0.03; sigma_radius = 0; min_rad = 0.001;
 shrunk_polytopes2=fcn_MapGen_polytopesShrinkToRadius(...
     trimmed_polytopes,des_rad,sigma_radius,min_rad,fig_num);
 
