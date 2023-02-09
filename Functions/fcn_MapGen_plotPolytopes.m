@@ -159,6 +159,7 @@ end
 if fill_info(1) == 1
     for polys = 1:size(polytopes,2)
         filler = fill(polytopes(polys).vertices(:,1)',polytopes(polys).vertices(:,2)',fill_info(2:4));
+        % use polytope shading darkness based on polytope traversal cost
         filler.FaceAlpha = polytopes(polys).cost;
     end
 end

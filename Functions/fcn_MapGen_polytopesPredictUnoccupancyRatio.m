@@ -25,6 +25,7 @@ function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(...
     %
     %     fcn_MapGen_polytopeFindVertexAngles
     %     fcn_MapGen_polytopesStatistics
+    %     fcn_MapGen_polytopesRadiusDistributions
     %
     % EXAMPLES:
     %
@@ -41,7 +42,52 @@ function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(...
     % 2022_01_17
     % -- first written by Steve Harnett
 
-    flag_do_plot = 0;
+    %% Debugging and Input checks
+    flag_check_inputs = 1; % Set equal to 1 to check the input arguments
+    flag_do_plot = 0;      % Set equal to 1 for plotting
+    flag_do_debug = 0;     % Set equal to 1 for debugging
+    if flag_do_debug
+        fig_for_debug = 748;
+        fig_num = 2101;
+        st = dbstack; %#ok<*UNRCH>
+        fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+    end
+
+    %% check input arguments?
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %   _____                   _
+    %  |_   _|                 | |
+    %    | |  _ __  _ __  _   _| |_ ___
+    %    | | | '_ \| '_ \| | | | __/ __|
+    %   _| |_| | | | |_) | |_| | |_\__ \
+    %  |_____|_| |_| .__/ \__,_|\__|___/
+    %              | |
+    %              |_|
+    % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+    if 1 == flag_check_inputs
+
+        % Are there the right number of inputs?
+        if nargin < 3 || nargin > 3
+            error('Incorrect number of input arguments')
+        end
+
+    end
+
+    %% Start of main code
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %   __  __       _
+    %  |  \/  |     (_)
+    %  | \  / | __ _ _ _ __
+    %  | |\/| |/ _` | | '_ \
+    %  | |  | | (_| | | | | |
+    %  |_|  |_|\__,_|_|_| |_|
+    %
+    %See: http://patorjk.com/software/taag/#p=display&f=Big&t=Main
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
+
 
     %% extract necessary stats from polytopes
     pre_shrink_stats = fcn_MapGen_polytopesStatistics(pre_shrink_polytopes);
