@@ -4,7 +4,7 @@ function [all_points, flag_was_intersection] = ...
 % fcn_MapGen_polytopeFindSelfIntersections finds the points where the
 % vertices of a polytope create self-intersections, e.g. where the "walls"
 % of the polytope cross each other. The algorithm returns all the points
-% where this occurs within the vertices, in order. In other works, if
+% where this occurs within the vertices, in order. In other words, if
 % vertex 1 to vertex 2 crosses an edge, then the output would be:
 % [vertex1; crossing; vertex2; (etc)]
 %

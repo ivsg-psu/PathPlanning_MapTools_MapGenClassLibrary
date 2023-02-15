@@ -2,8 +2,8 @@
 % Tests function: fcn_MapGen_mixedSetVoronoiTiling
 
 % REVISION HISTORY:
-% 2021_06_06 
-% -- first written by S. Brennan. 
+% 2021_06_06
+% -- first written by S. Brennan.
 
 %'haltonset','sobolset','lhsdesign','rand','randn'
 
@@ -30,7 +30,7 @@ mixedSet(3).AABB = [1 1 2 2];
 
 polytopes = fcn_MapGen_mixedSetVoronoiTiling(mixedSet,stretch,fig_num);
 
-
+assert(true);
 
 %% Show that the stretch works
 fig_num = 200;

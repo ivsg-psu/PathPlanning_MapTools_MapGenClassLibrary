@@ -108,6 +108,7 @@ kappa = zeros(size(R));
 clear err;
 [err.x, err.y, err.z] = fcn_MapGen_ugvSensorError({R, beta, kappa}, ...
     {0.08, 0.08, 0.08}, {0.03, 0.03, 0.4}, {0.02, -0.05});
+assert(true);
 
 err.R = sqrt(err.x.^2 + err.y.^2);
 

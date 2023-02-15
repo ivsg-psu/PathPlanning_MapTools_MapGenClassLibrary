@@ -8,3 +8,4 @@
 fig_num = 1;
 polytopes = fcn_MapGen_sobolVoronoiTiling([1 1000],[1 1],fig_num);
 
+assert(true);

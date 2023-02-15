@@ -30,3 +30,6 @@ codegen/
 
 # Octave session info
 octave-workspace
+
+# unit test log files
+*script_test_fcn_MapGen_all_stdout.txt

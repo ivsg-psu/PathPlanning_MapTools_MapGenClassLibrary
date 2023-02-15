@@ -1,9 +1,9 @@
 % script_test_fcn_MapGen_generatePolysFromTiling
 % Tests: fcn_MapGen_generatePolysFromTiling
 
-% 
+%
 % REVISION HISTORY:
-% 
+%
 % 2021_07_02 by Sean Brennan
 % -- first write of script
 %%%%%%%%%%%%%%§
@@ -28,3 +28,4 @@ AABB = [0 0 1 1];
 stretch = [1 1];
 polytopes = fcn_MapGen_generatePolysFromTiling(seed_points,V,C,AABB, stretch,fig_num);
 
+assert(true);

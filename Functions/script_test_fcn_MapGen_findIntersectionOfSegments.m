@@ -14,7 +14,7 @@ close all
 fprintf(1,'Simple intersection result: \n');
 wall_start = [0 10];
 wall_end   = [10 10];
-sensor_vector_start = [2 1]; 
+sensor_vector_start = [2 1];
 sensor_vector_end   = [5 15];
 fig_debugging = 2343;
 flag_search_type = 0;
@@ -24,11 +24,14 @@ flag_search_type = 0;
     flag_search_type,fig_debugging);
 print_results(distance,location);
 
+assert(isequal(round(distance,4),9.2043));
+assert(isequal(round(location,4),[3.9286,10]));
+
 %% Simple test 2 - no intersections
 fprintf(1,'No intersection result: \n');
 wall_start = [-4 10];
 wall_end   = [2 10];
-sensor_vector_start = [0 0]; 
+sensor_vector_start = [0 0];
 sensor_vector_end   = [5 12];
 fig_debugging = 2343;
 flag_search_type = 0;
@@ -43,7 +46,7 @@ fprintf(1,'Multiple intersections result: \n');
 wall_start = [0 10; 10 10; 0 6; 10 6];
 wall_end = [10 10; 0 6; 10 6; 0 2];
 
-sensor_vector_start = [0 0]; 
+sensor_vector_start = [0 0];
 sensor_vector_end   = [5 12];
 fig_debugging = 2343;
 flag_search_type = 0;
@@ -57,7 +60,7 @@ print_results(distance,location);
 fprintf(1,'Intersection through a vertex result: \n');
 wall_start = [0 5; 4 5];
 wall_end = [4 5; 8 2];
-sensor_vector_start = [4 0]; 
+sensor_vector_start = [4 0];
 sensor_vector_end   = [4 8];
 flag_search_type = 0;
 [distance,location] = ...
@@ -71,7 +74,7 @@ fprintf(1,'Intersection at start of sensor result: \n');
 path = [0 5; 4 5; 8 2];
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [4 5]; 
+sensor_vector_start = [4 5];
 sensor_vector_end   = [4 8];
 fig_debugging = 2343;
 flag_search_type = 0;
@@ -87,7 +90,7 @@ path = [0 5; 4 5; 8 2];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [4 0]; 
+sensor_vector_start = [4 0];
 sensor_vector_end   = [4 5];
 fig_debugging = 2343;
 flag_search_type = 0;
@@ -110,13 +113,13 @@ print_results(distance,location);
 
 
 
-%% Simple test 7 - identically overlapping colinear 
+%% Simple test 7 - identically overlapping colinear
 fprintf(1,'identically overlapping colinear result: \n');
 path = [0 10; 10 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [0 10]; 
+sensor_vector_start = [0 10];
 sensor_vector_end   = [10 10];
 fig_debugging = 2343;
 flag_search_type = 0;
@@ -133,7 +136,7 @@ path = [0 10; 10 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [-2 10]; 
+sensor_vector_start = [-2 10];
 sensor_vector_end   = [10 10];
 fig_debugging = 2343;
 flag_search_type = 0;
@@ -149,7 +152,7 @@ path = [0 10; 10 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [-2 10]; 
+sensor_vector_start = [-2 10];
 sensor_vector_end   = [5 10];
 fig_debugging = 2343;
 flag_search_type = 0;
@@ -165,7 +168,7 @@ path = [0 10; 10 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [3 10]; 
+sensor_vector_start = [3 10];
 sensor_vector_end   = [5 10];
 fig_debugging = 2343;
 flag_search_type = 0;
@@ -181,7 +184,7 @@ path = [0 10; 10 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [3 10]; 
+sensor_vector_start = [3 10];
 sensor_vector_end   = [15 10];
 fig_debugging = 2343;
 flag_search_type = 0;
@@ -197,7 +200,7 @@ path = [0 10; 10 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [-3 10]; 
+sensor_vector_start = [-3 10];
 sensor_vector_end   = [15 10];
 fig_debugging = 2343;
 flag_search_type = 0;
@@ -213,7 +216,7 @@ path = [0 10; 10 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [-3 10]; 
+sensor_vector_start = [-3 10];
 sensor_vector_end   = [0 10];
 fig_debugging = 2343;
 flag_search_type = 0;
@@ -229,7 +232,7 @@ path = [0 10; 10 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [10 10]; 
+sensor_vector_start = [10 10];
 sensor_vector_end   = [15 10];
 fig_debugging = 2343;
 flag_search_type = 0;
@@ -250,7 +253,7 @@ path = [0 10; 10 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_end = [0 10]; 
+sensor_vector_end = [0 10];
 sensor_vector_start   = [10 10];
 fig_debugging = 2343;
 flag_search_type = 0;
@@ -266,7 +269,7 @@ path = [0 10; 10 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_end = [-2 10]; 
+sensor_vector_end = [-2 10];
 sensor_vector_start   = [10 10];
 fig_debugging = 2343;
 flag_search_type = 0;
@@ -282,7 +285,7 @@ path = [0 10; 10 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_end = [-2 10]; 
+sensor_vector_end = [-2 10];
 sensor_vector_start   = [5 10];
 fig_debugging = 2343;
 flag_search_type = 0;
@@ -298,7 +301,7 @@ path = [0 10; 10 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_end = [3 10]; 
+sensor_vector_end = [3 10];
 sensor_vector_start   = [5 10];
 fig_debugging = 2343;
 flag_search_type = 0;
@@ -314,7 +317,7 @@ path = [0 10; 10 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_end = [3 10]; 
+sensor_vector_end = [3 10];
 sensor_vector_start   = [15 10];
 fig_debugging = 2343;
 flag_search_type = 0;
@@ -330,7 +333,7 @@ path = [0 10; 10 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_end = [-3 10]; 
+sensor_vector_end = [-3 10];
 sensor_vector_start   = [15 10];
 fig_debugging = 2343;
 flag_search_type = 0;
@@ -347,7 +350,7 @@ path = [0 10; 10 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_end = [-3 10]; 
+sensor_vector_end = [-3 10];
 sensor_vector_start   = [0 10];
 fig_debugging = 2343;
 flag_search_type = 0;
@@ -363,7 +366,7 @@ path = [0 10; 10 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_end = [10 10]; 
+sensor_vector_end = [10 10];
 sensor_vector_start   = [15 10];
 fig_debugging = 2343;
 flag_search_type = 0;
@@ -381,7 +384,7 @@ path = [0 10; 10 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [-3 10]; 
+sensor_vector_start = [-3 10];
 sensor_vector_end   = [-1 10];
 fig_debugging = 2343;
 flag_search_type = 0;
@@ -397,7 +400,7 @@ path = [0 10; 10 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [13 10]; 
+sensor_vector_start = [13 10];
 sensor_vector_end   = [15 10];
 fig_debugging = 2343;
 flag_search_type = 0;
@@ -414,7 +417,7 @@ path = [0 5; 4 5; 8 2];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [4 0]; 
+sensor_vector_start = [4 0];
 sensor_vector_end   = [4 2];
 fig_debugging = 2343;
 flag_search_type = 0;
@@ -434,7 +437,7 @@ flag_search_type = 1;
 print_results(distance,location);
 
 % Test the negative condition
-sensor_vector_start = [4 6]; 
+sensor_vector_start = [4 6];
 sensor_vector_end   = [4 8];
 fig_debugging = 2345;
 flag_search_type = 0;
@@ -453,14 +456,14 @@ flag_search_type = 1;
     flag_search_type,fig_debugging);
 print_results(distance,location);
 
-%   __  __       _ _   _ _    _ _ _   
-%  |  \/  |     | | | (_) |  | (_) |  
-%  | \  / |_   _| | |_ _| |__| |_| |_ 
+%   __  __       _ _   _ _    _ _ _
+%  |  \/  |     | | | (_) |  | (_) |
+%  | \  / |_   _| | |_ _| |__| |_| |_
 %  | |\/| | | | | | __| |  __  | | __|
-%  | |  | | |_| | | |_| | |  | | | |_ 
+%  | |  | | |_| | | |_| | |  | | | |_
 %  |_|  |_|\__,_|_|\__|_|_|  |_|_|\__|
-%                                     
-%                                     
+%
+%
 
 
 %% Advanced test 2 - multiple intersections
@@ -469,7 +472,7 @@ path = [0 10; 10 10; 0 6; 10 6; 0 2];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [0 0]; 
+sensor_vector_start = [0 0];
 sensor_vector_end   = [5 12];
 fig_debugging = 23488;
 flag_search_type = 2;
@@ -485,7 +488,7 @@ path = [0 10; 10 10; 0 6; 10 6; 0 2];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [0 0]; 
+sensor_vector_start = [0 0];
 sensor_vector_end   = [0.5 1.2];
 fig_debugging = 23499;
 flag_search_type = 2;
@@ -501,7 +504,7 @@ path = [0 10; 10 10; 0 6; 10 6; 0 2];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [0 0]; 
+sensor_vector_start = [0 0];
 sensor_vector_end   = [2.5 6];
 fig_debugging = 1010;
 flag_search_type = 2;
@@ -513,23 +516,23 @@ print_results(distance,location);
 
 
 
-%   __  __       _ _   _ _    _ _ _    ____                 _                   _             
-%  |  \/  |     | | | (_) |  | (_) |  / __ \               | |                 (_)            
-%  | \  / |_   _| | |_ _| |__| |_| |_| |  | |_   _____ _ __| | __ _ _ __  _ __  _ _ __   __ _ 
+%   __  __       _ _   _ _    _ _ _    ____                 _                   _
+%  |  \/  |     | | | (_) |  | (_) |  / __ \               | |                 (_)
+%  | \  / |_   _| | |_ _| |__| |_| |_| |  | |_   _____ _ __| | __ _ _ __  _ __  _ _ __   __ _
 %  | |\/| | | | | | __| |  __  | | __| |  | \ \ / / _ \ '__| |/ _` | '_ \| '_ \| | '_ \ / _` |
 %  | |  | | |_| | | |_| | |  | | | |_| |__| |\ V /  __/ |  | | (_| | |_) | |_) | | | | | (_| |
 %  |_|  |_|\__,_|_|\__|_|_|  |_|_|\__|\____/  \_/ \___|_|  |_|\__,_| .__/| .__/|_|_| |_|\__, |
 %                                                                  | |   | |             __/ |
-%                                                                  |_|   |_|            |___/ 
+%                                                                  |_|   |_|            |___/
 
 
-%% Advanced Multihit Overlapping test - identically overlapping colinear 
+%% Advanced Multihit Overlapping test - identically overlapping colinear
 fprintf(1,'identically overlapping colinear result: \n');
 path = [0 10; 10 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [0 10]; 
+sensor_vector_start = [0 10];
 sensor_vector_end   = [10 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -547,7 +550,7 @@ path = [0 10; 10 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [-2 10]; 
+sensor_vector_start = [-2 10];
 sensor_vector_end   = [10 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -563,7 +566,7 @@ path = [0 10; 10 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [-2 10]; 
+sensor_vector_start = [-2 10];
 sensor_vector_end   = [5 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -579,7 +582,7 @@ path = [0 10; 10 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [3 10]; 
+sensor_vector_start = [3 10];
 sensor_vector_end   = [5 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -595,7 +598,7 @@ path = [0 10; 10 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [3 10]; 
+sensor_vector_start = [3 10];
 sensor_vector_end   = [15 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -611,7 +614,7 @@ path = [0 10; 10 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [-3 10]; 
+sensor_vector_start = [-3 10];
 sensor_vector_end   = [15 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -627,7 +630,7 @@ path = [0 10; 10 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [-3 10]; 
+sensor_vector_start = [-3 10];
 sensor_vector_end   = [0 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -643,7 +646,7 @@ path = [0 10; 10 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [10 10]; 
+sensor_vector_start = [10 10];
 sensor_vector_end   = [15 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -661,7 +664,7 @@ print_results(distance,location);
 %% Advanced Multihit Overlapping  test 27 - identically overlapping colinear BACKWARDS
 fprintf(1,'identically overlapping colinear BACKWARDS result: \n');
 path = [0 10; 10 10]; wall_start = path(1:end-1,:); wall_end   = path(2:end,:);
-sensor_vector_end = [0 10]; 
+sensor_vector_end = [0 10];
 sensor_vector_start   = [10 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -674,7 +677,7 @@ print_results(distance,location);
 %% Advanced Multihit Overlapping  test 28 - partially overlapping colinear 1 BACKWARDS
 fprintf(1,'Partially overlapping colinear BACKWARDS result: \n');
 path = [0 10; 10 10]; wall_start = path(1:end-1,:); wall_end   = path(2:end,:);
-sensor_vector_end = [-2 10]; 
+sensor_vector_end = [-2 10];
 sensor_vector_start   = [10 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -687,7 +690,7 @@ print_results(distance,location);
 %% Advanced Multihit Overlapping  test 29 - partially overlapping colinear 1 BACKWARDS
 fprintf(1,'Partially overlapping colinear BACKWARDS result: \n');
 path = [0 10; 10 10]; wall_start = path(1:end-1,:); wall_end   = path(2:end,:);
-sensor_vector_end = [-2 10]; 
+sensor_vector_end = [-2 10];
 sensor_vector_start   = [5 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -700,7 +703,7 @@ print_results(distance,location);
 %% Advanced Multihit Overlapping  test 30 - partially overlapping colinear 1 BACKWARDS
 fprintf(1,'Partially overlapping colinear BACKWARDS result: \n');
 path = [0 10; 10 10]; wall_start = path(1:end-1,:); wall_end   = path(2:end,:);
-sensor_vector_end = [3 10]; 
+sensor_vector_end = [3 10];
 sensor_vector_start   = [5 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -713,7 +716,7 @@ print_results(distance,location);
 %% Advanced Multihit Overlapping  test 31 - partially overlapping colinear 1 BACKWARDS
 fprintf(1,'Partially overlapping colinear BACKWARDS result: \n');
 path = [0 10; 10 10]; wall_start = path(1:end-1,:); wall_end   = path(2:end,:);
-sensor_vector_end = [3 10]; 
+sensor_vector_end = [3 10];
 sensor_vector_start   = [15 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -726,7 +729,7 @@ print_results(distance,location);
 %% Advanced Multihit Overlapping  test 32 - super overlapping colinear 1 BACKWARDS
 fprintf(1,'Super overlapping colinear BACKWARDS result: \n');
 path = [0 10; 10 10]; wall_start = path(1:end-1,:); wall_end   = path(2:end,:);
-sensor_vector_end = [-3 10]; 
+sensor_vector_end = [-3 10];
 sensor_vector_start   = [15 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -740,7 +743,7 @@ print_results(distance,location);
 %% Advanced Multihit Overlapping  test 33 - end overlapping colinear 1 BACKWARDS
 fprintf(1,'End overlapping colinear result: \n');
 path = [0 10; 10 10]; wall_start = path(1:end-1,:); wall_end   = path(2:end,:);
-sensor_vector_end = [-3 10]; 
+sensor_vector_end = [-3 10];
 sensor_vector_start   = [0 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -753,7 +756,7 @@ print_results(distance,location);
 %% Advanced Multihit Overlapping  test 34 - end overlapping colinear 2 BACKWARDS
 fprintf(1,'End overlapping colinear BACKWARDS result: \n');
 path = [0 10; 10 10]; wall_start = path(1:end-1,:); wall_end   = path(2:end,:);
-sensor_vector_end = [10 10]; 
+sensor_vector_end = [10 10];
 sensor_vector_start   = [15 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -768,7 +771,7 @@ print_results(distance,location);
 %% Advanced Multihit Overlapping  test 15 - non overlapping colinear 1
 fprintf(1,'Non overlapping colinear result: \n');
 path = [0 10; 10 10]; wall_start = path(1:end-1,:); wall_end   = path(2:end,:);
-sensor_vector_start = [-3 10]; 
+sensor_vector_start = [-3 10];
 sensor_vector_end   = [-1 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -781,7 +784,7 @@ print_results(distance,location);
 %% Advanced Multihit Overlapping  test 15 - non overlapping colinear 2
 fprintf(1,'Non overlapping colinear result: \n');
 path = [0 10; 10 10]; wall_start = path(1:end-1,:); wall_end   = path(2:end,:);
-sensor_vector_start = [13 10]; 
+sensor_vector_start = [13 10];
 sensor_vector_end   = [15 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -793,23 +796,23 @@ print_results(distance,location);
 
 
 
-%   __  __       _ _   _ _    _ _ _   __  __       _ _ _   _____      _   _     
-%  |  \/  |     | | | (_) |  | (_) | |  \/  |     | (_) | |  __ \    | | | |    
-%  | \  / |_   _| | |_ _| |__| |_| |_| \  / |_   _| |_| |_| |__) |_ _| |_| |__  
-%  | |\/| | | | | | __| |  __  | | __| |\/| | | | | | | __|  ___/ _` | __| '_ \ 
+%   __  __       _ _   _ _    _ _ _   __  __       _ _ _   _____      _   _
+%  |  \/  |     | | | (_) |  | (_) | |  \/  |     | (_) | |  __ \    | | | |
+%  | \  / |_   _| | |_ _| |__| |_| |_| \  / |_   _| |_| |_| |__) |_ _| |_| |__
+%  | |\/| | | | | | __| |  __  | | __| |\/| | | | | | | __|  ___/ _` | __| '_ \
 %  | |  | | |_| | | |_| | |  | | | |_| |  | | |_| | | | |_| |  | (_| | |_| | | |
 %  |_|  |_|\__,_|_|\__|_|_|  |_|_|\__|_|  |_|\__,_|_|_|\__|_|   \__,_|\__|_| |_|
-%                                                                               
-%                                                                               
+%
+%
 
 
-%% Advanced Multihit Overlapping test - identically overlapping colinear 
+%% Advanced Multihit Overlapping test - identically overlapping colinear
 fprintf(1,'identically overlapping colinear result: \n');
 path = [0 10; 10 10; 12 8; 14 10; 15 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [0 10]; 
+sensor_vector_start = [0 10];
 sensor_vector_end   = [10 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -821,11 +824,11 @@ print_more_results(distance,location,path_segments);
 
 %% Advanced Multihit Overlapping  test 8 - partially overlapping colinear 1
 fprintf(1,'Partially overlapping colinear result: \n');
-path = [0 10; 10 10; 12 8; 14 10; 15 10]; 
+path = [0 10; 10 10; 12 8; 14 10; 15 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [-2 10]; 
+sensor_vector_start = [-2 10];
 sensor_vector_end   = [10 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -837,11 +840,11 @@ print_more_results(distance,location,path_segments);
 
 %% Advanced Multihit Overlapping  test 9 - partially overlapping colinear 1
 fprintf(1,'Partially overlapping colinear result: \n');
-path = [0 10; 10 10; 12 8; 14 10; 15 10]; 
+path = [0 10; 10 10; 12 8; 14 10; 15 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [-2 10]; 
+sensor_vector_start = [-2 10];
 sensor_vector_end   = [5 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -853,11 +856,11 @@ print_more_results(distance,location,path_segments);
 
 %% Advanced Multihit Overlapping  test 10 - partially overlapping colinear 1
 fprintf(1,'Partially overlapping colinear result: \n');
-path = [0 10; 10 10; 12 8; 14 10; 15 10]; 
+path = [0 10; 10 10; 12 8; 14 10; 15 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [3 10]; 
+sensor_vector_start = [3 10];
 sensor_vector_end   = [5 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -869,11 +872,11 @@ print_more_results(distance,location,path_segments);
 
 %% Advanced Multihit Overlapping  test 11 - partially overlapping colinear 1
 fprintf(1,'Partially overlapping colinear result: \n');
-path = [0 10; 10 10; 12 8; 14 10; 15 10]; 
+path = [0 10; 10 10; 12 8; 14 10; 15 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [3 10]; 
+sensor_vector_start = [3 10];
 sensor_vector_end   = [15 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -885,11 +888,11 @@ print_more_results(distance,location,path_segments);
 
 %% Advanced Multihit Overlapping  test 12 - super overlapping colinear 1
 fprintf(1,'Super overlapping colinear result: \n');
-path = [0 10; 10 10; 12 8; 14 10; 15 10];  
+path = [0 10; 10 10; 12 8; 14 10; 15 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [-3 10]; 
+sensor_vector_start = [-3 10];
 sensor_vector_end   = [15 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -901,11 +904,11 @@ print_more_results(distance,location,path_segments);
 
 %% Advanced Multihit Overlapping  test 13 - end overlapping colinear 1
 fprintf(1,'End overlapping colinear result: \n');
-path = [0 10; 10 10; 12 8; 14 10; 15 10]; 
+path = [0 10; 10 10; 12 8; 14 10; 15 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [-3 10]; 
+sensor_vector_start = [-3 10];
 sensor_vector_end   = [0 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -917,11 +920,11 @@ print_more_results(distance,location,path_segments);
 
 %% Advanced Multihit Overlapping  test 14 - end overlapping colinear 2
 fprintf(1,'End overlapping colinear result: \n');
-path = [0 10; 10 10; 12 8; 14 10; 15 10]; 
+path = [0 10; 10 10; 12 8; 14 10; 15 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [10 10]; 
+sensor_vector_start = [10 10];
 sensor_vector_end   = [15 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -938,11 +941,11 @@ print_more_results(distance,location,path_segments);
 
 %% Advanced Multihit Overlapping  test 27 - identically overlapping colinear BACKWARDS
 fprintf(1,'identically overlapping colinear BACKWARDS result: \n');
-path = [0 10; 10 10; 12 8; 14 10; 15 10];  
+path = [0 10; 10 10; 12 8; 14 10; 15 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_end = [0 10]; 
+sensor_vector_end = [0 10];
 sensor_vector_start   = [10 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -954,11 +957,11 @@ print_more_results(distance,location,path_segments);
 
 %% Advanced Multihit Overlapping  test 28 - partially overlapping colinear 1 BACKWARDS
 fprintf(1,'Partially overlapping colinear BACKWARDS result: \n');
-path = [0 10; 10 10; 12 8; 14 10; 15 10]; 
+path = [0 10; 10 10; 12 8; 14 10; 15 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_end = [-2 10]; 
+sensor_vector_end = [-2 10];
 sensor_vector_start   = [10 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -970,11 +973,11 @@ print_more_results(distance,location,path_segments);
 
 %% Advanced Multihit Overlapping  test 29 - partially overlapping colinear 1 BACKWARDS
 fprintf(1,'Partially overlapping colinear BACKWARDS result: \n');
-path = [0 10; 10 10; 12 8; 14 10; 15 10];  
+path = [0 10; 10 10; 12 8; 14 10; 15 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_end = [-2 10]; 
+sensor_vector_end = [-2 10];
 sensor_vector_start   = [5 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -986,11 +989,11 @@ print_more_results(distance,location,path_segments);
 
 %% Advanced Multihit Overlapping  test 30 - partially overlapping colinear 1 BACKWARDS
 fprintf(1,'Partially overlapping colinear BACKWARDS result: \n');
-path = [0 10; 10 10; 12 8; 14 10; 15 10];  
+path = [0 10; 10 10; 12 8; 14 10; 15 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_end = [3 10]; 
+sensor_vector_end = [3 10];
 sensor_vector_start   = [5 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -1002,11 +1005,11 @@ print_more_results(distance,location,path_segments);
 
 %% Advanced Multihit Overlapping  test 31 - partially overlapping colinear 1 BACKWARDS
 fprintf(1,'Partially overlapping colinear BACKWARDS result: \n');
-path = [0 10; 10 10; 12 8; 14 10; 15 10]; 
+path = [0 10; 10 10; 12 8; 14 10; 15 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_end = [3 10]; 
+sensor_vector_end = [3 10];
 sensor_vector_start   = [15 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -1018,11 +1021,11 @@ print_more_results(distance,location,path_segments);
 
 %% Advanced Multihit Overlapping  test 32 - super overlapping colinear 1 BACKWARDS
 fprintf(1,'Super overlapping colinear BACKWARDS result: \n');
-path = [0 10; 10 10; 12 8; 14 10; 15 10]; 
+path = [0 10; 10 10; 12 8; 14 10; 15 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_end = [-3 10]; 
+sensor_vector_end = [-3 10];
 sensor_vector_start   = [15 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -1035,11 +1038,11 @@ print_more_results(distance,location,path_segments);
 
 %% Advanced Multihit Overlapping  test 33 - end overlapping colinear 1 BACKWARDS
 fprintf(1,'End overlapping colinear result: \n');
-path = [0 10; 10 10; 12 8; 14 10; 15 10];  
+path = [0 10; 10 10; 12 8; 14 10; 15 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_end = [-3 10]; 
+sensor_vector_end = [-3 10];
 sensor_vector_start   = [0 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -1051,11 +1054,11 @@ print_more_results(distance,location,path_segments);
 
 %% Advanced Multihit Overlapping  test 34 - end overlapping colinear 2 BACKWARDS
 fprintf(1,'End overlapping colinear BACKWARDS result: \n');
-path = [0 10; 10 10; 12 8; 14 10; 15 10];  
+path = [0 10; 10 10; 12 8; 14 10; 15 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_end = [10 10]; 
+sensor_vector_end = [10 10];
 sensor_vector_start   = [15 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -1069,11 +1072,11 @@ print_more_results(distance,location,path_segments);
 
 %% Advanced Multihit Overlapping  test 15 - non overlapping colinear 1
 fprintf(1,'Non overlapping colinear result: \n');
-path = [0 10; 10 10; 12 8; 14 10; 15 10];  
+path = [0 10; 10 10; 12 8; 14 10; 15 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [-3 10]; 
+sensor_vector_start = [-3 10];
 sensor_vector_end   = [-1 10];
 fig_debugging = 2343;
 flag_search_type = 2;
@@ -1085,11 +1088,11 @@ print_more_results(distance,location,path_segments);
 
 %% Advanced Multihit Overlapping  test 15 - non overlapping colinear 2
 fprintf(1,'Non overlapping colinear result: \n');
-path = [0 10; 10 10; 12 8; 14 10; 15 10];  
+path = [0 10; 10 10; 12 8; 14 10; 15 10];
 
 wall_start = path(1:end-1,:);
 wall_end   = path(2:end,:);
-sensor_vector_start = [13 10]; 
+sensor_vector_start = [13 10];
 sensor_vector_end   = [15 10];
 fig_debugging = 2343;
 flag_search_type = 2;

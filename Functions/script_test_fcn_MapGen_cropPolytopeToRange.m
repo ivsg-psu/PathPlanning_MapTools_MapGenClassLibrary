@@ -8,6 +8,7 @@ interior_point = [0 0];
 AABB = [0 0 1 1];
 [cropped_vertices] = fcn_MapGen_cropPolytopeToRange(verticies,interior_point,AABB,fig_num);
 
+assert(isequal(round(cropped_vertices,4),[0,0;0.5000,0;0.5000,0.5000;0,0.5000;0,0]));
 
 %% Test case 2: simple triangle
 fig_num = 2;

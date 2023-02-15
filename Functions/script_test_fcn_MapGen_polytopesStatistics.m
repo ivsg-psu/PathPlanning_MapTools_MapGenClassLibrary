@@ -1,9 +1,9 @@
 % script_test_fcn_MapGen_polytopesStatistics
 % Tests: fcn_MapGen_polytopesStatistics
 
-% 
+%
 % REVISION HISTORY:
-% 
+%
 % 2021_07_12 by Sean Brennan
 % -- first write of script
 %%%%%%%%%%%%%%§
@@ -12,10 +12,10 @@ close all;
 
 % Generate a set of polytopes from the Halton set
 fig_num = 12;
-Halton_range = [200 301]; % range of Halton points to use to generate the tiling
+Halton_range = [200 3001]; % range of Halton points to use to generate the tiling
 polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1]);
 
-fcn_MapGen_polytopesStatistics(...
+pre_shrink_stats = fcn_MapGen_polytopesStatistics(...
     polytopes,...
     fig_num);
 
@@ -58,5 +58,3 @@ h_plot = subplot(2,3,1);
 hold on;
 line_width = 2;
 fcn_MapGen_plotPolytopes(polytopes,h_plot,'r',line_width);
-
-

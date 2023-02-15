@@ -16,9 +16,11 @@
 % 2021_07_12
 % -- Added ability to determine generic map statistics via the function:
 % fcn_MapGen_polytopesStatistics
-
+% 2023_01_15
+% -- Added demo of edge-based shrinking
 
 % TO-DO:
+% -- add debug library utility, and switch functions to this
 % -- add functions that, given a map, give core statistics (look out limit, linear density, etc - basically make functions to calculate all the pi-values and interpretations we might need)
 % -- add prior work on grid-based map generation
 
@@ -49,6 +51,17 @@ end
 Twocolumn_of_numbers_test = [4 1; 3 0; 2 5];
 fcn_MapGen_checkInputsToFunctions(Twocolumn_of_numbers_test, '2column_of_numbers');
 
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%    _____ _             _        _____      _       _                    ____                       _   _                 
+%   / ____(_)           | |      |  __ \    | |     | |                  / __ \                     | | (_)                
+%  | (___  _ _ __   __ _| | ___  | |__) |__ | |_   _| |_ ___  _ __   ___| |  | |_ __   ___ _ __ __ _| |_ _  ___  _ __  ___ 
+%   \___ \| | '_ \ / _` | |/ _ \ |  ___/ _ \| | | | | __/ _ \| '_ \ / _ \ |  | | '_ \ / _ \ '__/ _` | __| |/ _ \| '_ \/ __|
+%   ____) | | | | | (_| | |  __/ | |  | (_) | | |_| | || (_) | |_) |  __/ |__| | |_) |  __/ | | (_| | |_| | (_) | | | \__ \
+%  |_____/|_|_| |_|\__, |_|\___| |_|   \___/|_|\__, |\__\___/| .__/ \___|\____/| .__/ \___|_|  \__,_|\__|_|\___/|_| |_|___/
+%                   __/ |                       __/ |        | |               | |                                         
+%                  |___/                       |___/         |_|               |_|                                         
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Show how to check if points are within an Axis-Aligned Bounding Box
 AABB = [0 0 1 1]; % Define the axis-aligned bounding box
@@ -56,9 +69,60 @@ test_points = randn(100,2);
 fig_num = 1;
 isInside = fcn_MapGen_isWithinABBB(AABB,test_points,fig_num);
 
+%% Show how to plot a polytope
 
+%% Show how we calculate the polytope centroid and area
+% Note: this does NOT have to be a convex polytope, as the example shows.
+% Copied from script_test_fcn_MapGen_polytopeCentroidAndArea
+% Tests: fcn_MapGen_polytopeCentroidAndArea
+
+fig_num = 2;
+
+x = [3; 4; 2; -1; -2; -3; -4; -2; 1; 2; 3];
+y = [1; 2; 2; 3; 2; -1; -2; -3; -3; -2; 1];
+[Centroid,Area] = fcn_MapGen_polytopeCentroidAndArea([x,y],fig_num);
+
+assert(isequal(round(Centroid,4),[-0.1462,-0.2222]));
+assert(isequal(round(Area,4),28.5));
+
+figure(2);
+plot(x,y,'g-','linewidth',2)
+hold on
+plot(Centroid(:,1),Centroid(:,2),'kx','linewidth',1);
+
+
+%% Show how, if we have only the vertices of a polytope, we can calculate all other fields 
+% Also shows how to plot the polytopes
+% Copied from script_test_fcn_MapGen_fillPolytopeFieldsFromVerticies
+% Tests fcn_MapGen_fillPolytopeFieldsFromVerticies
+% Given a polytoope structure array where the vertices field is filled, 
+% calculates the values for all the other fields.
+
+
+fig_num = 3;
+clear polytopes
+polytopes(1).vertices = [0 0; 4 2; 2 4; 0 0];
+polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes);
+line_width = 3;
+fcn_MapGen_plotPolytopes(polytopes,fig_num,'r-',line_width);
+
+
+
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%   _____      _       _                   ______ _      _     _  ____                       _   _                 
+%  |  __ \    | |     | |                 |  ____(_)    | |   | |/ __ \                     | | (_)                
+%  | |__) |__ | |_   _| |_ ___  _ __   ___| |__   _  ___| | __| | |  | |_ __   ___ _ __ __ _| |_ _  ___  _ __  ___ 
+%  |  ___/ _ \| | | | | __/ _ \| '_ \ / _ \  __| | |/ _ \ |/ _` | |  | | '_ \ / _ \ '__/ _` | __| |/ _ \| '_ \/ __|
+%  | |  | (_) | | |_| | || (_) | |_) |  __/ |    | |  __/ | (_| | |__| | |_) |  __/ | | (_| | |_| | (_) | | | \__ \
+%  |_|   \___/|_|\__, |\__\___/| .__/ \___|_|    |_|\___|_|\__,_|\____/| .__/ \___|_|  \__,_|\__|_|\___/|_| |_|___/
+%                 __/ |        | |                                     | |                                         
+%                |___/         |_|                                     |_|                                         
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 %% Show how to generate polytopes from a tiling
+% Demos fcn_MapGen_generatePolysFromTiling
+% and script_test_fcn_MapGen_generatePolysFromTiling
 fig_num = 10;
 
 % pull halton set
@@ -136,7 +200,7 @@ polytopes = fcn_MapGen_mixedSetVoronoiTiling(mixedSet,stretch,fig_num);
 
 
 %% Generate many test sets of polytopes from the Halton set
-for i=1:100:10000
+for i=1:100:500
     fig_num = 21+i;
     figure(fig_num); clf;
     
@@ -155,24 +219,34 @@ for i=1:100:10000
     pause(0.1);
 end
 
-%% Show how the maps can be trimmed, shrunk, etc
+%% Show how the maps can be trimmed to a box
+
+% Generate polytopes from the Halton set
+Halton_range = [5401 5501];
+
+fig_num = 31;
+tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
+    
+fig_num = 32;
 fcn_MapGen_polytopesStatistics(...
     tiled_polytopes,...
-    fig_num+1);
+    fig_num);
 
 % Plot the polytopes
-fig_num = 22;
+fig_num = 33;
 line_width = 2;
 axis_limits = [0 1 0 1];
 fcn_MapGen_plotPolytopes(tiled_polytopes,fig_num,'r',line_width,axis_limits);
 
 % remove the edge polytopes that extend on or past the high and low points
-fig_num = 23;
+fig_num = 34;
 xlow = 0.01; xhigh = 0.99; ylow = 0.01; yhigh = 0.99;
 bounding_box = [xlow ylow; xhigh yhigh];
 trimmed_polytopes = ...
     fcn_MapGen_polytopeCropEdges(tiled_polytopes,bounding_box,fig_num);
 
+
+%% Show how the polytopes can be shrunk to a specified radius
 % Shrink to radius
 fig_num = 24;
 des_rad = 0.03; sigma_radius = 0; min_rad = 0.001;

@@ -29,6 +29,8 @@ shrunk_polytope =...
     fcn_MapGen_polytopeShrinkToRadius(...
     shrinker,des_rad,tolerance,fig_num);
 
+assert(isequal(round(shrunk_polytope.max_radius,4),round(orig_radius*ratio,4)));
+
 %% Iterative example of uniform shrinking
 fig_num = 2;
 orig_radius = shrinker.max_radius;
@@ -63,4 +65,3 @@ end
 
 % plot the last output polytope in black
 fcn_MapGen_plotPolytopes(shrunk_polytope,fig_num,'k.',2);
-  

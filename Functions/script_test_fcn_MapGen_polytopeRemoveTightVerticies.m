@@ -1,9 +1,9 @@
 % script_test_fcn_MapGen_polytopeRemoveTightVerticies
 % Tests: fcn_MapGen_polytopeRemoveTightVerticies
 
-% 
+%
 % REVISION HISTORY:
-% 
+%
 % 2021_07_02 by Sean Brennan
 % -- first write of script
 %%%%%%%%%%%%%%§
@@ -68,7 +68,13 @@ for ith_ratio = 1:length(ratios)
     pause(0.01);
 end
 
+% make some assertion tests based on expectations of the last cleaned polytope
+assert(isequal(round(cleaned_polytope.distances,4),[0;0;0]));
+assert(isnan(cleaned_polytope.mean(1)));
+assert(isequal(cleaned_polytope.area,0));
+assert(isnan(cleaned_polytope.max_radius));
+
 % plot the last output polytope in black
 fcn_MapGen_plotPolytopes(shrunk_polytope,fig_num,'k.',2);
-  
+
 

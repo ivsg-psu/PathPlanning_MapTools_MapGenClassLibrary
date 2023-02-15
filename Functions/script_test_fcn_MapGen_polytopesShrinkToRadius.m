@@ -20,6 +20,8 @@ des_rad = 0.05; sigma_radius = 0; min_rad = 0.001;
 shrunk_polytopes1=...
     fcn_MapGen_polytopesShrinkToRadius(...
     trim_polytopes,des_rad,sigma_radius,min_rad,fig_num);
+field_stats = fcn_MapGen_polytopesStatistics(shrunk_polytopes1);
+assert(isequal(round(field_stats.average_max_radius,4),round(des_rad,4)));
 
 %% Basic example of non-uniform shrinking
 fig_num = 3;

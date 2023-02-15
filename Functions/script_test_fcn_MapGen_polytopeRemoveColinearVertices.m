@@ -24,8 +24,12 @@ interior_point = [0.5 0.5];
     vertices_with_self_intersects(2:end,:),...
     fig_num);
 
-fig_num = 12;
+assert(isequal(round(projected_points,4),[0,0; 0,0; 1,0; 0.75,0.75; 0.6667,1; 0.6667,1; 0.5,1; 0,1]));
+
+    fig_num = 12;
 [cropped_vertices] = ...
     fcn_MapGen_polytopeRemoveColinearVertices(...,
     projected_points,...
     fig_num);
+
+assert(isequal(round(cropped_vertices,4),[0,0; 1,0; 0.75,0.75; 0.6667,1; 0,1]));

@@ -63,9 +63,9 @@ varargin...
 % -- fill in to-do items here.
 
 %% Debugging and Input checks
-flag_check_inputs = 1; % Set equal to 1 to check the input arguments 
-flag_do_plot = 0;      % Set equal to 1 for plotting 
-flag_do_debug = 0;     % Set equal to 1 for debugging 
+flag_check_inputs = 1; % Set equal to 1 to check the input arguments
+flag_do_plot = 0;      % Set equal to 1 for plotting
+flag_do_debug = 0;     % Set equal to 1 for debugging
 
 if flag_do_debug
     fig_for_debug = 3;
@@ -134,8 +134,9 @@ end
 filled_polytopes = polytopes;
 num_poly = length(polytopes);
 
-for ith_poly = 1:num_poly % pull each polytope
-    
+% Loop over each polytope, filling in data for each
+for ith_poly = 1:num_poly 
+
     % adjust polytopes
     filled_polytopes(ith_poly).xv        = (polytopes(ith_poly).vertices(1:end-1,1)');
     filled_polytopes(ith_poly).yv        = (polytopes(ith_poly).vertices(1:end-1,2)');
@@ -153,8 +154,12 @@ for ith_poly = 1:num_poly % pull each polytope
         ones(length(filled_polytopes(ith_poly).xv),1)*filled_polytopes(ith_poly).mean).^2,2).^0.5;
     filled_polytopes(ith_poly).max_radius = ...
         max(radii);
-end
-
+    filled_polytopes(ith_poly).min_radius = ...
+        min(radii);
+    filled_polytopes(ith_poly).mean_radius = ...
+        mean(radii);
+    filled_polytopes(ith_poly).radii = radii;
+    filled_polytopes(ith_poly).cost = rand;
 %§
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
