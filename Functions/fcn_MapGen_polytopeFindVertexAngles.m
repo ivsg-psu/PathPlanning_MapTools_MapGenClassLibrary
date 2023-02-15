@@ -14,7 +14,7 @@ function [angles, unit_in_vectors, unit_out_vectors] = ...
 % this is given by INSIDE = pi - OUTSIDE.
 %
 % FORMAT:
-% 
+%
 % [angles, unit_in_vectors, unit_out_vectors] = ...
 %     fcn_MapGen_polytopeFindVertexAngles(...
 %     vertices,...
@@ -23,7 +23,7 @@ function [angles, unit_in_vectors, unit_out_vectors] = ...
 % INPUTS:
 %
 %     vertices: N x 2 vector of vertices, in [x y] format
-%   
+%
 %    (OPTIONAL INPUTS)
 %
 %     fig_num: a figure number to plot results.
@@ -32,25 +32,21 @@ function [angles, unit_in_vectors, unit_out_vectors] = ...
 %
 %     angles: an Nx1 column of angles, one for each vertex. Returns NaN if
 %     polytope is degenerate, e.g. a single repeating point.
-<<<<<<< HEAD
-%  
-=======
 %
->>>>>>> origin/steveh/documentation_updates
 %     unit_in_vectors: the Nx2 matrix of unit vectors leading into each vertex
-%  
+%
 %     unit_out_vectors: the Nx2 matrix of unit vectors leading out of each vertex
-%   
+%
 % DEPENDENCIES:
-% 
+%
 %     fcn_MapGen_checkInputsToFunctions
-% 
+%
 % EXAMPLES:
 %
 % For additional examples, see: script_test_fcn_MapGen_polytopeFindVertexAngles
 %
 % This function was written on 2021_08_01 by S. Brennan
-% Questions or comments? sbrennan@psu.edu 
+% Questions or comments? sbrennan@psu.edu
 %
 
 % Revision History:
@@ -85,19 +81,19 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
+
 if flag_check_inputs
     % Are there the right number of inputs?
     if nargin < 1 || nargin > 2
         error('Incorrect number of input arguments')
     end
-    
+
     % Check the vertices input
     fcn_MapGen_checkInputsToFunctions(...
         vertices, '2column_of_numbers');
-    
+
 end
-    
+
 
 % Does user want to show the plots?
 if  2== nargin
@@ -159,14 +155,14 @@ angles(1:Nangles,1)  = angles_dot.*sign(angles_cross);
 
 %% Plot results?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____       _                 
-%  |  __ \     | |                
-%  | |  | | ___| |__  _   _  __ _ 
+%   _____       _
+%  |  __ \     | |
+%  | |  | | ___| |__  _   _  __ _
 %  | |  | |/ _ \ '_ \| | | |/ _` |
 %  | |__| |  __/ |_) | |_| | (_| |
 %  |_____/ \___|_.__/ \__,_|\__, |
 %                            __/ |
-%                           |___/ 
+%                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if flag_do_plot
@@ -175,14 +171,14 @@ if flag_do_plot
     grid on;
     hold on
     axis equal;
-    
+
     % Plot the polytope in red
     plot(vertices(:,1),vertices(:,2),'r-','Linewidth',2);
 
     % Find size of vertices
     size = max(max(vertices)) - min(min(vertices));
     nudge = size*0.01;
-    
+
     % Label the vertices
     for ith_angle = 1:Nangles
         ith_vertex = ith_angle;
@@ -193,7 +189,7 @@ if flag_do_plot
 end
 
 if flag_do_debug
-    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file); 
+    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
 end
 
 end % Ends function
@@ -201,14 +197,14 @@ end % Ends function
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   ______                _   _                 
-%  |  ____|              | | (_)                
-%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___ 
+%   ______                _   _
+%  |  ____|              | | (_)
+%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___
 %  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
 %  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
 %  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
-%                                               
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                                               
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 %% Calculate cross products

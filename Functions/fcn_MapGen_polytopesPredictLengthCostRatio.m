@@ -102,21 +102,6 @@ function [field_small_choice_angles,field_big_choice_angles,r_lc_estimates] =...
     field_small_choice_angles = [];
     field_big_choice_angles = [];
     field_chosen_side_length = [];
-<<<<<<< HEAD
-    % initialize path for iterative solution
-    path = NaN(1,2);
-    iterative_chosen_side_lengths = [];
-    iterative_small_choice_angles = [];
-    start_not_found = true;
-    % begin looping through polytopes in a field
-    for j=1:length(tiled_polytopes)
-        shrinker = tiled_polytopes(j);
-        [angles, unit_in_vectors, unit_out_vectors] =...
-            fcn_MapGen_polytopeFindVertexAngles(...
-            shrinker.vertices,fig_num);
-        assert(1000*eps>abs(360-sum(angles)*180/pi));
-        vertices = shrinker.vertices;
-=======
     for j=1:length(polytopes)
         shrinker = polytopes(j);
         vertices = shrinker.vertices;
@@ -129,7 +114,6 @@ function [field_small_choice_angles,field_big_choice_angles,r_lc_estimates] =...
             fcn_MapGen_polytopeFindVertexAngles(...
             vertices);
         end
->>>>>>> origin/steveh/documentation_updates
         mean_vectors = (unit_out_vectors-unit_in_vectors)/2;
         length_mean_vectors = sum(mean_vectors.^2,2).^0.5;
         unit_direction_of_cut = mean_vectors./length_mean_vectors;

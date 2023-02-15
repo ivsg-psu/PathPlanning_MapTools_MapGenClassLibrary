@@ -11,70 +11,6 @@ flag_check_inputs = 1; % Set equal to 1 to check the input arguments
 flag_do_plot = 0;      % Set equal to 1 for plotting
 flag_do_debug = 0;     % Set equal to 1 for debugging
 
-<<<<<<< HEAD
-do_single_test = false;
-if do_single_test
-    Halton_range = [1 20];
-    tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
-    % field_stats = fcn_MapGen_polytopesStatistics(tiled_polytopes);
-    % gap_size = 0;
-    % [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse] = fcn_MapGen_polytopesPredictLengthCostRatio(tiled_polytopes,gap_size)
-    field_stats = fcn_MapGen_polytopesStatistics(tiled_polytopes);
-    radii_goals = field_stats.average_max_radius*.40
-    des_rad = radii_goals; sigma_radius = 0; min_rad = 0.001;
-    [shrunk_field,mu_final,sigma_final] = fcn_MapGen_polytopesShrinkToRadius(tiled_polytopes,des_rad,sigma_radius,min_rad,fig_num);
-    field_stats = fcn_MapGen_polytopesStatistics(shrunk_field);
-    gap_size = field_stats.average_gap_size_G_bar;
-    r_D = field_stats.avg_r_D;
-    [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse_worst,r_lc_sparse_average,r_lc_sparse_std] = fcn_MapGen_polytopesPredictLengthCostRatio(shrunk_field,gap_size)
-end
-
-do_range_test = true;
-if do_range_test
-    % begin r_D range generation
-    r_D = [];
-    r_lc_max_all = [];
-    r_lc_avg_all = [];
-    r_lc_iterative_all = [];
-    r_lc_max_effective_all = [];
-    r_lc_avg_effective_all = [];
-    r_lc_iterative_effective_all = [];
-    r_lc_sparse_worst_all = [];
-    r_lc_sparse_average_all = [];
-    r_lc_sparse_std_all= [];
-    shrink_distance = [];
-    tiles_failed = [];
-    size_percent_failed = [];
-    for tiles=100%25:25:25%25:25:125%10:80:500
-        Halton_range = [1 tiles]; % range of Halton points to use to generate the tiling
-        tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
-        title('Halton set');
-        fig_num = fig_num+1;
-        % find r_D for this field
-        field_stats = fcn_MapGen_polytopesStatistics(tiled_polytopes);
-        field_avg_r_D = field_stats.avg_r_D;
-        r_D = [r_D, field_avg_r_D];
-        gap_size = 0;
-        [r_lc_max,r_lc_avg,r_lc_iterative,r_lc_max_effective,r_lc_avg_effective,r_lc_iterative_effective,r_lc_sparse_worst,r_lc_sparse_average,r_lc_sparse_std] = fcn_MapGen_polytopesPredictLengthCostRatio(tiled_polytopes,gap_size)
-        r_lc_max_all = [r_lc_max_all, r_lc_max];
-        r_lc_max_effective_all = [r_lc_max_effective_all, r_lc_max_effective];
-        r_lc_avg_all = [r_lc_avg_all, r_lc_avg];
-        r_lc_avg_effective_all = [r_lc_avg_effective_all, r_lc_avg_effective];
-        r_lc_iterative_all = [r_lc_iterative_all, r_lc_iterative];
-        r_lc_iterative_effective_all = [r_lc_iterative_effective_all, r_lc_iterative_effective];
-        r_lc_sparse_worst_all = [r_lc_sparse_worst_all, r_lc_sparse_worst];
-        r_lc_sparse_average_all = [r_lc_sparse_average_all, r_lc_sparse_average];
-        r_lc_sparse_std_all = [r_lc_sparse_std_all, r_lc_sparse_std];
-        shrink_distance = [shrink_distance, 0];
-        % for radii_goals=0.25%0.02:0.02:0.1%0.001:0.010:0.1
-        sd_radius_values = [0, 0.01, 0.02, 0.04, 0.08, 0.16, 0.32];
-        for sd_radius_index = 1:1:length(sd_radius_values)
-            sd_radius = sd_radius_values(sd_radius_index);
-            for radii_goals = 0.001:0.005:0.081
-                des_rad = radii_goals; sigma_radius = sd_radius; min_rad = 0.001;
-                % TODO switch this to side shrinking to get gap distance as an output so it can be given to predictor as input
-                [shrunk_field,mu_final,sigma_final] = fcn_MapGen_polytopesShrinkToRadius(tiled_polytopes,des_rad,sigma_radius,min_rad,fig_num);
-=======
 fig_num = 11;
 
 r_D = [];
@@ -145,7 +81,6 @@ for tiles=100 % a range can be input here to do fields with different numbers of
                 catch
                     fprintf("point for radii goals:%f didn't work",radii_goals);
                 end
->>>>>>> origin/steveh/documentation_updates
                 field_stats = fcn_MapGen_polytopesStatistics(shrunk_field);
                 field_avg_r_D = field_stats.avg_r_D;
                 field_stats_pre_shrink = fcn_MapGen_polytopesStatistics(tiled_polytopes);

@@ -5,7 +5,7 @@ function [shrunk_polytope, new_vertices, new_projection_vectors, cut_distance] =
     varargin)
 % fcn_MapGen_polytopeShrinkFromEdges cuts edges off the polytopes
 % Each edge is cut so that the entire polytope is trimmed exactly the same
-% amount from each edge. 
+% amount from each edge.
 %
 % This is implemented in three steps:
 % 1. Calculate the polytope skeleton, or use the skeleton if the user
@@ -17,15 +17,6 @@ function [shrunk_polytope, new_vertices, new_projection_vectors, cut_distance] =
 %
 % 3. Convert the resulting verticies into the standard polytope form.
 %
-% This is implemented in three steps:
-% 1. Calculate the polytope skeleton, or use the skeleton if the user
-% provides this as inputs.
-%
-% 2. Using the cut distance, find the template that is less than or equal
-% to the cut distance. If less, then calculate the additional cut and
-% project the verticies to their new points based on residual cut.
-%
-% 3. Convert the resulting verticies into the standard polytope form.
 %
 % FORMAT:
 %
@@ -79,7 +70,7 @@ function [shrunk_polytope, new_vertices, new_projection_vectors, cut_distance] =
 %    [new_vertices, new_projection_vectors, cut_distance] : outputs from
 %    the function: fcn_MapGen_polytopeFindVertexSkeleton(vertices,fig_num)
 %    or outputs from previous calls, used to speed up code since this
-%    skeleton calculation is by far the slowest part.    
+%    skeleton calculation is by far the slowest part.
 %
 %
 % DEPENDENCIES:
@@ -192,7 +183,7 @@ end
 % Initialize variables we may need
 vertices = shrinker.vertices;
 
-%% STEP 1. Calculate the polytope skeleton, 
+%% STEP 1. Calculate the polytope skeleton,
 % or use the skeleton if the user provides this as inputs.
 
 % Do we need to calculate skeleton values?
@@ -206,7 +197,7 @@ if 0 == flag_use_user_skeleton
     end
 end
 
-%% STEP 2. Using the cut distance, find the template 
+%% STEP 2. Using the cut distance, find the template
 % We want to use the one that is less than or equal to the cut distance. If
 % less, then calculate the additional cut and project the verticies to
 % their new points based on residual cut.

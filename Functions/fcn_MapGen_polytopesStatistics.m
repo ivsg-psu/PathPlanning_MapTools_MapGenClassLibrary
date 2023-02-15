@@ -219,23 +219,6 @@ poly_map_stats.Npolys = Npolys;
 poly_map_stats.NtotalVertices = NrealVertices;
 avg_r_D = average_max_radius*linear_density;
 
-figure(1);
-% errorbar(avg_r_D,avg_r_LC_from_avg_gap,std_r_LC_from_avg_gap,'ro')
-plot(avg_r_D,avg_r_LC_from_avg_gap,'ro')
-% plot(avg_r_D,r_LC_linear1,'go')
-% plot(avg_r_D,r_LC_linear2,'ko')
-% plot(avg_r_D,r_LC_1d_density_variation,'bo')
-% plot(avg_r_D,r_LC_2d_density_variation1,'co')
-% plot(avg_r_D,r_LC_2d_density_variation2,'mo')
-% plot(avg_r_D,r_LC_2d_density_variation3,'ro')
-% legend('linear','linear2','1d density variation','2d density variation1','2d density variation2','2d density variation3');
-% legend('length cost ratio from average gap size','length cost ratio from linear density');
-xlabel('r_D');
-ylabel('predicted r_{LC}');
-% Fill in results
-poly_map_stats.Npolys = Npolys;
-poly_map_stats.NtotalVertices = NrealVertices;
-
 % AREA METRICS
 poly_map_stats.min_x = AABB(1);
 poly_map_stats.max_x = AABB(3);
@@ -269,10 +252,6 @@ poly_map_stats.average_perimeter = average_perimeter;
 
 
 if flag_do_debug
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/steveh/documentation_updates
     figure(fig_for_debug);
     clf;
     hold on
