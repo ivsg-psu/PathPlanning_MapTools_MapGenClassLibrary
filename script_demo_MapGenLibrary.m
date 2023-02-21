@@ -18,6 +18,8 @@
 % fcn_MapGen_polytopesStatistics
 % 2023_01_15
 % -- Added demo of edge-based shrinking
+% 2023_02_20
+% -- Added code to better support README.md
 
 % TO-DO:
 % -- add debug library utility, and switch functions to this
@@ -119,8 +121,137 @@ fcn_MapGen_plotPolytopes(polytopes,fig_num,'r-',line_width);
 %                 __/ |        | |                                     | |                                         
 %                |___/         |_|                                     |_|                                         
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%% Show a detailed step-by-step process behind construction of obstacle map
+fig_num = 1010;
+AABB = [0 0 1 1]; % Define the axis-aligned bounding box
+scale = max(AABB,[],'all') - min(AABB,[],'all');
+new_axis = [AABB(1)-scale/2 AABB(3)+scale/2 AABB(2)-scale/2 AABB(4)+scale/2];
 
-%% Show how to generate polytopes from a tiling
+
+
+% Fill in the Halton set
+% pull halton set
+halton_points = haltonset(2);
+points_scrambled = scramble(halton_points,'RR2'); % scramble values
+
+
+% pick values from halton set
+Halton_range = [1 100];
+low_pt = Halton_range(1,1);
+high_pt = Halton_range(1,2);
+seed_points = points_scrambled(low_pt:high_pt,:);
+[V,C] = voronoin(seed_points);
+stretch = [1 1];
+
+% fill polytopes from tiling
+[polytopes,all_vertices] = fcn_MapGen_generatePolysFromTiling(seed_points,V,C,AABB, stretch);
+
+
+% PLOT THE SEED POINTS
+subplot(2,3,1);
+% plot the seed points in red
+plot(seed_points(:,1),seed_points(:,2),'r.','Markersize',10);
+
+
+% number the polytopes at seed points
+for ith_poly = 1:length(polytopes)
+    text_location = seed_points(ith_poly,:);
+    text(text_location(1,1),text_location(1,2),sprintf('%.0d',ith_poly));
+end
+axis(new_axis);
+title('Seed points');
+
+% PLOT THE VORONOI lines with the points
+subplot(2,3,2);
+
+% plot the seed points in red
+plot(seed_points(:,1),seed_points(:,2),'r.','Markersize',10);
+hold on;
+
+% plot all vertices
+plot(all_vertices(:,2),all_vertices(:,3),'c','Linewidth',1);
+
+axis(new_axis);
+title('Voronoi boundaries');
+
+
+% PLOT THE VORONOI lines with the points
+subplot(2,3,3);
+
+% plot the polytopes on current axis
+fcn_MapGen_plotPolytopes(polytopes,gca,'b',2);
+hold on;
+
+
+% plot the seed points in red
+plot(seed_points(:,1),seed_points(:,2),'r.','Markersize',10);
+
+% plot all vertices
+plot(all_vertices(:,2),all_vertices(:,3),'c','Linewidth',1);
+
+
+axis(new_axis);
+title('AABB imposed')
+
+
+% plot the means in black
+subplot(2,3,4);
+
+
+% plot the polytopes
+fcn_MapGen_plotPolytopes(polytopes,gca,'b',2);
+hold on;
+
+temp = zeros(length(polytopes),2);
+for ith_poly = 1:length(polytopes)
+    temp(ith_poly,:) = polytopes(ith_poly).mean;
+end
+plot(temp(:,1),temp(:,2),'ko','Markersize',3);
+
+
+% plot the means in black
+temp = zeros(length(polytopes),2);
+for ith_poly = 1:length(polytopes)
+    temp(ith_poly,:) = polytopes(ith_poly).mean;
+end
+plot(temp(:,1),temp(:,2),'ko','Markersize',3);
+
+axis(new_axis);
+title('Polytope stats (mean)');
+
+% plot the shrink to radius
+subplot(2,3,5);
+
+des_rad = 0.05; sigma_radius = 0; min_rad = 0.001;
+shrunk_polytopes=fcn_MapGen_polytopesShrinkToRadius(...
+    polytopes,des_rad,sigma_radius,min_rad);
+
+% plot the shrunk polytopes
+fcn_MapGen_plotPolytopes(shrunk_polytopes,gca,'r',2);
+hold on;
+
+axis(new_axis);
+title('Shrunk to radius polytopes');
+
+% plot the shrink to edge
+subplot(2,3,6);
+
+des_gap_size = 0.05;
+
+shrunk_polytopes2=...
+    fcn_MapGen_polytopesShrinkFromEdges(...
+    polytopes,des_gap_size);
+
+ % plot the shrunk polytopes
+fcn_MapGen_plotPolytopes(shrunk_polytopes2,gca,'r',2);
+hold on;
+
+axis(new_axis);
+title('Shrunk from edge polytopes');
+
+
+
+%% Show typical generation of polytopes from a tiling
 % Demos fcn_MapGen_generatePolysFromTiling
 % and script_test_fcn_MapGen_generatePolysFromTiling
 fig_num = 10;

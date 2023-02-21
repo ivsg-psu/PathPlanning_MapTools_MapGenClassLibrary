@@ -154,8 +154,12 @@ end
 
 % Initialize the shrunk polytopes structure array, and tolerance for
 % distance between vertices, below which vertices are merged into one.
-shrunk_polytopes = polytopes;
-tolerance = 1e-5; % Units are (implied) kilometers
+clear shrunk_polytopes
+shrinker = polytopes(1); % obstacle to be shrunk
+temp = ...
+    fcn_MapGen_polytopeShrinkFromEdges(...
+    shrinker,des_gap_size/2);
+shrunk_polytopes(length(polytopes)) = temp;
 
 % Loop through each polytope, shrinking it to the reference size
 for ith_poly = 1:length(polytopes)
