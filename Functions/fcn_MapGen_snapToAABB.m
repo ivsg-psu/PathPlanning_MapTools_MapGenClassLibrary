@@ -73,6 +73,12 @@ function [ ...
 % -- added snap type to allow projections from center
 % 2021_07_17
 % -- added vector projection snap type
+% 2023_02_22
+% -- fixed snap_type bug, where 2 was specified but 3 was used. Made all 2.
+% -- better comments
+% -- error check on snap type 2 to force 2 rows
+% -- switched over to fcn_DebugTools_checkInputsToFunctions
+
 
 %
 % TO DO:
@@ -113,17 +119,17 @@ if 1 == flag_check_inputs
     
     % Check the axis_aligned_bounding_box input, make sure it is
     % '4column_of_numbers' type
-    fcn_MapGen_checkInputsToFunctions(...
+    fcn_DebugTools_checkInputsToFunctions(...
         axis_aligned_bounding_box, '4column_of_numbers',1);
     
     % Check the test_point input, make sure it is '2column_of_numbers' type
     % with 1 or more rows
-    fcn_MapGen_checkInputsToFunctions(...
+    fcn_DebugTools_checkInputsToFunctions(...
         test_point, '2column_of_numbers',[1 2]);
 
     % Check the test_point input, make sure it is '2column_of_numbers' type
     % with 2 or less rows
-    fcn_MapGen_checkInputsToFunctions(...
+    fcn_DebugTools_checkInputsToFunctions(...
         test_point, '2column_of_numbers',[2 1]);
 
 end
@@ -131,6 +137,13 @@ end
 flag_snap_type = 0;
 if  3<= nargin
     flag_snap_type = varargin{1};
+
+    if 2 == flag_snap_type
+        % Check the test_point input, make sure it is '2column_of_numbers' type
+        % with 2 rows
+        fcn_DebugTools_checkInputsToFunctions(test_point, '2column_of_numbers',2);
+    end
+
 end
 
 % Does user want to show the plots?
@@ -191,7 +204,8 @@ if fcn_MapGen_isWithinABBB(axis_aligned_bounding_box,test_point)
         else % This is the x-min wall
             snap_point(1,1) = axis_aligned_bounding_box(1,1);
         end
-    elseif flag_snap_type == 3    % Use user-entered vector projection
+    elseif flag_snap_type == 2    % Use user-entered vector projection
+        try
         [~,snap_point,wall_number] = ...
             INTERNAL_fcn_geometry_findIntersectionOfSegments(...
             walls(1:end-1,:),...
@@ -199,6 +213,9 @@ if fcn_MapGen_isWithinABBB(axis_aligned_bounding_box,test_point)
             test_point(1,:),...  % Start
             test_point(2,:),...   % End
             3);
+        catch
+            disp('debug here')
+        end
     else
         error('Unrecognized projection type!');
     end
