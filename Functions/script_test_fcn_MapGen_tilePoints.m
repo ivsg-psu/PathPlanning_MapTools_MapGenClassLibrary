@@ -11,8 +11,68 @@
 fig_num = 1;
 Npoints = 20;
 tile_depth = 1;
-AABB = [0 0 1 1];
-input_points = rand(Npoints,2);
+AABB = [0 0 2 2];
+input_points = 2*rand(Npoints,2);
+[tiled_points] = fcn_MapGen_tilePoints(input_points,tile_depth,AABB, fig_num);
+
+% assert(vertical_error <= error_tolerance,['Wall should be vertical but x positions of start and end point',...
+%     ' were %d and %d yielding a vertical error of %d. Error tolerance was %d.\n'],...
+%     new_vertices(1,1),new_vertices(4,1),vertical_error,error_tolerance);
+
+%% Call with points outside AABB
+fig_num = 1;
+Npoints = 200;
+tile_depth = 1;
+AABB = [0 0 2 2];
+input_points = 0.5*randn(Npoints,2)+[7,0] + 1;
+[tiled_points] = fcn_MapGen_tilePoints(input_points,tile_depth,AABB, fig_num);
+
+% assert(vertical_error <= error_tolerance,['Wall should be vertical but x positions of start and end point',...
+%     ' were %d and %d yielding a vertical error of %d. Error tolerance was %d.\n'],...
+%     new_vertices(1,1),new_vertices(4,1),vertical_error,error_tolerance);
+
+%% Call with AABB bigger than points
+fig_num = 1;
+Npoints = 200;
+tile_depth = 1;
+AABB = [0 0 5 5];
+input_points = 0.5*randn(Npoints,2)+1;
+[tiled_points] = fcn_MapGen_tilePoints(input_points,tile_depth,AABB, fig_num);
+
+% assert(vertical_error <= error_tolerance,['Wall should be vertical but x positions of start and end point',...
+%     ' were %d and %d yielding a vertical error of %d. Error tolerance was %d.\n'],...
+%     new_vertices(1,1),new_vertices(4,1),vertical_error,error_tolerance);
+
+%% Call with AABB shifted
+fig_num = 1;
+Npoints = 200;
+tile_depth = 1;
+AABB = [0 0 2 2]- 7;
+input_points = 0.5*randn(Npoints,2) + 1;
+[tiled_points] = fcn_MapGen_tilePoints(input_points,tile_depth,AABB, fig_num);
+
+% assert(vertical_error <= error_tolerance,['Wall should be vertical but x positions of start and end point',...
+%     ' were %d and %d yielding a vertical error of %d. Error tolerance was %d.\n'],...
+%     new_vertices(1,1),new_vertices(4,1),vertical_error,error_tolerance);
+
+%% Call with depth of 2
+fig_num = 1;
+Npoints = 20;
+tile_depth = 2;
+AABB = [0 0 2 2];
+input_points = 2*rand(Npoints,2);
+[tiled_points] = fcn_MapGen_tilePoints(input_points,tile_depth,AABB, fig_num);
+
+% assert(vertical_error <= error_tolerance,['Wall should be vertical but x positions of start and end point',...
+%     ' were %d and %d yielding a vertical error of %d. Error tolerance was %d.\n'],...
+%     new_vertices(1,1),new_vertices(4,1),vertical_error,error_tolerance);
+
+%% Call with depth of 5
+fig_num = 1;
+Npoints = 20;
+tile_depth = 5;
+AABB = [0 0 2 2];
+input_points = 2*rand(Npoints,2);
 [tiled_points] = fcn_MapGen_tilePoints(input_points,tile_depth,AABB, fig_num);
 
 % assert(vertical_error <= error_tolerance,['Wall should be vertical but x positions of start and end point',...

@@ -41,9 +41,15 @@ The class library for functions to generate new maps, started from Seth Tau's or
             <ul>
                 <li><a href="#directories">Top-Level Directories</li>
                 <li><a href="#dependencies">Dependencies</li>
-                <li><a href="#functions">Functions</li>
             </ul>
         </li>
+        <li><a href="#functions">Functions</li>
+            <ul>
+                <li><a href="#polytope-field-feneration-functions">Polytope Field Generation Functions</li>
+                <ul>
+                    <li><a href="#fcn_MapGen_tilePoints">fcn_MapGen_tilePoints - a method to tile points</li>
+                    <li><a href="#dependencies">Dependencies</li>
+                </ul>            </ul>
         <li><a href="#usage">Usage</a></li>
             <ul>
                 <li><a href="#examples">Examples</li>
@@ -54,13 +60,14 @@ The class library for functions to generate new maps, started from Seth Tau's or
     </ol>
 </details>
 
+***
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-The MapGen class library hosts tools to build maps useful for studying path planning, autonomy, etc. The result of these operations is usually a map representation of the expected obstacle environment. As shown in Fig. 1 below, the process typically begins with user-selected seed points. These are then used to generate the Voronoi boundaries - the lines that are equidistant from other points. Next, an axis-aligned bounding box (AABB) is applied that crops the Voronoi boundaries to a specific working area. After this, the statistics for polytopes can be found (such as the mean of all verticies). These polytopes can then be used a the starter polytopes for shrinkage operations including shrinking polytopes to a particular radius, or shrinking equally from each polytope edge. 
+The MapGen class library hosts tools to build maps useful for studying path planning, autonomy, etc. The result of these operations is usually a map representation of the expected obstacle environment, and for nearly all the mapping work in the team, maps are stored as polytopes. 
 
-The use of a procedural creation method to create obstacle maps allows the controlled re-creation of these maps across algorithms, and thereby permits analysis of map properties to discover relationships between vehicle mobility and obstacle characteristics.
+Thus, a challenge when testing navigration algorithms is to generate polytope maps either from random inputs or from real data. Most of this library is coded to support random procedurally-generated map creation. As shown in Fig. 1 below, the process typically begins with user-selected seed points. These are then used to generate the Voronoi boundaries - the lines that are equidistant from other points. Next, an axis-aligned bounding box (AABB) is applied that crops the Voronoi boundaries to a specific working area. After this, the statistics for polytopes can be found (such as the mean of all verticies). These polytopes can then be used a the starter polytopes for shrinkage operations including shrinking polytopes to a particular radius, or shrinking equally from each polytope edge. The use of a procedural creation method to create obstacle maps allows the controlled re-creation of these maps across algorithms, and thereby permits analysis of map properties to discover relationships between vehicle mobility and obstacle characteristics.
 
-The most common usage of this repository is to generate maps for use in testing path planners and path following controllers.  This repository also includes tools for modifying generated maps such as changing obstalce traversal costs, obstacle size, and obstacle size distribution.  Finally, some obstacle field analysis tools are included as well.
+The most common usage of the maps from this repository is to generate maps for use in testing path planners and path following controllers.  This repository also includes tools for modifying generated maps such as changing obstalce traversal costs, obstacle size, and obstacle size distribution.  Finally, some obstacle field analysis tools are included as well.
 
 * Inputs: 
     * desired number of obstalces
@@ -78,7 +85,7 @@ The most common usage of this repository is to generate maps for use in testing 
 <a href="#pathplanning_maptools_mapgenclasslibrary">Back to top</a>
 
 
-
+***
 <!-- GETTING STARTED -->
 ## Getting Started
 
@@ -86,7 +93,7 @@ To get a local copy up and running follow these simple steps.
 
 ### Installation
 
-1.  Make sure to run MATLAB 2020b or higher. Why? The "digitspattern" command used in the DebugTools utilities was released late 2020 and this is used heavily in the Debug routines. If debugging is shut off, then earlier MATLAB versions will likely work, and this has been tested back to 2018 releases.
+1.  Make sure to run MATLAB 2020b or higher. Why? The "digitspattern" command used in the DebugTools utilities, one that is used for argument checking in many functions, was released late 2020. And this command is used heavily in the Debug routines. If debugging is shut off, then earlier MATLAB versions will likely work, and this has been tested back to 2018 releases.
 
 2. Clone the repo
    ```sh
@@ -99,6 +106,8 @@ To get a local copy up and running follow these simple steps.
 <a href="#pathplanning_maptools_mapgenclasslibrary">Back to top</a>
 
 <!-- STRUCTURE OF THE REPO -->
+***
+## Structure
 ### Directories
 The following are the top level directories within the repository:
 <ul>
@@ -125,7 +134,66 @@ The following are the top level directories within the repository:
 <a href="#pathplanning_maptools_mapgenclasslibrary">Back to top</a>
 
 <!-- FUNCTION DEFINITIONS -->
-### Functions
+## Functions
+
+### Polytope Field Generation Functions
+
+#### fcn_MapGen_tilePoints 
+The function  **fcn_MapGen_tilePoints** takes as an input set of Nx2 vector of points that specify a points in an area "X". The function returns a tiling of the points by repeating them but with coordinate displacements along the Axis-aligned Bounding Box (AABB), a certain tile "depth". For example, if a region "X" is specified and a tiling depth of 1 is used, this returns tiling points that make a 1-unit boundary around X, as:
+
+
+    Y Y Y
+    Y X Y
+    Y Y Y
+
+For a tiling depth of 2, then a boundary of 2 repetitions are formed around the region "X" as:
+
+    Y Y Y Y Y
+    Y Y Y Y Y
+    Y Y X Y Y
+    Y Y Y Y Y
+    Y Y Y Y Y
+
+Note: a tile depth of 0 returns simply X, the center region.
+
+The points are ordered such that the resulting matrix is Kx2, with K = (N*(2d+1)^2), and where d is the depth. Thus a depth of 2, which produces a 5x5 tiling, will produce N*25x2 matrix. The original points are in the middle-most portion of the matrix. Specifically, the resulting tile sets, S1 to SK, are organized as follows, using the depth=1 case as an example:
+
+    S3 S6 S9
+    S2 S5 S8
+    S1 S4 S7
+
+Thus, S1 contains the points on rows (1..N), S2 is ((N+1)...(2N)), S3 is ((2N+1)...(3N)), etc.
+
+Below is an example output illustrating how the center original points are tiled:
+
+<pre align="center">
+<img src=".\Images\fcn_MapGen_tilePoints_BasicCall.png " alt="Tiling points example" width="420" height="315">
+<figcaption>fcn_MapGen_tilePoints - the basic call.</figcaption>
+<!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+Note that the tiling does not require the points to be inside the AABB. If, for example, the center points are offset from the AABB, then the points are still tiled, resulting in points that are offset from the tiling pattern:
+
+<pre align="center">
+<img src=".\Images\fcn_MapGen_tilePoints_OffsetPoints.png " alt="Tiling points example with offsets" width="420" height="315">
+<figcaption>fcn_MapGen_tilePoints - showing point offsets.</figcaption>
+<!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+Here's an example with a tiling depth of 2, e.g. the number of cells that will "fence" the original points.
+
+<pre align="center">
+<img src=".\Images\fcn_MapGen_tilePoints_DepthOf2.png " alt="Tiling points example, depth of 2" width="420" height="315">
+<figcaption>fcn_MapGen_tilePoints - a depth of 2.</figcaption>
+<!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+
+
+
+<a href="#pathplanning_maptools_mapgenclasslibrary">Back to top</a>
+
+
 **Basic Support Functions**
 
  `fcn_MapGen_increasePolytopeVertexCount.m` : Some path planners may be restricted to navigating to points that are polytope vertices.  To provide a field that gives these planners higher resolution paths, it may be desirable to have colinear vertices on polytope sides.  This function accomplishes that.

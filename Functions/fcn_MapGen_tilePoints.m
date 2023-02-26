@@ -32,9 +32,9 @@ function [tiled_points] = ...
 % middle-most portion of the matrix. Specifically, the resulting tile sets,
 % S1 to SK, are organized as follows, using the depth=1 case as an example:
 %
-%                 S1 S4 S7
-%                 S2 S5 S8
 %                 S3 S6 S9
+%                 S2 S5 S8
+%                 S1 S4 S7
 %
 % Thus, S1 contains the points on rows (1..N), S2 is ((N+1)...(2N)), S3 is
 % ((2N+1)...(3N)), etc.
@@ -179,6 +179,7 @@ tiled_points = [];
 Npoints = length(input_points);
 superMatrix_height = (2*tile_depth+1);
 NumTiles = superMatrix_height^2;
+
 if NumTiles<1 || ~isnumeric(NumTiles)
     error('Tile depth producing an unusable tiling pattern.')
 end
@@ -202,19 +203,38 @@ offset_superMatrix_I = superMatrix_I - (tile_depth+1);
 offset_superMatrix_J = superMatrix_J - (tile_depth+1);
 
 % Make each of the offsets one "big" offset matrix
-offset_matrix = [offset_superMatrix_I offset_superMatrix_J];
-only_row_matrix = reshape(offset_matrix',1,NumTiles*2);
-repeated_only_row_matrix = repmat(only_row_matrix,Npoints,1);
-BIG_offset_superMatrix = reshape(repeated_only_row_matrix,Npoints*NumTiles,2);
+only_row_matrix_I = reshape(offset_superMatrix_I',1,NumTiles);
+only_row_matrix_J = reshape(offset_superMatrix_J',1,NumTiles);
+
+repeated_only_row_matrix_I = repmat(only_row_matrix_I,Npoints,1);
+repeated_only_row_matrix_J = repmat(only_row_matrix_J,Npoints,1);
+
+% The integer offset super matrix is the matrix that represents, for each
+% point, its "integer offset" tile count from the center of the tiling. The
+% geometric center is at  integer offset (0,0). The tile to the left of
+% this is at (-1,0), the one "above" is at (0,1), etc. The one that is 2
+% tiles to the right is at (2,0).
+BIG_integer_offset_superMatrix_I = reshape(repeated_only_row_matrix_I,Npoints*NumTiles,1);
+BIG_integer_offset_superMatrix_J = reshape(repeated_only_row_matrix_J,Npoints*NumTiles,1);
+
+% NOTE: I and J indices are in matrix form, which rows are "Y" and columns
+% are "X", so we reverse the order here
+BIG_integer_offset_superMatrix   = [BIG_integer_offset_superMatrix_J BIG_integer_offset_superMatrix_I];
 
 % Convert these to offsets
-BIG_offsets = BIG_offset_superMatrix.*range_xy_points;
+BIG_offsets = BIG_integer_offset_superMatrix.*range_xy_points;
 
-% Next, shift all the points to the AABB origin
+% Next, shift all the points to the AABB origin, so that range operations
+% are multiplicative. In other words, we want to make points that are 2
+% times away as y = 2*x if x is the point. This doesn't work if there's a
+% non-zero origin
 shifted_points = input_points - origin_point;
+
+% We are going to need points to cover the entire tiling, so we repeat the
+% points across all tiles
 BIG_shifted_points = repmat(shifted_points,NumTiles,1);
 
-% Finally, calculate the tiled_points
+% Finally, calculate the tiled_points by transforming the points
 tiled_points = (BIG_shifted_points+BIG_offsets)+origin_point;
 
 
@@ -241,22 +261,46 @@ if flag_do_plots
     grid on;
     grid minor;
     
-    %     scale = max(AABB,[],'all') - min(AABB,[],'all');
-    %     new_axis = [AABB(1)-scale/2 AABB(3)+scale/2 AABB(2)-scale/2 AABB(4)+scale/2];
-    %     axis(new_axis);
-    %
-    %
-    %     % Plot the vertices
-    %     plot(all_vertices(:,2),all_vertices(:,3),'r.-','Linewidth',3);
-    %
-    %     % Plot the walls
-    %     plot(walls(:,1),walls(:,2),'k-');
-    %
-    %     % Plot the seed_points
-    %     plot(seed_points(:,1),seed_points(:,2),'r.','Markersize',10);
-    %
-    %     % Plot the cropped_vertices locations
-    %     plot(bounded_vertices(:,2),bounded_vertices(:,3),'g-','Linewidth',2);
+    % Plot the input_points
+    plot(input_points(:,1),input_points(:,2),'bo','Markersize',5);
+    
+    % Label the center
+    center_of_label = origin_point + range_xy_points/2;
+    label_location = center_of_label;
+    text(label_location(1,1), label_location(1,2),sprintf('Original\nPoints'),'Fontsize',14,'Color',[0 0 1],'HorizontalAlignment','Center');
+
+    % Calculate the AABB, but shifted in by some eps factor so that they don't
+    % lie on top of each other when tiled
+    offset = 1000*eps;
+    AABB_coordinates = [...
+        AABB(1,1)+offset  AABB(1,2)+offset;
+        AABB(1,3)-offset  AABB(1,2)+offset;
+        AABB(1,3)-offset  AABB(1,4)-offset;
+        AABB(1,1)+offset  AABB(1,4)-offset;
+        AABB(1,1)+offset  AABB(1,2)+offset;
+        ];
+
+    % Plot the AABB
+    plot(AABB_coordinates(:,1),AABB_coordinates(:,2),'b-','Linewidth',3);
+
+    centerTile = ceil(NumTiles/2);
+    % Plot the shifted points and AABBs, each in a different color
+    AABB_offsets = [offset_superMatrix_J offset_superMatrix_I].*range_xy_points;
+    for ith_tile = 1:NumTiles
+        range = (ith_tile-1)*Npoints + (1:Npoints)';
+        fig_handle = plot(tiled_points(range,1),tiled_points(range,2),'.','Markersize',10);
+        
+        if ith_tile~=centerTile
+            % Plot the AABB in the same color
+            offset_AABB = AABB_coordinates + AABB_offsets(ith_tile,:);
+            plot(offset_AABB(:,1),offset_AABB(:,2),'-','Linewidth',2,'Color',get(fig_handle,'Color'));
+            
+            % Label the tile
+            label_location = center_of_label + AABB_offsets(ith_tile,:);
+            text(label_location(1,1), label_location(1,2),sprintf('%.0d',ith_tile),'Fontsize',14,'Color',get(fig_handle,'Color'),'HorizontalAlignment','Center');
+        end
+    
+    end
     
 end % Ends the flag_do_plot if statement
 

@@ -74,30 +74,6 @@ if ~exist('flag_was_run_before','var') || isempty(flag_was_run_before)
 end
 
 
-% %% Set up workspace
-% clear flag_was_run_before  % Force init to always run?
-% 
-% if ~exist('flag_was_run_before','var')
-%     
-%     clc
-%     close all
-%     
-%     % add necessary directories
-%     addpath([pwd '\Functions'])
-%     %     addpath([pwd '\GeomClassLibrary\Functions'])
-%     %     addpath([pwd '\MapGenClassLibrary\Functions'])
-%     %     addpath([pwd '\Plotting'])
-%     %     addpath([pwd '\Map_Generation\polytope_generation'])
-%     %     addpath([pwd '\Map_Generation\polytope_editing'])
-%     %     addpath([pwd '\Map_Generation\polytope_calculation'])
-%     
-%     flag_was_run_before = 1;
-% end
-
-%% Show how inputs are checked
-Twocolumn_of_numbers_test = [4 1; 3 0; 2 5];
-fcn_MapGen_checkInputsToFunctions(Twocolumn_of_numbers_test, '2column_of_numbers');
-
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 %    _____ _             _        _____      _       _                    ____                       _   _                 
@@ -189,7 +165,7 @@ seed_points = points_scrambled(low_pt:high_pt,:);
 stretch = [1 1];
 
 % fill polytopes from tiling
-[polytopes,all_vertices] = fcn_MapGen_generatePolysFromTiling(seed_points,V,C,AABB, stretch);
+[polytopes,all_vertices] = fcn_MapGen_generatePolysFromVoronoiAABB(seed_points,V,C,AABB, stretch);
 
 
 % PLOT THE SEED POINTS
@@ -300,8 +276,8 @@ title('Shrunk from edge polytopes');
 
 
 %% Show typical generation of polytopes from a tiling
-% Demos fcn_MapGen_generatePolysFromTiling
-% and script_test_fcn_MapGen_generatePolysFromTiling
+% Demos fcn_MapGen_generatePolysFromVoronoiAABB
+% and script_test_fcn_MapGen_generatePolysFromVoronoiAABB
 fig_num = 10;
 
 % pull halton set
@@ -320,7 +296,7 @@ AABB = [0 0 1 1]; % Define the axis-aligned bounding box
 stretch = [1 1];
 
 % fill polytopes from tiling
-fcn_MapGen_generatePolysFromTiling(seed_points,V,C,AABB, stretch,fig_num);
+fcn_MapGen_generatePolysFromVoronoiAABB(seed_points,V,C,AABB, stretch,fig_num);
 
 %% Show time-dependent generation of polytopes from a tiling
 % Moves just one point
@@ -366,7 +342,7 @@ for ith_step = 1:1:100
 
 
     % fill polytopes from tiling
-    polytopes = fcn_MapGen_generatePolysFromTiling(seed_points,V,C,AABB, stretch);
+    polytopes = fcn_MapGen_generatePolysFromVoronoiAABB(seed_points,V,C,AABB, stretch);
 
     des_gap_size = 0.02;
 
@@ -453,7 +429,7 @@ for ith_step = 1:1:100
     [V,C] = voronoin(seed_points);
 
     % fill polytopes from tiling of Voronoi diagram
-    polytopes = fcn_MapGen_generatePolysFromTiling(seed_points,V,C,AABB, stretch);
+    polytopes = fcn_MapGen_generatePolysFromVoronoiAABB(seed_points,V,C,AABB, stretch);
 
     des_gap_size = 0.02;
 
@@ -482,6 +458,145 @@ for ith_step = 1:1:100
     pause(0.1);
 end
 close(vidfile)
+
+%% Generate a Voronoi tiling that is a true tile
+fig_num = 112;
+
+% pull halton set
+rng(1111);
+halton_points = haltonset(2);
+points_scrambled = scramble(halton_points,'RR2'); % scramble values
+AABB = [0 0 1 1]; % Define the axis-aligned bounding box
+stretch = [1 1];
+
+
+% pick values from halton set
+Npoints = 100;
+Halton_range = [1 Npoints];
+low_pt = Halton_range(1,1);
+high_pt = Halton_range(1,2);
+original_seed_points = points_scrambled(low_pt:high_pt,:);
+
+%% FUNCTION WOULD START HERE
+tile_depth = 1;
+
+[tiled_original_seed_points] = fcn_MapGen_tilePoints(original_seed_points,tile_depth,AABB);
+
+[V,C] = voronoin(tiled_original_seed_points);
+
+%% Step 1: for each of the seed points, save the polytope for it
+% Initiate data structures
+num_poly = size(seed_points,1);
+polytopes(num_poly) = ...
+    struct(...
+    'vertices',[],...
+    'xv',[],...
+    'yv',[],...
+    'distances',[],...
+    'mean',[],...
+    'area',[],...
+    'max_radius',[],...
+    'min_radius',[],...
+    'mean_radius',[],...
+    'radii',[],...
+    'cost',[],...
+    'parent_poly_id',[]);
+
+Npolys = length(polytopes);
+Nvertices_per_poly = 20; % Maximum estimate
+Nvertices_per_map = Npolys*Nvertices_per_poly;
+all_vertices = nan(Nvertices_per_map,3);
+% all_neighbors = nan(Nvertices_per_map,1);
+
+
+% Loop through the polytopes, filling verticies and neighbors matrix
+for ith_poly = 1:Npolys
+    
+    %     if ith_poly==50
+    %         disp('Stop here');
+    %     end
+    
+    vertices_open = V(C{ith_poly},:); 
+    
+    %     % Remove ill-conditioned points by setting the ones really, really far
+    %     % away to infinity
+    %     scale = max(AABB,[],'all') - min(AABB,[],'all');
+    %     center = [AABB(1)+AABB(3), AABB(2)+AABB(4)]/2;
+    %     distances_from_center = sum((vertices_open-center).^2,2).^0.5;
+    %     near_infinite = (distances_from_center/scale)>1E5;
+    %     if any(near_infinite)
+    %         vertices_open(near_infinite,:) = inf;
+    %         % Remove repeated infinities
+    %         vertices_open = unique(vertices_open,'rows','stable');
+    %     end
+
+    % Append results to close off the vector loop
+    vertices = [vertices_open; vertices_open(1,:)]; % Close off the vertices
+    
+    %     Nvertices = length(vertices(:,1));
+    %     if Nvertices>Nvertices_per_poly
+    %         error('Need to resize the number of allowable vertices');
+    %     else
+    %         row_offset = (ith_poly-1)*Nvertices_per_poly;
+    %         all_vertices(row_offset+1:row_offset+Nvertices,1) = ith_poly;
+    %         all_vertices(row_offset+1:row_offset+Nvertices,2:3) = vertices;
+    %     end
+    
+
+       
+end
+
+% Apply the stretch
+num_poly = length(polytopes);
+for poly = 1:num_poly % pull each cell from the voronoi diagram   
+    try
+        polytopes(poly).vertices  = polytopes(poly).vertices.*stretch;
+    catch
+        disp('stop here');
+    end
+end % Ends for loop for stretch
+
+% Fill in all the other fields
+polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes);
+
+
+
+%% DEBUG AREA
+figure(fig_num);
+clf;
+hold on
+
+scale = max(AABB,[],'all') - min(AABB,[],'all');
+new_axis = [AABB(1)-scale/2 AABB(3)+scale/2 AABB(2)-scale/2 AABB(4)+scale/2];
+axis(new_axis);
+
+% plot the polytopes
+fcn_MapGen_plotPolytopes(polytopes,fig_num,'b',2);
+
+% plot all vertices
+plot(all_vertices(:,2),all_vertices(:,3),'c','Linewidth',1);
+
+
+% plot the seed points in red
+plot(seed_points(:,1),seed_points(:,2),'r.','Markersize',10);
+
+% plot the means in black
+temp = zeros(length(polytopes),2);
+for ith_poly = 1:length(polytopes)
+    temp(ith_poly,:) = polytopes(ith_poly).mean;
+end
+plot(temp(:,1),temp(:,2),'ko','Markersize',3);
+
+% number the polytopes at seed points
+for ith_poly = 1:length(polytopes)
+    text_location = seed_points(ith_poly,:);
+    text(text_location(1,1),text_location(1,2),sprintf('%.0d',ith_poly));
+end
+
+% fill polytopes from tiling
+% fcn_MapGen_generatePolysFromVoronoiAABB(tiled_original_seed_points,V,C,AABB, stretch,fig_num);
+
+
 
 
 %% Generate a set of polytopes from various pseudo-random sources
