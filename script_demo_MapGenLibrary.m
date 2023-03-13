@@ -22,6 +22,8 @@
 % -- Added code to better support README.md
 % 2023_02_21
 % -- Added Debug utility library
+% 2023_03_13 
+% -- Merged changes allowing for repeated tiling polytope field
 
 
 % TO-DO:
@@ -463,13 +465,16 @@ fcn_MapGen_generatePolysFromVoronoiAABB(seed_points,V,C,AABB, stretch,fig_num);
 % close(vidfile)
 
 %% Generate a Voronoi tiling that is a true tile
+% This is done by actually tiling around the central seed points copies of
+% these same points, then calculating the Voronoi diagram for this
+
 fig_num = 112;
 
 % pull halton set
 rng(1111);
 halton_points = haltonset(2);
 points_scrambled = scramble(halton_points,'RR2'); % scramble values
-AABB = [0 0 1 1]; % Define the axis-aligned bounding box
+unit_AABB = [0 0 1 1]; % Define the axis-aligned bounding box
 stretch = [1 1];
 
 
@@ -479,20 +484,29 @@ Halton_range = [1 Npoints];
 low_pt = Halton_range(1,1);
 high_pt = Halton_range(1,2);
 original_seed_points = points_scrambled(low_pt:high_pt,:);
+Nseedpoints = length(original_seed_points);
 
 %% FUNCTION WOULD START HERE
 tile_depth = 1;
 
-[tiled_original_seed_points] = fcn_MapGen_tilePoints(original_seed_points,tile_depth,AABB);
+[tiled_original_seed_points] = fcn_MapGen_tilePoints(original_seed_points,tile_depth,unit_AABB);
 
 [V,C] = voronoin(tiled_original_seed_points);
 
+% Choose the seed points from the middle area
+mid_tile_superindex = ceil((2*tile_depth+1)^2/2);
+mid_tile_range = ((Nseedpoints*(mid_tile_superindex-1)+1):Nseedpoints*mid_tile_superindex)';
+seed_points_to_use = tiled_original_seed_points(mid_tile_range,:);
+
 %% Step 1: for each of the seed points, save the polytope for it
 % Initiate data structures
-num_poly = size(seed_points,1);
+num_poly = size(seed_points_to_use,1);
+clear polytopes
 polytopes(num_poly) = ...
     struct(...
+    'seed_point',[],...
     'vertices',[],...
+    'AABB',[],...
     'xv',[],...
     'yv',[],...
     'distances',[],...
@@ -512,42 +526,84 @@ all_vertices = nan(Nvertices_per_map,3);
 % all_neighbors = nan(Nvertices_per_map,1);
 
 
-% Loop through the polytopes, filling verticies and neighbors matrix
-for ith_poly = 1:Npolys
-    
+% Loop through the polytopes, filling seed point, verticies (and neighbors
+% matrix?)
+fig_debug = 12345;
+figure(fig_debug);
+clf;
+hold on;
+
+scale = max(3*unit_AABB,[],'all') - min(3*unit_AABB,[],'all');
+new_axis = [unit_AABB(1)-scale/2 unit_AABB(3)+scale/2 unit_AABB(2)-scale/2 unit_AABB(4)+scale/2];
+axis(new_axis);
+
+for ith_poly = 1:length(original_seed_points)
+    % Find which seed index to use
+    offset_seed_index = mid_tile_range(ith_poly);
+
+    % Fill in seed_point
+    polytopes(ith_poly).seed_point = seed_points_to_use(ith_poly);
+
+
     %     if ith_poly==50
     %         disp('Stop here');
     %     end
     
-    vertices_open = V(C{ith_poly},:); 
-    
-    %     % Remove ill-conditioned points by setting the ones really, really far
-    %     % away to infinity
-    %     scale = max(AABB,[],'all') - min(AABB,[],'all');
-    %     center = [AABB(1)+AABB(3), AABB(2)+AABB(4)]/2;
-    %     distances_from_center = sum((vertices_open-center).^2,2).^0.5;
-    %     near_infinite = (distances_from_center/scale)>1E5;
-    %     if any(near_infinite)
-    %         vertices_open(near_infinite,:) = inf;
-    %         % Remove repeated infinities
-    %         vertices_open = unique(vertices_open,'rows','stable');
-    %     end
+    vertices_open = V(C{offset_seed_index},:); 
+
+    % Remove ill-conditioned points by setting the ones really, really far
+    % away to infinity
+    scale = max(AABB,[],'all') - min(AABB,[],'all');
+    center = [AABB(1)+AABB(3), AABB(2)+AABB(4)]/2;
+    distances_from_center = sum((vertices_open-center).^2,2).^0.5;
+    near_infinite = (distances_from_center/scale)>1E7;
+    if any(near_infinite)
+        warning('Near-infinite vertex found for polytope: %.0d, for seed point: (%.3f, %.3f)', ith_poly,seed_points_to_use(ith_poly,1),ith_poly,seed_points_to_use(ith_poly,1))
+        vertices_open(near_infinite,:) = inf;
+        % Remove repeated infinities
+        vertices_open = unique(vertices_open,'rows','stable');
+    end
 
     % Append results to close off the vector loop
     vertices = [vertices_open; vertices_open(1,:)]; % Close off the vertices
     
-    %     Nvertices = length(vertices(:,1));
-    %     if Nvertices>Nvertices_per_poly
-    %         error('Need to resize the number of allowable vertices');
-    %     else
-    %         row_offset = (ith_poly-1)*Nvertices_per_poly;
-    %         all_vertices(row_offset+1:row_offset+Nvertices,1) = ith_poly;
-    %         all_vertices(row_offset+1:row_offset+Nvertices,2:3) = vertices;
-    %     end
-    
+    % Save verticies to this polytope
+    polytopes(ith_poly).vertices = vertices;
 
-       
+    % Plot the poly?
+    if 1==1
+
+        % Replot the poly before this one in blue (to cover it up)
+        line_width = 3;
+        if ith_poly>1
+            fcn_MapGen_plotPolytopes(polytopes(ith_poly-1),fig_debug,'b-',line_width);
+        end
+
+        % Plot this one in red
+        fcn_MapGen_plotPolytopes(polytopes(ith_poly),fig_debug,'r-',line_width);
+        title(sprintf('Polytope: %.0d',ith_poly));
+
+        % Is it the last poly? Plot it in blue
+        if ith_poly==Npolys
+            fcn_MapGen_plotPolytopes(polytopes(ith_poly),fig_debug,'b-',line_width);
+        end
+
+        % Plot this one's seed point:
+        plot(seed_points_to_use(ith_poly,1),seed_points_to_use(ith_poly,2),'r.');
+
+    end
+
+    % Save verticies to the all_verticies array
+    Nvertices = length(vertices(:,1));
+    if Nvertices>Nvertices_per_poly
+        error('Need to resize the number of allowable vertices');
+    else
+        row_offset = (ith_poly-1)*Nvertices_per_poly;
+        all_vertices(row_offset+1:row_offset+Nvertices,1) = ith_poly;
+        all_vertices(row_offset+1:row_offset+Nvertices,2:3) = vertices;
+    end
 end
+
 
 % Apply the stretch
 num_poly = length(polytopes);
@@ -561,6 +617,100 @@ end % Ends for loop for stretch
 
 % Fill in all the other fields
 polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes);
+
+%% Confirm the tiling
+% if it is a true tiling, then the parts that stick out, e.g. values
+% greater than the AABB boundary, should match points that are in the
+% interior - in other words, there is a seamless connection between the two
+% areas.
+
+% Find the parts that stick out
+all_points = all_vertices(~isnan(all_vertices(:,1)),2:3);
+all_points_shifted = all_points - unit_AABB(1:2);
+rounded_points = mod(all_points_shifted,1);
+x_indices_stick_out = find(all_points_shifted(:,1)~=rounded_points(:,1));
+y_indices_stick_out = find(all_points_shifted(:,2)~=rounded_points(:,2));
+xy_indices_stick_out = intersect(x_indices_stick_out,y_indices_stick_out);
+
+% Find the points that are entirely within the AABB
+x_indices_inside = find(all_points_shifted(:,1)==rounded_points(:,1));
+y_indices_inside = find(all_points_shifted(:,2)==rounded_points(:,2));
+xy_indices_inside = intersect(x_indices_inside,y_indices_inside);
+points_inside = all_points(xy_indices_inside,:);
+
+% DEBUG AREA
+figure(fig_num);
+clf;
+hold on
+
+scale = max(AABB,[],'all') - min(AABB,[],'all');
+new_axis = [AABB(1)-scale/2 AABB(3)+scale/2 AABB(2)-scale/2 AABB(4)+scale/2];
+axis(new_axis);
+
+% plot the polytopes
+fcn_MapGen_plotPolytopes(polytopes,fig_num,'b',2);
+
+% plot all vertices
+plot(all_points(:,1),all_points(:,2),'c.','Linewidth',1);
+
+% Plot all the points that stick out
+plot(all_points(x_indices_stick_out,1),all_points(x_indices_stick_out,2),'r.','Markersize',20);
+plot(all_points(y_indices_stick_out,1),all_points(y_indices_stick_out,2),'m.','Markersize',15);
+plot(all_points(xy_indices_stick_out,1),all_points(xy_indices_stick_out,2),'k.','Markersize',10);
+legend('Polytopes','All points','X-data out of bounds','Y-data out of bounds','Both X and Y out of bounds');
+
+% For each of the "stick out" points, check to see that there's an inside
+% point that corresponds to the same location, but inside.
+
+legend off;
+
+% Start with x
+error_inside_to_outside_x = nan(length(x_indices_stick_out),1);
+for ith_outside_point = 1:length(x_indices_stick_out)
+    current_outside_point = all_points(x_indices_stick_out(ith_outside_point),:);
+    rounded_current_outside_point = mod(current_outside_point,1);
+
+    % Use a distance metric to find closest actual point
+    tolerance = 1E-10;
+    distances_to_outside_point = sum((rounded_current_outside_point-points_inside).^2,2).^0.5;
+    [min_distance,~] = min(distances_to_outside_point);
+    index_min = find(distances_to_outside_point<tolerance);
+    closest_points = points_inside(index_min,:);
+
+    % Show the results
+    plot(current_outside_point(:,1),current_outside_point(:,2),'ro','Markersize',20);
+    plot(closest_points(:,1),closest_points(:,2),'ro','Markersize',20);
+    error_inside_to_outside_x(ith_outside_point)= min_distance;
+end
+
+% Now with y
+error_inside_to_outside_y = nan(length(y_indices_stick_out),1);
+for ith_outside_point = 1:length(y_indices_stick_out)
+    current_outside_point = all_points(y_indices_stick_out(ith_outside_point),:);
+    rounded_current_outside_point = mod(current_outside_point,1);
+
+    % Use a distance metric to find closest actual point
+    tolerance = 1E-10;
+    distances_to_outside_point = sum((rounded_current_outside_point-points_inside).^2,2).^0.5;
+    [min_distance,~] = min(distances_to_outside_point);
+    index_min = find(distances_to_outside_point<tolerance);
+    closest_points = points_inside(index_min,:);
+
+    % Show the results
+    plot(current_outside_point(:,1),current_outside_point(:,2),'go','Markersize',20);
+    plot(closest_points(:,1),closest_points(:,2),'go','Markersize',20);
+    error_inside_to_outside_y(ith_outside_point)= min_distance;
+end
+figure(1234); 
+clf;
+hold on;
+plot(error_inside_to_outside_x);
+plot(error_inside_to_outside_y);
+legend('X errors', 'Y errors');
+
+
+
+
 
 
 
@@ -598,6 +748,8 @@ end
 
 % fill polytopes from tiling
 % fcn_MapGen_generatePolysFromVoronoiAABB(tiled_original_seed_points,V,C,AABB, stretch,fig_num);
+
+
 
 
 
