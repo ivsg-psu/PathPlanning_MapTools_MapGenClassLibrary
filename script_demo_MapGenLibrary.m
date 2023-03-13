@@ -93,6 +93,8 @@ fig_num = 1;
 isInside = fcn_MapGen_isWithinABBB(AABB,test_points,fig_num);
 
 %% Show how to plot a polytope
+polytopes(1).vertices = [0 0; 4 2; 2 4; 0 0];
+fcn_MapGen_plotPolytopes(polytopes,fig_num,'r-',line_width);
 
 %% Show how we calculate the polytope centroid and area
 % Note: this does NOT have to be a convex polytope, as the example shows.
@@ -125,9 +127,8 @@ plot(Centroid(:,1),Centroid(:,2),'kx','linewidth',1);
 fig_num = 3;
 clear polytopes
 polytopes(1).vertices = [0 0; 4 2; 2 4; 0 0];
-polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes);
-line_width = 3;
-fcn_MapGen_plotPolytopes(polytopes,fig_num,'r-',line_width);
+polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes,fig_num);
+assert(isequal(round(polytopes(1).max_radius,4),2.8284));
 
 
 
@@ -142,9 +143,10 @@ fcn_MapGen_plotPolytopes(polytopes,fig_num,'r-',line_width);
 %                 __/ |        | |                                     | |                                         
 %                |___/         |_|                                     |_|                                         
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-%% Show a detailed step-by-step process behind construction of obstacle map
+%% Show a detailed step-by-step process behind construction of obstacle map 
+% using fcn_MapGen_generatePolysFromVoronoiAABB
 fig_num = 1010;
-AABB = [0 0 1 1]; % Define the axis-aligned bounding box
+AABB = [0 0 1 1]; % Define the axis-aligned bounding box to be within the unit square
 scale = max(AABB,[],'all') - min(AABB,[],'all');
 new_axis = [AABB(1)-scale/2 AABB(3)+scale/2 AABB(2)-scale/2 AABB(4)+scale/2];
 
@@ -152,17 +154,18 @@ new_axis = [AABB(1)-scale/2 AABB(3)+scale/2 AABB(2)-scale/2 AABB(4)+scale/2];
 
 % Fill in the Halton set
 % pull halton set
-halton_points = haltonset(2);
+halton_points = haltonset(2); % Construct the halton set in 2 dimensions
 points_scrambled = scramble(halton_points,'RR2'); % scramble values
 
 
 % pick values from halton set
-Halton_range = [1 100];
+Halton_range = [1 100]; % The range of points to keep
 low_pt = Halton_range(1,1);
 high_pt = Halton_range(1,2);
+% Pull out only a small number of these points
 seed_points = points_scrambled(low_pt:high_pt,:);
 [V,C] = voronoin(seed_points);
-stretch = [1 1];
+stretch = [1 1]; % How much to stretch the tiling after creation
 
 % fill polytopes from tiling
 [polytopes,all_vertices] = fcn_MapGen_generatePolysFromVoronoiAABB(seed_points,V,C,AABB, stretch);
@@ -281,183 +284,183 @@ title('Shrunk from edge polytopes');
 fig_num = 10;
 
 % pull halton set
-halton_points = haltonset(2);
+halton_points = haltonset(2); % Generate the 2-D Halton set
 points_scrambled = scramble(halton_points,'RR2'); % scramble values
 
 
 % pick values from halton set
-Halton_range = [1 100];
+Halton_range = [1 100]; % Define number of points we want (e.g 1 to 100)
 low_pt = Halton_range(1,1);
 high_pt = Halton_range(1,2);
 seed_points = points_scrambled(low_pt:high_pt,:);
-[V,C] = voronoin(seed_points);
+[V,C] = voronoin(seed_points); % Calculate the Voronoi diagram
 
 AABB = [0 0 1 1]; % Define the axis-aligned bounding box
-stretch = [1 1];
+stretch = [1 1]; % Define the stretch factor on each axis
 
-% fill polytopes from tiling
+% fill polytopes from tiling, and give a figure number to show results
 fcn_MapGen_generatePolysFromVoronoiAABB(seed_points,V,C,AABB, stretch,fig_num);
 
-%% Show time-dependent generation of polytopes from a tiling
-% Moves just one point
-fig_num = 11111;
-clf;
-
-
-% pull halton set
-rng(1111);
-halton_points = haltonset(2);
-points_scrambled = scramble(halton_points,'RR2'); % scramble values
-AABB = [0 0 1 1]; % Define the axis-aligned bounding box
-stretch = [1 1];
-
-
-% pick values from halton set
-Npoints = 100;
-Halton_range = [1 Npoints];
-low_pt = Halton_range(1,1);
-high_pt = Halton_range(1,2);
-original_seed_points = points_scrambled(low_pt:high_pt,:);
-
-% Set the point to move
-pointID_to_move = 9;
-
-% Set the velocity vectors
-%velocities = 0.01*randn(Npoints,2);
-velocities = 0.01;
-
-% Prep the movie
-% vidfile = VideoWriter('MovingPolytope.mp4','MPEG-4');
-vidfile = VideoWriter('MovingPolytope.avi');
-open(vidfile);
-
-moved_seed_points = original_seed_points;
-for ith_step = 1:1:100
-    moved_seed_points(pointID_to_move) = original_seed_points(pointID_to_move) + velocities*ith_step;
-
-    % Wrap points
-    seed_points = mod(moved_seed_points,1);
-
-    [V,C] = voronoin(seed_points);
-
-
-    % fill polytopes from tiling
-    polytopes = fcn_MapGen_generatePolysFromVoronoiAABB(seed_points,V,C,AABB, stretch);
-
-    des_gap_size = 0.02;
-
-    shrunk_polytopes=...
-        fcn_MapGen_polytopesShrinkFromEdges(...
-        polytopes,des_gap_size);
-
-
-    % Plot the results
-    figure(fig_num);
-    clf;
-
-    line_width = 2;
-    color = [0 0 0];
-    axis_box = [0 1 0 1];
-    fcn_MapGen_plotPolytopes(shrunk_polytopes,gca,'-',line_width,color,axis_box,'square'); %,[1 0 0 0 0.5]);
-    hold on;
-    highlighted_polytope = shrunk_polytopes(pointID_to_move);
-
-    % Highlight the moving polytope
-    % FILL_INFO: a 1-by-5 vector to specify wether or not there is fill, the
-    % color of fill, and the opacity of the fill [Y/N, R, G, B, alpha]
-    % fill_info = [1 1 0 0 1];
-    fcn_MapGen_plotPolytopes(highlighted_polytope,gca,'-',line_width,[1 0 0],axis_box,'square');  % , fill_info);
-
-
-    frame = getframe(gcf);
-    writeVideo(vidfile,frame);
-
-
-    pause(0.1);
-end
-close(vidfile)
-
-
-%% Show time-dependent generation of polytopes from a tiling
-% Moves all points
-fig_num = 1111;
-clf;
-
-
-% pull halton set
-rng(1111);
-halton_points = haltonset(2);
-points_scrambled = scramble(halton_points,'RR2'); % scramble values
-AABB = [0 0 1 1]; % Define the axis-aligned bounding box
-stretch = [1 1];
-
-
-% pick values from halton set
-Npoints = 100;
-Halton_range = [1 Npoints];
-low_pt = Halton_range(1,1);
-high_pt = Halton_range(1,2);
-original_seed_points = points_scrambled(low_pt:high_pt,:);
-
-% Set the point to move
+%% (DEPRECATED) Show time-dependent generation of polytopes from a tiling
+% % Moves just one point
+% fig_num = 11111;
+% clf;
+% 
+% 
+% % pull halton set
+% rng(1111);
+% halton_points = haltonset(2);
+% points_scrambled = scramble(halton_points,'RR2'); % scramble values
+% AABB = [0 0 1 1]; % Define the axis-aligned bounding box
+% stretch = [1 1];
+% 
+% 
+% % pick values from halton set
+% Npoints = 100;
+% Halton_range = [1 Npoints];
+% low_pt = Halton_range(1,1);
+% high_pt = Halton_range(1,2);
+% original_seed_points = points_scrambled(low_pt:high_pt,:);
+% 
+% % Set the point to move
 % pointID_to_move = 9;
-
-% Set the velocity vectors
-velocities = 0.01*randn(Npoints,2);
+% 
+% % Set the velocity vectors
+% %velocities = 0.01*randn(Npoints,2);
 % velocities = 0.01;
+% 
+% % Prep the movie
+% % vidfile = VideoWriter('MovingPolytope.mp4','MPEG-4');
+% vidfile = VideoWriter('MovingPolytope.avi');
+% open(vidfile);
+% 
+% moved_seed_points = original_seed_points;
+% for ith_step = 1:1:100
+%     moved_seed_points(pointID_to_move) = original_seed_points(pointID_to_move) + velocities*ith_step;
+% 
+%     % Wrap points
+%     seed_points = mod(moved_seed_points,1);
+% 
+%     [V,C] = voronoin(seed_points);
+% 
+% 
+%     % fill polytopes from tiling
+%     polytopes = fcn_MapGen_generatePolysFromVoronoiAABB(seed_points,V,C,AABB, stretch);
+% 
+%     des_gap_size = 0.02;
+% 
+%     shrunk_polytopes=...
+%         fcn_MapGen_polytopesShrinkFromEdges(...
+%         polytopes,des_gap_size);
+% 
+% 
+%     % Plot the results
+%     figure(fig_num);
+%     clf;
+% 
+%     line_width = 2;
+%     color = [0 0 0];
+%     axis_box = [0 1 0 1];
+%     fcn_MapGen_plotPolytopes(shrunk_polytopes,gca,'-',line_width,color,axis_box,'square'); %,[1 0 0 0 0.5]);
+%     hold on;
+%     highlighted_polytope = shrunk_polytopes(pointID_to_move);
+% 
+%     % Highlight the moving polytope
+%     % FILL_INFO: a 1-by-5 vector to specify wether or not there is fill, the
+%     % color of fill, and the opacity of the fill [Y/N, R, G, B, alpha]
+%     % fill_info = [1 1 0 0 1];
+%     fcn_MapGen_plotPolytopes(highlighted_polytope,gca,'-',line_width,[1 0 0],axis_box,'square');  % , fill_info);
+% 
+% 
+%     frame = getframe(gcf);
+%     writeVideo(vidfile,frame);
+% 
+% 
+%     pause(0.1);
+% end
+% close(vidfile)
 
-% Prep the movie
-% vidfile = VideoWriter('MovingPolytope.mp4','MPEG-4');
-vidfile = VideoWriter('MovingPolytope.avi');
-open(vidfile);
 
-% Set figure parameters
-line_width = 2;
-color = [0 0 0];
-axis_box = [0 1 0 1];
-
-
-moved_seed_points = original_seed_points;
-for ith_step = 1:1:100
-    % moved_seed_points(pointID_to_move) = original_seed_points(pointID_to_move) + velocities*ith_step;
-    moved_seed_points = original_seed_points + velocities*ith_step;
-
-    % Wrap points to all exist between 0 and 1
-    seed_points = mod(moved_seed_points,1);
-
-    % Calculate the Voronoi diagram
-    [V,C] = voronoin(seed_points);
-
-    % fill polytopes from tiling of Voronoi diagram
-    polytopes = fcn_MapGen_generatePolysFromVoronoiAABB(seed_points,V,C,AABB, stretch);
-
-    des_gap_size = 0.02;
-
-    shrunk_polytopes=...
-        fcn_MapGen_polytopesShrinkFromEdges(...
-        polytopes,des_gap_size);
-
-
-    % Plot the results
-    figure(fig_num);
-    clf;
-
-    fcn_MapGen_plotPolytopes(shrunk_polytopes,gca,'-',line_width,color,axis_box,'square'); %,[1 0 0 0 0.5]);
-    
-    %     % Highlight the moving polytope
-    %     % FILL_INFO: a 1-by-5 vector to specify wether or not there is fill, the
-    %     % color of fill, and the opacity of the fill [Y/N, R, G, B, alpha]
-    %     % fill_info = [1 1 0 0 1];
-    %     fcn_MapGen_plotPolytopes(highlighted_polytope,gca,'-',line_width,[1 0 0],axis_box,'square');  % , fill_info);
-
-
-    frame = getframe(gcf);
-    writeVideo(vidfile,frame);
-
-
-    pause(0.1);
-end
-close(vidfile)
+% %% Show time-dependent generation of polytopes from a tiling
+% % Moves all points
+% fig_num = 1111;
+% clf;
+% 
+% 
+% % pull halton set
+% rng(1111);
+% halton_points = haltonset(2);
+% points_scrambled = scramble(halton_points,'RR2'); % scramble values
+% AABB = [0 0 1 1]; % Define the axis-aligned bounding box
+% stretch = [1 1];
+% 
+% 
+% % pick values from halton set
+% Npoints = 100;
+% Halton_range = [1 Npoints];
+% low_pt = Halton_range(1,1);
+% high_pt = Halton_range(1,2);
+% original_seed_points = points_scrambled(low_pt:high_pt,:);
+% 
+% % Set the point to move
+% % pointID_to_move = 9;
+% 
+% % Set the velocity vectors
+% velocities = 0.01*randn(Npoints,2);
+% % velocities = 0.01;
+% 
+% % Prep the movie
+% % vidfile = VideoWriter('MovingPolytope.mp4','MPEG-4');
+% vidfile = VideoWriter('MovingPolytope.avi');
+% open(vidfile);
+% 
+% % Set figure parameters
+% line_width = 2;
+% color = [0 0 0];
+% axis_box = [0 1 0 1];
+% 
+% 
+% moved_seed_points = original_seed_points;
+% for ith_step = 1:1:100
+%     % moved_seed_points(pointID_to_move) = original_seed_points(pointID_to_move) + velocities*ith_step;
+%     moved_seed_points = original_seed_points + velocities*ith_step;
+% 
+%     % Wrap points to all exist between 0 and 1
+%     seed_points = mod(moved_seed_points,1);
+% 
+%     % Calculate the Voronoi diagram
+%     [V,C] = voronoin(seed_points);
+% 
+%     % fill polytopes from tiling of Voronoi diagram
+%     polytopes = fcn_MapGen_generatePolysFromVoronoiAABB(seed_points,V,C,AABB, stretch);
+% 
+%     des_gap_size = 0.02;
+% 
+%     shrunk_polytopes=...
+%         fcn_MapGen_polytopesShrinkFromEdges(...
+%         polytopes,des_gap_size);
+% 
+% 
+%     % Plot the results
+%     figure(fig_num);
+%     clf;
+% 
+%     fcn_MapGen_plotPolytopes(shrunk_polytopes,gca,'-',line_width,color,axis_box,'square'); %,[1 0 0 0 0.5]);
+%     
+%     %     % Highlight the moving polytope
+%     %     % FILL_INFO: a 1-by-5 vector to specify wether or not there is fill, the
+%     %     % color of fill, and the opacity of the fill [Y/N, R, G, B, alpha]
+%     %     % fill_info = [1 1 0 0 1];
+%     %     fcn_MapGen_plotPolytopes(highlighted_polytope,gca,'-',line_width,[1 0 0],axis_box,'square');  % , fill_info);
+% 
+% 
+%     frame = getframe(gcf);
+%     writeVideo(vidfile,frame);
+% 
+% 
+%     pause(0.1);
+% end
+% close(vidfile)
 
 %% Generate a Voronoi tiling that is a true tile
 fig_num = 112;

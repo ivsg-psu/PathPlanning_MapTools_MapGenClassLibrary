@@ -45,11 +45,19 @@ The class library for functions to generate new maps, started from Seth Tau's or
         </li>
         <li><a href="#functions">Functions</li>
             <ul>
+                <li><a href="#single-polytope-functions">Single Polytope Functions</li>
+                <ul>
+                    <li><a href="#fcn_mapgen_iswithinaabb">fcn_MapGen_isWithinABBB - a method to test if points are within an AABB</li>
+                    <li><a href="#fcn_mapgen_plotpolytopes">fcn_MapGen_plotPolytopes - a method to plot polytope arrays</li>
+                    <li><a href="#fcn_mapgen_polytopecentroidandarea">fcn_MapGen_polytopeCentroidAndArea - calculates polytope centroid and area from vertices</li>
+                    <li><a href="#fcn_mapgen_fillpolytopefieldsfromvertices">fcn_MapGen_fillPolytopeFieldsFromVertices - calculates polytope properties from vertices</li>
+                </ul>            
                 <li><a href="#polytope-field-feneration-functions">Polytope Field Generation Functions</li>
                 <ul>
-                    <li><a href="#fcn_MapGen_tilePoints">fcn_MapGen_tilePoints - a method to tile points</li>
-                    <li><a href="#dependencies">Dependencies</li>
-                </ul>            </ul>
+                    <li><a href="#fcn_mapgen_generatepolysfromvoronoiaabb">fcn_MapGen_generatePolysFromVoronoiAABB - a method to generate polytope fields by "manaully" bounding the Voronoi diagram</li>
+                    <li><a href="#fcn_mapgen_tilepoints">fcn_MapGen_tilePoints - a method to tile points</li>
+                </ul>            
+            </ul>
         <li><a href="#usage">Usage</a></li>
             <ul>
                 <li><a href="#examples">Examples</li>
@@ -135,8 +143,171 @@ The following are the top level directories within the repository:
 
 <!-- FUNCTION DEFINITIONS -->
 ## Functions
+### Single Polytope Functions
+The following are basic functions that operate on single polytopes
+
+#### fcn_MapGen_isWithinAABB 
+The function  **fcn_MapGen_isWithinAABB** checks if the points are within the given axis-aligned bounding box, AABB, returning a vector of 1' or 0's the same length as the nubmer of rows of points. Each point must be strictly within the AABB - e.g. this function returns "false" if a point is on the "wall" of the AABB.
+
+<pre align="center">
+<img src=".\Images\fcn_MapGen_isWithinAABB.png " alt="AABB example" width="420" height="315">
+<figcaption>fcn_MapGen_isWithinAABB - applied over the unit square with random points.</figcaption>
+<!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+
+<a href="#pathplanning_maptools_mapgenclasslibrary">Back to top</a>
+***
+
+#### fcn_MapGen_plotPolytopes 
+The function  **fcn_MapGen_plotPolytopes** plots a polytope array. Note: it only requires the verticies subfield to exist in order to work. For example:
+
+```MATLAB
+polytopes(1).vertices = [0 0; 4 2; 2 4; 0 0];
+fcn_MapGen_plotPolytopes(polytopes,fig_num,'r-',line_width);
+```
+will give the following figure
+
+<pre align="center">
+<img src=".\Images\fcn_MapGen_plotPolytopes.png " alt="plotting example" width="420" height="315">
+<figcaption>fcn_MapGen_plotPolytopes - an example of plotting a polytope of three points.</figcaption>
+<!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+
+<a href="#pathplanning_maptools_mapgenclasslibrary">Back to top</a>
+***
+
+#### fcn_MapGen_polytopeCentroidAndArea 
+The function  **fcn_MapGen_polytopeCentroidAndArea** calculates the centroid and area of a polytope, given the closed-form X and y points for the polytope vertices.
+
+For example:
+
+```MATLAB
+fig_num = 2; % Define the figure
+
+% Define some points
+x = [3; 4; 2; -1; -2; -3; -4; -2; 1; 2; 3];
+y = [1; 2; 2; 3; 2; -1; -2; -3; -3; -2; 1];
+
+% Call the function
+[Centroid,Area] = fcn_MapGen_polytopeCentroidAndArea([x,y],fig_num);
+
+```
+will give the following figure
+
+<pre align="center">
+<img src=".\Images\fcn_MapGen_polytopeCentroidAndArea.png " alt="centroid and area calculation example" width="420" height="315">
+<figcaption>fcn_MapGen_polytopeCentroidAndArea - an example of calculating centroid and area of a polytope.</figcaption>
+<!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+
+<a href="#pathplanning_maptools_mapgenclasslibrary">Back to top</a>
+***
+
+#### fcn_MapGen_fillPolytopeFieldsFromVertices 
+The function  **fcn_MapGen_fillPolytopeFieldsFromVertices** fills in all fields of a polytope given the vertices.
+
+For example:
+
+```MATLAB
+fig_num = 3; % Define the figure number
+clear polytopes % Clear the variable
+polytopes(1).vertices = [0 0; 4 2; 2 4; 0 0]; % Fill in the verticies
+% Call the function to fill in all other fields
+polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes,fig_num);
+% Show that a new field now exists
+assert(isequal(round(polytopes(1).max_radius,4),2.8284));
+```
+will give a structure with all the fields filled in
+```
+>> polytopes
+
+polytopes = 
+
+  struct with fields:
+
+       vertices: [4x2 double]
+             xv: [0 4 2]
+             yv: [0 2 4]
+      distances: [3x1 double]
+           mean: [2 2]
+           area: 6
+     max_radius: 2.8284
+     min_radius: 2
+    mean_radius: 2.2761
+          radii: [3x1 double]
+           cost: 0.0688
+```
+
+
+<a href="#pathplanning_maptools_mapgenclasslibrary">Back to top</a>
+***
 
 ### Polytope Field Generation Functions
+
+
+There are several functions build to generate polytope fields.
+
+#### fcn_MapGen_generatePolysFromVoronoiAABB 
+The function  **fcn_MapGen_generatePolysFromVoronoiAABB** calculates a polytope field given a set of seed points by calculating the Voronoi diagram and manually bounding it. This is an older method, and one prone to error as there are known edge cases where this fails. Also, it tends to be a slow process. The method's steps are illustrated by the following figure:
+
+<pre align="center">
+    <img src=".\Images\MapGenProgression.png " alt="typical progression of map generation" width="960" height="450">
+    <figcaption>Fig.1 - The typical progression of map generation.</figcaption>
+    <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+The steps are:
+1. Given a set of seed points, calculate the Voronoi boundaries.
+2. Given the Vornoi boundaries, contain them by imposing an AABB, including calculating new polytopes as needed.
+3. With the new polytopes, calculate the statistics.
+4. Shrink the polytopes, if necessary, to produce obstacles either by shrinking to a radius, or
+5. Shrink the polytopes from their edges
+
+The following code illustrates a basic call:
+
+```Matlab
+% Demos fcn_MapGen_generatePolysFromVoronoiAABB
+% and script_test_fcn_MapGen_generatePolysFromVoronoiAABB
+fig_num = 10;
+
+% pull halton set
+halton_points = haltonset(2); % Generate the 2-D Halton set
+points_scrambled = scramble(halton_points,'RR2'); % scramble values
+
+
+% pick values from halton set
+Halton_range = [1 100]; % Define number of points we want (e.g 1 to 100)
+low_pt = Halton_range(1,1);
+high_pt = Halton_range(1,2);
+seed_points = points_scrambled(low_pt:high_pt,:);
+[V,C] = voronoin(seed_points); % Calculate the Voronoi diagram
+
+AABB = [0 0 1 1]; % Define the axis-aligned bounding box
+stretch = [1 1]; % Define the stretch factor on each axis
+
+% fill polytopes from tiling, and give a figure number to show results
+fcn_MapGen_generatePolysFromVoronoiAABB(seed_points,V,C,AABB, stretch,fig_num);
+```
+
+And it produces the following plot:
+
+<pre align="center">
+<img src=".\Images\fcn_MapGen_generatePolysFromVoronoiAABB.png " alt="AABB calculation of polytope fields" width="420" height="315">
+<figcaption>fcn_MapGen_generatePolysFromVoronoiAABB - an example of calculating a polytope field constrained by an Axis-Aligned Bounding Box.</figcaption>
+<!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+
+<a href="#pathplanning_maptools_mapgenclasslibrary">Back to top</a>
+***
+
+
+
+
+
 
 #### fcn_MapGen_tilePoints 
 The function  **fcn_MapGen_tilePoints** takes as an input set of Nx2 vector of points that specify a points in an area "X". The function returns a tiling of the points by repeating them but with coordinate displacements along the Axis-aligned Bounding Box (AABB), a certain tile "depth". For example, if a region "X" is specified and a tiling depth of 1 is used, this returns tiling points that make a 1-unit boundary around X, as:
