@@ -79,6 +79,10 @@ varargin...
 % -- first write of function
 % 2021_07_30 by Sean Brennan
 % -- fixed errors due to corners being omitted
+% 2023_03_13
+% -- converted over to narginchk
+% -- converted over to Debug input checking (via fcn_DebugTools_checkInputsToFunctions)
+% -- fixed error with empty figure number inputs
  
 % TO DO:
 % 
@@ -86,7 +90,7 @@ varargin...
 
 %% Debugging and Input checks
 flag_check_inputs = 1; % Set equal to 1 to check the input arguments 
-flag_do_plot = 0;      % Set equal to 1 for plotting 
+flag_do_plots = 0;      % Set equal to 1 for plotting 
 flag_do_debug = 0;     % Set equal to 1 for debugging 
 
 if flag_do_debug
@@ -112,29 +116,30 @@ end
 if 1 == flag_check_inputs
 
     % Are there the right number of inputs?
-    if nargin < 5 || nargin > 6
-        error('Incorrect number of input arguments')
-    end
+    narginchk(5,6);
 
     % Check the seed_points input, make sure it is '2column_of_numbers' type
-    fcn_MapGen_checkInputsToFunctions(...
+    fcn_DebugTools_checkInputsToFunctions(...
         seed_points, '2column_of_numbers');
  
     % Check the stretch input, make sure it is '2column_of_numbers' type
-    fcn_MapGen_checkInputsToFunctions(...
+    fcn_DebugTools_checkInputsToFunctions(...
         stretch, '2column_of_numbers',1);
 
 end
 
 % Does user want to show the plots?
-if  6== nargin
+if 6 == nargin
     fig_num = varargin{end};
-    flag_do_plot = 1;
+    if ~isempty(fig_num)
+        figure(fig_num);
+        flag_do_plots = 1;
+    end
 else
     if flag_do_debug
         fig = figure;
         fig_for_debug = fig.Number;
-        flag_do_plot = 1;
+        flag_do_plots = 1;
     end
 end
 
@@ -308,7 +313,7 @@ polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes);
 
 
 
-if flag_do_plot
+if flag_do_plots
     
     figure(fig_num);
     clf;

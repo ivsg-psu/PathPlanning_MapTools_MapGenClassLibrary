@@ -95,6 +95,8 @@ fig_num = 1;
 isInside = fcn_MapGen_isWithinABBB(AABB,test_points,fig_num);
 
 %% Show how to plot a polytope
+clear polytopes
+fig_num = 111;
 polytopes(1).vertices = [0 0; 4 2; 2 4; 0 0];
 fcn_MapGen_plotPolytopes(polytopes,fig_num,'r-',line_width);
 
@@ -470,11 +472,37 @@ fcn_MapGen_generatePolysFromVoronoiAABB(seed_points,V,C,AABB, stretch,fig_num);
 
 fig_num = 112;
 
-% pull halton set
+% Pull halton set
 rng(1111);
 halton_points = haltonset(2);
 points_scrambled = scramble(halton_points,'RR2'); % scramble values
 unit_AABB = [0 0 1 1]; % Define the axis-aligned bounding box
+stretch = [1 1];
+
+% Pick values from halton set
+Npoints = 100;
+Halton_range = [1 Npoints];
+low_pt = Halton_range(1,1);
+high_pt = Halton_range(1,2);
+original_seed_points = points_scrambled(low_pt:high_pt,:);
+
+% Call the function
+polytopes = fcn_MapGen_generatePolysFromVoronoiAABBWithTiling(original_seed_points,unit_AABB, stretch,fig_num);
+assert(true);
+
+
+
+%% Show time-dependent generation of polytopes from a tiling
+% Moves just one point
+fig_num = 11111;
+clf;
+
+
+% pull halton set
+rng(1111);
+halton_points = haltonset(2);
+points_scrambled = scramble(halton_points,'RR2'); % scramble values
+AABB = [0 0 1 1]; % Define the axis-aligned bounding box
 stretch = [1 1];
 
 
@@ -484,273 +512,168 @@ Halton_range = [1 Npoints];
 low_pt = Halton_range(1,1);
 high_pt = Halton_range(1,2);
 original_seed_points = points_scrambled(low_pt:high_pt,:);
-Nseedpoints = length(original_seed_points);
 
-%% FUNCTION WOULD START HERE
-tile_depth = 1;
+% Set the point to move
+pointID_to_move = 9;
 
-[tiled_original_seed_points] = fcn_MapGen_tilePoints(original_seed_points,tile_depth,unit_AABB);
+% Set the velocity vectors
+%velocities = 0.01*randn(Npoints,2);
+velocities = 0.01;
 
-[V,C] = voronoin(tiled_original_seed_points);
+flag_make_video = 1;
+% Prep the movie?
 
-% Choose the seed points from the middle area
-mid_tile_superindex = ceil((2*tile_depth+1)^2/2);
-mid_tile_range = ((Nseedpoints*(mid_tile_superindex-1)+1):Nseedpoints*mid_tile_superindex)';
-seed_points_to_use = tiled_original_seed_points(mid_tile_range,:);
+des_gap_size = 0.02;
 
-%% Step 1: for each of the seed points, save the polytope for it
-% Initiate data structures
-num_poly = size(seed_points_to_use,1);
-clear polytopes
-polytopes(num_poly) = ...
-    struct(...
-    'seed_point',[],...
-    'vertices',[],...
-    'AABB',[],...
-    'xv',[],...
-    'yv',[],...
-    'distances',[],...
-    'mean',[],...
-    'area',[],...
-    'max_radius',[],...
-    'min_radius',[],...
-    'mean_radius',[],...
-    'radii',[],...
-    'cost',[],...
-    'parent_poly_id',[]);
-
-Npolys = length(polytopes);
-Nvertices_per_poly = 20; % Maximum estimate
-Nvertices_per_map = Npolys*Nvertices_per_poly;
-all_vertices = nan(Nvertices_per_map,3);
-% all_neighbors = nan(Nvertices_per_map,1);
-
-
-% Loop through the polytopes, filling seed point, verticies (and neighbors
-% matrix?)
-fig_debug = 12345;
-figure(fig_debug);
-clf;
-hold on;
-
-scale = max(3*unit_AABB,[],'all') - min(3*unit_AABB,[],'all');
-new_axis = [unit_AABB(1)-scale/2 unit_AABB(3)+scale/2 unit_AABB(2)-scale/2 unit_AABB(4)+scale/2];
-axis(new_axis);
-
-for ith_poly = 1:length(original_seed_points)
-    % Find which seed index to use
-    offset_seed_index = mid_tile_range(ith_poly);
-
-    % Fill in seed_point
-    polytopes(ith_poly).seed_point = seed_points_to_use(ith_poly);
-
-
-    %     if ith_poly==50
-    %         disp('Stop here');
-    %     end
+moved_seed_points = original_seed_points;
+Nsteps = 100;
+im{Nsteps} = [];
+for ith_step = 1:Nsteps
+    moved_seed_points(pointID_to_move) = original_seed_points(pointID_to_move) + velocities*ith_step;
     
-    vertices_open = V(C{offset_seed_index},:); 
-
-    % Remove ill-conditioned points by setting the ones really, really far
-    % away to infinity
-    scale = max(AABB,[],'all') - min(AABB,[],'all');
-    center = [AABB(1)+AABB(3), AABB(2)+AABB(4)]/2;
-    distances_from_center = sum((vertices_open-center).^2,2).^0.5;
-    near_infinite = (distances_from_center/scale)>1E7;
-    if any(near_infinite)
-        warning('Near-infinite vertex found for polytope: %.0d, for seed point: (%.3f, %.3f)', ith_poly,seed_points_to_use(ith_poly,1),ith_poly,seed_points_to_use(ith_poly,1))
-        vertices_open(near_infinite,:) = inf;
-        % Remove repeated infinities
-        vertices_open = unique(vertices_open,'rows','stable');
-    end
-
-    % Append results to close off the vector loop
-    vertices = [vertices_open; vertices_open(1,:)]; % Close off the vertices
+    % Wrap points
+    seed_points = mod(moved_seed_points,1);
+       
+    % fill polytopes from tiling
+    polytopes = fcn_MapGen_generatePolysFromVoronoiAABBWithTiling(seed_points,unit_AABB, stretch);
+        
+    shrunk_polytopes=...
+        fcn_MapGen_polytopesShrinkFromEdges(...
+        polytopes,des_gap_size);
     
-    % Save verticies to this polytope
-    polytopes(ith_poly).vertices = vertices;
+    
+    % Plot the results
+    figure(fig_num);
+    clf;
+    
+    line_width = 2;
+    color = [0 0 0];
+    axis_box = [0 1 0 1];
+    fcn_MapGen_plotPolytopes(shrunk_polytopes,gca,'-',line_width,color,axis_box,'square'); %,[1 0 0 0 0.5]);
+    hold on;
+    highlighted_polytope = shrunk_polytopes(pointID_to_move);
+    
+    % Highlight the moving polytope
+    % FILL_INFO: a 1-by-5 vector to specify wether or not there is fill, the
+    % color of fill, and the opacity of the fill [Y/N, R, G, B, alpha]
+    % fill_info = [1 1 0 0 1];
+    fcn_MapGen_plotPolytopes(highlighted_polytope,gca,'-',line_width,[1 0 0],axis_box,'square');  % , fill_info);
+    
+    if flag_make_video
+        frame = getframe(gcf);
+        im{ith_step} = frame2im(frame);
+    end
+    
+    
 
-    % Plot the poly?
-    if 1==1
+    pause(0.1);
+end
 
-        % Replot the poly before this one in blue (to cover it up)
-        line_width = 3;
-        if ith_poly>1
-            fcn_MapGen_plotPolytopes(polytopes(ith_poly-1),fig_debug,'b-',line_width);
+if flag_make_video
+    delay_time = 1/25;
+    filename = "testAnimated.gif"; % Specify the output file name
+    for idx = 1:Nsteps
+        [A,map] = rgb2ind(im{idx},256);
+        if idx == 1
+            imwrite(A,map,filename,"gif","LoopCount",Inf,"DelayTime",delay_time);
+        else
+            imwrite(A,map,filename,"gif","WriteMode","append","DelayTime",delay_time);
         end
+    end
+end
 
-        % Plot this one in red
-        fcn_MapGen_plotPolytopes(polytopes(ith_poly),fig_debug,'r-',line_width);
-        title(sprintf('Polytope: %.0d',ith_poly));
 
-        % Is it the last poly? Plot it in blue
-        if ith_poly==Npolys
-            fcn_MapGen_plotPolytopes(polytopes(ith_poly),fig_debug,'b-',line_width);
+%% Show time-dependent generation of polytopes from a tiling
+% Moves all points
+fig_num = 11111;
+clf;
+
+
+% pull halton set
+rng(1111);
+halton_points = haltonset(2);
+points_scrambled = scramble(halton_points,'RR2'); % scramble values
+AABB = [0 0 1 1]; % Define the axis-aligned bounding box
+stretch = [1 1];
+
+
+% pick values from halton set
+Npoints = 100;
+Halton_range = [1 Npoints];
+low_pt = Halton_range(1,1);
+high_pt = Halton_range(1,2);
+original_seed_points = points_scrambled(low_pt:high_pt,:);
+
+% Set the point to move
+pointID_to_move = 9;
+
+% Set the velocity vectors
+velocities = 0.001*randn(Npoints,2);
+% velocities = 0.01;
+
+
+flag_make_video = 1;
+% Prep the movie?
+
+des_gap_size = 0.02;
+
+Nsteps = 1000;
+im{Nsteps} = [];
+for ith_step = 1:Nsteps
+    fprintf(1,'Iteration: %.0d\n',ith_step);
+    % moved_seed_points(pointID_to_move) = original_seed_points(pointID_to_move) + velocities*ith_step;
+    moved_seed_points = original_seed_points + velocities*ith_step;
+    
+    % Wrap points
+    seed_points = mod(moved_seed_points,1);
+       
+    % fill polytopes from tiling
+    polytopes = fcn_MapGen_generatePolysFromVoronoiAABBWithTiling(seed_points,unit_AABB, stretch);
+        
+    shrunk_polytopes=...
+        fcn_MapGen_polytopesShrinkFromEdges(...
+        polytopes,des_gap_size);
+    
+    
+    % Plot the results
+    figure(fig_num);
+    clf;
+    
+    line_width = 2;
+    color = [0 0 0];
+    axis_box = [0 1 0 1];
+    fcn_MapGen_plotPolytopes(shrunk_polytopes,gca,'-',line_width,color,axis_box,'square'); %,[1 0 0 0 0.5]);
+    hold on;
+    highlighted_polytope = shrunk_polytopes(pointID_to_move);
+    
+    % Highlight the moving polytope
+    % FILL_INFO: a 1-by-5 vector to specify wether or not there is fill, the
+    % color of fill, and the opacity of the fill [Y/N, R, G, B, alpha]
+    % fill_info = [1 1 0 0 1];
+    fcn_MapGen_plotPolytopes(highlighted_polytope,gca,'-',line_width,[1 0 0],axis_box,'square');  % , fill_info);
+    
+    if flag_make_video
+        frame = getframe(gcf);
+        im{ith_step} = frame2im(frame);
+    end
+    
+    
+
+    pause(0.1);
+end
+
+if flag_make_video
+    delay_time = 1/25;
+    filename = "testAnimated.gif"; % Specify the output file name
+    for idx = 1:Nsteps
+        [A,map] = rgb2ind(im{idx},256);
+        if idx == 1
+            imwrite(A,map,filename,"gif","LoopCount",Inf,"DelayTime",delay_time);
+        else
+            imwrite(A,map,filename,"gif","WriteMode","append","DelayTime",delay_time);
         end
-
-        % Plot this one's seed point:
-        plot(seed_points_to_use(ith_poly,1),seed_points_to_use(ith_poly,2),'r.');
-
-    end
-
-    % Save verticies to the all_verticies array
-    Nvertices = length(vertices(:,1));
-    if Nvertices>Nvertices_per_poly
-        error('Need to resize the number of allowable vertices');
-    else
-        row_offset = (ith_poly-1)*Nvertices_per_poly;
-        all_vertices(row_offset+1:row_offset+Nvertices,1) = ith_poly;
-        all_vertices(row_offset+1:row_offset+Nvertices,2:3) = vertices;
     end
 end
-
-
-% Apply the stretch
-num_poly = length(polytopes);
-for poly = 1:num_poly % pull each cell from the voronoi diagram   
-    try
-        polytopes(poly).vertices  = polytopes(poly).vertices.*stretch;
-    catch
-        disp('stop here');
-    end
-end % Ends for loop for stretch
-
-% Fill in all the other fields
-polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes);
-
-%% Confirm the tiling
-% if it is a true tiling, then the parts that stick out, e.g. values
-% greater than the AABB boundary, should match points that are in the
-% interior - in other words, there is a seamless connection between the two
-% areas.
-
-% Find the parts that stick out
-all_points = all_vertices(~isnan(all_vertices(:,1)),2:3);
-all_points_shifted = all_points - unit_AABB(1:2);
-rounded_points = mod(all_points_shifted,1);
-x_indices_stick_out = find(all_points_shifted(:,1)~=rounded_points(:,1));
-y_indices_stick_out = find(all_points_shifted(:,2)~=rounded_points(:,2));
-xy_indices_stick_out = intersect(x_indices_stick_out,y_indices_stick_out);
-
-% Find the points that are entirely within the AABB
-x_indices_inside = find(all_points_shifted(:,1)==rounded_points(:,1));
-y_indices_inside = find(all_points_shifted(:,2)==rounded_points(:,2));
-xy_indices_inside = intersect(x_indices_inside,y_indices_inside);
-points_inside = all_points(xy_indices_inside,:);
-
-% DEBUG AREA
-figure(fig_num);
-clf;
-hold on
-
-scale = max(AABB,[],'all') - min(AABB,[],'all');
-new_axis = [AABB(1)-scale/2 AABB(3)+scale/2 AABB(2)-scale/2 AABB(4)+scale/2];
-axis(new_axis);
-
-% plot the polytopes
-fcn_MapGen_plotPolytopes(polytopes,fig_num,'b',2);
-
-% plot all vertices
-plot(all_points(:,1),all_points(:,2),'c.','Linewidth',1);
-
-% Plot all the points that stick out
-plot(all_points(x_indices_stick_out,1),all_points(x_indices_stick_out,2),'r.','Markersize',20);
-plot(all_points(y_indices_stick_out,1),all_points(y_indices_stick_out,2),'m.','Markersize',15);
-plot(all_points(xy_indices_stick_out,1),all_points(xy_indices_stick_out,2),'k.','Markersize',10);
-legend('Polytopes','All points','X-data out of bounds','Y-data out of bounds','Both X and Y out of bounds');
-
-% For each of the "stick out" points, check to see that there's an inside
-% point that corresponds to the same location, but inside.
-
-legend off;
-
-% Start with x
-error_inside_to_outside_x = nan(length(x_indices_stick_out),1);
-for ith_outside_point = 1:length(x_indices_stick_out)
-    current_outside_point = all_points(x_indices_stick_out(ith_outside_point),:);
-    rounded_current_outside_point = mod(current_outside_point,1);
-
-    % Use a distance metric to find closest actual point
-    tolerance = 1E-10;
-    distances_to_outside_point = sum((rounded_current_outside_point-points_inside).^2,2).^0.5;
-    [min_distance,~] = min(distances_to_outside_point);
-    index_min = find(distances_to_outside_point<tolerance);
-    closest_points = points_inside(index_min,:);
-
-    % Show the results
-    plot(current_outside_point(:,1),current_outside_point(:,2),'ro','Markersize',20);
-    plot(closest_points(:,1),closest_points(:,2),'ro','Markersize',20);
-    error_inside_to_outside_x(ith_outside_point)= min_distance;
-end
-
-% Now with y
-error_inside_to_outside_y = nan(length(y_indices_stick_out),1);
-for ith_outside_point = 1:length(y_indices_stick_out)
-    current_outside_point = all_points(y_indices_stick_out(ith_outside_point),:);
-    rounded_current_outside_point = mod(current_outside_point,1);
-
-    % Use a distance metric to find closest actual point
-    tolerance = 1E-10;
-    distances_to_outside_point = sum((rounded_current_outside_point-points_inside).^2,2).^0.5;
-    [min_distance,~] = min(distances_to_outside_point);
-    index_min = find(distances_to_outside_point<tolerance);
-    closest_points = points_inside(index_min,:);
-
-    % Show the results
-    plot(current_outside_point(:,1),current_outside_point(:,2),'go','Markersize',20);
-    plot(closest_points(:,1),closest_points(:,2),'go','Markersize',20);
-    error_inside_to_outside_y(ith_outside_point)= min_distance;
-end
-figure(1234); 
-clf;
-hold on;
-plot(error_inside_to_outside_x);
-plot(error_inside_to_outside_y);
-legend('X errors', 'Y errors');
-
-
-
-
-
-
-
-%% DEBUG AREA
-figure(fig_num);
-clf;
-hold on
-
-scale = max(AABB,[],'all') - min(AABB,[],'all');
-new_axis = [AABB(1)-scale/2 AABB(3)+scale/2 AABB(2)-scale/2 AABB(4)+scale/2];
-axis(new_axis);
-
-% plot the polytopes
-fcn_MapGen_plotPolytopes(polytopes,fig_num,'b',2);
-
-% plot all vertices
-plot(all_vertices(:,2),all_vertices(:,3),'c','Linewidth',1);
-
-
-% plot the seed points in red
-plot(seed_points(:,1),seed_points(:,2),'r.','Markersize',10);
-
-% plot the means in black
-temp = zeros(length(polytopes),2);
-for ith_poly = 1:length(polytopes)
-    temp(ith_poly,:) = polytopes(ith_poly).mean;
-end
-plot(temp(:,1),temp(:,2),'ko','Markersize',3);
-
-% number the polytopes at seed points
-for ith_poly = 1:length(polytopes)
-    text_location = seed_points(ith_poly,:);
-    text(text_location(1,1),text_location(1,2),sprintf('%.0d',ith_poly));
-end
-
-% fill polytopes from tiling
-% fcn_MapGen_generatePolysFromVoronoiAABB(tiled_original_seed_points,V,C,AABB, stretch,fig_num);
-
-
-
 
 
 
@@ -758,34 +681,39 @@ end
 close all;
 
 % Generate a set of polytopes from the Sobol set
-fig_num = 11;
-Sobol_range = [1 1000]; % range of Sobol points to use to generate the tiling
+fig_num = 333;
+figure(fig_num);
+clf;
+hold on;
+Numpoints = 100;
+
+subplot(2,3,1);
+Sobol_range = [1 Numpoints]; % range of Sobol points to use to generate the tiling
 tiled_polytopes = fcn_MapGen_sobolVoronoiTiling(Sobol_range,[1 1],fig_num);
 title('Sobel set');
 
-
 % Generate a set of polytopes from the Halton set
-fig_num = 12;
-Halton_range = [1 1000]; % range of Halton points to use to generate the tiling
+subplot(2,3,2);
+Halton_range = [1 Numpoints]; % range of Halton points to use to generate the tiling
 tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
+%fcn_MapGen_plotPolytopes(tiled_polytopes,gca,'-',line_width,[0 0 1],axis_box,'square');  % , fill_info);
 title('Halton set');
 
 % Generate a set of polytopes from the Latin Hypercube set
-fig_num = 13;
-Latin_range = [1 1000]; % range of Halton points to use to generate the tiling
+subplot(2,3,3);
+Latin_range = [1 Numpoints]; % range of Halton points to use to generate the tiling
 tiled_polytopes = fcn_MapGen_latinVoronoiTiling(Latin_range,[1 1],fig_num);
 title('Latin Hypercube set');
 
-
 % Generate a set of polytopes from the Random set
-fig_num = 14;
-Rand_range = [1 1000]; % range of Halton points to use to generate the tiling
+subplot(2,3,4);
+Rand_range = [1 Numpoints]; % range of Halton points to use to generate the tiling
 tiled_polytopes = fcn_MapGen_randVoronoiTiling(Rand_range,[1 1],fig_num);
 title('Uniform random set');
 
 % Generate a set of polytopes from the Random Normal set
-fig_num = 15;
-Rand_range = [1 1000]; % range of Halton points to use to generate the tiling
+subplot(2,3,5);
+Rand_range = [1 Numpoints]; % range of Halton points to use to generate the tiling
 tiled_polytopes = fcn_MapGen_randomNormalVoronoiTiling(Rand_range,[1 1],fig_num);
 title('Random normally distributed set');
 

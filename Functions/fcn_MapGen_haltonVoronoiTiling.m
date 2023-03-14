@@ -171,17 +171,21 @@ if flag_do_plot
     moved_seed_points = seed_points.*stretch;
     plot(moved_seed_points(:,1),moved_seed_points(:,2),'r.','Markersize',10);
     
-    % plot the means in black
-    temp = zeros(length(polytopes),2);
-    for ith_poly = 1:length(polytopes)
-        temp(ith_poly,:) = polytopes(ith_poly).mean;
+    % plot the means in black?
+    if 1==0
+        temp = zeros(length(polytopes),2);
+        for ith_poly = 1:length(polytopes)
+            temp(ith_poly,:) = polytopes(ith_poly).mean;
+        end
+        plot(temp(:,1),temp(:,2),'ko','Markersize',3);
     end
-    plot(temp(:,1),temp(:,2),'ko','Markersize',3);
     
-    % number the polytopes    
-    for ith_poly = 1:length(polytopes)
-        text_location = moved_seed_points(ith_poly,:);
-        text(text_location(1,1),text_location(1,2),sprintf('%.0d',ith_poly));
+    % number the polytopes?
+    if 1==0
+        for ith_poly = 1:length(polytopes)
+            text_location = moved_seed_points(ith_poly,:);
+            text(text_location(1,1),text_location(1,2),sprintf('%.0d',ith_poly));
+        end
     end
     
     

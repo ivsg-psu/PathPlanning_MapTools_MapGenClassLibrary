@@ -52,7 +52,7 @@ The class library for functions to generate new maps, started from Seth Tau's or
                     <li><a href="#fcn_mapgen_polytopecentroidandarea">fcn_MapGen_polytopeCentroidAndArea - calculates polytope centroid and area from vertices</li>
                     <li><a href="#fcn_mapgen_fillpolytopefieldsfromvertices">fcn_MapGen_fillPolytopeFieldsFromVertices - calculates polytope properties from vertices</li>
                 </ul>
-                <li><a href="#polytope-field-feneration-functions">Polytope Field Generation Functions</li>
+                <li><a href="#polytope-field-generation-functions">Polytope Field Generation Functions</li>
                 <ul>
                     <li><a href="#fcn_mapgen_generatepolysfromvoronoiaabb">fcn_MapGen_generatePolysFromVoronoiAABB - a method to generate polytope fields by "manaully" bounding the Voronoi diagram</li>
                     <li><a href="#fcn_mapgen_tilepoints">fcn_MapGen_tilePoints - a method to tile points</li>
@@ -365,6 +365,71 @@ Here's an example with a tiling depth of 2, e.g. the number of cells that will "
 </pre>
 
 <a href="#pathplanning_maptools_mapgenclasslibrary">Back to top</a>
+
+#### fcn_MapGen_generatePolysFromVoronoiAABBWithTiling
+
+The function  **fcn_MapGen_generatePolysFromVoronoiAABBWithTiling** is similar to **fcn_MapGen_generatePolysFromVoronoiAABB** in that it calculates a polytope field given a set of seed points by calculating the Voronoi diagram and manually bounding it. However, it "bounds" the polytope by creating a tiling of seed points around the original set, using the AABB for the tiling, before generating the Voronoi diagram. This prevents edge polytopes from extending to infinity or having close-off issues. Further, the resulting polytope field has a perfect tiling. The method's steps are illustrated by the following figure:
+
+<pre align="center">
+    <img src=".\Images\fcn_MapGen_generatePolysFromVoronoiAABBWithTiling.png " alt="steps in creating a Voronio polytope field via tiling" width="960" height="450">
+    <figcaption>fcn_MapGen_generatePolysFromVoronoiAABBWithTiling - creates a Voronio polytope field via tiling.</figcaption>
+    <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+The steps are:
+
+1. Given a set of seed points, tile these to create a "border" of one copy thick around the original points
+2. Calculate the Voronoi boundaries for the tiled points.
+3. Extract the middle set and use these to create a polytope field.
+4. Shrink the polytopes, if necessary, to produce obstacles either by shrinking to a radius, and
+5. Note that the polytopes "tile", e.g. they align along their borders.
+
+The following code illustrates a basic call:
+
+```Matlab
+%% pull halton set
+halton_points = haltonset(2);
+points_scrambled = scramble(halton_points,'RR2'); % scramble values
+
+%% pick values from halton set
+Halton_range = [1801 1901];
+low_pt = Halton_range(1,1);
+high_pt = Halton_range(1,2);
+seed_points = points_scrambled(low_pt:high_pt,:);
+
+%% fill polytopes from tiling
+fig_num = 1;
+AABB = [0 0 1 1];
+stretch = [1 1];
+polytopes = fcn_MapGen_generatePolysFromVoronoiAABBWithTiling(seed_points,AABB, stretch,fig_num);
+```
+
+And it produces the following plot:
+
+<pre align="center">
+<img src=".\Images\fcn_MapGen_generatePolysFromVoronoiAABBWithTiling_Example.png " alt="creating a polytope field via tiling" width="420" height="315">
+<figcaption>fcn_MapGen_generatePolysFromVoronoiAABBWithTiling - an example of calculating a polytope field constrained by an Axis-Aligned Bounding Box and tiling.</figcaption>
+<!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+This mapping method is particularly good for moving obstacles, such as a single polytope:
+
+<pre align="center">
+<img src=".\Images\testAnimated_onePoly_25Hz.gif " alt="animated single polytope" width="420" height="315">
+<figcaption>A test animation of a single moving polytope, 25 Hz.</figcaption>
+<!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+Or many polytopes:
+
+<pre align="center">
+<img src=".\Images\testAnimated_allPoly_25Hz.gif " alt="animated many polytopes" width="420" height="315">
+<figcaption>A test animation of a many moving polytopes, 25 Hz.</figcaption>
+<!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+<a href="#pathplanning_maptools_mapgenclasslibrary">Back to top</a>
+***
 
 #### Basic Support Functions
 

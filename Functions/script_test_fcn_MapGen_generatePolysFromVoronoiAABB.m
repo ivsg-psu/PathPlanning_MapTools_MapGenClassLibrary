@@ -27,5 +27,10 @@ fig_num = 1;
 AABB = [0 0 1 1];
 stretch = [1 1];
 polytopes = fcn_MapGen_generatePolysFromVoronoiAABB(seed_points,V,C,AABB, stretch,fig_num);
-
 assert(true);
+
+%% check empty figure number (should not plot)
+fig_num = [];
+AABB = [0 0 1 1];
+stretch = [1 1];
+polytopes = fcn_MapGen_generatePolysFromVoronoiAABB(seed_points,V,C,AABB, stretch,fig_num);

@@ -91,7 +91,8 @@ function [tiled_points] = ...
 %
 % 2023_02_23 by Sean Brennan
 % -- first write of function
-
+% 2023_03_13 by Sean Brennan
+% -- shut off debugging
 %
 % TO DO:
 %
@@ -100,10 +101,10 @@ function [tiled_points] = ...
 %% Debugging and Input checks
 flag_check_inputs = 1; % Set equal to 1 to check the input arguments
 flag_do_plots = 0;      % % Set equal to 1 for plotting
-flag_do_debug = 1;     % Set equal to 1 for debugging
+flag_do_debug = 0;     % Set equal to 1 for debugging
 
 if flag_do_debug
-    fig_for_debug = 846; %#ok<NASGU> 
+    fig_for_debug = 846; 
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
 end
@@ -172,8 +173,6 @@ end
 % ind2sub calculation of each subset matrix relative to the center. Then,
 % using these offsets, the points are calculated for the entire
 % supermatrix in one step.
-
-tiled_points = [];
 
 % Calculate the number of tiles to create, e.g. the K value
 Npoints = length(input_points);
