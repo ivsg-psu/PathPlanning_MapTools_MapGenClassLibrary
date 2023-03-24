@@ -1,5 +1,5 @@
 % script_test_fcn_MapGen_generatePolysFromTiling
-% Tests: fcn_MapGen_generatePolysFromTiling
+% Tests: fcn_MapGen_generatePolysFromVoronoiAABB
 
 %
 % REVISION HISTORY:

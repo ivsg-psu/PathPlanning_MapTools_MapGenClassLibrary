@@ -56,6 +56,8 @@ varargin...
 % 
 % 2021_07_02 by Sean Brennan
 % -- first write of function
+% 2023_03_13 by Sean Brennan
+% -- added check and fix for ensuring verticies are counter-clockwise
 
 % 
 % TO DO:
@@ -136,6 +138,29 @@ num_poly = length(polytopes);
 
 % Loop over each polytope, filling in data for each
 for ith_poly = 1:num_poly 
+    
+    % check that verticies are counter-clockwise by calculating the angles. 
+    [angles, ~, ~] = fcn_MapGen_polytopeFindVertexAngles(...
+        filled_polytopes(ith_poly).vertices);
+
+    % Confirm that all angles are positive
+    if ~all(angles>=0)
+        if any(isnan(angles)) % This happens when there is a repeating point, which is a degenerate poly
+            filled_polytopes(ith_poly).vertices = nan(length(filled_polytopes(ith_poly).vertices),2);
+        elseif all(angles<=0)
+            filled_polytopes(ith_poly).vertices = flipud(filled_polytopes(ith_poly).vertices);
+        else            
+            fprintf(1,'Verticies:\n');
+            for ith_vertex = 1:length(filled_polytopes(ith_poly).vertices)
+                fprintf(1,'%.2f %.2f\n',filled_polytopes(ith_poly).vertices(ith_vertex,1),filled_polytopes(ith_poly).vertices(ith_vertex,2))
+            end
+            fprintf(1,'\nAngles:\n');
+            for ith_angle = 1:length(angles)                
+                fprintf(1,'%.2f\n',angles(ith_angle));
+            end
+            error('All vertices must be organized counter-clockwise, e.g. with positive cross-products');
+        end
+    end
 
     % adjust polytopes
     filled_polytopes(ith_poly).xv        = (polytopes(ith_poly).vertices(1:end-1,1)');
@@ -160,6 +185,9 @@ for ith_poly = 1:num_poly
         mean(radii);
     filled_polytopes(ith_poly).radii = radii;
     filled_polytopes(ith_poly).cost = rand;
+end
+
+
 %§
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

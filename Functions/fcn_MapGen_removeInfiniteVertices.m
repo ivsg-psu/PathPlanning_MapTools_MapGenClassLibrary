@@ -62,6 +62,8 @@ function [bounded_vertices] = ...
 % -- first write of function
 % 2021_07_30 by Sean Brennan
 % -- fixed errors due to corners being omitted
+% 2023_02_22 by Sean Brennan
+% -- switched over to DebugTools
 
 %
 % TO DO:
@@ -102,22 +104,22 @@ if 1 == flag_check_inputs
     
     % Check the all_vertices input, make sure it has 3 columns, and can be
     % mixed NaN with numeric values
-    fcn_MapGen_checkInputsToFunctions(...
+    fcn_DebugTools_checkInputsToFunctions(...
         all_vertices, '3column_of_mixed');
     
     % Check the Nvertices_per_poly input, make sure it has 1 column, 1 row
-    fcn_MapGen_checkInputsToFunctions(...
+    fcn_DebugTools_checkInputsToFunctions(...
         Nvertices_per_poly, '1column_of_numbers',1);
     
     % Check the seed_points input, make sure it is '2column_of_numbers'
     % type, with correct number of rows
-    fcn_MapGen_checkInputsToFunctions(...
+    fcn_DebugTools_checkInputsToFunctions(...
         seed_points, '2column_of_numbers',...
         round(length(all_vertices(:,1))/Nvertices_per_poly));
     
     % Check the AABB input, make sure it is '4column_of_numbers' type, with
     % 1 row
-    fcn_MapGen_checkInputsToFunctions(...
+    fcn_DebugTools_checkInputsToFunctions(...
         AABB, '4column_of_numbers',1);
     
 end
@@ -209,6 +211,7 @@ if any(isinf(all_vertices),'all') % Are there any infinite vertices
         row_offset = (bad_poly-1)*Nvertices_per_poly;
         this_poly = all_vertices(row_offset+1:row_offset+Nvertices_per_poly,:);
 
+        % Plot the bad polytope?
         if flag_do_debug           
             % Plot the vertices
             plot(this_poly(:,2),this_poly(:,3),'b.-');
@@ -234,7 +237,11 @@ if any(isinf(all_vertices),'all') % Are there any infinite vertices
             % Check to see if the infinity is at start and end, artificially
             % repeated
             if isequal(bad_indices,[1; length(vertices(:,1))])
-                vertices_no_repeats = vertices(1:end-1,:);
+                if length(bad_indices)==3
+                    disp('stop here');
+                else
+                    vertices_no_repeats = vertices(1:end-1,:);
+                end
             else
                 warning('More than 2 infinities found in one vector. Code may break');
             end
@@ -249,6 +256,10 @@ if any(isinf(all_vertices),'all') % Are there any infinite vertices
         vertex_string = ...
             [vertices_no_repeats(bad_index+1:end,:); ...
             vertices_no_repeats(1:bad_index-1,:)];
+
+        if length(vertex_string(:,1))==1
+            error('single vertex "triangle" encountered');
+        end
         
         if flag_do_debug
             % Plot the vertex_string
@@ -444,6 +455,9 @@ end % Ends the function
 
 function new_point = INTERNAL_fcn_MapGen_findMissingBoundaryPoint(...
     test_point,incoming_point, bad_poly,AABB,sorted_all_vertices,seed_points)
+% The goal of this funtion is to replace a missing bounary point on a
+% polytope. This usually occurs because a polytope is specified as having a
+% point at infinity.
 
 flag_do_debug = 0;
 fig_for_debug = 846; %#ok<NASGU>
@@ -452,6 +466,7 @@ fig_for_debug = 846; %#ok<NASGU>
 % have the same x values
 current_seed = seed_points(bad_poly,:);
 
+% For debugging:
 tolerance = 0.001;
 location = [0.9935 0.1354];
 if (...
@@ -465,6 +480,8 @@ end
 
 if flag_do_debug
     figure(fig_for_debug);
+    clf;
+    hold on;
     
     % Plot the current_seed
     plot(current_seed(:,1),current_seed(:,2),'g.','Markersize',20);
@@ -486,7 +503,7 @@ index_neighbors = ismember(sorted_all_vertices(:,2),test_point(1,1));
 neighbors = sorted_all_vertices(index_neighbors,1);
 
 % Remove the neighbor that matches the current polytope
-neighbors = neighbors(neighbors~=bad_poly);
+valid_neighbors = neighbors(neighbors~=bad_poly);
 
 
 % Grab the incoming by first finding all the vertices that match the
@@ -497,11 +514,11 @@ index_incoming = ismember(sorted_all_vertices(:,2),incoming_point(1,1));
 incoming = sorted_all_vertices(index_incoming,1);
 
 % Remove the incoming that matches the current polytope
-incoming = incoming(incoming~=bad_poly);
+valid_incoming = incoming(incoming~=bad_poly);
 
 % We can identify which vertex to create by finding which neighbor is NOT
 % incoming
-missing_neighbor = neighbors(~ismember(neighbors,incoming));
+missing_neighbor = valid_neighbors(~ismember(valid_neighbors,valid_incoming));
 
 % Grab the seed points of the missing_neighbor
 missing_neighbors_seed = seed_points(missing_neighbor,:);
@@ -531,6 +548,9 @@ distances_squared = ...
 [~,sort_index] = sort(distances_squared,'descend');
 sorted_points_for_vector = points_for_vector(sort_index,:);
 
+if length(sorted_points_for_vector(:,1))<2
+    error('Insufficient points for a vector!');
+end
 if flag_do_debug
     figure(fig_for_debug);
     
@@ -546,7 +566,7 @@ if flag_do_debug
 end
 
 
-snap_type = 3;
+snap_type = 2;
 new_point = fcn_MapGen_snapToAABB(AABB,sorted_points_for_vector,snap_type);
 
 

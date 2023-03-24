@@ -81,6 +81,8 @@ function [fig] = fcn_MapGen_plotPolytopes(polytopes,fig_num,line_spec,line_width
 % -- added test script for function
 % 2023_01_15 - S.Brennan
 % -- uses narginchk now
+% 2023_02_20 - S.Brennan
+% -- checks if figure exists
 
 
 %% chec input arguments
@@ -156,6 +158,7 @@ end
 % end
 
 %% plot polytopes
+% Plot polytope as filled object, using 'fill'
 if fill_info(1) == 1
     for polys = 1:size(polytopes,2)
         filler = fill(polytopes(polys).vertices(:,1)',polytopes(polys).vertices(:,2)',fill_info(2:4));
@@ -171,7 +174,7 @@ for polys = 1:size(polytopes,2) % plot each polytope
     polytope_plot_data_y = [polytope_plot_data_y; polytopes(polys).vertices(:,2); nan]; %#ok<AGROW>
 end
 
-% Plot depending on line style
+% Plot polytope edges depending on line style
 if plots == 1 % basic plot
     plot(polytope_plot_data_x,polytope_plot_data_y,line_spec,'linewidth',line_width)
 else

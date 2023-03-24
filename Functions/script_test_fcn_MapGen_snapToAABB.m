@@ -85,7 +85,7 @@ assert(isequal(test_point,snap_point))
 box = [0 0 1 1];
 test_point = [0.2 0.7; 0.2 0.9];
 fig_num = 51;
-snap_type = 3;
+snap_type = 2;
 snap_point = fcn_MapGen_snapToAABB(box,test_point,snap_type, fig_num);
 true_point = [0.2 1];
 assert(all(abs(true_point-snap_point)<eps))

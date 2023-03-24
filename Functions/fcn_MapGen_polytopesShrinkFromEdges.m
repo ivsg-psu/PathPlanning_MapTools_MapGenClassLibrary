@@ -154,24 +154,33 @@ end
 
 % Initialize the shrunk polytopes structure array, and tolerance for
 % distance between vertices, below which vertices are merged into one.
-shrunk_polytopes = polytopes;
-tolerance = 1e-5; % Units are (implied) kilometers
+clear shrunk_polytopes
+shrinker = polytopes(1); % obstacle to be shrunk
+temp = ...
+    fcn_MapGen_polytopeShrinkFromEdges(...
+    shrinker,des_gap_size/2);
+shrunk_polytopes(length(polytopes)) = temp;
 
 % Loop through each polytope, shrinking it to the reference size
 for ith_poly = 1:length(polytopes)
     shrinker = polytopes(ith_poly); % obstacle to be shrunk
 
-    % assign to shrunk_polytopes
-    % gap_size over 2 is the normal distance to pull edges in
-    shrunk_polytopes(ith_poly) = ...
-        fcn_MapGen_polytopeShrinkFromEdges(...
-        shrinker,des_gap_size/2);
+    if isnan(shrinker.vertices(1,1)) % Degenerate
+        shrunk_polytopes(ith_poly)=shrinker;
+    else
+        % assign to shrunk_polytopes
+        % gap_size over 2 is the normal distance to pull edges in
+        shrunk_polytopes(ith_poly) = ...
+            fcn_MapGen_polytopeShrinkFromEdges(...
+            shrinker,des_gap_size/2);
+    end
 end
 
 
-final_stats = fcn_MapGen_polytopesStatistics(shrunk_polytopes);
-final_average_max_rad = final_stats.average_max_radius;
+
 if flag_do_debug
+    final_stats = fcn_MapGen_polytopesStatistics(shrunk_polytopes);
+    final_average_max_rad = final_stats.average_max_radius;
     fprintf(1,'Final distrubution statistics:\n');
     fprintf(1,'\tAvg mag rad: %.4f\n',final_average_max_rad);
 end
