@@ -2,6 +2,8 @@ function poly_size_stats = fcn_MapGen_polytopesRadiusDistributions(polytopes)
 % fcn_MapGen_polytopesRadiusDistributions uses statistics and calculaus to get
 % estimates of polytope radius distribution, expected radius, and expected
 % width, independent of traversal location and direction
+% by rotating polytopes about their centroids to produce a radial probability of
+% occupation
 %
 % FORMAT:
 % poly_size_stats = fcn_MapGen_polytopesRadiusDistributions(polytopes)
@@ -17,7 +19,7 @@ function poly_size_stats = fcn_MapGen_polytopesRadiusDistributions(polytopes)
 %
 % DEPENDENCIES:
 %
-%     none from IVSG libraries, only Matlab built-in depencies
+%     fcn_MapGen_polytopesStatistics
 %
 % EXAMPLES:
 %
@@ -354,4 +356,3 @@ if flag_do_plot
     hold on
     plot([0,max(o)],[poly_size_stats.mean_d_eff_scalar,poly_size_stats.mean_d_eff_scalar],'k-')
 end
-save('workspace')
