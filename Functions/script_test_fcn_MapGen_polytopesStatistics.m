@@ -12,7 +12,7 @@ close all;
 
 % Generate a set of polytopes from the Halton set
 fig_num = 12;
-Halton_range = [200 3001]; % range of Halton points to use to generate the tiling
+Halton_range = [200 301]; % range of Halton points to use to generate the tiling
 polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1]);
 
 pre_shrink_stats = fcn_MapGen_polytopesStatistics(...
