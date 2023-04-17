@@ -91,6 +91,14 @@ plot(polyshape_background)
 figure(4)
 plot(polyshape_background)
 
+background_verts = polyshape_background.Vertices;
+background_verts(sum(isnan(background_verts), 2) >= 1, :) = [];
+DT = delaunayTriangulation(background_verts);
+figure(6)
+triplot(DT)
+hold on; box on;
+plot(polyshape_background)
+
 [p_tri_polyshapes, p_tri_polytopes] = INTERNAL_fcn_triangulatePolyshape(polyshape_background,flag_do_plot)
 figure(5)
 for i = 1:length(p_tri_polyshapes)
