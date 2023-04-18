@@ -8,7 +8,7 @@ m = 25;
 sz = [n m]; % size of board
 surface_grid = rand(n,m);
 cells = [];
-figure(1); hold on
+figure(1); hold on; box on;
 xlabel('x [km]')
 ylabel('y [km]')
 for ind = 1:1:n
@@ -22,7 +22,7 @@ for ind = 1:1:n
         cells(ind*jind).cost = face_alpha;
     end
 end
-figure(2); hold on
+figure(2); hold on; box on;
 for ind = 1:1:n
     yvec = [(ind-1)/n (ind-1)/n ind/n ind/n];
     for jind = 1:1:m
@@ -34,7 +34,23 @@ for ind = 1:1:n
         cells(ind*jind).cost = face_alpha;
     end
 end
-figure(5); hold on
+figure(22); hold on; box on;
+for ind = 1:1:n
+    yvec = [(ind-1)/n (ind-1)/n ind/n ind/n];
+    for jind = 1:1:m
+        xvec = [(jind-1)/m jind/m jind/m (jind-1)/m];
+        face_alpha = surface_grid(ind,jind);
+
+        fill(xvec,yvec,'black','FaceAlpha',face_alpha)
+        if face_alpha >=0.9
+            fill(xvec,yvec,'red','FaceAlpha',face_alpha)
+        end
+        cells(ind*jind).xv = xvec;
+        cells(ind*jind).yv = yvec;
+        cells(ind*jind).cost = face_alpha;
+    end
+end
+figure(5); hold on; box on;
 for ind = 1:1:n
     yvec = [(ind-1)/n (ind-1)/n ind/n ind/n];
     for jind = 1:1:m
@@ -51,11 +67,24 @@ Halton_seed = 10;
 low_pt = 1+Halton_seed; high_pt = 30+Halton_seed; % range of Halton points to use to generate the tiling
 trim_polytopes = fcn_MapGen_haltonVoronoiTiling([low_pt,high_pt],[1 1]);
 % shink the polytopes so that they are no longer tiled
-gap_size = 0.08; % desired average maximum radius
+gap_size = 0.12; % desired average maximum radius
 polytopes = fcn_MapGen_polytopesShrinkFromEdges(trim_polytopes,gap_size);
 % plot the map
 
     fig = 2; % figure to plot on
+    line_spec = 'b-'; % edge line plotting
+    line_width = 2; % linewidth of the edge
+    axes_limits = [0 1 0 1]; % x and y axes limits
+    axis_style = 'square'; % plot axes style
+    fcn_MapGen_plotPolytopes(polytopes,fig,line_spec,line_width,axes_limits,axis_style);
+    hold on
+    box on
+    xlabel('x [km]')
+    ylabel('y [km]')
+    poly_map_stats = fcn_MapGen_polytopesStatistics(polytopes);
+    my_title = sprintf('obstacle departure ratio: %2f',poly_map_stats.avg_r_D);
+    title(my_title);
+    fig = 22; % figure to plot on
     line_spec = 'b-'; % edge line plotting
     line_width = 2; % linewidth of the edge
     axes_limits = [0 1 0 1]; % x and y axes limits
@@ -80,7 +109,7 @@ polytopes = fcn_MapGen_polytopesShrinkFromEdges(trim_polytopes,gap_size);
         polyshapes = [polyshapes, new_polyshape];
         if flag_do_plot
             figure(3)
-            hold on
+            hold on; box on;
             title('Polyshapes before subtraction')
             plot(polyshapes(i))
         end
@@ -88,7 +117,7 @@ polytopes = fcn_MapGen_polytopesShrinkFromEdges(trim_polytopes,gap_size);
     end
 figure(3)
 plot(polyshape_background)
-figure(4)
+figure(4); box on;
 plot(polyshape_background)
 
 background_verts = polyshape_background.Vertices;
@@ -100,10 +129,18 @@ hold on; box on;
 plot(polyshape_background)
 
 [p_tri_polyshapes, p_tri_polytopes] = INTERNAL_fcn_triangulatePolyshape(polyshape_background,flag_do_plot)
-figure(5)
+figure(5); box on;
+areas = NaN(1,length(p_tri_polyshapes));
 for i = 1:length(p_tri_polyshapes)
     plot(p_tri_polyshapes{i})
+    areas(i) = area(p_tri_polyshapes{i});
 end
+figure(7)
+xlim([0 1])
+ylim([0 1])
+box on;
+cool_title = sprintf('gap size = %.2f \n num. tris = %i \n avg. area = %.5f',gap_size,length(p_tri_polyshapes),mean(areas));
+title(cool_title)
 % make a grid Thrusday
 % convert some grid cells to polytopes Friday-Monday
     % this means find departure ratio
@@ -119,7 +156,7 @@ function [p_tri_polyshapes, p_tri_polytopes] = INTERNAL_fcn_triangulatePolyshape
     % make polyshape into triangulation
     p_tri = triangulation(my_polyshape);
     if flag_do_plot
-        figure
+        figure(7)
         hold on
         triplot(p_tri)
     end
