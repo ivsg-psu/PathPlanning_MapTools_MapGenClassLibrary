@@ -433,6 +433,7 @@ Or many polytopes:
 
 #### Basic Support Functions
 
+
 `fcn_MapGen_increasePolytopeVertexCount.m` : Some path planners may be restricted to navigating to points that are polytope vertices.  To provide a field that gives these planners higher resolution paths, it may be desirable to have colinear vertices on polytope sides.  This function accomplishes that.
 
 <img src=".\Images\fcn_MapGen_increasePolytopeVertexCount.png " alt="vertex interpolation example">
@@ -564,6 +565,7 @@ Project Link: [https://github.com/ivsg-psu/PathPlanning_MapTools_MapGenClassLibr
 <a href="#pathplanning_maptools_mapgenclasslibrary">Back to top</a>
 
 <!-- MARKDOWN LINKS & IMAGES -->
+
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links
 [contributors-shield]: https://img.shields.io/github/contributors/ivsg-psu/FeatureExtraction_Association_PointToPointAssociation.svg?style=for-the-badge
 [contributors-url]: https://github.com/ivsg-psu/FeatureExtraction_Association_PointToPointAssociation/graphs/contributors
