@@ -78,7 +78,7 @@ Thus, a challenge when testing navigration algorithms is to generate polytope ma
 
 The most common usage of the maps from this repository is to generate maps for use in testing path planners and path following controllers.  This repository also includes tools for modifying generated maps such as changing obstalce traversal costs, obstacle size, and obstacle size distribution.  Finally, some obstacle field analysis tools are included as well.
 
-* Inputs:  
+* Inputs:
   * desired number of obstalces
   * obstacle size distribution
 * Outputs
@@ -230,7 +230,7 @@ will give a structure with all the fields filled in
 ```sh
 >> polytopes
 
-polytopes = 
+polytopes =
 
   struct with fields:
 
@@ -433,50 +433,51 @@ Or many polytopes:
 
 #### Basic Support Functions
 
- `fcn_MapGen_increasePolytopeVertexCount.m` : Some path planners may be restricted to navigating to points that are polytope vertices.  To provide a field that gives these planners higher resolution paths, it may be desirable to have colinear vertices on polytope sides.  This function accomplishes that.
 
- ![image](https://user-images.githubusercontent.com/82562987/220429815-071f8a28-5fe6-4926-951d-3dd930c65a31.png)
+`fcn_MapGen_increasePolytopeVertexCount.m` : Some path planners may be restricted to navigating to points that are polytope vertices.  To provide a field that gives these planners higher resolution paths, it may be desirable to have colinear vertices on polytope sides.  This function accomplishes that.
+
+<img src=".\Images\fcn_MapGen_increasePolytopeVertexCount.png " alt="vertex interpolation example">
 
 `fcn_MapGen_polytopesPredictLengthCostRatio.m` : This is an example of a map analysis tool.  Given a field of polytopes, without planning a path, this will approximate the typical distance cost-to-go for that field.  As expected, this increases with denser fields and larger obstacles.
 
-![image](https://user-images.githubusercontent.com/82562987/220430629-a30a9bc6-6a53-4e06-ba24-abe5e245a896.png)
+<img src=".\Images\fcn_MapGen_polytopesPredictLengthCostRatio.png " alt="predicted and measured length cost ratio">
 
 `fcn_MapGen_polytopesPredictLengthCostRatioStraightPath.m` : This performs a similar analysis to what was described above, but rather than approxiting the behavior of a path planner that routes around obstacles, this approximates the cost resulting path planner that routes through all obstacles in a straight line, traversing all encountered obstacles.
 
-![image](https://user-images.githubusercontent.com/82562987/220430650-5c13292e-096d-4939-af95-be387e37791e.png)
+<img src=".\Images\fcn_MapGen_polytopesPredictLengthCostRatioStraightPath.png " alt="predicted and measured length cost ratio for straight path">
 
 `fcn_MapGen_polytopesPredictUnoccupancyRatio.m` : This function, given a polytope field, both before and after shrinking, will use different methods to predict linear and area unoccupancy, i.e. the amount of free length or area relative to the amount of total length or area.
 
-![image](https://user-images.githubusercontent.com/82562987/220431115-425e5ebe-efeb-4a6f-88a7-08246f4b51a5.png)
+<img src=".\Images\fcn_MapGen_polytopesPredictUnoccupancyRatio.png " alt="estimated occupancy ratio">
 
 `fcn_MapGen_polytopesRadiusDistributions.m` : This function rotates polytopes about their centroids to produce a radial probability of occupation and therefore an effective polytope width, independent of position and orientation.
 
-![image](https://user-images.githubusercontent.com/82562987/220431404-42fd9f6d-db9e-44d7-b3aa-7295b846ad3f.png)
+<img src=".\Images\fcn_MapGen_polytopesRadiusDistributions_diagram.png " alt="diagram of statistical polytope representation">
 
-![image](https://user-images.githubusercontent.com/82562987/220431555-5a21073c-3911-4546-a1cf-5be8888a681d.png)
+<img src=".\Images\fcn_MapGen_polytopesRadiusDistributions_plot.png " alt="plot of polytope effective depths">
 
 `script_ui_manuallyDefineMapLayers.m` : This script starts a command line and GUI utility that allows the user to load an image of their choosing, often a satellite map, and draw potentially overlapping polytopes on this image in multiple layers.  The layers will then be flattened into a non-overlapping, convex polytope struct array.
 
 Example drawn polytopes:
 
-![image](https://user-images.githubusercontent.com/82562987/220432752-9c57c185-efa2-4538-85be-dd7ab84aca57.png)
+<img src=".\Images\script_ui_manuallyDefineMapLayers.png " alt="polytopes manually drawn">
 
 Example path planned through this:
 
-![image](https://user-images.githubusercontent.com/82562987/220432801-c217fd61-cc9e-46ba-9b3c-3a8a51197eee.png)
+<img src=".\Images\script_ui_manuallyDefineMapLayers_path.png " alt="polytopes manually drawn and used for path planning">
 
 `fcn_MapGen_flattenPolytopeMap.m` : This takes a potentially overlapping set of polytopes and breaks them into non-overlapping triangles to enforce convexity.  Note, polytope traversal costs will be linearlly combined.
 Example overlapping polytopes:
 
-![image](https://user-images.githubusercontent.com/82562987/220432234-47b632c4-4c71-4686-86b6-225d30961457.png)
+<img src=".\Images\fcn_MapGen_flattenPolytopeMap.png " alt="overlapping polytopes on a satellite map">
 
 Example non-overlapping but potentially convex polytopes:
 
-![image](https://user-images.githubusercontent.com/82562987/220432274-1a65b2b9-2646-4c4e-9fe0-818f44a4b744.png)
+<img src=".\Images\fcn_MapGen_flattenPolytopeMap_2.png " alt="non-overlapping flattened polytopes">
 
 Example non-convex and non-overlapping triangular polytopes:
 
-![image](https://user-images.githubusercontent.com/82562987/220432320-4d819071-6962-421e-807d-e0005cd5b356.png)
+<img src=".\Images\fcn_MapGen_flattenPolytopeMap_3.png " alt="triangulated flattened polytopes">
 
 <a href="#pathplanning_maptools_mapgenclasslibrary">Back to top</a>
 
@@ -564,7 +565,8 @@ Project Link: [https://github.com/ivsg-psu/PathPlanning_MapTools_MapGenClassLibr
 <a href="#pathplanning_maptools_mapgenclasslibrary">Back to top</a>
 
 <!-- MARKDOWN LINKS & IMAGES -->
-<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links 
+
+<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links
 [contributors-shield]: https://img.shields.io/github/contributors/ivsg-psu/FeatureExtraction_Association_PointToPointAssociation.svg?style=for-the-badge
 [contributors-url]: https://github.com/ivsg-psu/FeatureExtraction_Association_PointToPointAssociation/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/ivsg-psu/FeatureExtraction_Association_PointToPointAssociation.svg?style=for-the-badge
