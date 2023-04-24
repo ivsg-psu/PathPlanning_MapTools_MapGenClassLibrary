@@ -67,7 +67,7 @@ Halton_seed = 10;
 low_pt = 1+Halton_seed; high_pt = 30+Halton_seed; % range of Halton points to use to generate the tiling
 trim_polytopes = fcn_MapGen_haltonVoronoiTiling([low_pt,high_pt],[1 1]);
 % shink the polytopes so that they are no longer tiled
-gap_size = 0.12; % desired average maximum radius
+gap_size = 0.08;%0.12; % desired average maximum radius
 polytopes = fcn_MapGen_polytopesShrinkFromEdges(trim_polytopes,gap_size);
 % plot the map
 
@@ -151,6 +151,17 @@ title(cool_title)
     % remove them from the list replacing them with their union()
     % non overlapping squares just get added to the list
 
+background_polytopes = p_tri_polytopes;
+
+[p_tri_polyshapes, p_tri_polytopes] = INTERNAL_fcn_triangulatePolyshape(polyshape_background,flag_do_plot)
+
+% TODO edge classification scheme - parent_poly_id
+% keep parent ID
+% poly ID different, parent ID same = internal edge
+% poly ID different, parent ID different = free space
+% poly ID same = external edge
+
+
 % subtract polytopes from background and triangulate Monday-Tuesday
 function [p_tri_polyshapes, p_tri_polytopes] = INTERNAL_fcn_triangulatePolyshape(my_polyshape,flag_do_plot)
     % make polyshape into triangulation
@@ -184,5 +195,6 @@ function [p_tri_polyshapes, p_tri_polytopes] = INTERNAL_fcn_triangulatePolyshape
         p_tri_polytopes(i).vertices = [x1 y1; x2 y2; x3 y3; x1 y1];
     end
     % fill out all polytope fields from vertices
+    % TODO need to write function to set parent ID here
     p_tri_polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(p_tri_polytopes);
 end
