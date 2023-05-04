@@ -27,6 +27,9 @@
 % 2023_04_27
 % -- Updated the installer to latest version of Debug Tools (fixes bug with
 % Git archives of zips).
+% 2023_05_04 - sbrennan@psu.edu
+% -- Cleared the path variable, in case variable of same name shadows
+% command. This was causing errors in some codes.
 
 
 % TO-DO:
@@ -67,6 +70,7 @@ if 1==0
     % Clear out the variables
     clear global flag* FLAG*
     clear flag*
+    clear path
 
     % Clear out any path directories under Utilities
     path_dirs = regexp(path,'[;]','split');
