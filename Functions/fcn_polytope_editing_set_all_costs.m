@@ -47,7 +47,8 @@ function new_cost_polytopes = ...
     %    of costs so that a cost distribution can be applied instead of a fixed uniform cost
 
     for poly_idx = 1:length(polytopes)
-        polytopes(poly_idx) = setfield(polytopes(poly_idx),'cost',des_cost);
+        % polytopes(poly_idx) = setfield(polytopes(poly_idx),'cost',des_cost);
+        polytopes(poly_idx).cost = des_cost;
     end
     new_cost_polytopes = polytopes;
 end
