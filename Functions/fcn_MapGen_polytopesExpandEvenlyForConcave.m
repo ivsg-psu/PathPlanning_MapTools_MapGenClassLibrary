@@ -6,8 +6,11 @@ polytopes, ...
 exp_dist, ...
 varargin...
 )
-% fcn_MapGen_polytopesExpandEvenly
-% Expands an obstacle out by exp_dist on all sides.
+% fcn_MapGen_polytopesExpandEvenlyForConcave
+% Expands an obstacle out by exp_dist on all sides using matlab's polyshape object
+% and the polybuffer object function (method). The utility of this is that this
+% method is compatible with nonconvex polytopes while the implementation of
+% fcn_MapGen_polytopesExpandEvenly is not.
 %
 %
 %
@@ -16,7 +19,7 @@ varargin...
 %    [ ...
 %    exp_polytopes ...
 %    ] = ...
-%    fcn_MapGen_polytopesExpandEvenly( ...
+%    fcn_MapGen_polytopesExpandEvenlyForConcave( ...
 %    polytopes, ...
 %    delta, ...
 %    exp_dist, ...
@@ -47,29 +50,22 @@ varargin...
 %     fcn_MapGen_checkInputsToFunctions
 %     fcn_MapGen_fillPolytopeFieldsFromVertices
 %     fcn_MapGen_plotPolytopes
+%     MATLAB's polyshape object and polybuffer object function (method)
 %
 %
 % EXAMPLES:
 %
-% See the script: script_test_fcn_MapGen_polytopesExpandEvenly
+% See the script: script_test_fcn_MapGen_polytopesExpandEvenlyForConcave
 % for a full test suite.
 %
-% This function was written on 2018_11_17, Adjusted example code on 2021_04_28 by Seth Tau, Rebased on 2021_06_26 by S. Brennan by Seth Tau
-% Questions or comments? contact sbrennan@psu.edu and sat5340@psu.edu
+% This function was written 5 Feb. 2024 by Steve Harnett
+% Questions or comments? contact sjharnett@psu.edu
 
 %
 % REVISION HISTORY:
 %
-% 2018_11_17, Seth Tau
+% 2024_02_05, Seth Tau
 % -- first write of script
-% 2021_04_28, Seth Tau
-% -- Adjusted example code ,
-% 2021_06_26 S. Brennan
-% -- Rebased code
-% -- Rewrote for clarity
-% 2021_07_06 S. Brennan
-% -- Vectorized plotting into array structure, to better support legends
-% (rather than plotting all polytopes individually)
 
 %
 % TO DO:
@@ -82,7 +78,7 @@ flag_do_plot = 0;      % Set equal to 1 for plotting
 flag_do_debug = 0;     % Set equal to 1 for debugging
 
 if flag_do_debug
-    fig_for_debug = 680;
+    fig_for_debug = 681;
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
 end
@@ -149,11 +145,46 @@ end
 
 clear exp_polytopes;
 for p = 1:length(polytopes)
-    this_polytope = polytopes(p);
-    this_polyshape = polyshape(this_polytope.vertices);
-    scaled_polyshape = polybuffer(this_polyshape,exp_dist,'JointType','miter','MiterLimit',2);
-    new_vertices = scaled_polyshape.Vertices;
-    new_vertices = [new_vertices; new_vertices(1,:)];
-    exp_polytopes(p).vertices = new_vertices;
+    this_polytope = polytopes(p); % look at one polytope
+    this_polyshape = polyshape(this_polytope.vertices); % convert it to matlab polyshape
+    scaled_polyshape = polybuffer(this_polyshape,exp_dist,'JointType','miter','MiterLimit',2); % use polyshape to enlarge it by a buffer
+    new_vertices = scaled_polyshape.Vertices; % extract the vertices from the polyshape
+    new_vertices = [new_vertices; new_vertices(1,:)]; % duplicate first vertex at end of array
+    exp_polytopes(p).vertices = new_vertices; % store vertices in expanded poly struct array
 end
-exp_polytopes= fcn_MapGen_fillPolytopeFieldsFromVertices(exp_polytopes);
+exp_polytopes= fcn_MapGen_fillPolytopeFieldsFromVertices(exp_polytopes); % fill polytopes from vertices
+
+%% Plot the results (for debugging)?
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   _____       _
+%  |  __ \     | |
+%  | |  | | ___| |__  _   _  __ _
+%  | |  | |/ _ \ '_ \| | | |/ _` |
+%  | |__| |  __/ |_) | |_| | (_| |
+%  |_____/ \___|_.__/ \__,_|\__, |
+%                            __/ |
+%                           |___/
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+if flag_do_plot
+    figure(fig_num)
+    clf;
+
+    LineWidth = 2;
+    fcn_MapGen_plotPolytopes(polytopes,fig_num,'r-',LineWidth);
+    fcn_MapGen_plotPolytopes(exp_polytopes,fig_num,'b-',LineWidth,'square');
+    legend('Original','Expanded')
+    box on
+    xlabel('X Position')
+    ylabel('Y Position')
+
+end % Ends the flag_do_plot if statement
+
+if flag_do_debug
+    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
+end
+
+
+end % Ends the function
