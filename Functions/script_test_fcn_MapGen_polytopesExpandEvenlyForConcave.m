@@ -48,5 +48,6 @@ end
 
 %% use concave expansion function
 exp_polytopes=fcn_MapGen_polytopesExpandEvenlyForConcave(polytopes,exp_dist);
+line_width =2;
 fcn_MapGen_plotPolytopes(exp_polytopes,fig_num,'g-',line_width);
 legend('original','*ExpandEvenly','scale method','*ExpandEvenlyForConvex');
