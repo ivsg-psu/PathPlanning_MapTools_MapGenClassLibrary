@@ -38,7 +38,7 @@ function [vx,vy,h] = fcn_MapGen_generateVoronoiDiagramBetweenPolytopes(polytopes
         [vx,vy] = voronoi([polytopes.xv],[polytopes.yv]);
         h = voronoi([polytopes.xv],[polytopes.yv]);
     else
-        % TODO @sjharnett min of diff between all points /2 so at least every side is cut in half
+        % min of diff between all points /2 so at least every side is cut in half
         distances = diff([[polytopes.xv]',[polytopes.yv]']);
         min_distance_between_verts = min(sqrt(sum(distances.*distances,2)));
         % poly_map_stats = fcn_MapGen_polytopesStatistics(polytopes);
