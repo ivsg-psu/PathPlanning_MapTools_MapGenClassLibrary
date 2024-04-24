@@ -13,14 +13,14 @@ function output_pts = fcn_MapGen_snapInteriorPointToVertex(polytopes, pts_to_tes
         if isempty(pts_in)
             continue
         end
-        for pt_in = 1:length(pts_in)
-            pt_to_test = pts_to_test(pts_in(pt_in));
+        for pt_in_idx = 1:length(pts_in)
+            pt_to_test = pts_to_test(pts_in(pt_in_idx),:);
             % if it is, get distance to all vertices
             vert_to_start_deltas = these_verts - pt_to_test;
             vert_to_start_distances = vert_to_start_deltas(:,1).^2 + vert_to_start_deltas(:,2).^2;
             [min_value, idx_of_min] = min(vert_to_start_distances);
             % set this point to the nearest vertex
-            output_pts(pts_in(pt_in),:) = these_verts(idx_of_min,:);
+            output_pts(pts_in(pt_in_idx),:) = these_verts(idx_of_min,:);
         end
     end
 end

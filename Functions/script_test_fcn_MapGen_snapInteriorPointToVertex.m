@@ -30,11 +30,12 @@ if flag_do_plot
     fig = 111; % figure to plot on
     line_spec = 'b-'; % edge line plotting
     line_width = 2; % linewidth of the edge
-    axes_limits = [-3 3 -3 5]; % x and y axes limits
+    axes_limits = [-3 5 -3 5]; % x and y axes limits
     axis_style = 'square'; % plot axes style
     fcn_plot_polytopes(polytopes,fig,line_spec,line_width,axes_limits,axis_style);
     hold on
     box on
+    title('function result')
     xlabel('x [km]')
     ylabel('y [km]')
     plot(pts_to_test(1,1), pts_to_test(1,2),'rd')
@@ -89,9 +90,10 @@ if flag_do_plot
     fig = 121; % figure to plot on
     line_spec = 'b-'; % edge line plotting
     line_width = 2; % linewidth of the edge
-    axes_limits = [-3 3 -3 5]; % x and y axes limits
+    axes_limits = [-3 5 -3 5]; % x and y axes limits
     axis_style = 'square'; % plot axes style
     fcn_plot_polytopes(polytopes,fig,line_spec,line_width,axes_limits,axis_style);
+    title('legacy script result')
     hold on
     box on
     xlabel('x [km]')
