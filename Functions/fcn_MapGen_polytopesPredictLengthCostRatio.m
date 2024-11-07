@@ -72,7 +72,7 @@ function [field_small_choice_angles,field_big_choice_angles,r_lc_estimates] =...
     if 1 == flag_check_inputs
 
         % Are there the right number of inputs?
-        if nargin < 3 || nargin > 3
+        if nargin < 5 || nargin > 5
             error('Incorrect number of input arguments')
         end
 
