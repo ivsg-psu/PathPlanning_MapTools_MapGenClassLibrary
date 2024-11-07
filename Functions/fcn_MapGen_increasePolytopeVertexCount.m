@@ -1,4 +1,4 @@
-function interpolated_polytopes = fcn_MapGen_increasePolytopeVertexCount(polytopes,resolution)
+function interpolated_polytopes = fcn_MapGen_increasePolytopeVertexCount(polytopes,resolution, varargin)
     % fcn_MapGen_increasePolytopeVertexCount
     % Given polytope field and a desired resolution distance, n, returns an equivalent
     % polytope field with colinear vertices added to each polytope side such that
@@ -38,7 +38,7 @@ function interpolated_polytopes = fcn_MapGen_increasePolytopeVertexCount(polytop
 
     %% Debugging and Input checks
     flag_check_inputs = 1; % Set equal to 1 to check the input arguments
-    flag_do_plot = 1;      % Set equal to 1 for plotting
+    flag_do_plot = 0;      % Set equal to 1 for plotting
     flag_do_debug = 0;     % Set equal to 1 for debugging
     if flag_do_debug
         fig_for_debug = 747;
@@ -46,6 +46,38 @@ function interpolated_polytopes = fcn_MapGen_increasePolytopeVertexCount(polytop
         st = dbstack; %#ok<*UNRCH>
         fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
     end
+    %% check input arguments?
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %   _____                   _
+    %  |_   _|                 | |
+    %    | |  _ __  _ __  _   _| |_ ___
+    %    | | | '_ \| '_ \| | | | __/ __|
+    %   _| |_| | | | |_) | |_| | |_\__ \
+    %  |_____|_| |_| .__/ \__,_|\__|___/
+    %              | |
+    %              |_|
+    % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    if flag_check_inputs
+        % Are there the right number of inputs?
+        if nargin < 2 || nargin > 3
+            error('Incorrect number of input arguments')
+        end
+    end
+
+
+    % Does user want to show the plots?
+    if  3 == nargin
+        fig_num = varargin{end};
+        flag_do_plot = 1;
+    else
+        if flag_do_debug
+            fig_for_debug = 333;
+            flag_do_plot = 1;
+        end
+    end
+
 
     %% Start of main code
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -109,6 +141,8 @@ function interpolated_polytopes = fcn_MapGen_increasePolytopeVertexCount(polytop
                         num_verts_needed_this_side);
                 % and make an x vector of the appropriate size containing the only x value possible
                 xq = ones(1,length(vq)).*polytopes(i).vertices(j,1);
+            else
+                error(sprintf('polytope in position %i could not be interpolated between vertex %i and %i. Does this vertex pair correctly represent a polytope side?',i,j,j+1))
             end
             % log new vertecies for this side
             new_verts_this_side = [xq; vq]';
