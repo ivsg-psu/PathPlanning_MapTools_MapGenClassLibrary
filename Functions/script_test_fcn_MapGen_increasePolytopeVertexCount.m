@@ -19,4 +19,3 @@ interpolated_polytopes = fcn_MapGen_increasePolytopeVertexCount(polytopes,resolu
 fcn_MapGen_plotPolytopes(interpolated_polytopes,1000,'-',2,[0 0 0],axis_box,'square',[1 0 0 0 0.5]);
 % assert that there are more vertices now than there were before
 assert(size(extractfield(polytopes,'vertices'),2)<size(extractfield(interpolated_polytopes,'vertices'),2));
-% TODO
