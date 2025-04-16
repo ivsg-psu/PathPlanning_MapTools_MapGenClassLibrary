@@ -57,7 +57,9 @@ varargin...
 % REVISION HISTORY:
 %
 % 2024_02_23, Steve Harnett
-% -- first write of script
+% -- first write of function
+% 2025_04_16, Steve Harnett
+% -- add legend to plotting
 
 %
 % TO DO:
@@ -100,9 +102,6 @@ if 1 == flag_check_inputs
     fcn_MapGen_checkInputsToFunctions(...
         polytopes, 'polytopes');
 
-    %     % Check the delta input, make sure it is 'positive_column_of_numbers' type
-    %     fcn_MapGen_checkInputsToFunctions(...
-    %         delta, 'positive_column_of_numbers',1);
 
 end
 
@@ -138,6 +137,11 @@ for p = 1:length(polytopes)
     this_polytope = polytopes(p); % look at one polytope
     if flag_do_plot
         figure(fig_num); hold on; box on; fill(this_polytope.vertices(:,1)',this_polytope.vertices(:,2),[0 0 1],'FaceAlpha',1);
+        if p == 1
+            leg_str = {'obstacles'};
+        else
+            leg_str{end+1} = '';
+        end
     end
     these_vertices = this_polytope.vertices(1:(end-1),:); % grab only non-repeating vertices
     k = convhull(these_vertices); % find convex hull of vertices
@@ -145,10 +149,16 @@ for p = 1:length(polytopes)
     this_conv_hull_polyshape = polyshape(convex_hull_vertices); % convert it to matlab polyshape
     if flag_do_plot
         figure(fig_num); hold on; box on; plot(this_conv_hull_polyshape,'FaceColor','green','FaceAlpha',0.2);
+        if p == 1
+            leg_str{end+1} = 'obs. convex hull';
+        else
+            leg_str{end+1} = '';
+        end
     end
     conv_hull_polyshapes = [conv_hull_polyshapes; this_conv_hull_polyshape];
     A_occupied = A_occupied+this_polytope.area;
 end
+flag_havent_plotted = 1;
 for i = 1:length(polytopes)
     j = 1;
     while j <= length(polytopes)
@@ -161,6 +171,10 @@ for i = 1:length(polytopes)
         overlap_polyshape = intersect(conv_hull_polyshapes(i),conv_hull_polyshapes(j));
         if flag_do_plot
             figure(fig_num); hold on; box on; plot(overlap_polyshape,'FaceColor','red');
+            if flag_havent_plotted
+                leg_str{end+1} = 'overlap';
+                flag_havent_plotted = 0;
+            end
         end
         A_overlap = A_overlap + area(overlap_polyshape);
         j = j+1;
@@ -171,6 +185,7 @@ convex_hull_overlap_ratio = A_overlap/A_occupied;
 if flag_do_plot
     title_str = sprintf('total obstacle area: %.3f\noverlapping convex hull area: %.3f\nconvex hull overlap ratio: %.3f',A_occupied,A_overlap,convex_hull_overlap_ratio);
     figure(fig_num); title(title_str);
+    legend(leg_str)
 end
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
