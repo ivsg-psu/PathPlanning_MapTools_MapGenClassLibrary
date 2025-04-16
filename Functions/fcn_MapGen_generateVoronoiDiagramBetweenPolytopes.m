@@ -1,39 +1,44 @@
 function [vx,vy,h] = fcn_MapGen_generateVoronoiDiagramBetweenPolytopes(polytopes,is_nonconvex)
     % fcn_MapGen_increasePolytopeVertexCount
-    % Given polytope field and a desired resolution distance, n, returns an equivalent
-    % polytope field with colinear vertices added to each polytope side such that
-    % there is a vertex every n units
-    % The utility of this is that if path planning is restricted to using polytope
-    % vertices as waypoints, this increases the number of options the planner has
-    % while keeping the obstacle field the same
-    %
+    % Wraps the matlab voronoi() function to find the voronoi diagram using
+    % the vertices of polytopes as the seed points, in the case of convex obstacles
+    % or using densely packed colinear vertices along polytope sides as seed points
+    % in the case of nonconvex osbtacles.  Voronoi diagram boundaries may collide
+    % with polytope sides but voronoi diagram boundaries bewteen obstacles are also
+    % calcualted.  This is similar to the process used by Masehian et al. 2004, see:
+    % Masehian, Ellips, and M. R. Amin‐Naseri. "A voronoi diagram‐visibility graph‐potential field compound algorithm for robot path planning." Journal of Robotic Systems 21.6 (2004): 275-300.
+    % To generate the medial axis between polytopes without these errant edges, you may
+    % wish to use the fcn_MedialAxis_* functions in PathPlanning_GridFreePathPlanners_BoundedAStar
     %
     %
     % FORMAT:
-    % interpolated_polytopes = fcn_MapGen_increasePolytopeVertexCount(polytopes,resolution)
+    % [vx,vy,h] = fcn_MapGen_generateVoronoiDiagramBetweenPolytopes(polytopes,is_nonconvex)
     %
     % INPUTS:
     %     polytopes - the initial polytope field
-    %     resolution - the desired linear spacing between vertices along each polytope side
+    %     is_nonconvex - boolean flag indicating if there are or are not non-convex polytopes
     %
     % OUTPUTS:
     %
-    %
-    %     interpolated_polytopes - a polytope field equivalent to the input but with vertices added
-    %       along the polytopes sides every RESOLUTION units such that each polytope now has more vertices
+    %     Outputs are forwarded directly from Matlab's voronoi function.  See here for description:
+    %       https://www.mathworks.com/help/matlab/ref/voronoi.html
     %
     % DEPENDENCIES:
+    %     Matlab's voronoi function
+    %     fcn_MapGen_increasePolytopeVertexCount
     %
     % EXAMPLES:
     %
-    % See the script: script_fcn_MapGen_increasePolytopeVertexCount.m
+    % See the script: script_fcn_MapGen_generateVoronoiDiagramBetweenPolytopes.m
     % for a full test suite.
     %
     % Questions or comments? contact sjh6473@psu.edu
 
     % REVISION HISTORY:
-    % 2021_10_13
+    % 2024_03_15
     % -- first written by Steve Harnett
+    % 2025_04_16
+    % -- commented by Steve Harnett
     if ~is_nonconvex
         [vx,vy] = voronoi([polytopes.xv],[polytopes.yv]);
         h = voronoi([polytopes.xv],[polytopes.yv]);

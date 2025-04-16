@@ -6,17 +6,10 @@ addpath(strcat(pwd,'\..\..\PathPlanning_PathTools_PathClassLibrary\Functions'));
 addpath(strcat(pwd,'\..\..\PathPlanning_MapTools_MapGenClassLibrary\Functions'));
 addpath(strcat(pwd,'\..\..\Errata_Tutorials_DebugTools\Functions'));
 
-flag_do_plot = 1;
-flag_do_slow_plot = 0;
-flag_do_animation = 0;
-flag_do_plot_slow = 0;
-
-
+%% test convex
 Halton_range = [200 301]; % range of Halton points to use to generate the tiling
 polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1]);
-
 des_gap_size = 0.025;
-
 [shrunk_polytopes] = fcn_MapGen_polytopesShrinkFromEdges(polytopes, des_gap_size);
 is_nonconvex = 0;
 [vx,vy,h] = fcn_MapGen_generateVoronoiDiagramBetweenPolytopes(shrunk_polytopes,is_nonconvex)
