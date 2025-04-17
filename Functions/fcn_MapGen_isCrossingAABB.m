@@ -53,26 +53,20 @@ function [isInside] = fcn_MapGen_isCrossingAABB(AABB, test_points)
 % See the script: script_test_fcn_MapGen_isWithinABBB
 % for a full test suite.
 %
-% This function was written on 2021_07_11 by Sean Brennan
-% Questions or comments? contact sbrennan@psu.edu
+% This function was written on 2024_03_20 by Steve Harnett
+% Questions or comments? contact sjharnett@psu.edu
 
 %
 % REVISION HISTORY:
 %
-% 2021_07_11 by Sean Brennan
-% -- first write of function
-% 2021_07_17 by Sean Brennan
-% -- clarified strictness of the AABB
+% 2024_03_20
+% -- first written by S. Harnett
 
 %
 % TO DO:
 %
 % -- fill in to-do items here.
 
-%% Debugging and Input checks
-flag_check_inputs = 1; % Set equal to 1 to check the input arguments
-flag_do_plot = 0;      % Set equal to 1 for plotting
-flag_do_debug = 0;     % Set equal to 1 for debugging
 
 %% Start of main code
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

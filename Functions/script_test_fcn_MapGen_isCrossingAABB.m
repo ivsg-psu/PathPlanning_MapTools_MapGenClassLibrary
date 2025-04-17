@@ -1,3 +1,10 @@
+% script_test for fcn_MapGen_isCrossingAABB
+% Tests: test for fcn_MapGen_isCrossingAABB
+%
+% REVISION HISTORY:
+% 2024_03_20
+% -- first written by S. Harnett
+
 close all; clear all; clc;
 AABB = [2 2 4 4];
 figure; hold on; box on;
