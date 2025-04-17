@@ -25,7 +25,7 @@ polytopes.vertices = [
     1.0000    0.5217
 ];
 
-polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes);
+polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes,1009,1);
 
 % Set parameters
 exp_dist = 0.04; % Set the expansion distance

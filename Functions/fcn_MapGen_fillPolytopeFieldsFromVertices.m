@@ -18,7 +18,8 @@ varargin...
 %    ] = ...
 %    fcn_MapGen_fillPolytopeFieldsFromVertices( ...
 %    polytopes, ...
-%    (fig_num) ...
+%    (fig_num),...
+%    (is_nonconvex)...
 %    )
 %
 % INPUTS:
@@ -31,6 +32,7 @@ varargin...
 %     fig_num: any number that acts as a figure number output, causing a
 %     figure to be drawn showing results.
 %
+%     is_nonconvex - boolean flag indicating if there are or are not non-convex polytopes
 %
 % OUTPUTS:
 %
@@ -92,7 +94,7 @@ end
 if 1 == flag_check_inputs
 
     % Are there the right number of inputs?
-    if nargin < 1 || nargin > 2
+    if nargin < 1 || nargin > 3
         error('Incorrect number of input arguments')
     end
 
@@ -109,8 +111,8 @@ if 1 == flag_check_inputs
 end
 
 % Does user want to show the plots?
-if  2== nargin
-    fig_num = varargin{end};
+if nargin >= 2
+    fig_num = varargin{1};
     flag_do_plot = 1;
 else
     if flag_do_debug
@@ -118,6 +120,11 @@ else
         fig_for_debug = fig.Number;
         flag_do_plot = 1;
     end
+end
+if nargin == 3
+    is_nonconvex = varargin{2}; % set the non-convex flag if it was given
+else
+    is_nonconvex = 0;
 end
 
 %% Start of main code
@@ -158,7 +165,9 @@ for ith_poly = 1:num_poly
             for ith_angle = 1:length(angles)
                 fprintf(1,'%.2f\n',angles(ith_angle));
             end
-            %error('All vertices must be organized counter-clockwise, e.g. with positive cross-products');
+            if ~is_nonconvex
+                error('All vertices must be organized counter-clockwise, e.g. with positive cross-products. This error will get thrown for nonconvex obstacles.  Did you mean intentionally create nonconvex obstalces? If so you must pass the "is_nonconvex" flag to fcn_MapGen_fillPolytopeFieldsFromVertices to turn off this error.');
+            end
         end
     end
 
