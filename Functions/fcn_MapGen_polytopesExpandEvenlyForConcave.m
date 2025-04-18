@@ -64,7 +64,7 @@ varargin...
 %
 % REVISION HISTORY:
 %
-% 2024_02_05, Seth Tau
+% 2024_02_05, Steve Harnett
 % -- first write of script
 
 %
@@ -100,7 +100,6 @@ end
 if 1 == flag_check_inputs
 
     % Are there the right number of inputs?
-    % if nargin < 3 || nargin > 4
     if nargin < 2 || nargin > 3
         error('Incorrect number of input arguments')
     end
@@ -109,9 +108,6 @@ if 1 == flag_check_inputs
     fcn_MapGen_checkInputsToFunctions(...
         polytopes, 'polytopes');
 
-    %     % Check the delta input, make sure it is 'positive_column_of_numbers' type
-    %     fcn_MapGen_checkInputsToFunctions(...
-    %         delta, 'positive_column_of_numbers',1);
 
     % Check the exp_dist input, make sure it is 'positive_column_of_numbers' type
     fcn_MapGen_checkInputsToFunctions(...
@@ -152,7 +148,7 @@ for p = 1:length(polytopes)
     new_vertices = [new_vertices; new_vertices(1,:)]; % duplicate first vertex at end of array
     exp_polytopes(p).vertices = new_vertices; % store vertices in expanded poly struct array
 end
-exp_polytopes= fcn_MapGen_fillPolytopeFieldsFromVertices(exp_polytopes); % fill polytopes from vertices
+exp_polytopes= fcn_MapGen_fillPolytopeFieldsFromVertices(exp_polytopes,1009,1); % fill polytopes from vertices
 
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

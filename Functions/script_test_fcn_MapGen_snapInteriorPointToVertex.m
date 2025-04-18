@@ -1,5 +1,5 @@
-% script_test_fcn_visibility_clear_and_blocked_points_global
-% Tests: fcn_visibility_clear_and_blocked_points_global
+% script_test_fcn_MapGen_snapInteriorPointToVertex
+% Tests: fcn_MapGen_snapInteriorPointToVertex
 
 %
 % REVISION HISTORY:
