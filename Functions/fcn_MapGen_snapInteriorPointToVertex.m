@@ -6,46 +6,35 @@ function output_pts = fcn_MapGen_snapInteriorPointToVertex(polytopes, pts_to_tes
 %
 % FORMAT:
 %
-%    [ ...
-%    exp_polytopes ...
-%    ] = ...
-%    fcn_MapGen_polytopesExpandEvenlyForConcave( ...
-%    polytopes, ...
-%    delta, ...
-%    exp_dist, ...
-%    (fig_num) ...
-%    )
+% output_pts = fcn_MapGen_snapInteriorPointToVertex(polytopes, pts_to_test)
 %
 % INPUTS:
 %
 %     polytopes: the structure of 'polytopes' type that stores the
 %     polytopes to be expanded
 %
-%     exp_dist: distance to expand the obstacle
+%     pts_to_test: Nx2 matrix of (X,Y) points for N points to snap to vertices, if interior to
+%           a polytope in 'polytopes'
 %
-%     (optional inputs)
 %
-%     fig_num: any number that acts somewhat like a figure number output.
-%     If given, this forces the variable types to be displayed as output
-%     and as well makes the input check process verbose.
 %
 %
 % OUTPUTS:
 %
-%     exp_polytopes: structure of expanded polytopes
+%     output_pts: Nx2 matrix of N (X,Y) positions.  For each of the N points in pts_to_test,
+%       the row in 'output_pts' is either the nearest polytope verticex if the input point was internal
+%       to a polytope in 'polytopes' or the output point is the same as the input point if the input
+%       is not within any polytope
 %
 %
 % DEPENDENCIES:
 %
-%     fcn_MapGen_checkInputsToFunctions
-%     fcn_MapGen_fillPolytopeFieldsFromVertices
-%     fcn_MapGen_plotPolytopes
-%     MATLAB's polyshape object and polybuffer object function (method)
+%     MATLAB's polyshape object and isInterior polyshape function (method)
 %
 %
 % EXAMPLES:
 %
-% See the script: script_test_fcn_MapGen_polytopesExpandEvenlyForConcave
+% See the script: script_test_fcn_MapGen_snapInteriorPointToVertex
 % for a full test suite.
 %
 % This function was written 5 Feb. 2024 by Steve Harnett
@@ -61,10 +50,6 @@ function output_pts = fcn_MapGen_snapInteriorPointToVertex(polytopes, pts_to_tes
 % TO DO:
 %
 % -- fill in to-do items here.
-    % TODO this needs to go in MapGen
-    % TODO @sjharnett make function for snapping point to nearest vertex of polytope
-    % enlarging polytopes may have put the midway start inside a polytope
-    % for each polytope, check if this point is inside the polytope
     output_pts = pts_to_test;
     for p = 1:length(polytopes)
         these_verts = polytopes(p).vertices;
