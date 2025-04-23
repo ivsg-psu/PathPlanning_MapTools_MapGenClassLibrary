@@ -30,7 +30,7 @@ varargin...
 %     (optional inputs)
 %
 %     fig_num: any number that acts as a figure number output, causing a
-%     figure to be drawn showing results.
+%     figure to be drawn showing results.  If 0, plotting is flagged off.
 %
 %     is_nonconvex - boolean flag indicating if there are or are not non-convex polytopes
 %
@@ -113,7 +113,11 @@ end
 % Does user want to show the plots?
 if nargin >= 2
     fig_num = varargin{1};
-    flag_do_plot = 1;
+    if fig_num == 0
+        flag_do_plot = 0;
+    else
+        flag_do_plot = 1;
+    end
 else
     if flag_do_debug
         fig = figure;

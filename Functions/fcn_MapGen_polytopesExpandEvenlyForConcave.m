@@ -148,7 +148,7 @@ for p = 1:length(polytopes)
     new_vertices = [new_vertices; new_vertices(1,:)]; % duplicate first vertex at end of array
     exp_polytopes(p).vertices = new_vertices; % store vertices in expanded poly struct array
 end
-exp_polytopes= fcn_MapGen_fillPolytopeFieldsFromVertices(exp_polytopes,1009,1); % fill polytopes from vertices
+exp_polytopes= fcn_MapGen_fillPolytopeFieldsFromVertices(exp_polytopes,0,1); % fill polytopes from vertices
 
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

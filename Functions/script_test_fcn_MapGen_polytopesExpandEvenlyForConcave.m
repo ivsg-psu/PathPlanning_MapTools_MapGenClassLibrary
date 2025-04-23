@@ -4,7 +4,7 @@
 %
 % REVISION HISTORY:
 %§
-% 2024_, Steve Harnett
+% 2024_02_05, Steve Harnett
 % -- first write of script
 
 % Prep the workspace
@@ -25,8 +25,8 @@ polytopes.vertices = [
     1.0000    0.5217
 ];
 
-polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes,1009,1);
-
+polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes,0,1);
+fcn_MapGen_plotPolytopes(polytopes,1,'r',2);
 % Set parameters
 exp_dist = 0.04; % Set the expansion distance
 fig_num = 221; % Set the figure number
@@ -53,7 +53,7 @@ for ith_poly = 1:size(polytopes,2) % check each obstacle
     exp_polytopes(ith_poly).vertices = centroid + my_scale*(vertices-centroid);
 
     % fill in other fields from the vertices field
-    exp_polytopes(ith_poly) = fcn_MapGen_fillPolytopeFieldsFromVertices(exp_polytopes(ith_poly),109,1);
+    exp_polytopes(ith_poly) = fcn_MapGen_fillPolytopeFieldsFromVertices(exp_polytopes(ith_poly),1,1);
 
 end
 hold on; box on;
@@ -71,7 +71,6 @@ end
 %% use concave expansion function
 exp_polytopes=fcn_MapGen_polytopesExpandEvenlyForConcave(polytopes,exp_dist);
 line_width =2;
-fig_num = 109;
+fig_num = 1;
 fcn_MapGen_plotPolytopes(exp_polytopes,fig_num,'g-',line_width);
-legend('original','*ExpandEvenly','scale method','*ExpandEvenlyForConvex');
-% you are here
+legend('original','*ExpandEvenly','','scale method','*ExpandEvenlyForConvex');

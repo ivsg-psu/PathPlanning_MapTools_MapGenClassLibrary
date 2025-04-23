@@ -23,7 +23,7 @@ flag_do_plot = 1;
 convex_polytope(1).vertices = [0 0; 1 1; -1 2; -2 1; -1 0; 0 0];
 convex_polytope(2).vertices = [convex_polytope(1).vertices(:,1) + 4, convex_polytope(1).vertices(:,2) - 2];
 polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(convex_polytope);
-pts_to_test = [0 0.5; -1 -1; 4 -1];
+pts_to_test = [0 0.5; -1 -1; 4 -1; 4.1 -1];
 output_pts = fcn_MapGen_snapInteriorPointToVertex(polytopes, pts_to_test)
 
 % plot the map
@@ -44,9 +44,11 @@ if flag_do_plot
     plot(pts_to_test(1,1), pts_to_test(1,2),'rd')
     plot(pts_to_test(2,1), pts_to_test(2,2),'bd')
     plot(pts_to_test(3,1), pts_to_test(3,2),'gd')
+    plot(pts_to_test(4,1), pts_to_test(4,2),'kd')
     plot(output_pts(1,1), output_pts(1,2),'rx')
     plot(output_pts(2,1), output_pts(2,2),'bx')
     plot(output_pts(3,1), output_pts(3,2),'gx')
+    plot(output_pts(4,1), output_pts(4,2),'kx')
     legend('polytope','pt. 1 init.','pt. 2 init.','pt. 3 init.','pt. 1 snapped','pt. 2 snapped','pt. 3 snapped')
 end
 
