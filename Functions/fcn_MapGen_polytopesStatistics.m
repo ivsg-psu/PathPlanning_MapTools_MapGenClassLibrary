@@ -184,6 +184,7 @@ all_walls_end_no_nan   = all_walls_end(~isnan(all_walls_end(:,1)),:);
 % Now, reshape the angles into one column, remove the NaN values, and
 % calculate means and standar deviations
 angle_column = reshape(all_angles,Nverticies_per_poly*Npolys,1);
+% angle_column = reshape(all_angles,1,[]); % this line is a useful alternative if the above line fails
 angle_column_no_nan = angle_column(~isnan(angle_column));
 average_vertex_angle = nanmean(angle_column_no_nan*180/pi);
 std_vertex_angle = nanstd(angle_column_no_nan*180/pi);
@@ -200,6 +201,7 @@ std_max_radius = nanstd(all_max_radius);
 
 % Determine the length properties related to sides of polytopes
 length_column = reshape(all_lengths,Nverticies_per_poly*Npolys,1);
+% length_column = reshape(all_lengths,1,[]); % this line is a useful alternative if the above fails
 length_column_no_nan = length_column(~isnan(length_column));
 total_perimeter = sum(length_column_no_nan);
 average_side_length = nanmean(length_column_no_nan);

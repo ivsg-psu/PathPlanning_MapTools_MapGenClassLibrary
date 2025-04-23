@@ -1,16 +1,16 @@
 function [ ...
 exp_polytopes ...
 ] = ...
-fcn_MapGen_polytopesExpandEvenly( ...
+fcn_MapGen_polytopesExpandEvenlyForConcave( ...
 polytopes, ...
 exp_dist, ...
 varargin...
 )
-% fcn_MapGen_polytopesExpandEvenly
-% Expands an obstacle out by exp_dist on all sides.  This function works as intended
-% with convex polytopes.  There is counterintuitive behavior with non-convex polytopes
-% that can be avoided by using fcn_MapGen_polytopesExpandEvenlyForConcave which implements
-% MATLAB's polyshape object and polybuffer method (object function).
+% fcn_MapGen_polytopesExpandEvenlyForConcave
+% Expands an obstacle out by exp_dist on all sides using matlab's polyshape object
+% and the polybuffer object function (method). The utility of this is that this
+% method is compatible with nonconvex polytopes while the implementation of
+% fcn_MapGen_polytopesExpandEvenly is not.
 %
 %
 %
@@ -19,7 +19,7 @@ varargin...
 %    [ ...
 %    exp_polytopes ...
 %    ] = ...
-%    fcn_MapGen_polytopesExpandEvenly( ...
+%    fcn_MapGen_polytopesExpandEvenlyForConcave( ...
 %    polytopes, ...
 %    delta, ...
 %    exp_dist, ...
@@ -50,32 +50,22 @@ varargin...
 %     fcn_MapGen_checkInputsToFunctions
 %     fcn_MapGen_fillPolytopeFieldsFromVertices
 %     fcn_MapGen_plotPolytopes
+%     MATLAB's polyshape object and polybuffer object function (method)
 %
 %
 % EXAMPLES:
 %
-% See the script: script_test_fcn_MapGen_polytopesExpandEvenly
+% See the script: script_test_fcn_MapGen_polytopesExpandEvenlyForConcave
 % for a full test suite.
 %
-% This function was written on 2018_11_17, Adjusted example code on 2021_04_28 by Seth Tau, Rebased on 2021_06_26 by S. Brennan by Seth Tau
-% Questions or comments? contact sbrennan@psu.edu and sat5340@psu.edu
+% This function was written 5 Feb. 2024 by Steve Harnett
+% Questions or comments? contact sjharnett@psu.edu
 
 %
 % REVISION HISTORY:
 %
-% 2018_11_17, Seth Tau
+% 2024_02_05, Steve Harnett
 % -- first write of script
-% 2021_04_28, Seth Tau
-% -- Adjusted example code ,
-% 2021_06_26 S. Brennan
-% -- Rebased code
-% -- Rewrote for clarity
-% 2021_07_06 S. Brennan
-% -- Vectorized plotting into array structure, to better support legends
-% (rather than plotting all polytopes individually)
-% 2024_02_14 S.J. Harnett
-% -- Updated docstring comment to point to fcn_MapGen_polytopesExpandEvenlyForConcave
-%    for non-convex obstacles
 
 %
 % TO DO:
@@ -88,7 +78,7 @@ flag_do_plot = 0;      % Set equal to 1 for plotting
 flag_do_debug = 0;     % Set equal to 1 for debugging
 
 if flag_do_debug
-    fig_for_debug = 680;
+    fig_for_debug = 681;
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
 end
@@ -110,7 +100,6 @@ end
 if 1 == flag_check_inputs
 
     % Are there the right number of inputs?
-    % if nargin < 3 || nargin > 4
     if nargin < 2 || nargin > 3
         error('Incorrect number of input arguments')
     end
@@ -119,9 +108,6 @@ if 1 == flag_check_inputs
     fcn_MapGen_checkInputsToFunctions(...
         polytopes, 'polytopes');
 
-    %     % Check the delta input, make sure it is 'positive_column_of_numbers' type
-    %     fcn_MapGen_checkInputsToFunctions(...
-    %         delta, 'positive_column_of_numbers',1);
 
     % Check the exp_dist input, make sure it is 'positive_column_of_numbers' type
     fcn_MapGen_checkInputsToFunctions(...
@@ -153,27 +139,17 @@ end
 %See: http://patorjk.com/software/taag/#p=display&f=Big&t=Main
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
-exp_polytopes = polytopes; % both structures will be the same size
-
-for ith_poly = 1:size(polytopes,2) % check each obstacle
-
-    % pull values
-    vertices = polytopes(ith_poly).vertices;
-    centroid = polytopes(ith_poly).mean;
-    rad = polytopes(ith_poly).max_radius;
-
-    % Calculate scale
-    scale = (rad+exp_dist)/rad;
-
-    % Calculate new vertices
-    exp_polytopes(ith_poly).vertices = centroid + scale*(vertices-centroid);
-
-    % fill in other fields from the vertices field
-    exp_polytopes(ith_poly) = fcn_MapGen_fillPolytopeFieldsFromVertices(exp_polytopes(ith_poly));
-
+clear exp_polytopes;
+for p = 1:length(polytopes)
+    this_polytope = polytopes(p); % look at one polytope
+    this_polyshape = polyshape(this_polytope.vertices); % convert it to matlab polyshape
+    scaled_polyshape = polybuffer(this_polyshape,exp_dist,'JointType','miter','MiterLimit',2); % use polyshape to enlarge it by a buffer
+    new_vertices = scaled_polyshape.Vertices; % extract the vertices from the polyshape
+    new_vertices = [new_vertices; new_vertices(1,:)]; % duplicate first vertex at end of array
+    exp_polytopes(p).vertices = new_vertices; % store vertices in expanded poly struct array
 end
+exp_polytopes= fcn_MapGen_fillPolytopeFieldsFromVertices(exp_polytopes,0,1); % fill polytopes from vertices
 
-%§
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   _____       _
@@ -208,16 +184,3 @@ end
 
 
 end % Ends the function
-
-%% Functions follow
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   ______                _   _
-%  |  ____|              | | (_)
-%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___
-%  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
-%  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
-%  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
-%
-% See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
-

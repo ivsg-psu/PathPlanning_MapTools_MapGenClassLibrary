@@ -221,9 +221,9 @@ if flag_do_plot
         errorbar(r_D_theoretical,r_lc_sparse_average_all_new,zeros(1,length(r_lc_sparse_average_all_new)),2*r_lc_sparse_std_all_new,zeros(1,length(r_lc_sparse_average_all_new)),zeros(1,length(r_lc_sparse_average_all_new)),'bd')
         errorbar(r_D_theoretical,r_lc_sparse_average_all_actual,zeros(1,length(r_lc_sparse_average_all_actual)),2*r_lc_sparse_std_all_actual,zeros(1,length(r_lc_sparse_average_all_actual)),zeros(1,length(r_lc_sparse_average_all_actual)),'yd')
         plot(r_D_theoretical,r_lc_sparse_average_all,'cd')
-        plot(r_D_theoretical,r_lc_sparse_average_all_new,'bd')
+        plot(r_D_theoretical,r_lc_sparse_average_all_new,'bd') % this should be upper limit
         plot(r_D_theoretical,r_lc_sparse_average_all_actual,'yd')
-        plot(r_D_theoretical,r_lc_sparse_average_all_linear,'LineStyle','none','Color',[0.9290 0.6940 0.1250],'Marker','d')
+        plot(r_D_theoretical,r_lc_sparse_average_all_linear,'LineStyle','none','Color',[0.9290 0.6940 0.1250],'Marker','d') % this should be best estimate
         legend('0.32',...
             '0.16',...
             '0.08',...
