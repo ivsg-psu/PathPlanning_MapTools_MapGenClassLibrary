@@ -1,7 +1,7 @@
 % This is a wrapper script to run all the test scripts in the MapGen
 % class library for the purpose of evaluating every assertion test in these
 % files
-clear all; close all; clc;
+clear all; close all; 
 all_scripts = dir('script_test_fcn_*.m');
 diary 'script_test_fcn_MapGen_all_stdout.txt';
 for i_script = 1:length(all_scripts)

@@ -10,7 +10,7 @@
 % -- remove dependence on test fixture
 %%%%%%%%%%%%%%§
 
-close all; clear all; clc;
+close all; clear all; 
 
 %% basic polytope case
 polytopes(1).vertices = [0 0; 10 0; 10 1; 0 1; 0 0];

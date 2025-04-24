@@ -5,7 +5,7 @@
 % 2024_03_20
 % -- first written by S. Harnett
 
-close all; clear all; clc;
+close all; clear all; 
 AABB = [2 2 4 4];
 figure; hold on; box on;
 fill([AABB(1) AABB(1) AABB(3) AABB(3)], [AABB(2) AABB(4) AABB(4) AABB(2)],[0 0 1],'FaceAlpha',0.3);

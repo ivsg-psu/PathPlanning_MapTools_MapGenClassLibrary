@@ -9,7 +9,6 @@
 %%%%%%%%%%%%%%§
 
 clear
-clc
 close all
 
 %% add necessary directories

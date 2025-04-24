@@ -1,4 +1,4 @@
-clear; close all; clc
+clear; close all;
 % script_test_fcn_MapGen_generateVoronoiDiagramBetweenPolytopes
 % test script of making a Voronoi diagram from points along side sof polytopes
 

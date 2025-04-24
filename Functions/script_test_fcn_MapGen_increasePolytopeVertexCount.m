@@ -8,7 +8,7 @@
 % -- first write of script
 %%%%%%%%%%%%%%§
 
-close all; clear all; clc;
+close all; clear all; 
 %% tests two sets of overlapping polytopes
 axis_box = [0 1 0 1];
 halton_range = [1 100]; % Sets the indices to use from halton set

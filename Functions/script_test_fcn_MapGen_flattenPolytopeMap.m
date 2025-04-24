@@ -10,7 +10,7 @@
 % -- test fixtures and assertions added
 %%%%%%%%%%%%%%§
 
-close all; clear all; clc;
+close all; clear all; 
 %% tests two sets of overlapping polytopes
 load('..\testFixtures/overlapped_real_world_polys')
 flattened_polytopes = fcn_MapGen_flattenPolytopeMap(polytopes);
@@ -20,7 +20,8 @@ assert(isequal(length(flattened_polytopes),23));
 % assert that no polytope has an area smaller than 1e-10
 assert(isequal(sum(extractfield(flattened_polytopes,'area')<1e-10),0));
 
-close all; clear all; clc;
+close all; clear all; 
+
 %% tests an large polytope with several enclave polytopes
 % this is how free space would be broken into polytopes
 load('..\testFixtures/bound_entire_map')

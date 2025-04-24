@@ -5,7 +5,7 @@
 % 2021_10_22
 % -- first written by S. Harnett
 
-clear all; close all;clc;
+clear all; close all;
 %% Debugging and Input checks
 flag_check_inputs = 1; % Set equal to 1 to check the input arguments
 flag_do_plot = 0;      % Set equal to 1 for plotting

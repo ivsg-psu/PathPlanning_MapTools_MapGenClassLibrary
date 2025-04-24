@@ -6,7 +6,7 @@
 % 2022_03_09
 % -- first written by S. Harnett
 
-close all; clear all; clc;
+close all; clear all;
 
 N_int_actual_all = [];
 rd_all= [];

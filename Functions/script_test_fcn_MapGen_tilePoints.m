@@ -5,7 +5,7 @@
 % 2023_02_24
 % -- first written by S. Brennan using
  close all
- clc
+ 
 
 %% Basic example call
 fig_num = 1;
@@ -81,56 +81,56 @@ input_points = 2*rand(Npoints,2);
 
 if 1==0 % Fail cases
     %% Input incorrect, wrong number of arguments
-    clc;
+    ;
     input_points = rand(10,1);
     tile_depth = 2;
     fcn_MapGen_tilePoints(input_points,tile_depth);
 
     %% Input incorrect, wrong number of arguments
-    clc;
+    
     input_points = rand(10,1);
     tile_depth = 2;
     AABB = [0 0 1 1];
     fcn_MapGen_tilePoints(input_points,tile_depth,AABB,3,4);
 
     %% Input incorrect for input_points, only 1 column
-    clc;
+    
     input_points = rand(10,1);
     tile_depth = 2;
     AABB = [0 0 1 1];
     fcn_MapGen_tilePoints(input_points,tile_depth,AABB);
     %% Input incorrect for input_points, 3 column
-    clc;
+    
     input_points = rand(10,1);
     tile_depth = 2;
     AABB = [0 0 1 1];
     fcn_MapGen_tilePoints(input_points,tile_depth,AABB);
     %% Input incorrect for tile_depth, not strictly positive
-    clc;
+    
     input_points = rand(10,2);
     tile_depth = 0;
     AABB = [0 0 1 1];
     fcn_MapGen_tilePoints(input_points,tile_depth,AABB);
     %% Input incorrect for tile_depth, not an integer
-    clc;
+    
     input_points = rand(10,2);
     tile_depth = 1.2;
     AABB = [0 0 1 1];
     fcn_MapGen_tilePoints(input_points,tile_depth,AABB);
     %% Input incorrect for AABB, not an 4x1
-    clc;
+    
     input_points = rand(10,2);
     tile_depth = 1;
     AABB = [0 0 1];
     fcn_MapGen_tilePoints(input_points,tile_depth,AABB);
     %% Input incorrect for AABB, not an 4x1
-    clc;
+    
     input_points = rand(10,2);
     tile_depth = 1;
     AABB = [0 0 1 1 1];
     fcn_MapGen_tilePoints(input_points,tile_depth,AABB);
     %% Input incorrect for AABB, not an 4x1
-    clc;
+    
     input_points = rand(10,2);
     tile_depth = 1;
     AABB = [0 0 1 1; 0 0 0 0];

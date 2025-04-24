@@ -17,7 +17,6 @@ close all
 %% Set up workspace
 if ~exist('flag_was_run_before','var')
     
-    clc
     close all
     
     % add necessary directories

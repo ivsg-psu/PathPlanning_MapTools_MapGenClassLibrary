@@ -7,7 +7,6 @@
 %      2021_06_05
 %      -- wrote function, adapted from script_test_fcn_MapGen_findIntersectionOfSegments.m
 
-clc
 close all
 
 %% Simple test 1 - a simple intersection

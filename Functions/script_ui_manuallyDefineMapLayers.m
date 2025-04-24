@@ -14,7 +14,8 @@
 % -- allowing user to set polytope costs and changing from matrices of polytopes to cell array
 %%%%%%%%%%%%%%§
 
-clear all; close all; clc;
+clear all; close all; 
+
 % prompt user to open a fig file
 sprintf("Select a satellite photo or other map figure with appropriate coordinates\n")
 [FileName,PathName,FilterIndex] = uigetfile('.fig')
