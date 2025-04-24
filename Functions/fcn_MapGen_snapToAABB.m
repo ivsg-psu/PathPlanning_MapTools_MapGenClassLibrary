@@ -17,7 +17,8 @@ function [ ...
 % FORMAT:
 %
 %    [ ...
-%    snap_point ...
+%    snap_point,...
+%    wall_number,...
 %    ] = ...
 %    fcn_MapGen_snapToAABB( ...
 %    axis_aligned_bounding_box, ...
@@ -78,7 +79,8 @@ function [ ...
 % -- better comments
 % -- error check on snap type 2 to force 2 rows
 % -- switched over to fcn_DebugTools_checkInputsToFunctions
-
+% 2025_04_24
+% -- fixed comments and argument listings
 
 %
 % TO DO:
@@ -139,9 +141,9 @@ if  3<= nargin
     flag_snap_type = varargin{1};
 
     if 2 == flag_snap_type
-        % Check the test_point input, make sure it is '2column_of_numbers' type
+        % Check the flag_snap_type input, make sure it is '1column_of_numbers' type
         % with 2 rows
-        fcn_DebugTools_checkInputsToFunctions(test_point, '2column_of_numbers',2);
+        fcn_DebugTools_checkInputsToFunctions(flag_snap_type, '1column_of_numbers',1);
     end
 
 end
@@ -197,13 +199,17 @@ if fcn_MapGen_isWithinABBB(axis_aligned_bounding_box,test_point)
         snap_point = test_point;
         if angle>=-pi/4 && angle<pi/4  % This is the x-max wall
             snap_point(1,1) = axis_aligned_bounding_box(1,3);
+            wall_number = 2;
         elseif angle>=pi/4 && angle<pi*3/4 % This is the y-max wall
             snap_point(1,2) = axis_aligned_bounding_box(1,4);
+            wall_number = 3;
         elseif angle>=-3*pi/4 && angle<(-pi/4) % This is the y-min wall
             snap_point(1,2) = axis_aligned_bounding_box(1,2);
-        else % This is the x-min wall
+           wall_number = 1;
+         else % This is the x-min wall
             snap_point(1,1) = axis_aligned_bounding_box(1,1);
-        end
+           wall_number = 4;
+         end
     elseif flag_snap_type == 2    % Use user-entered vector projection
         try
         [~,snap_point,wall_number] = ...
