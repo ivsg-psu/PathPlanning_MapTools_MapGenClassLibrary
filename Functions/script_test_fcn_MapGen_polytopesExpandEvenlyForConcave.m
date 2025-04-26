@@ -9,11 +9,12 @@
 
 % Prep the workspace
 close all;
+
+%% use legacy polytope expansion
 clear polytopes;
 polytopes = fcn_MapGen_generateOneRandomPolytope;
 
-
-%% concave polytope
+% concave polytope
 polytopes.vertices = [
     1.0000    0.5217
     1.0000    0.5242
@@ -25,13 +26,12 @@ polytopes.vertices = [
     1.0000    0.5217
 ];
 
-polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes,0,1);
+polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes,1);
 fcn_MapGen_plotPolytopes(polytopes,1,'r',2);
 % Set parameters
 exp_dist = 0.04; % Set the expansion distance
-fig_num = 221; % Set the figure number
 
-%% use legacy polytope expansion
+
 % notice how the concavity is not well represented when enlarging the polytope with *ExpandEvenly
 % this code is taken directly from fcn_MapGen_polytopesExpandEvenly
 % code is reproduced here because this function requires slight modification to work with nonconvex
@@ -58,7 +58,7 @@ for ith_poly = 1:size(polytopes,2) % check each obstacle
 end
 hold on; box on;
 
-%% use scale method
+% use scale method
 % notice how the concavity is not well represented when enlarging the polytope with the scale polyshape method
 scale_factor = 1.2;
 for p = 1:length(polytopes)
@@ -68,7 +68,7 @@ for p = 1:length(polytopes)
     plot(scaled_polyshape);
 end
 
-%% use concave expansion function
+% use concave expansion function
 exp_polytopes=fcn_MapGen_polytopesExpandEvenlyForConcave(polytopes,exp_dist);
 line_width =2;
 fig_num = 1;

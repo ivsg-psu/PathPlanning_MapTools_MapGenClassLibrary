@@ -31,7 +31,10 @@
 % -- Cleared the path variable, in case variable of same name shadows
 % command. This was causing errors in some codes.
 % -- functionalized the clear process
-
+% 2025_04_25 - Sean Brennan
+% -- Updated DebugTools_v2024_12_18 dependency
+% -- Added global flags for setting test conditions and plotting
+% -- Deprecated fcn_MapGen_checkInputsToFunctions, converted to fcn_DebugTools_checkInputsToFunctions
 
 % TO-DO:
 % -- add debug library utility, and switch functions to this
@@ -40,9 +43,9 @@
 clear library_name library_folders library_url
 
 ith_library = 1;
-library_name{ith_library}    = 'DebugTools_v2023_04_22';
+library_name{ith_library}    = 'DebugTools_v2024_12_18';
 library_folders{ith_library} = {'Functions','Data'};
-library_url{ith_library}     = 'https://github.com/ivsg-psu/Errata_Tutorials_DebugTools/archive/refs/tags/DebugTools_v2023_04_22.zip';
+library_url{ith_library}     = 'https://github.com/ivsg-psu/Errata_Tutorials_DebugTools/archive/refs/tags/DebugTools_v2024_12_18.zip';
 
 % ith_library = ith_library+1;
 % library_name{ith_library}    = 'PathClass_v2023_02_01';
@@ -67,17 +70,44 @@ library_url{ith_library}     = 'https://github.com/ivsg-psu/Errata_Tutorials_Deb
 
 %% Clear paths and folders, if needed
 if 1==1
-
+    clear flag_MapGen_Folders_Initialized
    fcn_INTERNAL_clearUtilitiesFromPathAndFolders;
 
 end
 
 %% Do we need to set up the work space?
 if ~exist('flag_MapGen_Folders_Initialized','var')
-    this_project_folders = {'Functions'}; % {'Functions','Data'};
+    this_project_folders = {'Functions','testFixtures'}; % {'Functions','Data'};
     fcn_INTERNAL_initializeUtilities(library_name,library_folders,library_url,this_project_folders);  
     flag_MapGen_Folders_Initialized = 1;
 end
+
+%% Set environment flags for input checking in HSOV library
+% These are values to set if we want to check inputs or do debugging
+setenv('MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS','1');
+setenv('MATLABFLAG_MAPGEN_FLAG_DO_DEBUG','0');
+
+%% Set environment flags for input checking in Geometry library
+setenv('MATLABFLAG_GEOMETRY_FLAG_CHECK_INPUTS','0');
+setenv('MATLABFLAG_GEOMETRY_FLAG_DO_DEBUG','0');
+
+% %% Set environment flags that define the ENU origin
+% % This sets the "center" of the ENU coordinate system for all plotting
+% % functions
+% 
+% % Location for Test Track base station
+% setenv('MATLABFLAG_PLOTROAD_REFERENCE_LATITUDE','40.86368573');
+% setenv('MATLABFLAG_PLOTROAD_REFERENCE_LONGITUDE','-77.83592832');
+% setenv('MATLABFLAG_PLOTROAD_REFERENCE_ALTITUDE','344.189');
+% 
+% 
+% %% Set environment flags for plotting
+% % These are values to set if we are forcing image alignment via Lat and Lon
+% % shifting, when doing geoplot. This is added because the geoplot images
+% % are very, very slightly off at the test track, which is confusing when
+% % plotting data
+% setenv('MATLABFLAG_PLOTROAD_ALIGNMATLABLLAPLOTTINGIMAGES_LAT','-0.0000008');
+% setenv('MATLABFLAG_PLOTROAD_ALIGNMATLABLLAPLOTTINGIMAGES_LON','0.0000054');
 
 
 %%

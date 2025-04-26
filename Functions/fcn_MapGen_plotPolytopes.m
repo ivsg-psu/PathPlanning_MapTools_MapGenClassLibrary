@@ -83,10 +83,78 @@ function [fig] = fcn_MapGen_plotPolytopes(polytopes,fig_num,line_spec,line_width
 % -- uses narginchk now
 % 2023_02_20 - S.Brennan
 % -- checks if figure exists
+% 2025_04_25 by Sean Brennan
+% -- added global debugging options
+% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
+
+% TO DO
+% -- none
+
+%% Debugging and Input checks
+
+% Check if flag_max_speed set. This occurs if the fig_num variable input
+% argument (varargin) is given a number of -1, which is not a valid figure
+% number.
+flag_max_speed = 0;
+if (nargin>=2 && isequal(fig_num,-1))
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 0; % Flag to perform input checking
+    flag_max_speed = 1;
+else
+    % Check to see if we are externally setting debug mode to be "on"
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 1; % Flag to perform input checking
+    MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS");
+    MATLABFLAG_MAPGEN_FLAG_DO_DEBUG = getenv("MATLABFLAG_MAPGEN_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_MAPGEN_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_MAPGEN_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS);
+    end
+end
+
+% flag_do_debug = 1;
+
+if flag_do_debug
+    st = dbstack; %#ok<*UNRCH>
+    fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+    debug_fig_num = 999978; %#ok<NASGU>
+else
+    debug_fig_num = []; %#ok<NASGU>
+end
 
 
-%% chec input arguments
-narginchk(4,8);
+%% check input arguments?
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   _____                   _
+%  |_   _|                 | |
+%    | |  _ __  _ __  _   _| |_ ___
+%    | | | '_ \| '_ \| | | | __/ __|
+%   _| |_| | | | |_) | |_| | |_\__ \
+%  |_____|_| |_| .__/ \__,_|\__|___/
+%              | |
+%              |_|
+% See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+if (0==flag_max_speed)
+    if 1 == flag_check_inputs
+
+        % Are there the right number of inputs?
+        narginchk(4,8);
+
+        % % Check the polytopes input, make sure it is 'polytopes' type
+        % fcn_DebugTools_checkInputsToFunctions(...
+        %     polytopes, 'polytopes');
+        % 
+        % 
+        % % Check the exp_dist input, make sure it is 'positive_column_of_numbers' type
+        % fcn_DebugTools_checkInputsToFunctions(...
+        %     exp_dist, 'positive_1column_of_numbers',1);
+
+    end
+end
+
+
 
 %% open figures
 if isempty(fig_num)
@@ -111,6 +179,8 @@ if nargin > 4
         arg_size = length(argument);
         if ischar(argument)
             axis_style = argument; % axis style (ie square or equal)
+        elseif arg_size == 0
+            % Do nothing - user left it blank
         elseif arg_size == 3
             color = argument; % color to plot polytopes
             plots = 2; % specific color plot

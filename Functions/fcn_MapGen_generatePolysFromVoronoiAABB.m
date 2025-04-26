@@ -59,7 +59,7 @@ varargin...
 %
 % DEPENDENCIES:
 %
-%     fcn_MapGen_checkInputsToFunctions
+%     fcn_DebugTools_checkInputsToFunctions
 %     fcn_MapGen_cropPolytopeToRange
 %     fcn_MapGen_fillPolytopeFieldsFromVertices
 %
@@ -83,20 +83,44 @@ varargin...
 % -- converted over to narginchk
 % -- converted over to Debug input checking (via fcn_DebugTools_checkInputsToFunctions)
 % -- fixed error with empty figure number inputs
+% 2025_04_25 by Sean Brennan
+% -- added global debugging options
+% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
 
-% TO DO:
-%
-% -- fill in to-do items here.
+
+% TO DO
+% -- none
 
 %% Debugging and Input checks
-flag_check_inputs = 1; % Set equal to 1 to check the input arguments
-flag_do_plots = 0;      % Set equal to 1 for plotting
-flag_do_debug = 0;     % Set equal to 1 for debugging
+
+% Check if flag_max_speed set. This occurs if the fig_num variable input
+% argument (varargin) is given a number of -1, which is not a valid figure
+% number.
+flag_max_speed = 0;
+if (nargin==6 && isequal(varargin{end},-1))
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 0; % Flag to perform input checking
+    flag_max_speed = 1;
+else
+    % Check to see if we are externally setting debug mode to be "on"
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 1; % Flag to perform input checking
+    MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS");
+    MATLABFLAG_MAPGEN_FLAG_DO_DEBUG = getenv("MATLABFLAG_MAPGEN_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_MAPGEN_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_MAPGEN_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS);
+    end
+end
+
+% flag_do_debug = 1;
 
 if flag_do_debug
-    fig_for_debug = 846;
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+    debug_fig_num = 999978; %#ok<NASGU>
+else
+    debug_fig_num = []; %#ok<NASGU>
 end
 
 %% check input arguments?
@@ -112,36 +136,40 @@ end
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+if (0==flag_max_speed)
+    if 1 == flag_check_inputs
 
-if 1 == flag_check_inputs
+        % Are there the right number of inputs?
+        narginchk(5,6);
 
-    % Are there the right number of inputs?
-    narginchk(5,6);
+        % Check the seed_points input, make sure it is '2column_of_numbers' type
+        fcn_DebugTools_checkInputsToFunctions(...
+            seed_points, '2column_of_numbers');
 
-    % Check the seed_points input, make sure it is '2column_of_numbers' type
-    fcn_DebugTools_checkInputsToFunctions(...
-        seed_points, '2column_of_numbers');
+        % Check the stretch input, make sure it is '2column_of_numbers' type
+        fcn_DebugTools_checkInputsToFunctions(...
+            stretch, '2column_of_numbers',1);
 
-    % Check the stretch input, make sure it is '2column_of_numbers' type
-    fcn_DebugTools_checkInputsToFunctions(...
-        stretch, '2column_of_numbers',1);
-
+    end
 end
+
 
 % Does user want to show the plots?
-if 6 == nargin
-    fig_num = varargin{end};
-    if ~isempty(fig_num)
-        figure(fig_num);
-        flag_do_plots = 1;
+flag_do_plot = 0; % Default is no plotting
+if  6 == nargin && (0==flag_max_speed) % Only create a figure if NOT maximizing speed
+    temp = varargin{end}; % Last argument is always figure number
+    if ~isempty(temp) % Make sure the user is not giving empty input
+        fig_num = temp;
+        flag_do_plot = 1; % Set flag to do plotting
     end
 else
-    if flag_do_debug
+    if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
         fig = figure;
-        fig_for_debug = fig.Number;
-        flag_do_plots = 1;
+        fig_for_debug = fig.Number; %#ok<NASGU>
+        flag_do_plot = 1;
     end
 end
+
 
 %% Start of main code
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -312,7 +340,7 @@ polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes);
 
 
 
-if flag_do_plots
+if flag_do_plot
 
     figure(fig_num);
     clf;

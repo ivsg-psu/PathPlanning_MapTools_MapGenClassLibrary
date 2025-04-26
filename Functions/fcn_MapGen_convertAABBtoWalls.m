@@ -19,8 +19,11 @@ function [walls] = ...
 %
 %     (optional inputs)
 %
-%     fig_num: any number that acts as a figure number output, causing a 
-%     figure to be drawn showing results.
+%      fig_num: a figure number to plot results. If set to -1, skips any
+%      input checking or debugging, no figures will be generated, and sets
+%      up code to maximize speed. As well, if given, this forces the
+%      variable types to be displayed as output and as well makes the input
+%      check process verbose.
 % 
 % 
 % OUTPUTS:
@@ -32,7 +35,7 @@ function [walls] = ...
 % 
 % DEPENDENCIES:
 % 
-%     fcn_MapGen_checkInputsToFunctions
+%     fcn_DebugTools_checkInputsToFunctions
 % 
 % EXAMPLES:
 % 
@@ -47,22 +50,46 @@ function [walls] = ...
 % 
 % 2021_07_17 by Sean Brennan
 % -- first write of function
+% 2025_04_25 by Sean Brennan
+% -- added global debugging options
+% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
 
-% 
-% TO DO:
-% 
 
+% TO DO
+% -- none
 
 %% Debugging and Input checks
-flag_check_inputs = 1; % Set equal to 1 to check the input arguments 
-flag_do_plot = 0;      % % Set equal to 1 for plotting 
-flag_do_debug = 0;     % Set equal to 1 for debugging 
+
+% Check if flag_max_speed set. This occurs if the fig_num variable input
+% argument (varargin) is given a number of -1, which is not a valid figure
+% number.
+flag_max_speed = 0;
+if (nargin==2 && isequal(varargin{end},-1))
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 0; % Flag to perform input checking
+    flag_max_speed = 1;
+else
+    % Check to see if we are externally setting debug mode to be "on"
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 1; % Flag to perform input checking
+    MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS");
+    MATLABFLAG_MAPGEN_FLAG_DO_DEBUG = getenv("MATLABFLAG_MAPGEN_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_MAPGEN_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_MAPGEN_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS);
+    end
+end
+
+% flag_do_debug = 1;
 
 if flag_do_debug
-    fig_for_debug = 4564;
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-end 
+    debug_fig_num = 999978; %#ok<NASGU>
+else
+    debug_fig_num = []; %#ok<NASGU>
+end
+
 
 %% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -77,31 +104,39 @@ end
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+if (0==flag_max_speed)
+    if 1 == flag_check_inputs
 
-if 1 == flag_check_inputs
+        % Are there the right number of inputs?
+        if nargin < 1 || nargin > 2
+            error('Incorrect number of input arguments')
+        end
 
-    % Are there the right number of inputs?
-    if nargin < 1 || nargin > 2
-        error('Incorrect number of input arguments')
+        % Check the AABB input, make sure it is '4column_of_numbers' type, with
+        % 1 row
+        fcn_DebugTools_checkInputsToFunctions(...
+            AABB, '4column_of_numbers',1);
+
     end
-   
-    % Check the AABB input, make sure it is '4column_of_numbers' type, with
-    % 1 row
-    fcn_MapGen_checkInputsToFunctions(...
-        AABB, '4column_of_numbers',1);
-
 end
 
 % Does user want to show the plots?
-if  2== nargin
-    fig_num = varargin{end}; 
-    flag_do_plot = 1; 
+flag_do_plot = 0; % Default is no plotting
+if  2 == nargin && (0==flag_max_speed) % Only create a figure if NOT maximizing speed
+    temp = varargin{end}; % Last argument is always figure number
+    if ~isempty(temp) % Make sure the user is not giving empty input
+        fig_num = temp;
+        flag_do_plot = 1; % Set flag to do plotting
+    end
 else
-    if flag_do_debug
-        fig_num = fig_for_debug;
+    if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
+        fig = figure;
+        fig_for_debug = fig.Number; %#ok<NASGU>
         flag_do_plot = 1;
     end
 end
+
+
 
 %% Start of main code
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

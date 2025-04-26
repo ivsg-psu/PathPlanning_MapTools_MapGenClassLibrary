@@ -4,9 +4,11 @@
 % REVISION HISTORY:
 % 2024_03_20
 % -- first written by S. Harnett
+% 2025_04_25 - S. Brennan
+% -- changed AABB to show that code is not working as expected
 
-close all; clear all; 
-AABB = [2 2 4 4];
+close all; 
+AABB = [2.5 2.5 3.5 3.5];
 figure; hold on; box on;
 fill([AABB(1) AABB(1) AABB(3) AABB(3)], [AABB(2) AABB(4) AABB(4) AABB(2)],[0 0 1],'FaceAlpha',0.3);
 test_coords = [1 3 5];

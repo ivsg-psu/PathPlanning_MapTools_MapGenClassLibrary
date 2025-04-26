@@ -51,7 +51,11 @@ function [shrunk_polytope, new_vertices, new_projection_vectors, cut_distance] =
 %    or outputs from previous calls, used to speed up code since this
 %    skeleton calculation is by far the slowest part.
 %
-%     fig_num: a figure number to plot results.
+%      fig_num: a figure number to plot results. If set to -1, skips any
+%      input checking or debugging, no figures will be generated, and sets
+%      up code to maximize speed. As well, if given, this forces the
+%      variable types to be displayed as output and as well makes the input
+%      check process verbose.
 %
 % OUTPUTS:
 %
@@ -71,11 +75,11 @@ function [shrunk_polytope, new_vertices, new_projection_vectors, cut_distance] =
 %    the function: fcn_MapGen_polytopeFindVertexSkeleton(vertices,fig_num)
 %    or outputs from previous calls, used to speed up code since this
 %    skeleton calculation is by far the slowest part.
-%      
+%
 %
 % DEPENDENCIES:
 %
-%     fcn_MapGen_checkInputsToFunctions
+%     fcn_DebugTools_checkInputsToFunctions
 %     fcn_MapGen_polytopeFindVertexAngles
 %     fcn_MapGen_fillPolytopeFieldsFromVertices
 %
@@ -93,20 +97,44 @@ function [shrunk_polytope, new_vertices, new_projection_vectors, cut_distance] =
 % -- first write of code
 % 2022_02_13 - S.Brennan
 % -- supress MATLAB's warning about flags
-% 
+% 2025_04_25 by Sean Brennan
+% -- added global debugging options
+% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
+
 
 % TO DO
 % -- none
 
 %% Debugging and Input checks
-flag_check_inputs = 0; % Set equal to 1 to check the input arguments
-flag_do_plot = 0;      %#ok<*NASGU> % Set equal to 1 for plotting
-flag_do_debug = 0;     % Set equal to 1 for debugging
+
+% Check if flag_max_speed set. This occurs if the fig_num variable input
+% argument (varargin) is given a number of -1, which is not a valid figure
+% number.
+flag_max_speed = 0;
+if (nargin==6 && isequal(varargin{end},-1))
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 0; % Flag to perform input checking
+    flag_max_speed = 1;
+else
+    % Check to see if we are externally setting debug mode to be "on"
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 1; % Flag to perform input checking
+    MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS");
+    MATLABFLAG_MAPGEN_FLAG_DO_DEBUG = getenv("MATLABFLAG_MAPGEN_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_MAPGEN_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_MAPGEN_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS);
+    end
+end
+
+% flag_do_debug = 1;
 
 if flag_do_debug
-    fig_for_debug = 5168;
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+    debug_fig_num = 999978; %#ok<NASGU>
+else
+    debug_fig_num = []; %#ok<NASGU>
 end
 
 %% check input arguments?
@@ -121,21 +149,20 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if (0==flag_max_speed)
+    if flag_check_inputs
+        % Are there the right number of inputs?
+        narginchk(2,6);
 
-if flag_check_inputs
-    % Are there the right number of inputs?
-    if nargin < 2 || nargin > 6
-        error('Incorrect number of input arguments')
+        % Check the shrinker input
+        fcn_DebugTools_checkInputsToFunctions(...
+            shrinker, 'polytopes');
+
+        % Check the edge_cut input
+        fcn_DebugTools_checkInputsToFunctions(...
+            edge_cut, 'positive_1column_of_numbers',1);
+
     end
-
-    % Check the shrinker input
-    fcn_MapGen_checkInputsToFunctions(...
-        shrinker, 'polytopes');
-
-    % Check the edge_cut input
-    fcn_MapGen_checkInputsToFunctions(...
-        edge_cut, 'positive_1column_of_numbers',1);
-
 end
 
 % Does user want to input skeleton values?
@@ -144,32 +171,37 @@ if  3 < nargin % Only way this happens is if user specifies skeleton
     if nargin<5
         error('Incorrect number of input arguments');
     end
-    
+
     new_vertices = varargin{1};
     new_projection_vectors = varargin{2};
     cut_distance = varargin{3};
-    
-    if flag_check_inputs
-        % Check the cut_distance input
-        fcn_MapGen_checkInputsToFunctions(...
-            new_vertices, '1column_of_numbers');
-    end
-    
+
+    % if flag_check_inputs
+    %     % Check the cut_distance input
+    %     fcn_DebugTools_checkInputsToFunctions(...
+    %         new_vertices, '1column_of_numbers');
+    % end
+
     flag_use_user_skeleton = 1;
 
 end
 
 % Does user want to show the plots?
-if  (6 == nargin) || (3 == nargin)
-    fig_num = varargin{end};
-    flag_do_plot = 1;
+flag_do_plot = 0; % Default is no plotting
+if  ((6 == nargin) || (3==nargin)) && (0==flag_max_speed) % Only create a figure if NOT maximizing speed
+    temp = varargin{end}; % Last argument is always figure number
+    if ~isempty(temp) % Make sure the user is not giving empty input
+        fig_num = temp;
+        flag_do_plot = 1; % Set flag to do plotting
+    end
 else
-    if flag_do_debug
-        fig_for_debug = 1584;
+    if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
+        fig = figure;
+        fig_for_debug = fig.Number; %#ok<NASGU>
         flag_do_plot = 1;
-        fig_num = 1684;
     end
 end
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   __  __       _
@@ -184,7 +216,7 @@ end
 % Initialize variables we may need
 vertices = shrinker.vertices;
 
-%% STEP 1. Calculate the polytope skeleton, 
+%% STEP 1. Calculate the polytope skeleton,
 % or use the skeleton if the user provides this as inputs.
 
 % Do we need to calculate skeleton values?
@@ -198,7 +230,7 @@ if 0 == flag_use_user_skeleton
     end
 end
 
-%% STEP 2. Using the cut distance, find the template 
+%% STEP 2. Using the cut distance, find the template
 % We want to use the one that is less than or equal to the cut distance. If
 % less, then calculate the additional cut and project the verticies to
 % their new points based on residual cut.
@@ -217,7 +249,7 @@ additional_cut_distance = edge_cut - template_start_cut;
 % Determine final vertices
 final_vertices = template_vertices + new_projection_vectors{shape_index}*additional_cut_distance;
 
-   
+
 
 %% STEP 3. Convert the resulting verticies into the standard polytope form
 % Fill in the results

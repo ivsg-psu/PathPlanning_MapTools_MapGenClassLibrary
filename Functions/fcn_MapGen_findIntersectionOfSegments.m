@@ -70,7 +70,9 @@ function [distance,location,wall_that_was_hit] = ...
 %
 % EXAMPLES:
 %      
-%       See the script: script_test_fcn_geometry_findIntersectionOfSegments.m
+%       See the script: script_test_fcn_MapGen_findIntersectionOfSegments
+%       and
+%       script_test_fcn_geometry_findIntersectionOfSegments.m
 %       for a full test suite. 
 %
 % Adopted from https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
@@ -80,17 +82,45 @@ function [distance,location,wall_that_was_hit] = ...
 % Revision history:
 %      2021_06_05 
 %      - wrote the code, templated from fcn_geometry_findIntersectionOfSegments
+% 2025_04_25 by Sean Brennan
+% -- added global debugging options
+% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
+% -- fixed call to fcn_MapGen_fillPolytopeFieldsFromVertices
 
 
+% TO DO
+% -- none
 
-%% Set up for debugging
-flag_do_debug = 0; % Flag to plot the results for debugging
-flag_do_plot = 0; % Flag to plot the results for debugging
-flag_check_inputs = 0; % Flag to perform input checking
+%% Debugging and Input checks
+
+% Check if flag_max_speed set. This occurs if the fig_num variable input
+% argument (varargin) is given a number of -1, which is not a valid figure
+% number.
+flag_max_speed = 0;
+if (nargin==6 && isequal(varargin{end},-1))
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 0; % Flag to perform input checking
+    flag_max_speed = 1;
+else
+    % Check to see if we are externally setting debug mode to be "on"
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 1; % Flag to perform input checking
+    MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS");
+    MATLABFLAG_MAPGEN_FLAG_DO_DEBUG = getenv("MATLABFLAG_MAPGEN_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_MAPGEN_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_MAPGEN_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS);
+    end
+end
+
+% flag_do_debug = 1;
 
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
-    fprintf(1,'Starting function: %s, in file: %s\n',st(1).name,st(1).file);
+    fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+    debug_fig_num = 999978; %#ok<NASGU>
+else
+    debug_fig_num = []; %#ok<NASGU>
 end
 
 %% check input arguments
@@ -109,24 +139,26 @@ end
 flag_search_type = 0;
 
 % check input arguments
-if flag_check_inputs == 1
-    if nargin < 4 || nargin > 6
-        error('Incorrect number of input arguments.')
+if (0==flag_max_speed)
+    if flag_check_inputs == 1
+        if nargin < 4 || nargin > 6
+            error('Incorrect number of input arguments.')
+        end
+
+        % Check wall_start input
+        fcn_DebugTools_checkInputsToFunctions(wall_start, '2column_of_numbers');
+
+        Nwalls = length(wall_start(:,1));
+
+        % Check wall_end input
+        fcn_DebugTools_checkInputsToFunctions(wall_end, '2column_of_numbers',Nwalls);
+
+        % Check sensor_vector_start input
+        fcn_DebugTools_checkInputsToFunctions(sensor_vector_start, '2column_of_numbers',1);
+
+        % Check sensor_vector_end input
+        fcn_DebugTools_checkInputsToFunctions(sensor_vector_end, '2column_of_numbers',1);
     end
-    
-    % Check wall_start input
-    fcn_geometry_checkInputsToFunctions(wall_start, '2column_of_numbers');
-    
-    Nwalls = length(wall_start(:,1));
-     
-    % Check wall_end input
-    fcn_geometry_checkInputsToFunctions(wall_end, '2column_of_numbers',Nwalls);
-      
-    % Check sensor_vector_start input
-    fcn_geometry_checkInputsToFunctions(sensor_vector_start, '2column_of_numbers',1);
-     
-    % Check sensor_vector_end input
-    fcn_geometry_checkInputsToFunctions(sensor_vector_end, '2column_of_numbers',1);
 end
 
 % Does user wish to specify search type?
@@ -136,14 +168,17 @@ end
 
 
 % Does user want to show the plots?
-if 6 == nargin
-    fig_num = varargin{end};
-    figure(fig_num);
-    flag_do_plot = 1;
+flag_do_plot = 0; % Default is no plotting
+if  6 == nargin && (0==flag_max_speed) % Only create a figure if NOT maximizing speed
+    temp = varargin{end}; % Last argument is always figure number
+    if ~isempty(temp) % Make sure the user is not giving empty input
+        fig_num = temp;
+        flag_do_plot = 1; % Set flag to do plotting
+    end
 else
-    if flag_do_debug
+    if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
         fig = figure;
-        fig_num = fig.Number;
+        fig_for_debug = fig.Number; %#ok<NASGU>
         flag_do_plot = 1;
     end
 end

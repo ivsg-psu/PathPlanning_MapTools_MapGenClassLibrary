@@ -14,12 +14,12 @@ polytopes = fcn_MapGen_haltonVoronoiTiling([1 100],[1 1], fig_num);
 bounding_box = [0,0; 1,1];
 trim_polytopes = fcn_MapGen_polytopeCropEdges(polytopes,bounding_box,fig_num);
 
-%% Pick a random polytope
+% Pick a random polytope
 Npolys = length(trim_polytopes);
 rand_poly = 1+floor(rand*Npolys);
 shrinker = trim_polytopes(rand_poly);
 
-%% Basic example of uniform shrinking
+% Basic example of uniform shrinking
 fig_num = 11;
 orig_radius = shrinker.max_radius;
 ratio = 0.5;
@@ -31,7 +31,7 @@ shrunk_polytope =...
 
 assert(isequal(round(shrunk_polytope.max_radius,4),round(orig_radius*ratio,4)));
 
-%% Iterative example of uniform shrinking
+% Iterative example of uniform shrinking
 fig_num = 2;
 orig_radius = shrinker.max_radius;
 ratios = (0.99:-0.05:0);
@@ -45,7 +45,7 @@ for ith_ratio = 1:length(ratios)
     pause(0.01);
 end
 
-%% Show results of increasing the tolerance distance to merge points.
+% Show results of increasing the tolerance distance to merge points.
 % So that points merge earlier than they would, thus allowing one to see
 % the effects of merging points around the polytope.
 fig_num = 3;

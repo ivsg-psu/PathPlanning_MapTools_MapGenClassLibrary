@@ -30,6 +30,8 @@ close all;
 
 %% Test case 0.1: inside, close to bottom
 fig_num = 001;
+figure(fig_num);
+clf;
 
 axis_aligned_bounding_box = [0 0 1 1];
 test_point = [0.3 0.2];
@@ -43,6 +45,8 @@ assert(isequal(1,wall_number))
 
 %% Test case 0.2: inside, close to right
 fig_num = 002;
+figure(fig_num);
+clf;
 
 axis_aligned_bounding_box = [0 0 1 1];
 test_point = [0.8 0.4];
@@ -55,6 +59,8 @@ assert(isequal(2,wall_number))
 
 %% Test case 0.3: inside, close to top
 fig_num = 003;
+figure(fig_num);
+clf;
 
 axis_aligned_bounding_box = [0 0 1 1];
 test_point = [0.6 0.9];
@@ -67,6 +73,8 @@ assert(isequal(3,wall_number))
 
 %% Test case 0.4: inside, close to left
 fig_num = 004;
+figure(fig_num);
+clf;
 
 axis_aligned_bounding_box = [0 0 1 1];
 test_point = [0.2 0.7];
@@ -80,6 +88,8 @@ assert(isequal(4,wall_number))
 
 %% Test case 0.5: outside, close to bottom
 fig_num = 005;
+figure(fig_num);
+clf;
 
 axis_aligned_bounding_box = [0 0 1 1];
 test_point = [0.3 -0.2];
@@ -110,6 +120,8 @@ assert(isequal(1,wall_number))
 
 %% Test case 1.1: inside, close to bottom
 fig_num = 101;
+figure(fig_num);
+clf;
 
 axis_aligned_bounding_box = [0 0 1 1];
 test_point = [0.3 0.2];
@@ -123,6 +135,8 @@ assert(isequal(1,wall_number))
 
 %% Test case 1.2: inside, close to right
 fig_num = 102;
+figure(fig_num);
+clf;
 
 axis_aligned_bounding_box = [0 0 1 1];
 test_point = [0.8 0.4];
@@ -135,6 +149,8 @@ assert(isequal(2,wall_number))
 
 %% Test case 1.3: inside, close to top
 fig_num = 103;
+figure(fig_num);
+clf;
 
 axis_aligned_bounding_box = [0 0 1 1];
 test_point = [0.6 0.9];
@@ -147,6 +163,8 @@ assert(isequal(3,wall_number))
 
 %% Test case 1.4: inside, close to left
 fig_num = 104;
+figure(fig_num);
+clf;
 
 axis_aligned_bounding_box = [0 0 1 1];
 test_point = [0.2 0.7];
@@ -160,6 +178,8 @@ assert(isequal(4,wall_number))
 
 %% Test case 1.5: outside, close to bottom
 fig_num = 105;
+figure(fig_num);
+clf;
 
 axis_aligned_bounding_box = [0 0 1 1];
 test_point = [0.3 -0.2];
@@ -172,6 +192,8 @@ assert(isequal(1,wall_number))
 
 %% Test case 1.6: inside, close to right
 fig_num = 106;
+figure(fig_num);
+clf;
 
 axis_aligned_bounding_box = [0 0 1 1];
 test_point = [1.2 0.4];
@@ -184,6 +206,8 @@ assert(isequal(2,wall_number))
 
 %% Test case 1.7: inside, close to top
 fig_num = 107;
+figure(fig_num);
+clf;
 
 axis_aligned_bounding_box = [0 0 1 1];
 test_point = [0.6 1.1];
@@ -197,6 +221,8 @@ assert(isequal(3,wall_number))
 
 %% Test case 1.8: inside, close to left
 fig_num = 108;
+figure(fig_num);
+clf;
 
 axis_aligned_bounding_box = [0 0 1 1];
 test_point = [-0.2 0.7];
@@ -227,6 +253,8 @@ assert(isequal(4,wall_number))
 
 %% Test case 2.9: user-defined vector
 fig_num = 209;
+figure(fig_num);
+clf;
 
 axis_aligned_bounding_box = [0 0 1 1];
 test_point = [0.2 0.7; 0.2 0.9];

@@ -1,22 +1,22 @@
 function [ ...
-cleaned_polytope ...
-] = ...
-fcn_MapGen_polytopeRemoveTightVerticies( ...
-polytope, ...
-tolerance, ...
-varargin...
-)
+    cleaned_polytope ...
+    ] = ...
+    fcn_MapGen_polytopeRemoveTightVerticies( ...
+    polytope, ...
+    tolerance, ...
+    varargin...
+    )
 % fcn_MapGen_polytopeRemoveTightVerticies
-% removes verticies of polytopes that are too close to each other, 
+% removes verticies of polytopes that are too close to each other,
 % measured by a tolerance
-% 
-% Sometimes, when shrinking, the new verticies are particularly close to 
-% each other to where an edge has a trivial length. To prevent this, we 
-% get rid of one of any vertices that are too close to each other. This 
+%
+% Sometimes, when shrinking, the new verticies are particularly close to
+% each other to where an edge has a trivial length. To prevent this, we
+% get rid of one of any vertices that are too close to each other. This
 % proximity is set by a user-defined tolerance.
-% 
+%
 % FORMAT:
-% 
+%
 %    [ ...
 %    cleaned_polytope ...
 %    ] = ...
@@ -25,63 +25,92 @@ varargin...
 %    tolerance, ...
 %    (fig_num) ...
 %    )
-% 
+%
 % INPUTS:
-% 
-%     polytope: an individual structure or structure array of 'polytopes' 
+%
+%     polytope: an individual structure or structure array of 'polytopes'
 %     type that stores the polytopes to be evaluated
-% 
-%     tolerance: a numeric value that defines how close points should be 
+%
+%     tolerance: a numeric value that defines how close points should be
 %     to be removed
-% 
+%
 %     (optional inputs)
 %
-%     fig_num: any number that acts as a figure number output, causing a 
-%     figure to be drawn showing results.
-% 
-% 
+%      fig_num: a figure number to plot results. If set to -1, skips any
+%      input checking or debugging, no figures will be generated, and sets
+%      up code to maximize speed. As well, if given, this forces the
+%      variable types to be displayed as output and as well makes the input
+%      check process verbose.
+%
+%
 % OUTPUTS:
-% 
-%     cleaned_polytope: the resulting polytope after close edges are 
+%
+%     cleaned_polytope: the resulting polytope after close edges are
 %     removed.
-% 
-% 
+%
+%
 % DEPENDENCIES:
-% 
-%     fcn_MapGen_checkInputsToFunctions
-% 
+%
+%     fcn_DebugTools_checkInputsToFunctions
+%
 %     fcn_MapGen_fillPolytopeFieldsFromVerticies
-% 
-% 
+%
+%
 % EXAMPLES:
-% 
+%
 % See the script: script_test_fcn_MapGen_polytopeRemoveTightVerticies
 % for a full test suite.
-% 
+%
 % This function was written on 2021_07_02 by Sean Brennan
 % Questions or comments? contact sbrennan@psu.edu
 
-% 
+%
 % REVISION HISTORY:
-% 
+%
 % 2021_07_02 by Sean Brennan
 % -- first write of function
+% 2025_04_25 by Sean Brennan
+% -- added global debugging options
+% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
+% -- fixed call to fcn_MapGen_fillPolytopeFieldsFromVertices
 
-% 
-% TO DO:
-% 
-% -- fill in to-do items here.
+
+% TO DO
+% -- none
 
 %% Debugging and Input checks
-flag_check_inputs = 1; % Set equal to 1 to check the input arguments 
-flag_do_plot = 0;      % Set equal to 1 for plotting 
-flag_do_debug = 0;     % Set equal to 1 for debugging 
+
+% Check if flag_max_speed set. This occurs if the fig_num variable input
+% argument (varargin) is given a number of -1, which is not a valid figure
+% number.
+flag_max_speed = 0;
+if (nargin==3 && isequal(varargin{end},-1))
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 0; % Flag to perform input checking
+    flag_max_speed = 1;
+else
+    % Check to see if we are externally setting debug mode to be "on"
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 1; % Flag to perform input checking
+    MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS");
+    MATLABFLAG_MAPGEN_FLAG_DO_DEBUG = getenv("MATLABFLAG_MAPGEN_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_MAPGEN_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_MAPGEN_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS);
+    end
+end
+
+% flag_do_debug = 1;
 
 if flag_do_debug
-    fig_for_debug = 7;
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-end 
+    debug_fig_num = 999978; %#ok<NASGU>
+else
+    debug_fig_num = []; %#ok<NASGU>
+end
+
+
 
 %% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -96,36 +125,41 @@ end
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+if (0==flag_max_speed)
+    if 1 == flag_check_inputs
 
-if 1 == flag_check_inputs
+        % Are there the right number of inputs?
+        narginchk(2,3);
 
-    % Are there the right number of inputs?
-    if nargin < 2 || nargin > 3
-        error('Incorrect number of input arguments')
+        % Check the polytopes input, make sure it is 'polytopes' type
+        fcn_DebugTools_checkInputsToFunctions(...
+            polytope, 'polytopes');
+
+        % Check the tolerance input, make sure it is '1column_of_numbers' type,
+        % e.g. 1x1 numerical data.
+        fcn_DebugTools_checkInputsToFunctions(...
+            tolerance, '1column_of_numbers',[1 1]);
+
     end
-
-    % Check the polytopes input, make sure it is 'polytopes' type
-    fcn_MapGen_checkInputsToFunctions(...
-        polytope, 'polytopes');
- 
-    % Check the tolerance input, make sure it is '1column_of_numbers' type,
-    % e.g. 1x1 numerical data.
-    fcn_MapGen_checkInputsToFunctions(...
-        tolerance, '1column_of_numbers',[1 1]);
- 
 end
 
+
 % Does user want to show the plots?
-if  3== nargin
-    fig_num = varargin{end};
-    flag_do_plot = 1;
+flag_do_plot = 0; % Default is no plotting
+if  3 == nargin && (0==flag_max_speed) % Only create a figure if NOT maximizing speed
+    temp = varargin{end}; % Last argument is always figure number
+    if ~isempty(temp) % Make sure the user is not giving empty input
+        fig_num = temp;
+        flag_do_plot = 1; % Set flag to do plotting
+    end
 else
-    if flag_do_debug
+    if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
         fig = figure;
-        fig_for_debug = fig.Number;
+        fig_for_debug = fig.Number; %#ok<NASGU>
         flag_do_plot = 1;
     end
 end
+
 
 %% Start of main code
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -162,7 +196,7 @@ if sum(good_ind)>2 % sufficient good points to make a shape
     new_vert = vertices(good_ind,:);
 elseif sum(good_ind)==2 % line shape
     new_vert = vertices(good_ind,:);
-    
+
     % The line may not go through the centroid, which is odd. We force
     % this by removing the point closest to the centroid
     distances_to_centroid = sum((new_vert-centroid).^2,2).^0.5;
@@ -171,7 +205,7 @@ elseif sum(good_ind)==2 % line shape
     else
         new_vert(1,:)=centroid;
     end
-    
+
     new_vert = [new_vert; flipud(new_vert)];
 else % singular shape (i.e. point) or no shape
     new_vert = [centroid; centroid; centroid];
@@ -197,17 +231,17 @@ cleaned_polytope = fcn_MapGen_fillPolytopeFieldsFromVertices(cleaned_polytope);
 if flag_do_plot
     figure(fig_num);
     hold on
-    
+
     % Plot the cetroid in black
     plot(centroid(:,1),centroid(:,2),'ko','Markersize',10);
-    
+
     % Plot the input polytope in red
     fcn_MapGen_plotPolytopes(polytope,fig_num,'r',2);
-    
+
     % plot the output polytope in blue
     fcn_MapGen_plotPolytopes(cleaned_polytope,fig_num,'b',2);
-    
-end % Ends the flag_do_plot if statement    
+
+end % Ends the flag_do_plot if statement
 
 if flag_do_debug
     fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
@@ -218,13 +252,13 @@ end % Ends the function
 
 %% Functions follow
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   ______                _   _                 
-%  |  ____|              | | (_)                
-%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___ 
+%   ______                _   _
+%  |  ____|              | | (_)
+%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___
 %  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
 %  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
 %  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
-%                                               
+%
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 

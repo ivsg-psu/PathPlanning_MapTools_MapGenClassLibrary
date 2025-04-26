@@ -17,8 +17,11 @@ function poly_map_stats = fcn_MapGen_polytopesStatistics(...
 %
 %     (optional inputs)
 %
-%     fig_num: any number that acts as a figure number output, causing a
-%     figure to be drawn showing results.
+%      fig_num: a figure number to plot results. If set to -1, skips any
+%      input checking or debugging, no figures will be generated, and sets
+%      up code to maximize speed. As well, if given, this forces the
+%      variable types to be displayed as output and as well makes the input
+%      check process verbose.
 %
 % OUTPUTS:
 %
@@ -29,7 +32,7 @@ function poly_map_stats = fcn_MapGen_polytopesStatistics(...
 %
 % DEPENDENCIES:
 %
-%     fcn_MapGen_checkInputsToFunctions
+%     fcn_DebugTools_checkInputsToFunctions
 %     fcn_MapGen_polytopeFindVertexAngles
 %     fcn_MapGen_plotPolytopes
 %
@@ -46,20 +49,46 @@ function poly_map_stats = fcn_MapGen_polytopesStatistics(...
 % -- first write of function
 % 2022_06_17 - S. Harnett
 % -- numerous features added to support length cost ratio prediction
+% 2025_04_25 by Sean Brennan
+% -- added global debugging options
+% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
+
 
 % TO DO
-% -- TBD
+% -- none
 
 %% Debugging and Input checks
-flag_check_inputs = 1; % Set equal to 1 to check the input arguments
-flag_do_plot = 0;      % Set equal to 1 for plotting
-flag_do_debug = 0;     % Set equal to 1 for debugging
+
+% Check if flag_max_speed set. This occurs if the fig_num variable input
+% argument (varargin) is given a number of -1, which is not a valid figure
+% number.
+flag_max_speed = 0;
+if (nargin==2 && isequal(varargin{end},-1))
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 0; % Flag to perform input checking
+    flag_max_speed = 1;
+else
+    % Check to see if we are externally setting debug mode to be "on"
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 1; % Flag to perform input checking
+    MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS");
+    MATLABFLAG_MAPGEN_FLAG_DO_DEBUG = getenv("MATLABFLAG_MAPGEN_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_MAPGEN_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_MAPGEN_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS);
+    end
+end
+
+% flag_do_debug = 1;
 
 if flag_do_debug
-    fig_for_debug = 9453;
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+    debug_fig_num = 999978; %#ok<NASGU>
+else
+    debug_fig_num = []; %#ok<NASGU>
 end
+
 
 %% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -73,30 +102,36 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if (0==flag_max_speed)
+    if flag_check_inputs
+        % Are there the right number of inputs?
+        if nargin < 1 || nargin > 2
+            error('Incorrect number of input arguments')
+        end
 
-if flag_check_inputs
-    % Are there the right number of inputs?
-    if nargin < 1 || nargin > 2
-        error('Incorrect number of input arguments')
+        % Check the polytopes input
+        fcn_DebugTools_checkInputsToFunctions(...
+            polytopes, 'polytopes');
+
     end
-
-    % Check the polytopes input
-    fcn_MapGen_checkInputsToFunctions(...
-        polytopes, 'polytopes');
-
 end
-
 
 % Does user want to show the plots?
-if  2 == nargin
-    fig_num = varargin{end};
-    flag_do_plot = 1;
+flag_do_plot = 0; % Default is no plotting
+if  2 == nargin && (0==flag_max_speed) % Only create a figure if NOT maximizing speed
+    temp = varargin{end}; % Last argument is always figure number
+    if ~isempty(temp) % Make sure the user is not giving empty input
+        fig_num = temp;
+        flag_do_plot = 1; % Set flag to do plotting
+    end
 else
-    if flag_do_debug
+    if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
         fig = figure;
-        fig_for_debug = fig.Number;
+        fig_for_debug = fig.Number; 
+        flag_do_plot = 1;
     end
 end
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   __  __       _
@@ -108,8 +143,14 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
 Npolys = length(polytopes);
+
+% Loop through the polytopes, count the radii
+Nradii = 0;
+for ith_poly = 1:Npolys
+    Nradii = Nradii+length(polytopes(ith_poly).radii);
+end
+
 Nverticies_per_poly = 20; % Maximum estimate
 NrealVertices = 0; % Actual number of vertices
 Ntotal_vertices = Npolys*Nverticies_per_poly;
@@ -120,7 +161,7 @@ all_lengths = nan(Nverticies_per_poly,Npolys);
 all_side_count = zeros(Npolys,1);
 all_max_radius = zeros(Npolys,1);
 all_min_radius = zeros(Npolys,1);
-all_radii = [];
+all_radii = zeros(Nradii,1);
 all_mean_radius = zeros(Npolys,1);
 all_sharpness_ratios = zeros(Npolys,1);
 all_areas = zeros(Npolys,1);
@@ -134,6 +175,7 @@ AABB(3) = max(all_x_vertices);
 AABB(4) = max(all_y_vertices);
 
 % Loop through the polytopes
+Nradii_found = 0;
 for ith_poly = 1:Npolys
     vertices = polytopes(ith_poly).vertices;
     Nvertices = length(vertices(:,1))-1;
@@ -165,7 +207,13 @@ for ith_poly = 1:Npolys
     all_min_radius(ith_poly,1) = polytopes(ith_poly).min_radius;
     all_min_radius(ith_poly,1) = polytopes(ith_poly).min_radius;
     all_mean_radius(ith_poly,1) = polytopes(ith_poly).mean_radius;
-    all_radii = [all_radii; polytopes(ith_poly).radii];
+
+    % Add up radii
+    Nthisradii = length(polytopes(ith_poly).radii);
+    all_radii((Nradii_found+1):Nradii_found+Nthisradii,1) = polytopes(ith_poly).radii;
+    Nradii_found = Nradii_found+Nthisradii;
+
+
     % note that sharpness is the ratio of max radius to min radius
     % this is not the same thing as aspect ratio which is AABB width to height
     all_sharpness_ratios(ith_poly,1) = ...
@@ -186,16 +234,16 @@ all_walls_end_no_nan   = all_walls_end(~isnan(all_walls_end(:,1)),:);
 angle_column = reshape(all_angles,Nverticies_per_poly*Npolys,1);
 % angle_column = reshape(all_angles,1,[]); % this line is a useful alternative if the above line fails
 angle_column_no_nan = angle_column(~isnan(angle_column));
-average_vertex_angle = nanmean(angle_column_no_nan*180/pi);
-std_vertex_angle = nanstd(angle_column_no_nan*180/pi);
+average_vertex_angle = mean(angle_column_no_nan*180/pi,'omitmissing');
+std_vertex_angle = std(angle_column_no_nan*180/pi,'omitmissing');
 
 % Find the mean and std deviations of radii metrics
-average_max_radius = nanmean(all_max_radius);
-average_min_radius = nanmean(all_min_radius);
-average_mean_radius = nanmean(all_mean_radius);
-average_radius = nanmean(all_radii);
-average_sharpness = nanmean(all_sharpness_ratios);
-std_max_radius = nanstd(all_max_radius);
+average_max_radius = mean(all_max_radius,'omitmissing');
+average_min_radius = mean(all_min_radius,'omitmissing');
+average_mean_radius = mean(all_mean_radius,'omitmissing');
+average_radius = mean(all_radii,'omitmissing');
+average_sharpness = mean(all_sharpness_ratios,'omitmissing');
+std_max_radius = std(all_max_radius,'omitmissing');
 % all_mean_radii = extractfield(polytopes,'true_mean_radius');
 % average_mean_radius = nanmean(all_mean_radii);
 
@@ -204,8 +252,8 @@ length_column = reshape(all_lengths,Nverticies_per_poly*Npolys,1);
 % length_column = reshape(all_lengths,1,[]); % this line is a useful alternative if the above fails
 length_column_no_nan = length_column(~isnan(length_column));
 total_perimeter = sum(length_column_no_nan);
-average_side_length = nanmean(length_column_no_nan);
-std_side_length = nanstd(length_column_no_nan);
+average_side_length = mean(length_column_no_nan,'omitmissing');
+std_side_length = std(length_column_no_nan,'omitmissing');
 average_perimeter = total_perimeter/Npolys;
 
 % Determine the area properties of the map
@@ -389,7 +437,7 @@ if flag_do_plot
     subplot(2,3,3);
     histogram(all_side_count,100);
     xlabel('N vertices (count)');
-    title(sprintf('Histogram of side count. Mean: %.4f, StdDev: %.4f',nanmean(all_side_count),nanstd(all_side_count)));
+    title(sprintf('Histogram of side count. Mean: %.4f, StdDev: %.4f',mean(all_side_count,'omitmissing'),std(all_side_count,'omitmissing')));
 
     subplot(2,3,4);
     histogram(length_column_no_nan,100);

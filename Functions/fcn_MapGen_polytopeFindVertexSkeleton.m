@@ -15,7 +15,11 @@ function [new_vertices, new_projection_vectors, cut_distance] = ...
 %
 %    (OPTIONAL INPUTS)
 %
-%     fig_num: a figure number to plot results.
+%      fig_num: a figure number to plot results. If set to -1, skips any
+%      input checking or debugging, no figures will be generated, and sets
+%      up code to maximize speed. As well, if given, this forces the
+%      variable types to be displayed as output and as well makes the input
+%      check process verbose.
 %
 % OUTPUTS:
 %
@@ -35,7 +39,7 @@ function [new_vertices, new_projection_vectors, cut_distance] = ...
 %
 % DEPENDENCIES:
 %
-%     fcn_MapGen_checkInputsToFunctions
+%     fcn_DebugTools_checkInputsToFunctions
 %     INTERNAL_fcn_findUnitDirectionVectors
 %     fcn_MapGen_polytopeFindVertexAngles
 %
@@ -50,20 +54,46 @@ function [new_vertices, new_projection_vectors, cut_distance] = ...
 % 2022_02_13 - S. Brennan
 % -- first write of code
 % -- pulled the function out of edge shrinking code
+% 2025_04_25 by Sean Brennan
+% -- added global debugging options
+% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
+
 
 % TO DO
 % -- none
 
 %% Debugging and Input checks
-flag_check_inputs = 1; % Set equal to 1 to check the input arguments
-flag_do_plot = 0;      % Set equal to 1 for plotting
-flag_do_debug = 0;     % Set equal to 1 for debugging
+
+% Check if flag_max_speed set. This occurs if the fig_num variable input
+% argument (varargin) is given a number of -1, which is not a valid figure
+% number.
+flag_max_speed = 0;
+if (nargin==2 && isequal(varargin{end},-1))
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 0; % Flag to perform input checking
+    flag_max_speed = 1;
+else
+    % Check to see if we are externally setting debug mode to be "on"
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 1; % Flag to perform input checking
+    MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS");
+    MATLABFLAG_MAPGEN_FLAG_DO_DEBUG = getenv("MATLABFLAG_MAPGEN_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_MAPGEN_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_MAPGEN_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS);
+    end
+end
+
+% flag_do_debug = 1;
 
 if flag_do_debug
-    fig_for_debug = 5168;
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+    debug_fig_num = 999978; %#ok<NASGU>
+else
+    debug_fig_num = []; %#ok<NASGU>
 end
+
 
 %% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -77,30 +107,37 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if (0==flag_max_speed)
+    if flag_check_inputs
+        % Are there the right number of inputs?
+        if nargin < 1 || nargin > 2
+            error('Incorrect number of input arguments')
+        end
 
-if flag_check_inputs
-    % Are there the right number of inputs?
-    if nargin < 1 || nargin > 2
-        error('Incorrect number of input arguments')
+        % Check the vertices input
+        fcn_DebugTools_checkInputsToFunctions(...
+            vertices, '2column_of_numbers');
+
     end
-
-    % Check the vertices input
-    fcn_MapGen_checkInputsToFunctions(...
-        vertices, '2column_of_numbers');
-
 end
 
 
 % Does user want to show the plots?
-if  2 == nargin
-    fig_num = varargin{end};
-    flag_do_plot = 1;
+flag_do_plot = 0; % Default is no plotting
+if  2 == nargin && (0==flag_max_speed) % Only create a figure if NOT maximizing speed
+    temp = varargin{end}; % Last argument is always figure number
+    if ~isempty(temp) % Make sure the user is not giving empty input
+        fig_num = temp;
+        flag_do_plot = 1; % Set flag to do plotting
+    end
 else
-    if flag_do_debug
-        fig_for_debug = 333;
+    if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
+        fig = figure;
+        fig_for_debug = fig.Number; 
         flag_do_plot = 1;
     end
 end
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   __  __       _
@@ -123,7 +160,7 @@ working_vertices = vertices;  % The vertices we are now using are the starting v
 while 0 == flag_stop_loop
     % Save the current iteration's results
     new_vertices{iteration} = working_vertices; %#ok<AGROW>
-    cut_distance(iteration) = total_cut; %#ok<AGROW>
+    cut_distance(iteration,1) = total_cut; %#ok<AGROW>
 
     % Check how many vertices we have
     Nvertices = length(working_vertices(:,1));
@@ -401,7 +438,7 @@ if flag_check_inputs
     end
 
     % Check the vertices input
-    fcn_MapGen_checkInputsToFunctions(...
+    fcn_DebugTools_checkInputsToFunctions(...
         vertices, '2column_of_numbers');
 
 end
@@ -547,7 +584,7 @@ function [h_fig] = ...
 %
 % DEPENDENCIES:
 %
-%     fcn_MapGen_checkInputsToFunctions
+%     fcn_DebugTools_checkInputsToFunctions
 %
 % % EXAMPLES:
 % For additional examples, see: script_test_fcn_MapGen_polytopePlotSkeleton
@@ -559,19 +596,44 @@ function [h_fig] = ...
 % Revision History:
 % 2022_02_16 - S. Brennan
 % -- first write of code
+% 2025_04_25 by Sean Brennan
+% -- added global debugging options
+% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
+
 
 % TO DO
 % -- none
 
 %% Debugging and Input checks
-flag_check_inputs = 1; % Set equal to 1 to check the input arguments
-flag_do_plot = 0;      % Set equal to 1 for plotting
-flag_do_debug = 0;     % Set equal to 1 for debugging
+
+% Check if flag_max_speed set. This occurs if the fig_num variable input
+% argument (varargin) is given a number of -1, which is not a valid figure
+% number.
+flag_max_speed = 0;
+if (nargin==4 && isequal(varargin{end},-1))
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 0; % Flag to perform input checking
+    flag_max_speed = 1;
+else
+    % Check to see if we are externally setting debug mode to be "on"
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 1; % Flag to perform input checking
+    MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS");
+    MATLABFLAG_MAPGEN_FLAG_DO_DEBUG = getenv("MATLABFLAG_MAPGEN_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_MAPGEN_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_MAPGEN_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS);
+    end
+end
+
+% flag_do_debug = 1;
 
 if flag_do_debug
-    fig_for_debug = 46473;
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+    debug_fig_num = 999978; %#ok<NASGU>
+else
+    debug_fig_num = []; %#ok<NASGU>
 end
 
 %% check input arguments?
@@ -586,25 +648,35 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if (0==flag_max_speed)
+    if flag_check_inputs
+        % Are there the right number of inputs?
+        if nargin < 3 || nargin > 4
+            error('Incorrect number of input arguments')
+        end
 
-if flag_check_inputs
-    % Are there the right number of inputs?
-    if nargin < 3 || nargin > 4
-        error('Incorrect number of input arguments')
+        % Check the cut_distance input
+        fcn_DebugTools_checkInputsToFunctions(...
+            cut_distance, '1column_of_numbers');
+
     end
-
-    % Check the cut_distance input
-    fcn_MapGen_checkInputsToFunctions(...
-        cut_distance, '1column_of_numbers');
-
 end
 
 
-% Does user want to specify the figure number?
-if  4 == nargin
-    fig_num = varargin{end};
+% Does user want to show the plots?
+flag_do_plot = 0; % Default is no plotting
+if  (4 == nargin) && (0==flag_max_speed) % Only create a figure if NOT maximizing speed
+    temp = varargin{end}; % Last argument is always figure number
+    if ~isempty(temp) % Make sure the user is not giving empty input
+        fig_num = temp;
+        flag_do_plot = 1; % Set flag to do plotting
+    end
 else
-    fig_num = 1595;
+    if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
+        fig = figure;
+        fig_for_debug = fig.Number; %#ok<NASGU>
+        flag_do_plot = 1;
+    end
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

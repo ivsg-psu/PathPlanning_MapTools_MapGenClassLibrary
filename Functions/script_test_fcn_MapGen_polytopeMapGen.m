@@ -5,6 +5,7 @@
 % 2021_06_06
 % -- first written by S. Brennan.
 
+close all
 
 % generate Voronoi tiling from Halton points
 Halton_range = [1 200]; % range of Halton points to use to generate the tiling

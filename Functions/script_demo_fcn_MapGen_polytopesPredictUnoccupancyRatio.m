@@ -1,5 +1,5 @@
-% script_fcn_MapGen_polytopeShrinkFromEdges
-% Tests function: fcn_MapGen_polytopeShrinkFromEdges
+% script_test_fcn_MapGen_polytopesPredictUnoccupancyRatio
+% Tests function: fcn_MapGen_polytopesPredictUnoccupancyRatio
 % note this script only tests the area unoccupancy/occupancy estimates
 % for a test of the linear unoccupancy/occupancy estiamtes (which depends on a path planner
 % to measure ground truth as a means of comparison) please see the file:

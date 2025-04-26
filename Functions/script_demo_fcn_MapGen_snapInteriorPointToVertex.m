@@ -8,22 +8,17 @@
 % -- first write of script
 %%%%%%%%%%%%%%§
 
-clear
 close all
 
-%% add necessary directories
-addpath([pwd '\..\Example_Map_Generation_Code'])
-addpath([pwd '\..\PathPlanning_MapTools_MapGenClassLibrary\Functions'])
-addpath([pwd '\..\PathPlanning_GeomTools_GeomClassLibrary\Functions'])
 
 %% run snapInteriorPointToVertex function
 flag_do_plot = 1;
-%% convex polytope
+% convex polytope
 convex_polytope(1).vertices = [0 0; 1 1; -1 2; -2 1; -1 0; 0 0];
 convex_polytope(2).vertices = [convex_polytope(1).vertices(:,1) + 4, convex_polytope(1).vertices(:,2) - 2];
 polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(convex_polytope);
 pts_to_test = [0 0.5; -1 -1; 4 -1; 4.1 -1];
-output_pts = fcn_MapGen_snapInteriorPointToVertex(polytopes, pts_to_test)
+output_pts = fcn_MapGen_snapInteriorPointToVertex(polytopes, pts_to_test);
 
 % plot the map
 if flag_do_plot
@@ -32,9 +27,10 @@ if flag_do_plot
     line_width = 2; % linewidth of the edge
     axes_limits = [-3 5 -3 5]; % x and y axes limits
     axis_style = 'square'; % plot axes style
-    % fcn_plot_polytopes(polytopes,fig,line_spec,line_width,axes_limits,axis_style);
     figure
-    fcn_plot_polytopes(polytopes);
+    fcn_MapGen_plotPolytopes(polytopes,fig,line_spec,line_width,axes_limits,axis_style);
+    %fcn_MapGen_plotPolytopes(polytopes);
+    % fcn_plot_polytopes(polytopes);
     hold on
     box on
     title('function result')
@@ -51,7 +47,7 @@ if flag_do_plot
     legend('polytope','pt. 1 init.','pt. 2 init.','pt. 3 init.','pt. 1 snapped','pt. 2 snapped','pt. 3 snapped')
 end
 
-%% run hard coded legacy method
+% run hard coded legacy method
 start_midway = pts_to_test(1,:);
 finish_init = pts_to_test(2,:);
 other_pt = pts_to_test(3,:);
@@ -96,9 +92,11 @@ if flag_do_plot
     line_width = 2; % linewidth of the edge
     axes_limits = [-3 5 -3 5]; % x and y axes limits
     axis_style = 'square'; % plot axes style
-    % fcn_plot_polytopes(polytopes,fig,line_spec,line_width,axes_limits,axis_style);
+    % fcn_MapGen_plotPolytopes(polytopes,fig,line_spec,line_width,axes_limits,axis_style);
     figure
-    fcn_plot_polytopes(polytopes);
+    fcn_MapGen_plotPolytopes(polytopes);
+    % fcn_plot_polytopes(polytopes);
+
     title('legacy script result')
     hold on
     box on

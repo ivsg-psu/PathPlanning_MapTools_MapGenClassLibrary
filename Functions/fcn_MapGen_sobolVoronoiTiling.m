@@ -22,7 +22,11 @@ function [polytopes] = ...
 %    stretch: [x,y] scaling factors to allow the values from the Sobol set
 %    to be scaled to fit maps shapes other than square
 %
-%    fig_num: a figure number to plot results.
+%      fig_num: a figure number to plot results. If set to -1, skips any
+%      input checking or debugging, no figures will be generated, and sets
+%      up code to maximize speed. As well, if given, this forces the
+%      variable types to be displayed as output and as well makes the input
+%      check process verbose.
 %
 % OUTPUTS:
 %
@@ -39,7 +43,7 @@ function [polytopes] = ...
 %
 % DEPENDENCIES:
 %
-%      fcn_MapGen_checkInputsToFunctions
+%      fcn_DebugTools_checkInputsToFunctions
 %      fcn_MapGen_polytopeCentroidAndArea
 %      fcn_MapGen_plotPolytopes
 %
@@ -54,6 +58,9 @@ function [polytopes] = ...
 % REVISION HISTORY:
 % 2021_06_06 
 % -- edited by S. Brennan to put it into MapGen format
+% 2025_04_25 by Sean Brennan
+% -- added global debugging options
+% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
 
 % TO DO:
 % -- check cross product around entire polytope
@@ -62,14 +69,35 @@ function [polytopes] = ...
 % -- force correct number of polytopes?
 
 %% Debugging and Input checks
-flag_check_inputs = 1; % Set equal to 1 to check the input arguments
-flag_do_plot = 0;      % Set equal to 1 for plotting
-flag_do_debug = 0;     % Set equal to 1 for debugging
+
+% Check if flag_max_speed set. This occurs if the fig_num variable input
+% argument (varargin) is given a number of -1, which is not a valid figure
+% number.
+flag_max_speed = 0;
+if (nargin==3 && isequal(varargin{end},-1))
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 0; % Flag to perform input checking
+    flag_max_speed = 1;
+else
+    % Check to see if we are externally setting debug mode to be "on"
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 1; % Flag to perform input checking
+    MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS");
+    MATLABFLAG_MAPGEN_FLAG_DO_DEBUG = getenv("MATLABFLAG_MAPGEN_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_MAPGEN_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_MAPGEN_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS);
+    end
+end
+
+% flag_do_debug = 1;
 
 if flag_do_debug
-    fig_for_debug = 9993;
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+    debug_fig_num = 999978; %#ok<NASGU>
+else
+    debug_fig_num = []; %#ok<NASGU>
 end
 
 %% check input arguments?
@@ -84,19 +112,17 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
-if flag_check_inputs    
-    % Are there the right number of inputs?
-    if nargin < 1 || nargin > 3
-        error('Incorrect number of input arguments')
+if (0==flag_max_speed)
+    if flag_check_inputs
+        % Are there the right number of inputs?
+        narginchk(1,3);
+
+        % Check the Sobol_range input
+        fcn_DebugTools_checkInputsToFunctions(...
+            Sobol_range, '2column_of_integers');
+
     end
-    
-    % Check the Sobol_range input
-    fcn_MapGen_checkInputsToFunctions(...
-        Sobol_range, '2column_of_integers');
-
 end
-
 
 % check variable argument
 stretch = [1 1]; % default stretch value
@@ -104,21 +130,24 @@ if 2 == nargin
     stretch = varargin{1};
     
     % Check the stretch input
-    fcn_MapGen_checkInputsToFunctions(...
+    fcn_DebugTools_checkInputsToFunctions(...
         stretch, '2column_of_numbers',1);
        
 end
 
 
 % Does user want to show the plots?
-if 3 == nargin
-    fig_num = varargin{end};
-    figure(fig_num);
-    flag_do_plot = 1;
+flag_do_plot = 0; % Default is no plotting
+if  (3 == nargin) && (0==flag_max_speed) % Only create a figure if NOT maximizing speed
+    temp = varargin{end}; % Last argument is always figure number
+    if ~isempty(temp) % Make sure the user is not giving empty input
+        fig_num = temp;
+        flag_do_plot = 1; % Set flag to do plotting
+    end
 else
-    if flag_do_debug
+    if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
         fig = figure;
-        fig_for_debug = fig.Number;
+        fig_for_debug = fig.Number; %#ok<NASGU>
         flag_do_plot = 1;
     end
 end

@@ -20,9 +20,10 @@ for i_script = 1:N_files
     file_name_extended = all_scripts(i_script).name;
     file_name = erase(file_name_extended,'.m');
     if ~strcmp(mfilename,file_name)
-        file_name_trunc = erase(file_name,'script_');
+        %file_name_trunc = erase(file_name,'script_');
         fcn_DebugTools_cprintf('*blue',' ');
-        fcn_DebugTools_cprintf('*blue','Testing script: %.0d of %.0d, %s\n\n',i_script,length(all_scripts),file_name_trunc);
+        fcn_DebugTools_cprintf('*blue','Testing script: %.0d of %.0d, %s\n\n',i_script,length(all_scripts),file_name);
+        disp('Press any key to continue');
         tstart = tic;
         suite = testsuite(file_name);
         results = run(suite);
@@ -40,4 +41,8 @@ xlabel('Script test number');
 ylabel('Elapsed time to test (sec)');
 
 fprintf(1,'The testing times for each script:\n');
-disp(testing_times);
+for i_script = 1:N_files
+    if ~isnan(testing_times(i_script))
+        fprintf(1,'%.0d: \t %.2f seconds for script: \t %s \n',i_script, testing_times(i_script), all_scripts(i_script).name);
+    end
+end

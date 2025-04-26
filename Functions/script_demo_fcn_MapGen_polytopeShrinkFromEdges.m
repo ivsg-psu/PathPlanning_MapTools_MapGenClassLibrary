@@ -179,7 +179,7 @@ hold on;
     fcn_MapGen_polytopeShrinkFromEdges(...
         shrinker,edge_cut,fig_num);
 
-edge_cut_step = 0.00002;
+edge_cut_step = 0.002;
 iterations = (shrinker.max_radius/1.5+edge_cut_step)/edge_cut_step;
 
 % Do calculation without pre-calculation

@@ -9,7 +9,7 @@
 %%%%%%%%%%%%%%§
 
 
-
+close all;
 
 %% Test case 1: inside, close to bottom
 vertices = [0 0; 1 0; 1 1; 0 1; 0 0];

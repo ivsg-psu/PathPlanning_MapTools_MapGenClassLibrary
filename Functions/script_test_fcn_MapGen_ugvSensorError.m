@@ -14,24 +14,6 @@
 
 close all
 
-%% Set up workspace
-if ~exist('flag_was_run_before','var')
-    
-    close all
-    
-    % add necessary directories
-    addpath([pwd '\Functions'])
-    %     addpath([pwd '\GeomClassLibrary\Functions'])
-    %     addpath([pwd '\MapGenClassLibrary\Functions'])
-    %     addpath([pwd '\Plotting'])
-    %     addpath([pwd '\Map_Generation\polytope_generation'])
-    %     addpath([pwd '\Map_Generation\polytope_editing'])
-    %     addpath([pwd '\Map_Generation\polytope_calculation'])
-    
-    flag_was_run_before = 1;
-end
-
-
 
 %% Generating Error Bubbles and Plotting
 
@@ -63,7 +45,7 @@ shrunk_polytopes2=fcn_MapGen_polytopesShrinkToRadius(...
 
 
 
-%% generate error bubbles
+% generate error bubbles
 [err] = fcn_MapGen_ugvSensorErrorBubble(shrunk_polytopes2, 0, 5);
 
 % Convert error bounds into polytope structure
