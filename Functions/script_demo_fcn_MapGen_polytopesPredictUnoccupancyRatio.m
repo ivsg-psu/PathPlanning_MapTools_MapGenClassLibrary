@@ -1,15 +1,21 @@
-% script_test_fcn_MapGen_polytopesPredictUnoccupancyRatio
-% Tests function: fcn_MapGen_polytopesPredictUnoccupancyRatio
+% script_demo_fcn_MapGen_polytopesPredictUnoccupancyRatio
+% Generates data using function: fcn_MapGen_polytopesPredictUnoccupancyRatio
 % note this script only tests the area unoccupancy/occupancy estimates
 % for a test of the linear unoccupancy/occupancy estiamtes (which depends on a path planner
 % to measure ground truth as a means of comparison) please see the file:
 % script_test_linear_occupancy.m
 % in the repo PathPlanning_GridFreePathPlanners_BoundedAStar
 %
-
+% this data is what was used to generate plots in:
+% S. J. Harnett, S. Brennan, K. Reichard, J. Pentzer, ”Determining a Direction- and Position-Agnostic
+% Occupancy Probability and Occupancy Ratio from Maps of Obstacle Fields for Ground Vehicle Navigation,”
+% In Proceedings of the Ground Vehicle Systems Engineering and Technology Symposium (GVSETS), NDIA,
+% Novi, MI, Aug. 15-17, 2023.
 % REVISION HISTORY:
 % 2022_01_17
 % -- first written by S. Harnett
+% 2025_04_28
+% -- comment updated to point to paper by S. Harnett
 
 %% Set up variables
 close all;clear all;

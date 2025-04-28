@@ -1,9 +1,16 @@
 function poly_size_stats = fcn_MapGen_polytopesRadiusDistributions(polytopes, varargin)
-% fcn_MapGen_polytopesRadiusDistributions uses statistics and calculaus to get
+% fcn_MapGen_polytopesRadiusDistributions uses statistics and calculus to get
 % estimates of polytope radius distribution, expected radius, and expected
 % width, independent of traversal location and direction
 % by rotating polytopes about their centroids to produce a radial probability of
 % occupation
+% for a description of how this works, please see:
+% S. J. Harnett, S. Brennan, K. Reichard, J. Pentzer, ”Determining a Direction- and Position-Agnostic
+% Occupancy Probability and Occupancy Ratio from Maps of Obstacle Fields for Ground Vehicle Navigation,”
+% In Proceedings of the Ground Vehicle Systems Engineering and Technology Symposium (GVSETS), NDIA,
+% Novi, MI, Aug. 15-17, 2023.
+% available for download here:
+% http://gvsets.ndia-mich.org/documents/AAIR/2023/2%2010PM%20Determining%20a%20Direction%20and%20Position%20Agnostic%20Occupancy%20Probability%20and%20Occupancy%20Ration%20from%20Maps.pdf
 %
 % FORMAT:
 % poly_size_stats = fcn_MapGen_polytopesRadiusDistributions(polytopes, (fig_num))
@@ -42,7 +49,7 @@ function poly_size_stats = fcn_MapGen_polytopesRadiusDistributions(polytopes, va
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
 
 % TO DO
-% -- none
+% -- plotting needs to be consolodated to one part of the function
 
 %% Debugging and Input checks
 
@@ -98,8 +105,8 @@ if (0==flag_max_speed)
         % % Check the polytopes input, make sure it is 'polytopes' type
         % fcn_DebugTools_checkInputsToFunctions(...
         %     polytopes, 'polytopes');
-        % 
-        % 
+        %
+        %
         % % Check the exp_dist input, make sure it is 'positive_column_of_numbers' type
         % fcn_DebugTools_checkInputsToFunctions(...
         %     exp_dist, 'positive_1column_of_numbers',1);
@@ -456,7 +463,7 @@ end
 if flag_do_plot
     figure(fig_num)
     clf;
-    % 
+    %
     % LineWidth = 2;
     % fcn_MapGen_plotPolytopes(polytopes,fig_num,'r-',LineWidth);
     % fcn_MapGen_plotPolytopes(exp_polytopes,fig_num,'b-',LineWidth,'square');

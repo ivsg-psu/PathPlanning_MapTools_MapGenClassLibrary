@@ -1,11 +1,14 @@
-% script_test_fcn_MapGen_snapInteriorPointToVertex
-% Tests: fcn_MapGen_snapInteriorPointToVertex
+% script_demo_fcn_MapGen_snapInteriorPointToVertex
+% compares function: fcn_MapGen_snapInteriorPointToVertex
+% to legacy method
 
 %
 % REVISION HISTORY:
 %
 % 2024_04_19 by S. Harnett
 % -- first write of script
+% 2025_04_28 by S. Harnett
+% -- fix legends
 %%%%%%%%%%%%%%§
 
 close all
@@ -29,8 +32,6 @@ if flag_do_plot
     axis_style = 'square'; % plot axes style
     figure
     fcn_MapGen_plotPolytopes(polytopes,fig,line_spec,line_width,axes_limits,axis_style);
-    %fcn_MapGen_plotPolytopes(polytopes);
-    % fcn_plot_polytopes(polytopes);
     hold on
     box on
     title('function result')
@@ -44,7 +45,7 @@ if flag_do_plot
     plot(output_pts(2,1), output_pts(2,2),'bx')
     plot(output_pts(3,1), output_pts(3,2),'gx')
     plot(output_pts(4,1), output_pts(4,2),'kx')
-    legend('polytope','pt. 1 init.','pt. 2 init.','pt. 3 init.','pt. 1 snapped','pt. 2 snapped','pt. 3 snapped')
+    legend('polytope','pt. 1 init.','pt. 2 init.','pt. 3 init.','pt. 4 init.','pt. 1 snapped','pt. 2 snapped','pt. 3 snapped','pt. 4 snapped')
 end
 
 % run hard coded legacy method
@@ -92,10 +93,7 @@ if flag_do_plot
     line_width = 2; % linewidth of the edge
     axes_limits = [-3 5 -3 5]; % x and y axes limits
     axis_style = 'square'; % plot axes style
-    % fcn_MapGen_plotPolytopes(polytopes,fig,line_spec,line_width,axes_limits,axis_style);
-    figure
-    fcn_MapGen_plotPolytopes(polytopes);
-    % fcn_plot_polytopes(polytopes);
+    fcn_MapGen_plotPolytopes(polytopes,fig,line_spec,line_width,axes_limits,axis_style);
 
     title('legacy script result')
     hold on
@@ -108,5 +106,5 @@ if flag_do_plot
     plot(output_pts(1,1), output_pts(1,2),'rx')
     plot(output_pts(2,1), output_pts(2,2),'bx')
     plot(output_pts(3,1), output_pts(3,2),'gx')
-    legend('','polytope','pt. 1 init.','pt. 2 init.','pt. 1 snapped','pt. 2 snapped')
+    legend('polytope','pt. 1 init.','pt. 2 init.','pt. 3 init.','pt. 1 snapped','pt. 2 snapped','pt. 3 snapped')
 end
