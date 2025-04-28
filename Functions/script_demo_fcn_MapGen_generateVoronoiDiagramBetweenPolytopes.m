@@ -1,7 +1,5 @@
-%% script_test_fcn_MapGen_generateVoronoiDiagramBetweenPolytopes
-% test script of making a Voronoi diagram from points along side sof polytopes
-
-clear; close all;
+%% script_demo_fcn_MapGen_generateVoronoiDiagramBetweenPolytopes
+% demo script of making a Voronoi diagram from points along sides of polytopes
 
 %% test convex
 fig_num = 1;

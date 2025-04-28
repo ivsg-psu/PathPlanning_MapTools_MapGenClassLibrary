@@ -331,8 +331,9 @@ if flag_do_plot
     figure;
     hold on;
     histogram(field_chosen_side_length,'BinWidth',2,'FaceColor','g','FaceAlpha',0.4)
-    legendstr_side = sprintf('effective chosen side length for gap size %.1f',gap_size);
-    legend('chosen side length', legendstr_side)
+    % legendstr_side = sprintf('effective chosen side length for gap size %.1f',gap_size);
+    % legend('chosen side length', legendstr_side)
+    legend('chosen side length')
     xlabel('side length [m]')
     ylabel('count')
     title('Histogram of Traveled Side Lengths')

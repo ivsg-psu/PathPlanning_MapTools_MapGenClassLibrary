@@ -171,7 +171,7 @@ new_cost_polytopes = polytopes;
 if flag_do_plot
     figure(fig_num)
     clf;
-    % 
+    %
     % LineWidth = 2;
     % fcn_MapGen_plotPolytopes(polytopes,fig_num,'r-',LineWidth);
     % fcn_MapGen_plotPolytopes(exp_polytopes,fig_num,'b-',LineWidth,'square');
