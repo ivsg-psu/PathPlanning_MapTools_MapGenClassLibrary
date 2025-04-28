@@ -70,7 +70,13 @@ function [isInside] = fcn_MapGen_isCrossingAABB(AABB, test_points, varargin)
 
 
 % TO DO
-% -- none
+% -- this function it's currently implemented is doing a much coarser check than is necessary.
+%    It checks if a line segment COULD BE hitting an AABB.  In other words, this function indicating
+%    no hit means the line semgment cannot hit the AABB but this function indicating hit means the
+%    line segment may or may not hit the AABB and further collision checking is necessary.  A better
+%    way to implement this is to implement line-side collision checking like this:
+%    https://www.jeffreythompson.org/collision-detection/line-rect.php which requires this:
+%    https://www.jeffreythompson.org/collision-detection/line-line.php
 
 %% Debugging and Input checks
 
@@ -130,8 +136,8 @@ if (0==flag_max_speed)
         % % Check the polytopes input, make sure it is 'polytopes' type
         % fcn_DebugTools_checkInputsToFunctions(...
         %     polytopes, 'polytopes');
-        % 
-        % 
+        %
+        %
         % % Check the exp_dist input, make sure it is 'positive_column_of_numbers' type
         % fcn_DebugTools_checkInputsToFunctions(...
         %     exp_dist, 'positive_1column_of_numbers',1);
@@ -196,7 +202,7 @@ edge_is_left = xmax_mat <= xmin;
 edge_is_right = xmin_mat >= xmax;
 % the whole line segment is above the AABB
 edge_is_above = ymin_mat >= ymax;
-% the whole line segment i=s below the AABB
+% the whole line segment is below the AABB
 edge_is_below = ymax_mat <= ymin;
 %% if none of these cases are true, the edge is either entirely within the AABB, partially within the AABB, or straddling the AABB
 isInside = ~(edge_is_left | edge_is_right | edge_is_above | edge_is_below);
