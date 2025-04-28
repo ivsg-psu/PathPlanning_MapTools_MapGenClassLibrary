@@ -280,9 +280,9 @@ N_int_actual = field_stats.linear_density_mean;
 N_int_linear = linear_density*(1-(gap_size/2)/R_bar_initial);
 s_divergence_heights = sort(divergence_heights);
 worst_divergence_heights = s_divergence_heights(end-linear_density_int+1:end);
-worst_divergence_heights_new = s_divergence_heights(end-N_int_from_shrink_dist+1:end);
-worst_divergence_heights_actual = s_divergence_heights(end-N_int_actual+1:end);
-worst_divergence_heights_linear = s_divergence_heights(end-N_int_linear+1:end);
+worst_divergence_heights_new = s_divergence_heights(end-cast(N_int_from_shrink_dist,'uint8')+1:end);
+worst_divergence_heights_actual = s_divergence_heights(end-cast(N_int_actual,'uint8')+1:end);
+worst_divergence_heights_linear = s_divergence_heights(end-cast(N_int_linear,'uint8')+1:end);
 
 r_lc_estimates.r_lc_sparse_worst = sum((worst_divergence_heights.^2+(1/linear_density_int)^2).^0.5)/L_E;
 r_lc_estimates.r_lc_sparse_average = linear_density_int*mean((s_divergence_heights.^2+(1/linear_density_int)^2).^0.5)/L_E;

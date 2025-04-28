@@ -26,7 +26,7 @@ L_E = 1;
 [field_small_choice_angles,field_big_choice_angles,r_lc_estimates] = ...
     fcn_MapGen_polytopesPredictLengthCostRatio(tiled_polytopes,shrunk_field,gap_size,travel_direction,L_E)
 assert(true);
-% expected output:
+% approxiamte expected output:
 %              r_lc_sparse_worst: 1.0258
 %            r_lc_sparse_average: 1.0098
 %                r_lc_sparse_std: 0.0133
