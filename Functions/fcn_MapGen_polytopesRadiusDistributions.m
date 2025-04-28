@@ -354,6 +354,9 @@ for ith_poly = 1:length(polytopes)
         % integrate over all probabilities
         delta_d = 0.1;
         d_max = sqrt(max(1000*max(r_of_theta_all_sides))^2-offset^2); % TODO
+        if ~isreal(d_max)
+            d_max = 0;
+        end
         for i = 0:delta_d:d_max
             % expected value is P(R)*delta_R
             % delta_R = bin_center(i+1)-bin_center(i);

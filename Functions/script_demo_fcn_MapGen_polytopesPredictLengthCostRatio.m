@@ -1,5 +1,11 @@
-% script_test_fcn_MapGen_polytopesPredictLengthCostRatio
-% Tests function: fcn_MapGen_polytopesPredictLengthCostRatio
+% script_demo_fcn_MapGen_polytopesPredictLengthCostRatio
+% Generates data using function: fcn_MapGen_polytopesPredictLengthCostRatio
+% this data is what was used to generate plots in:
+% S. J. Harnett, S. Brennan, K. Reichard, J. Pentzer, S. A. Tau, D. Gorsich, ”Path-free Estimation
+% of Navigation Distance Using Obstacle Shape Statistics and Density,” In Proceedings of the Ground Vehicle
+% Systems Engineering and Technology Symposium (GVSETS), NDIA, Novi, MI, Aug. 16-18, 2022.
+%
+% script is very slow and should be run overnight
 
 % REVISION HISTORY:
 % 2021_10_22
