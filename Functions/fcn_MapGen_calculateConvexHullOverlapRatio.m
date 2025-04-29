@@ -47,7 +47,7 @@ varargin...
 %
 % EXAMPLES:
 %
-% See the script: script_test_fcn_MapGen_polytopesExpandEvenlyForConcave
+% See the script: script_test_fcn_MapGen_calculateConvexHullOverlapRatio
 % for a full test suite.
 %
 % This function was written 23 Feb. 2024 by Steve Harnett
@@ -63,7 +63,8 @@ varargin...
 % 2025_04_25 by Sean Brennan
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-
+% 2025_04_29 by Sean Brennan
+% -- Fixed script mis-labeling in the docstrings
 
 % TO DO
 % -- rewrite to move plotting to debug area only
