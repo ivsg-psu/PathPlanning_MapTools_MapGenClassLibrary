@@ -479,6 +479,20 @@ Example non-convex and non-overlapping triangular polytopes:
 
 <img src=".\Images\fcn_MapGen_flattenPolytopeMap_3.png " alt="triangulated flattened polytopes">
 
+`fcn_MapGen_polytopesExpandEvenlyForConcave.m`: can be used as an alternative to `fcn_MapGen_polytopesExpandEvenly`.  The existing function works well for convex polytopes but unexpected behavior can occur with concave polytopes.  The new function uses Matlab's polyshape object and polybuffer method to create a buffer around the polytope that is robust to concave input polytopes.
+
+![image](https://github.com/ivsg-psu/PathPlanning_MapTools_MapGenClassLibrary/assets/82562987/501b21a1-d26e-45c0-b6ce-5d08b0839f35)
+
+`fcn_MapGen_calculateConvexHullOverlapRatio.m`: can be used to calculate the area of obstacle convex hulls that overlap relative to the total area covered by obstacles.  This is useful for assessing how much obstacles protrude into concavities of other obstacles.
+
+![image](https://github.com/user-attachments/assets/f5cefffa-9149-472b-8990-cafb9c6ee310)
+
+`fcn_MapGen_generateVoronoiDiagramBetweenPolytopes.m`: implemented as a wrapper for MATLAB's `voronoi` function to call `voronoi` on polytope vertices.  If you're looking to create the medial axis graph, this is not the function to use.  This is useful for comparing the voronoi diagram formed from vertices to the medial axis around the obstacles.  To generate the medial axis between polytopes without these errant edges, you may wish to use the `fcn_MedialAxis_*` functions in [PathPlanning_GridFreePathPlanners_BoundedAStar](https://github.com/ivsg-psu/PathPlanning_GridFreePathPlanners_BoundedAStar)
+
+`fcn_MapGen_isCrossingAABB.m`: checks if line segments intersect the axis-aligned bounding boxes of polytopes.  This is useful for partially modifying the visibility graph by adding or removing edges while only checking for collisions with polytopes whose AABB contacts the graph edge.
+
+`fcn_MapGen_snapInteriorPointToVertex.m`: checks if points are interior to polytopes.  If they are, it overwrites these points with the nearest polytope vertex of the containing polytope.  This is useful when dilating polytopes such that if dilation overlaps a point of interest, that point can be moved to the outside of the polytope.  See [here ](https://github.com/ivsg-psu/PathPlanning_GridFreePathPlanners_BoundedAStar/blob/main/Functions/script_test_polytope_canyon_replan_with_dilation.m) for an example of this in use.
+
 <a href="#pathplanning_maptools_mapgenclasslibrary">Back to top</a>
 
 #### Core Functions
