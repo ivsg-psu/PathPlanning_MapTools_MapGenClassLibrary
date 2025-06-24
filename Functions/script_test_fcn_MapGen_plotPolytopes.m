@@ -50,6 +50,8 @@ line_color = [0.5 0 0];
 fcn_MapGen_plotPolytopes(polytopes,fig_num,line_spec,line_width,line_color);
 
 %% Advanced examples
+close all
+
 line_width = 3;
 axis_box = [0 1 0 1];
 halton_range = [1 100]; % Sets the indices to use from halton set
@@ -94,3 +96,5 @@ fcn_MapGen_plotPolytopes(polytopes2,fig1,'r-',2);
 fcn_MapGen_plotPolytopes(polytopes2,fig2,'b--',2,axis_box);
 fcn_MapGen_plotPolytopes(polytopes2,fig3,'g-',3,axis_box,'square');
 fcn_MapGen_plotPolytopes(polytopes2,fig4,'k-',3,axis_box,'square',[1 0 0 0 0.5]);
+
+%  save('testData_fcn_MapGen_plotPolytopes','polytopes','polytopes2')
