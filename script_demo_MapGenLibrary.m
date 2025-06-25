@@ -35,6 +35,8 @@
 % -- Updated DebugTools_v2024_12_18 dependency
 % -- Added global flags for setting test conditions and plotting
 % -- Deprecated fcn_MapGen_checkInputsToFunctions, converted to fcn_DebugTools_checkInputsToFunctions
+% 2025_06_25 - Sean Brennan
+% -- upgraded debug tools to version DebugTools_v2025_06_24
 
 % TO-DO:
 % -- add debug library utility, and switch functions to this
@@ -43,9 +45,9 @@
 clear library_name library_folders library_url
 
 ith_library = 1;
-library_name{ith_library}    = 'DebugTools_v2024_12_18';
+library_name{ith_library}    = 'DebugTools_v2025_06_24';
 library_folders{ith_library} = {'Functions','Data'};
-library_url{ith_library}     = 'https://github.com/ivsg-psu/Errata_Tutorials_DebugTools/archive/refs/tags/DebugTools_v2024_12_18.zip';
+library_url{ith_library}     = 'https://github.com/ivsg-psu/Errata_Tutorials_DebugTools/archive/refs/tags/DebugTools_v2025_06_24.zip';
 
 % ith_library = ith_library+1;
 % library_name{ith_library}    = 'PathClass_v2023_02_01';
@@ -71,7 +73,7 @@ library_url{ith_library}     = 'https://github.com/ivsg-psu/Errata_Tutorials_Deb
 %% Clear paths and folders, if needed
 if 1==1
     clear flag_MapGen_Folders_Initialized
-   fcn_INTERNAL_clearUtilitiesFromPathAndFolders;
+    fcn_INTERNAL_clearUtilitiesFromPathAndFolders;
 
 end
 
@@ -88,8 +90,8 @@ setenv('MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS','1');
 setenv('MATLABFLAG_MAPGEN_FLAG_DO_DEBUG','0');
 
 %% Set environment flags for input checking in Geometry library
-setenv('MATLABFLAG_GEOMETRY_FLAG_CHECK_INPUTS','0');
-setenv('MATLABFLAG_GEOMETRY_FLAG_DO_DEBUG','0');
+% setenv('MATLABFLAG_GEOMETRY_FLAG_CHECK_INPUTS','0');
+% setenv('MATLABFLAG_GEOMETRY_FLAG_DO_DEBUG','0');
 
 % %% Set environment flags that define the ENU origin
 % % This sets the "center" of the ENU coordinate system for all plotting
@@ -109,6 +111,21 @@ setenv('MATLABFLAG_GEOMETRY_FLAG_DO_DEBUG','0');
 % setenv('MATLABFLAG_PLOTROAD_ALIGNMATLABLLAPLOTTINGIMAGES_LAT','-0.0000008');
 % setenv('MATLABFLAG_PLOTROAD_ALIGNMATLABLLAPLOTTINGIMAGES_LON','0.0000054');
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+%    _____      _   _   _                _____ _             _           _ 
+%   / ____|    | | | | (_)              / ____| |           | |         | |
+%  | |  __  ___| |_| |_ _ _ __   __ _  | (___ | |_ __ _ _ __| |_ ___  __| |
+%  | | |_ |/ _ \ __| __| | '_ \ / _` |  \___ \| __/ _` | '__| __/ _ \/ _` |
+%  | |__| |  __/ |_| |_| | | | | (_| |  ____) | || (_| | |  | ||  __/ (_| |
+%   \_____|\___|\__|\__|_|_| |_|\__, | |_____/ \__\__,_|_|   \__\___|\__,_|
+%                                __/ |                                     
+%                               |___/                                      
+% See http://patorjk.com/software/taag/#p=display&f=Big&t=Getting%20Started
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+disp('Welcome to the MapGen library!')
 
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
