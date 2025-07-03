@@ -37,11 +37,19 @@
 % -- Deprecated fcn_MapGen_checkInputsToFunctions, converted to fcn_DebugTools_checkInputsToFunctions
 % 2025_06_25 - Sean Brennan
 % -- upgraded debug tools to version DebugTools_v2025_06_24
+% 2025_07_03 - Sean Brennan
+% -- added minor comments in demo script
 
 % TO-DO:
-% -- add debug library utility, and switch functions to this
+% -- add debug library utility, and switch functions to this. Done?
 % -- add functions that, given a map, give core statistics (look out limit, linear density, etc - basically make functions to calculate all the pi-values and interpretations we might need)
 % -- add prior work on grid-based map generation
+% 2025_07_03 - Sean Brennan
+% -- need codes to generate non-convex obstacles randomly
+%    Possible approach: generate convex polytopes, and then carve
+%    subpolytopes out of these
+% -- need codes to generate 3D obstacles randomly via Halton set
+
 clear library_name library_folders library_url
 
 ith_library = 1;
@@ -50,9 +58,9 @@ library_folders{ith_library} = {'Functions','Data'};
 library_url{ith_library}     = 'https://github.com/ivsg-psu/Errata_Tutorials_DebugTools/archive/refs/tags/DebugTools_v2025_06_24.zip';
 
 % ith_library = ith_library+1;
-% library_name{ith_library}    = 'PathClass_v2023_02_01';
+% library_name{ith_library}    = 'PathClass_v2025_07_02';
 % library_folders{ith_library} = {'Functions'};                                
-% library_url{ith_library}     = 'https://github.com/ivsg-psu/PathPlanning_PathTools_PathClassLibrary/blob/main/Releases/PathClass_v2023_02_01.zip?raw=true';
+% library_url{ith_library}     = 'https://github.com/ivsg-psu/PathPlanning_PathTools_PathClassLibrary/blob/main/Releases/PathClass_v2025_07_02.zip?raw=true';
 % 
 % ith_library = ith_library+1;
 % library_name{ith_library}    = 'GPSClass_v2023_04_21';
@@ -71,7 +79,7 @@ library_url{ith_library}     = 'https://github.com/ivsg-psu/Errata_Tutorials_Deb
 
 
 %% Clear paths and folders, if needed
-if 1==1
+if 1==0
     clear flag_MapGen_Folders_Initialized
     fcn_INTERNAL_clearUtilitiesFromPathAndFolders;
 
@@ -79,7 +87,7 @@ end
 
 %% Do we need to set up the work space?
 if ~exist('flag_MapGen_Folders_Initialized','var')
-    this_project_folders = {'Functions','testFixtures'}; % {'Functions','Data'};
+    this_project_folders = {'Functions','testFixtures','Data'}; % {'Functions','Data'};
     fcn_INTERNAL_initializeUtilities(library_name,library_folders,library_url,this_project_folders);  
     flag_MapGen_Folders_Initialized = 1;
 end
@@ -540,7 +548,7 @@ original_seed_points = points_scrambled(low_pt:high_pt,:);
 
 % Call the function
 polytopes = fcn_MapGen_generatePolysFromVoronoiAABBWithTiling(original_seed_points,unit_AABB, stretch,fig_num);
-assert(true);
+assert(isstruct(polytopes));
 
 
 
