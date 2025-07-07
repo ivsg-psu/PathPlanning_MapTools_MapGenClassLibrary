@@ -39,6 +39,9 @@
 % -- upgraded debug tools to version DebugTools_v2025_06_24
 % 2025_07_03 - Sean Brennan
 % -- added minor comments in demo script
+% 2025_07_07 - Sean Brennan
+% -- started updating headers and test scripts. Only have 
+% fcn_MapGen_generatePolysFromTiling done so far.
 
 % TO-DO:
 % -- add debug library utility, and switch functions to this. Done?

@@ -132,12 +132,13 @@ end
 % check variable argument
 stretch = [1 1]; % default stretch value
 if 2 <= nargin
-    stretch = varargin{1};
-    
-    % Check the stretch input
-    fcn_DebugTools_checkInputsToFunctions(...
-        stretch, '2column_of_numbers',1);
-       
+    temp = varargin{1};
+    if ~isempty(temp)
+        stretch = temp;
+        % Check the stretch input
+        fcn_DebugTools_checkInputsToFunctions(...
+            stretch, '2column_of_numbers',1);
+    end
 end
 
 
@@ -168,15 +169,19 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% pull halton set
-halton_points = haltonset(2);
+halton_points = haltonset(2); % pull a 2 dimensional halton sequence of points
 points_scrambled = scramble(halton_points,'RR2'); % scramble values
 
 %% pick values from halton set
 low_pt = Halton_range(1,1);
 high_pt = Halton_range(1,2);
+
+%% Pick values from the Halton set
 seed_points = points_scrambled(low_pt:high_pt,:);
+% seed_points = seed_points.*stretch; % Stretch the values (old code)
+
+%% Generate Voronoi diagram based on Halton set
 [V,C] = voronoin(seed_points);
-% V = V.*stretch;
 
 %% fill polytopes from tiling
 AABB = [0 0 1 1];
