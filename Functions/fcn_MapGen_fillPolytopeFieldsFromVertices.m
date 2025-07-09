@@ -9,8 +9,6 @@ function [ ...
 % Given a polytoope structure array where the vertices field is filled,
 % calculates the values for all the other fields.
 %
-%
-%
 % FORMAT:
 %
 %    [ ...
@@ -47,7 +45,6 @@ function [ ...
 %     fcn_MapGen_polytopeCentroidAndArea
 %     fcn_DebugTools_checkInputsToFunctions
 %
-%
 % EXAMPLES:
 %
 % See the script: script_test_fcn_MapGen_fillPolytopeFieldsFromVertices
@@ -70,9 +67,10 @@ function [ ...
 % other functions, and changed all functions/scripts that call this
 % function to correct this
 
-
 % TO DO
-% -- none
+% 2025_07_09 - S. Brennan and K. Hayes
+% --  need a tool to check if polytope is convex. This is causing some of
+% the codes in Bounded_AStar to break
 
 %% Debugging and Input checks
 
