@@ -27,6 +27,7 @@ varargin...
 %    C, ...
 %    AABB, ...
 %    stretch, ...
+%    (flag_removeEdgePolytopes),...
 %    (fig_num) ...
 %    )
 %
@@ -47,6 +48,12 @@ varargin...
 %     calculated, in format of [xmagnification ymagnification]
 %
 %     (optional inputs)
+%
+%     flag_removeEdgePolytopes: if 0 (default), the polytopes on the edges
+%     of the AABB are trimmed to create new polytopes so that the entire
+%     bounding box is filled. If set to 1, any polytope crossing over the
+%     edge of the bounding box is removed and there is no polytopes
+%     cropped.
 %
 %      fig_num: a figure number to plot results. If set to -1, skips any
 %      input checking or debugging, no figures will be generated, and sets
@@ -86,18 +93,23 @@ varargin...
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
 % -- fixed call to fcn_MapGen_fillPolytopeFieldsFromVertices
+% 2025_07_07 by Sean Brennan
+% -- added flag_removeEdgePolytopes option to be compatible with Bounded
+%    Astar library usage of old codes
+% 2025_07_07 by Sean Brennan
+% -- updated header debugging and input area to fix global flags,
+%    streamline plotting and make debugging/editing easier in future
 
-
-% TO DO
-% -- none
+% TO-DO
+% (none)
 
 %% Debugging and Input checks
-
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 7; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==6 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -122,6 +134,7 @@ if flag_do_debug
 else
     debug_fig_num = []; %#ok<NASGU>
 end
+
 %% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   _____                   _
@@ -134,14 +147,10 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-if (0==flag_max_speed)
-    if 1 == flag_check_inputs
-
+if 0==flag_max_speed
+    if flag_check_inputs
         % Are there the right number of inputs?
-        if nargin < 5 || nargin > 6
-            error('Incorrect number of input arguments')
-        end
+        narginchk(5,MAX_NARGIN);
 
         % Check the seed_points input, make sure it is '2column_of_numbers' type
         fcn_DebugTools_checkInputsToFunctions(...
@@ -150,28 +159,31 @@ if (0==flag_max_speed)
         % Check the stretch input, make sure it is '2column_of_numbers' type
         fcn_DebugTools_checkInputsToFunctions(...
             stretch, '2column_of_numbers',1);
+    end
+end
 
+
+% Does user want to specify the flag_removeEdgePolytopes input?
+flag_removeEdgePolytopes = 0; % Default is to NOT remove the edges
+if 6 <= nargin
+    temp = varargin{1};
+    if ~isempty(temp)
+        flag_removeEdgePolytopes = temp;
     end
 end
 
 % Does user want to show the plots?
-flag_do_plot = 0; % Default is no plotting
-if  6 == nargin && (0==flag_max_speed) % Only create a figure if NOT maximizing speed
-    temp = varargin{end}; % Last argument is always figure number
-    if ~isempty(temp) % Make sure the user is not giving empty input
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
+    temp = varargin{end};
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
-        flag_do_plot = 1; % Set flag to do plotting
-    end
-else
-    if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
-        fig = figure;
-        fig_for_debug = fig.Number; %#ok<NASGU>
-        flag_do_plot = 1;
+        figure(fig_num);
+        flag_do_plots = 1;
     end
 end
 
-
-%% Start of main code
+%% Main code
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   __  __       _
 %  |  \/  |     (_)
@@ -199,7 +211,8 @@ polytopes(num_poly) = ...
     'min_radius',[],...
     'mean_radius',[],...
     'radii',[],...
-    'cost',[]);
+    'cost',[],...
+    'parent_poly_id',[]);
 
 Npolys = length(polytopes);
 Nvertices_per_poly = 20; % Maximum estimate
@@ -252,14 +265,15 @@ end
 
 %% Crop vertices
 remove = 0; % keep track of how many cells to be removed
-for poly = 1:num_poly % pull each cell from the voronoi diagram
+goodIndices = ones(num_poly,1);
+for ith_poly = 1:num_poly % pull each cell from the voronoi diagram
     % Grab verticies
     %     row_offset = (poly-1)*Nvertices_per_poly;
     %     vertices = bounded_vertices(row_offset+1:row_offset+Nvertices,2:3);
     %     vertices = vertices(~isnan(vertices(:,1)));
-    indices = bounded_vertices(:,1)==poly;
+    indices = bounded_vertices(:,1)==ith_poly;
     vertices = bounded_vertices(indices,2:3);
-    interior_point = seed_points(poly,:);
+    interior_point = seed_points(ith_poly,:);
 
     %     % For debugging
     %     tolerance = 0.001;
@@ -279,10 +293,14 @@ for poly = 1:num_poly % pull each cell from the voronoi diagram
 
     % Are any vertices outside the AABB? If so, must crop them
     if ~all(fcn_MapGen_isWithinABBB(AABB,vertices)==1)
-
-      % Crop vertices to allowable range
+        % Crop vertices to allowable range
         [cropped_vertices] = ...
             fcn_MapGen_cropPolytopeToRange(vertices, interior_point, AABB);
+
+        if 1==flag_removeEdgePolytopes
+            % don't keep polytopes with any vertices outside the bounding box
+            goodIndices(ith_poly,1) = 0;
+        end
     else
         cropped_vertices = vertices;
     end
@@ -299,27 +317,29 @@ for poly = 1:num_poly % pull each cell from the voronoi diagram
         end
 
         % enter info into polytope structure
-        polytopes(poly-remove).vertices = cropped_vertices;
+        polytopes(ith_poly-remove).vertices = cropped_vertices;
         % polytopes(poly-remove).seed_point = interior_point;
 
     else % if 2 or less points in cell
-        remove = remove+1; %#ok<NASGU> % skip cell and remove later
-        error('2 points or less found in a polytope, must exit');
+        remove = remove+1; % % skip cell and remove later
+        % error('2 points or less found in a polytope, must exit');
     end
 end
 
 
 
 % remove extra empty polytopes
-polytopes = polytopes(1:(num_poly-remove));
+polytopes = polytopes(find(goodIndices)); %#ok<FNDSB>
 
-% Check that all the wall corners are inside polytopes
-polytopes = INTERNAL_fcn_addCorners(polytopes,seed_points,AABB);
+if 0==flag_removeEdgePolytopes
+    % Check that all the wall corners are inside polytopes
+    polytopes = INTERNAL_fcn_addCorners(polytopes,seed_points,AABB);
+end
 
 % Apply the stretch
 num_poly = length(polytopes);
-for poly = 1:num_poly % pull each cell from the voronoi diagram
-    polytopes(poly).vertices  = polytopes(poly).vertices.*stretch;
+for ith_poly = 1:num_poly % pull each cell from the voronoi diagram
+    polytopes(ith_poly).vertices  = polytopes(ith_poly).vertices.*stretch;
 end % Ends for loop for stretch
 
 % Fill in all the other fields
@@ -340,7 +360,7 @@ polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes);
 
 
 
-if flag_do_plot
+if flag_do_plots
 
     figure(fig_num);
     clf;
