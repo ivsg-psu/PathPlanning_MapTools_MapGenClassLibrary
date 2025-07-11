@@ -10,27 +10,10 @@
 % -- Reworked to be compatible with MapGen library
 % 2021_07_07 by Sean Brennan
 % -- additional edits on script
-%%%%%%%%%%%%%%§
+% 2025_07_11 by S. Brennan
+% -- still have no idea what this script does!
 
 close all
-
-%% Set up workspace
-if ~exist('flag_was_run_before','var')
-    
-    close all
-    
-    % add necessary directories
-    addpath([pwd '\Functions'])
-    %     addpath([pwd '\GeomClassLibrary\Functions'])
-    %     addpath([pwd '\MapGenClassLibrary\Functions'])
-    %     addpath([pwd '\Plotting'])
-    %     addpath([pwd '\Map_Generation\polytope_generation'])
-    %     addpath([pwd '\Map_Generation\polytope_editing'])
-    %     addpath([pwd '\Map_Generation\polytope_calculation'])
-    
-    flag_was_run_before = 1;
-end
-
 
 
 %% Generating Error Bubbles and Plotting
@@ -94,7 +77,8 @@ legend('Real Object','Perceived Object')
 grid on
 axis equal
 
-%% Testing work with contour plots, using function fcn_MapGen_ugvSensorError
+%%%%
+% Testing work with contour plots, using function fcn_MapGen_ugvSensorError
 
 %generating R and beta values for a grid of points
 x = linspace(0,200,200);

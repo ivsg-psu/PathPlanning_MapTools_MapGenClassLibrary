@@ -3,7 +3,7 @@
 
 % REVISION HISTORY:
 % 2023_02_24
-% -- first written by S. Brennan using
+% -- first written by S. Brennan
  close all
  
 
