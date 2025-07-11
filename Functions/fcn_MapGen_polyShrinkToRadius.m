@@ -208,6 +208,7 @@ r_dist = r_dist + (des_radius-mean(r_dist)); % adjust to ensure the mean value i
 max_r_dist = max(radii); % largest possible radius
 min_r_dist = min_rad; % smallest possible radius
 if sum((r_dist>max_r_dist)+(r_dist<min_r_dist)) > 0
+    warning('on','backtrace');
     warning('standard deviation skewed due to truncated distribution')
 end
 r_dist(r_dist>max_r_dist) = max_r_dist; % truncate any values that are too large

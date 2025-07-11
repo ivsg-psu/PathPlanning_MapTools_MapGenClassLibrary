@@ -208,7 +208,7 @@ AABB = [0 0 1 1];
 stretch = [1 1];
 flag_removeEdgePolytopes = 1; % do NOT fill in polytopes to edge
 
-Niterations = 2;
+Niterations = 10;
 
 % Do calculation without pre-calculation
 tic;

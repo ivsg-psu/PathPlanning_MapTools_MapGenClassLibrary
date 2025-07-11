@@ -1,35 +1,35 @@
-function [cropped_vertices] = ...
+function [croppedVertices] = ...
     fcn_MapGen_cropPolytopeToRange(...
     vertices, ...
-    interior_point,...
+    interiorPoint,...
     AABB,...
     varargin...
     )
 % fcn_MapGen_cropPolytopeToRange
-% crops the given vertices of a polytope to an axis-aligned bounding box 
-% 
+% crops the given vertices of a polytope to an axis-aligned bounding box
+%
 % FORMAT:
-% 
-%    [cropped_vertices] = ...
+%
+%    [croppedVertices] = ...
 %     fcn_MapGen_cropPolytopeToRange(...
 %     vertices, ...
-%     interior_point,...
+%     interiorPoint,...
 %     AABB,...
 %    (fig_num) ...
 %    )
-% 
+%
 % INPUTS:
-% 
+%
 %     vertices: the list of vertex points defining the polytope, in [x y]
 %     format, where x and y are columns
-% 
-%     interior_point: a point inside the polytope, in [x y]
+%
+%     interiorPoint: a point inside the polytope, in [x y]
 %     format, where x and y are scalars
-% 
-%     AABB: the axis-aligned bounding box, in format of 
+%
+%     AABB: the axis-aligned bounding box, in format of
 %     [xmin ymin xmax ymax], wherein the resulting polytopes must be
 %     bounded.
-% 
+%
 %     (optional inputs)
 %
 %      fig_num: a figure number to plot results. If set to -1, skips any
@@ -37,30 +37,32 @@ function [cropped_vertices] = ...
 %      up code to maximize speed. As well, if given, this forces the
 %      variable types to be displayed as output and as well makes the input
 %      check process verbose.
-% 
-% 
+%
+%
 % OUTPUTS:
-% 
-%     cropped_vertices: the resulting vertices of the polytope, forced to
+%
+%     croppedVertices: the resulting vertices of the polytope, forced to
 %     fit within the AABB
-% 
-% 
+%
 % DEPENDENCIES:
-% 
+%
 %     fcn_DebugTools_checkInputsToFunctions
 %     fcn_MapGen_convertAABBtoWalls
-% 
+%     fcn_MapGen_polytopeProjectVerticesOntoWalls
+%     fcn_MapGen_polytopeRemoveColinearVertices
+%     fcn_Path_findSensorHitOnWall
+%
 % EXAMPLES:
-% 
+%
 % See the script: script_test_fcn_MapGen_cropPolytopeToRange
 % for a full test suite.
-% 
+%
 % This function was written on 2021_07_11 by Sean Brennan
 % Questions or comments? contact sbrennan@psu.edu
 
-% 
+%
 % REVISION HISTORY:
-% 
+%
 % 2021_07_11 by Sean Brennan
 % -- first write of function
 % 2021_07_30 by Sean Brennan
@@ -68,24 +70,29 @@ function [cropped_vertices] = ...
 % 2025_04_25 by Sean Brennan
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
+% 2025_07_10 by Sean Brennan
+% -- changed fcn_MapGen_findIntersectionOfSegments to use
+% fcn_Path_findSensorHitOnWall instead, as the Path function is much more
+% tested/debugged and regularly updated
+% -- renamed variables for clarity
+% -- improved plotting
 
-% 
 % TO DO:
-% 
+%
 % -- allow user to enter the allowable range (hard-coded now to 0 to 1)
-% -- check that inrerior point is inside vertices
+% -- check that interior point is actually inside vertices!
 
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 flag_max_speed = 0;
 if (nargin==4 && isequal(varargin{end},-1))
-    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_do_debug = 0; %     % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
 else
     % Check to see if we are externally setting debug mode to be "on"
-    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_do_debug = 0; %     % Flag to plot the results for debugging
     flag_check_inputs = 1; % Flag to perform input checking
     MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS");
     MATLABFLAG_MAPGEN_FLAG_DO_DEBUG = getenv("MATLABFLAG_MAPGEN_FLAG_DO_DEBUG");
@@ -130,10 +137,10 @@ if 0==flag_max_speed
         fcn_DebugTools_checkInputsToFunctions(...
             vertices, '2column_of_numbers');
 
-        % Check the interior_point input, make sure it is '2column_of_numbers'
+        % Check the interiorPoint input, make sure it is '2column_of_numbers'
         % type, with 1 row
         fcn_DebugTools_checkInputsToFunctions(...
-            interior_point, '2column_of_numbers',1);
+            interiorPoint, '2column_of_numbers',1);
 
         % Check the AABB input, make sure it is '4column_of_numbers' type, with
         % 1 row
@@ -175,49 +182,49 @@ end
 % tolerance = 0.001;
 % location = [0.6128 0.9867];
 % if (...
-%         (interior_point(1,1)<location(1)+tolerance) && ...
-%         (interior_point(1,1)>location(1)-tolerance) && ...
-%         (interior_point(1,2)<location(2)+tolerance) && ...
-%         (interior_point(1,2)>location(2)-tolerance))
+%         (interiorPoint(1,1)<location(1)+tolerance) && ...
+%         (interiorPoint(1,1)>location(1)-tolerance) && ...
+%         (interiorPoint(1,2)<location(2)+tolerance) && ...
+%         (interiorPoint(1,2)>location(2)-tolerance))
 %     disp('stop here');
 % end
 
 % Convert axis-aligned bounding box to wall format
-walls = fcn_MapGen_convertAABBtoWalls(AABB);
+walls = fcn_MapGen_convertAABBtoWalls(AABB, -1);
 
 % Open the figure if doing debugging
 if flag_do_debug
     figure(1);
     clf;
     hold on;
-    
+
     % Set the axis
     scale = max(AABB,[],'all') - min(AABB,[],'all');
     new_axis = [AABB(1)-scale/2 AABB(3)+scale/2 AABB(2)-scale/2 AABB(4)+scale/2];
     axis(new_axis);
-    
+
     % Plot the original vertices
     plot(...
         [vertices(:,1); vertices(1,1)],...
         [vertices(:,2); vertices(1,2)],...
         '.-','Linewidth',3);
-    
+
     % Plot the walls
     plot(walls(:,1),walls(:,2),'k-');
-    
+
     % Plot the interior point
-    plot(interior_point(:,1),interior_point(:,2),'ro');
+    plot(interiorPoint(:,1),interiorPoint(:,2),'ro');
 
 end
 
 % Nudge the interior point inward, if it is on a border
-interior_point = ...
-    INTERNAL_fcn_nudgeInteriorPointInward(interior_point,AABB);
+interiorPoint = ...
+    fcn_INTERNAL_nudgeInteriorPointInward(interiorPoint, AABB);
 
 if flag_do_debug
     % Plot the new interior point
     figure(1);
-    plot(interior_point(:,1),interior_point(:,2),'ro');
+    plot(interiorPoint(:,1),interiorPoint(:,2),'ro');
 
 end
 
@@ -227,7 +234,7 @@ vertices_no_infinite = vertices;
 % add these border crossings as extra points so that we can project the
 % polytope correctly back onto walls (in a later step).
 [all_points, flag_was_intersection] = ...
-    INTERNAL_fcn_findAllPoints(vertices_no_infinite,walls);
+    fcn_INTERNAL_findAllPoints(vertices_no_infinite, walls);
 
 if flag_do_debug
     figure(1);
@@ -242,43 +249,43 @@ flag_vertices_outside = ((vertices_no_infinite(:,1)>=AABB(1,3)) + ...
     (vertices_no_infinite(:,1)<=AABB(1,1))).*((vertices_no_infinite(:,2)>=AABB(1,4)) + ...
     (vertices_no_infinite(:,2)<=AABB(1,2)));
 if all(flag_vertices_outside) && (flag_was_intersection==0)
-    cropped_vertices = walls;
+    croppedVertices = walls;
 else
-    
+
     % From the interior point, project all_points back onto the wall to create
     % a polytope limited by the bounding box.    
     [projected_points] = ...
-    fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-    interior_point,...
-    all_points,...
-    walls(1:end-1,:),...
-    walls(2:end,:));
-    
+        fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
+        interiorPoint,...
+        all_points,...
+        walls(1:end-1,:),...
+        walls(2:end,:), -1);
+
     if flag_do_debug
         figure(1);
         % Plot the projected_points locations
         plot(projected_points(:,1),projected_points(:,2),'go-');
     end
-       
+
     % Use the cross-product to eliminate co-linear points, as sometimes the
     % above process generates multiple points in a line, which is technically
-    % not a polytope.    
-    [cropped_vertices] = ...
-    fcn_MapGen_polytopeRemoveColinearVertices(...,
-    projected_points);
-    
+    % not a polytope.
+    [croppedVertices] = ...
+        fcn_MapGen_polytopeRemoveColinearVertices(...,
+        projected_points, -1);
+
     % Sometimes the cross-product step above removes the repeated last vertex.
     % So we may have to fix this
-    if ~isempty(cropped_vertices)
-        if ~isequal(cropped_vertices(1,:),cropped_vertices(end,:))
-            cropped_vertices = [cropped_vertices; cropped_vertices(1,:)];
+    if ~isempty(croppedVertices)
+        if ~isequal(croppedVertices(1,:),croppedVertices(end,:))
+            croppedVertices = [croppedVertices; croppedVertices(1,:)];
         end
     else
         error('Error in cropPolytopeToRange');
     end
-    
-    
-    
+
+
+
 end % Ends if statement to check if all points are enclosed
 
 
@@ -297,28 +304,27 @@ end % Ends if statement to check if all points are enclosed
 
 
 
-if flag_do_plot    
+if flag_do_plot
     figure(fig_num);
-    clf;
     hold on;
-    grid on;
-    grid minor;
-    
+
+    % Plot the input interiorPoint
+    plot(interiorPoint(:,1),interiorPoint(:,2),'g.','MarkerSize', 30, 'DisplayName','Input: interiorPoint');
+
     % Plot the original vertices
     plot(...
         [vertices(:,1); vertices(1,1)],...
         [vertices(:,2); vertices(1,2)],...
-        '.-');
-    
-    % Plot the walls
-    plot(walls(:,1),walls(:,2),'k-');
-    
-    % Plot the interior point
-    plot(interior_point(:,1),interior_point(:,2),'ro');
-    
-    % Plot the cropped_vertices locations
-    plot(cropped_vertices(:,1),cropped_vertices(:,2),'mo-');
-    
+        '.-', 'DisplayName','Input: vertices');
+
+    % Plot the AABB
+    plot(walls(:,1),walls(:,2),'k.-','DisplayName','Input: AABB');
+
+    % Plot the croppedVertices locations
+    plot(croppedVertices(:,1),croppedVertices(:,2),'mo-','DisplayName','Output: croppedVertices');
+
+    legend('Interpreter','none');
+
 end % Ends the flag_do_plot if statement
 
 if flag_do_debug
@@ -328,25 +334,20 @@ end
 
 end % Ends the function
 
-
-
-
-
-
 %% Functions follow
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   ______                _   _                 
-%  |  ____|              | | (_)                
-%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___ 
+%   ______                _   _
+%  |  ____|              | | (_)
+%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___
 %  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
 %  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
 %  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
-%                                               
+%
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
-
-function [all_points, flag_was_intersection] = INTERNAL_fcn_findAllPoints(vertices,walls)
+%% fcn_INTERNAL_findAllPoints
+function [all_points, flag_was_intersection] = fcn_INTERNAL_findAllPoints(vertices,walls)
 % Finds all vertices where the polytope intersects the walls, as well as
 % any wall start locations that are within the polytope
 
@@ -372,55 +373,59 @@ flag_was_intersection = 0;
 % Find all intersection points
 for ith_point = 1:length(start_vertices(:,1))
     all_points = [all_points; start_vertices(ith_point,:)]; %#ok<AGROW>
-    
+
     % Define start and end of the sensor
     sensor_vector_start = start_vertices(ith_point,:);
     sensor_vector_end = end_vertices(ith_point,:);
-    
+
     % Define the start and end of the walls
     wall_start = walls(1:end-1,:);
     wall_end = walls(2:end,:);
 
     % Call a function that determines where and if the sensor crosses the
     % walls
-    [distance,location,~] = ...
-        fcn_MapGen_findIntersectionOfSegments(...
-        wall_start,...
-        wall_end,...
-        sensor_vector_start,...
-        sensor_vector_end,2);
-    
+    [distance, location] = ...
+        fcn_Path_findSensorHitOnWall(...
+        wall_start,...           % wall start
+        wall_end,...             % wall end
+        sensor_vector_start,...  % sensor_vector_start
+        sensor_vector_end,...    % sensor_vector_end
+        (1), ...                 % (flag_search_return_type) -- 1 means ALL hits of any results,
+        (0), ...                 % (flag_search_range_type)  -- 0 means only if overlapping wall/sensor, ...
+        ([]),...                 % (tolerance) -- default is eps * 1000,
+        (-1));                   % (fig_num) -- -1 means to use "fast mode")
+
     if ~isnan(distance)
         all_points = [all_points; location]; %#ok<AGROW>
         flag_was_intersection = 1;
     end
-    
+
 end
 
 % Get rid of duplicates (occurs when two points are both on edges)
 indices_not_repeated = [~all(abs(diff(all_points))<eps*10,2); 1];
 all_points = all_points(indices_not_repeated>0,:);
 
-end % Ends INTERNAL_fcn_findAllPoints
+end % Ends fcn_INTERNAL_findAllPoints
 
-
-function interior_point = INTERNAL_fcn_nudgeInteriorPointInward(interior_point,box)
+%% fcn_INTERNAL_nudgeInteriorPointInward
+function interiorPoint = fcn_INTERNAL_nudgeInteriorPointInward(interiorPoint,box)
 % If the interior point is on the edge of the box, or even outside, this
 % nudges the interior point to the true interior.
 
 nudge = 1e-8;
 
-if interior_point(1,1)<=box(1,1)
-    interior_point(1,1) = nudge;
-elseif interior_point(1,1)>=box(1,3)
-    interior_point(1,1) = 1 - nudge;
+if interiorPoint(1,1)<=box(1,1)
+    interiorPoint(1,1) = nudge;
+elseif interiorPoint(1,1)>=box(1,3)
+    interiorPoint(1,1) = 1 - nudge;
 end
-if interior_point(1,2)<=box(1,2)
-    interior_point(1,2) = nudge;
-elseif interior_point(1,2)>=box(1,4)
-    interior_point(1,2) = 1 - nudge;
+if interiorPoint(1,2)<=box(1,2)
+    interiorPoint(1,2) = nudge;
+elseif interiorPoint(1,2)>=box(1,4)
+    interiorPoint(1,2) = 1 - nudge;
 end
-end % Ends INTERNAL_fcn_nudgeInteriorPointInward
+end % Ends fcn_INTERNAL_nudgeInteriorPointInward
 
 
 

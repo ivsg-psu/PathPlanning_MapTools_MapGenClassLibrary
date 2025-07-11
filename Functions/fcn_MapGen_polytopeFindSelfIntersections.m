@@ -1,4 +1,4 @@
-function [all_points, flag_was_intersection] = ...
+function [verticesIncludingSelfIntersections, flag_wasIntersection] = ...
     fcn_MapGen_polytopeFindSelfIntersections(vertices,...
     varargin)
 % fcn_MapGen_polytopeFindSelfIntersections finds the points where the
@@ -10,9 +10,8 @@ function [all_points, flag_was_intersection] = ...
 %
 % FORMAT:
 % 
-% [all_points, flag_was_intersection] = ...
-%    fcn_MapGen_polytopeFindSelfIntersections(vertices,...
-%     (fig_num))
+%    [verticesIncludingSelfIntersections, flag_wasIntersection] = ...
+%    fcn_MapGen_polytopeFindSelfIntersections(vertices, (fig_num))
 %
 % INPUTS:
 %
@@ -20,26 +19,28 @@ function [all_points, flag_was_intersection] = ...
 %
 %    (OPTIONAL INPUTS)
 %
-%      fig_num: a figure number to plot results. If set to -1, skips any
-%      input checking or debugging, no figures will be generated, and sets
-%      up code to maximize speed. As well, if given, this forces the
-%      variable types to be displayed as output and as well makes the input
-%      check process verbose.
+%    fig_num: a figure number to plot results. If set to -1, skips any
+%    input checking or debugging, no figures will be generated, and sets
+%    up code to maximize speed. As well, if given, this forces the
+%    variable types to be displayed as output and as well makes the input
+%    check process verbose.
 %
 % OUTPUTS:
 %
-%     all_points: an Mx2 matrix of [x y] points, which include the vertices
-%     and point crossings
+%     verticesIncludingSelfIntersections: an Mx2 matrix of [x y] points,
+%     which include both the input vertices and added crossings
+%     (self-intersections) where walls intersect with other walls
+%
+%     flag_wasIntersection: a flag that is 0 if there were no self
+%     intersections detected, 1 if there were
 %   
 % DEPENDENCIES:
 % 
 %     fcn_DebugTools_checkInputsToFunctions
-%     fcn_MapGen_polytopeFindVertexAngles
-%     fcn_MapGen_fillPolytopeFieldsFromVertices
+%     fcn_Path_findSensorHitOnWall
 % 
-% % EXAMPLES:
+% EXAMPLES:
 %      
-%
 % For additional examples, see:
 % script_test_fcn_MapGen_polytopeFindSelfIntersections
 %
@@ -53,6 +54,12 @@ function [all_points, flag_was_intersection] = ...
 % 2025_04_25 by Sean Brennan
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
+% 2025_07_10 by Sean Brennan
+% -- updated variable names for clarity
+% -- changed fcn_MapGen_findIntersectionOfSegments to use
+% fcn_Path_findSensorHitOnWall instead, as the Path function is much more
+% tested/debugged and regularly updated
+% -- fixed bug with flag_wasIntersection
 
 % TO DO
 % -- none
@@ -143,17 +150,17 @@ end
 % Finds all vertices where the polytope intersects itself. Assumes the
 % vertices already wrap around
 
-% Fill in blank all_points as starter
-all_points = [];
+% Fill in blank verticesIncludingSelfIntersections as starter
+verticesIncludingSelfIntersections = [];
 
 start_vertices = vertices(1:end-1,:);
 end_vertices = vertices(2:end,:);
 all_indices = (1:(length(vertices(:,1))-1))'; 
 
-flag_was_intersection = 0;
+flag_wasIntersection = 0;
 % Find all intersection points
 for ith_point = 1:length(start_vertices(:,1))
-    all_points = [all_points; start_vertices(ith_point,:)]; %#ok<AGROW>
+    verticesIncludingSelfIntersections = [verticesIncludingSelfIntersections; start_vertices(ith_point,:)]; %#ok<AGROW>
     
     % Define start and end of the sensor
     sensor_vector_start = start_vertices(ith_point,:);
@@ -199,12 +206,16 @@ for ith_point = 1:length(start_vertices(:,1))
 
     % Call a function that determines where and if the sensor crosses the
     % walls
-    [distance,location,~] = ...
-        fcn_MapGen_findIntersectionOfSegments(...
-        wall_start,...
-        wall_end,...
-        sensor_vector_start,...
-        sensor_vector_end,2);
+    [distance, location] = ...
+        fcn_Path_findSensorHitOnWall(...
+        wall_start,...           % wall start
+        wall_end,...             % wall end
+        sensor_vector_start,...  % sensor_vector_start
+        sensor_vector_end,...    % sensor_vector_end
+        (1), ...                 % (flag_search_return_type) -- 1 means ALL hit of any results,
+        (0), ...                 % (flag_search_range_type)  -- 0 means only if overlapping wall/sensor, ...
+        ([]),...                 % (tolerance) -- default is eps * 1000,
+        (-1));                   % (fig_num) -- -1 means to use "fast mode")
     
     % Sort by distances
     sorting_data = [distance location];
@@ -213,16 +224,21 @@ for ith_point = 1:length(start_vertices(:,1))
     location = sorted_data(:,2:3);
     
     if ~isnan(distance)
-        all_points = [all_points; location(distance~=0,:)]; %#ok<AGROW>
-        flag_was_intersection = 1;
+        verticesIncludingSelfIntersections = [verticesIncludingSelfIntersections; location(distance~=0,:)]; %#ok<AGROW>
     end
     
 end
 
-% Get rid of duplicates (occurs when two points are both on edges)
-indices_not_repeated = [~all(abs(diff(all_points))<eps*10,2); 1];
-all_points = all_points(indices_not_repeated>0,:);
+% Get rid of duplicates. This happens when two points are both on edges,
+% and at every end of connecting segments
+indices_not_repeated = [~all(abs(diff(verticesIncludingSelfIntersections))<eps*10,2); 1];
+verticesIncludingSelfIntersections = verticesIncludingSelfIntersections(indices_not_repeated>0,:);
 
+if length(verticesIncludingSelfIntersections(:,1))==length(vertices(:,1))
+    flag_wasIntersection = 0;
+else
+    flag_wasIntersection = 1;
+end
 
 %% Plot results?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -246,8 +262,8 @@ if flag_do_plot
     % Plot the vertices
     plot(vertices(:,1),vertices(:,2),'r-');
     
-    % Plot the all_points
-    plot(all_points(:,1),all_points(:,2),'ko');
+    % Plot the verticesIncludingSelfIntersections
+    plot(verticesIncludingSelfIntersections(:,1),verticesIncludingSelfIntersections(:,2),'ko');
 
 end
 

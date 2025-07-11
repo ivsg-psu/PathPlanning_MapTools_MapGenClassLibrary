@@ -257,6 +257,7 @@ for ith_poly = 1:length(seed_points)
     distances_from_center = sum((vertices_open-center).^2,2).^0.5;
     near_infinite = (distances_from_center/scale)>1E7;
     if any(near_infinite)
+        warning('on','backtrace');
         warning('Near-infinite vertex found for polytope: %.0d, for seed point: (%.3f, %.3f)', ith_poly,seed_points_to_use(ith_poly,1),seed_points_to_use(ith_poly,2))
         vertices_open(near_infinite,:) = inf;
         % Remove repeated infinities

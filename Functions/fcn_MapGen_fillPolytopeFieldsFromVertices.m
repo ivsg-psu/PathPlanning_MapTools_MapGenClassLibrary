@@ -187,7 +187,7 @@ for ith_poly = 1:num_poly
 
     % check that verticies are counter-clockwise by calculating the angles.
     [angles, ~, ~] = fcn_MapGen_polytopeFindVertexAngles(...
-        filled_polytopes(ith_poly).vertices);
+        filled_polytopes(ith_poly).vertices, -1);
 
     % Confirm that all angles are positive
     if ~all(angles>=0)
@@ -219,7 +219,7 @@ for ith_poly = 1:num_poly
 
     % Calculate the mean and area
     [filled_polytopes(ith_poly).mean,filled_polytopes(ith_poly).area] = ...
-        fcn_MapGen_polytopeCentroidAndArea(polytopes(ith_poly).vertices);
+        fcn_MapGen_polytopeCentroidAndArea(polytopes(ith_poly).vertices, -1);
 
     % Find max radius
     radii = sum(...

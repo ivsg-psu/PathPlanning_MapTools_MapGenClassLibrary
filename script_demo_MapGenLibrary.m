@@ -42,6 +42,11 @@
 % 2025_07_07 - Sean Brennan
 % -- started updating headers and test scripts. Only have 
 % fcn_MapGen_generatePolysFromTiling done so far.
+% 2025_07_11 - Sean Brennan
+% -- updated DebugTools library
+% -- added PathClass library to use this function (better) rather than
+%    fcn_MapGen_findIntersectionOfSegments
+%    
 
 % TO-DO:
 % -- add debug library utility, and switch functions to this. Done?
@@ -52,19 +57,22 @@
 %    Possible approach: generate convex polytopes, and then carve
 %    subpolytopes out of these
 % -- need codes to generate 3D obstacles randomly via Halton set
+% 2025_07_11 - Sean Brennan
+% -- in fcn_MapGen_generatePolysFromTiling, seems all arguments are
+%    optional. Need to fix this
 
 clear library_name library_folders library_url
 
 ith_library = 1;
-library_name{ith_library}    = 'DebugTools_v2025_06_24';
+library_name{ith_library}    = 'DebugTools_v2025_07_10';
 library_folders{ith_library} = {'Functions','Data'};
-library_url{ith_library}     = 'https://github.com/ivsg-psu/Errata_Tutorials_DebugTools/archive/refs/tags/DebugTools_v2025_06_24.zip';
+library_url{ith_library}     = 'https://github.com/ivsg-psu/Errata_Tutorials_DebugTools/archive/refs/tags/DebugTools_v2025_07_10.zip';
 
-% ith_library = ith_library+1;
-% library_name{ith_library}    = 'PathClass_v2025_07_02';
-% library_folders{ith_library} = {'Functions'};                                
-% library_url{ith_library}     = 'https://github.com/ivsg-psu/PathPlanning_PathTools_PathClassLibrary/blob/main/Releases/PathClass_v2025_07_02.zip?raw=true';
-% 
+ith_library = ith_library+1;
+library_name{ith_library}    = 'PathClass_v2025_07_06';
+library_folders{ith_library} = {'Functions'};                                
+library_url{ith_library}     = 'https://github.com/ivsg-psu/PathPlanning_PathTools_PathClassLibrary/archive/refs/tags/PathClass_v2025_07_06.zip?raw=true';
+
 % ith_library = ith_library+1;
 % library_name{ith_library}    = 'GPSClass_v2023_04_21';
 % library_folders{ith_library} = {''};
@@ -73,16 +81,16 @@ library_url{ith_library}     = 'https://github.com/ivsg-psu/Errata_Tutorials_Deb
 % ith_library = ith_library+1;
 % library_name{ith_library}    = 'GetUserInputPath_v2023_02_01';
 % library_folders{ith_library} = {''};
-% library_url{ith_library}     = 'https://github.com/ivsg-psu/PathPlanning_PathTools_GetUserInputPath/blob/main/Releases/GetUserInputPath_v2023_02_01.zip?raw=true';
+% library_url{ith_library}     = 'https://github.com/ivsg-psu/PathPlanning_PathTools_GetUserInputPath/archive/refs/tags/GetUserInputPath_v2023_02_01.zip?raw=true';
 % 
 % ith_library = ith_library+1;
 % library_name{ith_library}    = 'AlignCoordinates_2023_03_29';
 % library_folders{ith_library} = {'Functions'};
-% library_url{ith_library}     = 'https://github.com/ivsg-psu/PathPlanning_GeomTools_AlignCoordinates/blob/main/Releases/AlignCoordinates_2023_03_29.zip?raw=true';
+% library_url{ith_library}     = 'https://github.com/ivsg-psu/PathPlanning_GeomTools_AlignCoordinates/archive/refs/tags/AlignCoordinates_2023_03_29.zip?raw=true';
 
 
 %% Clear paths and folders, if needed
-if 1==0
+if 1==1
     clear flag_MapGen_Folders_Initialized
     fcn_INTERNAL_clearUtilitiesFromPathAndFolders;
 

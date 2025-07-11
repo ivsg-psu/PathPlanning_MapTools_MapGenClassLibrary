@@ -262,6 +262,7 @@ Ntruncations = sum((new_r_dist>max_r_dist)+(new_r_dist<min_r_dist));
 if flag_do_debug
     if  Ntruncations> 0
         st = dbstack;
+        warning('on','backtrace');
         warning('In function: %s, in file: %s\n\tThe standard deviation will skewed due to truncated distribution.\n\tThe number of truncations per total population of polytopes is: %.0d out of %.0d',...
             st(1).name,st(1).file,Ntruncations,Nradii);
     end

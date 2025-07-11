@@ -29,6 +29,7 @@ map_layers = input(prompt_map_layers)
 % each map layer should have its own color, if possible
 colors = ['r','g','c','m','b','y'];
 if map_layers > length(colors)
+    warning('on','backtrace');
     warning("There are more map layers than colors to plot them in, colors will be recycled\n")
 end
 

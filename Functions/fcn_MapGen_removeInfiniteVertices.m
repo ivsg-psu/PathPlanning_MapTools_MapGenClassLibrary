@@ -30,18 +30,16 @@ function [bounded_vertices] = ...
 %
 %     (optional inputs)
 %
-%      fig_num: a figure number to plot results. If set to -1, skips any
-%      input checking or debugging, no figures will be generated, and sets
-%      up code to maximize speed. As well, if given, this forces the
-%      variable types to be displayed as output and as well makes the input
-%      check process verbose.
-%
+%     fig_num: a figure number to plot results. If set to -1, skips any
+%     input checking or debugging, no figures will be generated, and sets
+%     up code to maximize speed. As well, if given, this forces the
+%     variable types to be displayed as output and as well makes the input
+%     check process verbose.
 %
 % OUTPUTS:
 %
 %     bounded_vertices: the resulting vertices of the polytope, forced to
 %     fit within the AABB
-%
 %
 % DEPENDENCIES:
 %
@@ -179,7 +177,7 @@ end
 % points prior, and after the infinite one that "close" the polytope.
 
 % Convert axis-aligned bounding box to wall format
-walls = fcn_MapGen_convertAABBtoWalls(AABB);
+walls = fcn_MapGen_convertAABBtoWalls(AABB, -1);
 
 
 if flag_do_debug
@@ -272,6 +270,7 @@ if any(isinf(all_vertices),'all') % Are there any infinite vertices
                     vertices_no_repeats = vertices(1:end-1,:);
                 end
             else
+                warning('on','backtrace');
                 warning('More than 2 infinities found in one vector. Code may break');
             end
         else
@@ -325,7 +324,7 @@ if any(isinf(all_vertices),'all') % Are there any infinite vertices
         % out to the boundaries. This is a bit challenging since these
         % represent cases where the Vornoi boundary is missing, so
         % basically it means we have to calculate the boundary ourselves.
-        isInside = fcn_MapGen_isWithinABBB(AABB, [prior_point; next_point]);        
+        isInside = fcn_MapGen_isWithinABBB(AABB, [prior_point; next_point], -1);        
         if isInside(1)
             new_prior = INTERNAL_fcn_MapGen_findMissingBoundaryPoint(...
                 prior_point,prior_point_lead_in, bad_poly,AABB,sorted_all_vertices,seed_points);
@@ -571,7 +570,7 @@ end
 % Check which is closer - midpoint or the current point? - to where the
 % snap point would have been:
 points_for_vector = [midpoint;test_point];
-nominal_new_boundary_point = fcn_MapGen_snapToAABB(AABB,test_point);
+nominal_new_boundary_point = fcn_MapGen_snapToAABB(AABB,test_point,[],-1);
 distances_squared = ...
     sum((points_for_vector-nominal_new_boundary_point).^2,2);
 [~,sort_index] = sort(distances_squared,'descend');
@@ -596,7 +595,7 @@ end
 
 
 snap_type = 2;
-new_point = fcn_MapGen_snapToAABB(AABB,sorted_points_for_vector,snap_type);
+new_point = fcn_MapGen_snapToAABB(AABB, sorted_points_for_vector, snap_type,-1);
 
 
 if flag_do_debug

@@ -50,16 +50,20 @@ varargin...
 %     (optional inputs)
 %
 %     flag_removeEdgePolytopes: if 0 (default), the polytopes on the edges
-%     of the AABB are trimmed to create new polytopes so that the entire
-%     bounding box is filled. If set to 1, any polytope crossing over the
-%     edge of the bounding box is removed and there is no polytopes
-%     cropped.
+%     of the AABB are trimmed to create new polytopes so that the bounding
+%     box is completely filled. This usually causes the number of generated
+%     polytopes to be equal to or greater than the number of seed points.
+%     The additional polytopes are for those created to fill the corners.
+%     If set to 1, any polytope crossing over the edge of the bounding box
+%     is removed and the result is, typically, that the number of generated
+%     polytopes is less, sometimes significantly so, than the number of
+%     seed points.
 %
-%      fig_num: a figure number to plot results. If set to -1, skips any
-%      input checking or debugging, no figures will be generated, and sets
-%      up code to maximize speed. As well, if given, this forces the
-%      variable types to be displayed as output and as well makes the input
-%      check process verbose.
+%     fig_num: a figure number to plot results. If set to -1, skips any
+%     input checking or debugging, no figures will be generated, and sets
+%     up code to maximize speed. As well, if given, this forces the
+%     variable types to be displayed as output and as well makes the input
+%     check process verbose.
 %
 %
 % OUTPUTS:
@@ -70,9 +74,13 @@ varargin...
 % DEPENDENCIES:
 %
 %     fcn_DebugTools_checkInputsToFunctions
+%     fcn_MapGen_removeInfiniteVertices
+%     fcn_MapGen_isWithinABBB
 %     fcn_MapGen_cropPolytopeToRange
 %     fcn_MapGen_fillPolytopeFieldsFromVertices
-%
+%     fcn_MapGen_plotPolytopes
+%     fcn_MapGen_convertAABBtoWalls
+%     fcn_Path_findSensorHitOnWall
 %
 % EXAMPLES:
 %
@@ -82,7 +90,6 @@ varargin...
 % This function was written on 2021_07_02 by Sean Brennan
 % Questions or comments? contact sbrennan@psu.edu
 
-%
 % REVISION HISTORY:
 %
 % 2021_07_02 by Sean Brennan
@@ -99,6 +106,12 @@ varargin...
 % 2025_07_07 by Sean Brennan
 % -- updated header debugging and input area to fix global flags,
 %    streamline plotting and make debugging/editing easier in future
+% 2025_07_10 by Sean Brennan
+% -- changed fcn_MapGen_findIntersectionOfSegments to use
+% fcn_Path_findSensorHitOnWall instead, as the Path function is much more
+% tested/debugged and regularly updated
+% 2025_07_10 by Sean Brennan
+% -- updated header debugging and input area to fix global flags,
 
 % TO-DO
 % (none)
@@ -110,12 +123,12 @@ varargin...
 MAX_NARGIN = 7; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
 if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
-    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_do_debug = 0; %     % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
 else
     % Check to see if we are externally setting debug mode to be "on"
-    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_do_debug = 0; %     % Flag to plot the results for debugging
     flag_check_inputs = 1; % Flag to perform input checking
     MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS");
     MATLABFLAG_MAPGEN_FLAG_DO_DEBUG = getenv("MATLABFLAG_MAPGEN_FLAG_DO_DEBUG");
@@ -261,7 +274,7 @@ end
 %% Remove infinite vertices
 [bounded_vertices] = ...
     fcn_MapGen_removeInfiniteVertices(...
-    all_vertices,seed_points,AABB,Nvertices_per_poly);
+    all_vertices,seed_points,AABB,Nvertices_per_poly, -1);
 
 %% Crop vertices
 remove = 0; % keep track of how many cells to be removed
@@ -292,10 +305,10 @@ for ith_poly = 1:num_poly % pull each cell from the voronoi diagram
 
 
     % Are any vertices outside the AABB? If so, must crop them
-    if ~all(fcn_MapGen_isWithinABBB(AABB,vertices)==1)
+    if ~all(fcn_MapGen_isWithinABBB(AABB,vertices,-1)==1)
         % Crop vertices to allowable range
         [cropped_vertices] = ...
-            fcn_MapGen_cropPolytopeToRange(vertices, interior_point, AABB);
+            fcn_MapGen_cropPolytopeToRange(vertices, interior_point, AABB, -1);
 
         if 1==flag_removeEdgePolytopes
             % don't keep polytopes with any vertices outside the bounding box
@@ -333,7 +346,7 @@ polytopes = polytopes(find(goodIndices)); %#ok<FNDSB>
 
 if 0==flag_removeEdgePolytopes
     % Check that all the wall corners are inside polytopes
-    polytopes = INTERNAL_fcn_addCorners(polytopes,seed_points,AABB);
+    polytopes = fcn_INTERNAL_addCorners(polytopes,seed_points,AABB);
 end
 
 % Apply the stretch
@@ -343,7 +356,7 @@ for ith_poly = 1:num_poly % pull each cell from the voronoi diagram
 end % Ends for loop for stretch
 
 % Fill in all the other fields
-polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes);
+polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes, [], -1);
 
 %§
 %% Plot the results (for debugging)?
@@ -374,7 +387,6 @@ if flag_do_plots
 
     % plot all vertices
     plot(all_vertices(:,2),all_vertices(:,3),'c','Linewidth',1);
-
 
     % plot the seed points in red
     plot(seed_points(:,1),seed_points(:,2),'r.','Markersize',10);
@@ -471,7 +483,7 @@ end % Ends the function
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
-function polytopes_with_corners = INTERNAL_fcn_addCorners(polytopes,seed_points,AABB)
+function polytopes_with_corners = fcn_INTERNAL_addCorners(polytopes,seed_points,AABB)
 % This function loops through the corners of the AABB, and checks to see
 % that all are within polytopes. If they are not, it finds the closest
 % polytope to each missing corner (based on seed point location), finds the
@@ -479,7 +491,7 @@ function polytopes_with_corners = INTERNAL_fcn_addCorners(polytopes,seed_points,
 % trims that polytope down to appropriate size with the corner included.
 
 % Check that all the wall corners are inside polytopes
-walls = fcn_MapGen_convertAABBtoWalls(AABB);
+walls = fcn_MapGen_convertAABBtoWalls(AABB, -1);
 test_points = walls(1:4,:);
 all_found = zeros(length(test_points(:,1)),1); % keep track of which vertices are hit
 for poly = 1:length(polytopes)
@@ -503,13 +515,16 @@ for ith_missing = 1:length(missing_vertices(:,1))
     interior_point = seed_points(closest_poly,:);
 
     % Find the polytope wall that is closest to the missing point
-    [~,~,wall_that_was_hit] = ...
-        fcn_MapGen_findIntersectionOfSegments(...
+    [~, ~, wall_that_was_hit] = ...
+        fcn_Path_findSensorHitOnWall(...
         vertices(1:end-1,:),...  % wall start
         vertices(2:end,:),...    % wall end
         missing_point,...        % sensor_vector_start
         interior_point,...       % sensor_vector_end
-        0);
+        (0), ...                 % (flag_search_return_type) -- 0 means first hit of any results, 
+        (0), ...                 % (flag_search_range_type)  -- 0 means only if overlapping wall/sensor, ...
+        ([]),...                 % (tolerance) -- default is eps * 1000,
+        (-1));                   % (fig_num) -- -1 means to use "fast mode")
 
     % Put the point into the vertices
     shoved_vertices = [...
@@ -519,7 +534,7 @@ for ith_missing = 1:length(missing_vertices(:,1))
 
     % Crop vertices to allowable range
     [cropped_vertices] = ...
-        fcn_MapGen_cropPolytopeToRange(shoved_vertices, interior_point, AABB);
+        fcn_MapGen_cropPolytopeToRange(shoved_vertices, interior_point, AABB, -1);
 
     % make sure cw
     vec1 = [cropped_vertices(2,:)-cropped_vertices(1,:),0]; % vector leading into point

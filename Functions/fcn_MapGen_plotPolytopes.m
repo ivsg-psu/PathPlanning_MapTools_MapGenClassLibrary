@@ -189,6 +189,7 @@ if nargin > 4
         elseif arg_size == 5
             fill_info = argument; % all the fill information [Y/N R G B alpha]
         else
+            warning('on','backtrace');
             warning('Invalid argument. Argument ignored.')
         end
     end

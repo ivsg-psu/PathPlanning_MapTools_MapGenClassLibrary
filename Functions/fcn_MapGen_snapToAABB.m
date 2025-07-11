@@ -164,14 +164,15 @@ end
 
 flag_snap_type = 0;
 if  3<= nargin
-    flag_snap_type = varargin{1};
-
-    if 2 == flag_snap_type
-        % Check the flag_snap_type input, make sure it is '1column_of_numbers' type
-        % with 2 rows
-        fcn_DebugTools_checkInputsToFunctions(flag_snap_type, '1column_of_numbers',1);
+    temp = varargin{1};
+    if ~isempty(temp)
+        flag_snap_type = temp;
+        if 2 == flag_snap_type && (1 == flag_check_inputs)
+            % Check the flag_snap_type input, make sure it is '1column_of_numbers' type
+            % with 2 rows
+            fcn_DebugTools_checkInputsToFunctions(flag_snap_type, '1column_of_numbers',1);
+        end
     end
-
 end
 
 % Does user want to show the plots?
