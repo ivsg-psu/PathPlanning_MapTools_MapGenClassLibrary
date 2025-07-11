@@ -1,9 +1,9 @@
 function [ ...
 polytopes, ...
-all_vertices...
+polytopeVertices...
 ] = ...
 fcn_MapGen_generatePolysFromTiling( ...
-seed_points, ...
+seedPoints, ...
 V, ...
 C, ...
 AABB, ...
@@ -22,7 +22,7 @@ varargin...
 %    polytopes ...
 %    ] = ...
 %    fcn_MapGen_generatePolysFromTiling( ...
-%    seed_points, ...
+%    seedPoints, ...
 %    V, ...
 %    C, ...
 %    AABB, ...
@@ -33,7 +33,7 @@ varargin...
 %
 % INPUTS:
 %
-%     seed_points: the list of seed points in [x y] format, where x and y
+%     seedPoints: the list of seed points in [x y] format, where x and y
 %     are columns
 %
 %     V: the V matrix resulting from Voronoi calculations
@@ -110,8 +110,10 @@ varargin...
 % -- changed fcn_MapGen_findIntersectionOfSegments to use
 % fcn_Path_findSensorHitOnWall instead, as the Path function is much more
 % tested/debugged and regularly updated
+% -- updated some variable naming
+% -- clean-up of comments
 % 2025_07_10 by Sean Brennan
-% -- updated header debugging and input area to fix global flags,
+% -- updated header debugging and input area to fix global flags
 
 % TO-DO
 % (none)
@@ -165,9 +167,9 @@ if 0==flag_max_speed
         % Are there the right number of inputs?
         narginchk(5,MAX_NARGIN);
 
-        % Check the seed_points input, make sure it is '2column_of_numbers' type
+        % Check the seedPoints input, make sure it is '2column_of_numbers' type
         fcn_DebugTools_checkInputsToFunctions(...
-            seed_points, '2column_of_numbers');
+            seedPoints, '2column_of_numbers');
 
         % Check the stretch input, make sure it is '2column_of_numbers' type
         fcn_DebugTools_checkInputsToFunctions(...
@@ -211,7 +213,7 @@ end
 
 
 %% Initiate data structures
-num_poly = size(seed_points,1);
+num_poly = size(seedPoints,1);
 polytopes(num_poly) = ...
     struct(...
     'vertices',[],...
@@ -230,7 +232,7 @@ polytopes(num_poly) = ...
 Npolys = length(polytopes);
 Nvertices_per_poly = 20; % Maximum estimate
 Nvertices_per_map = Npolys*Nvertices_per_poly;
-all_vertices = nan(Nvertices_per_map,3);
+polytopeVertices = nan(Nvertices_per_map,3);
 % all_neighbors = nan(Nvertices_per_map,1);
 
 %% Loop through the polytopes, filling verticies and neighbors matrix
@@ -262,8 +264,8 @@ for ith_poly = 1:Npolys
         error('Need to resize the number of allowable vertices');
     else
         row_offset = (ith_poly-1)*Nvertices_per_poly;
-        all_vertices(row_offset+1:row_offset+Nvertices,1) = ith_poly;
-        all_vertices(row_offset+1:row_offset+Nvertices,2:3) = vertices;
+        polytopeVertices(row_offset+1:row_offset+Nvertices,1) = ith_poly;
+        polytopeVertices(row_offset+1:row_offset+Nvertices,2:3) = vertices;
     end
 
 
@@ -274,7 +276,7 @@ end
 %% Remove infinite vertices
 [bounded_vertices] = ...
     fcn_MapGen_removeInfiniteVertices(...
-    all_vertices,seed_points,AABB,Nvertices_per_poly, -1);
+    polytopeVertices,seedPoints,AABB,Nvertices_per_poly, -1);
 
 %% Crop vertices
 remove = 0; % keep track of how many cells to be removed
@@ -286,7 +288,7 @@ for ith_poly = 1:num_poly % pull each cell from the voronoi diagram
     %     vertices = vertices(~isnan(vertices(:,1)));
     indices = bounded_vertices(:,1)==ith_poly;
     vertices = bounded_vertices(indices,2:3);
-    interior_point = seed_points(ith_poly,:);
+    interior_point = seedPoints(ith_poly,:);
 
     %     % For debugging
     %     tolerance = 0.001;
@@ -346,7 +348,7 @@ polytopes = polytopes(find(goodIndices)); %#ok<FNDSB>
 
 if 0==flag_removeEdgePolytopes
     % Check that all the wall corners are inside polytopes
-    polytopes = fcn_INTERNAL_addCorners(polytopes,seed_points,AABB);
+    polytopes = fcn_INTERNAL_addCorners(polytopes,seedPoints,AABB);
 end
 
 % Apply the stretch
@@ -386,10 +388,10 @@ if flag_do_plots
     fcn_MapGen_plotPolytopes(polytopes,fig_num,'b',2);
 
     % plot all vertices
-    plot(all_vertices(:,2),all_vertices(:,3),'c','Linewidth',1);
+    plot(polytopeVertices(:,2),polytopeVertices(:,3),'c','Linewidth',1);
 
     % plot the seed points in red
-    plot(seed_points(:,1),seed_points(:,2),'r.','Markersize',10);
+    plot(seedPoints(:,1),seedPoints(:,2),'r.','Markersize',10);
 
     % plot the means in black
     temp = zeros(length(polytopes),2);
@@ -400,7 +402,7 @@ if flag_do_plots
 
     % number the polytopes at seed points
     for ith_poly = 1:length(polytopes)
-        text_location = seed_points(ith_poly,:);
+        text_location = seedPoints(ith_poly,:);
         text(text_location(1,1),text_location(1,2),sprintf('%.0d',ith_poly));
     end
 
@@ -413,24 +415,24 @@ if flag_do_plots
     % plot the connections between the polytope neighbors
     if 1==0
         % Clean up and sort the vertices so that we can associate neighbors
-        all_vertices_no_nan = all_vertices(~isnan(all_vertices(:,1)),:);
-        sorted_all_vertices = sortrows(all_vertices_no_nan,[2 3]);
+        polytopeVertices_no_nan = polytopeVertices(~isnan(polytopeVertices(:,1)),:);
+        sorted_polytopeVertices = sortrows(polytopeVertices_no_nan,[2 3]);
 
         % Remove repeats
-        sorted_all_vertices = unique(sorted_all_vertices,'rows','stable');
+        sorted_polytopeVertices = unique(sorted_polytopeVertices,'rows','stable');
 
         % Remove infinities
-        sorted_all_vertices = sorted_all_vertices(~isinf(sorted_all_vertices(:,2)));
+        sorted_polytopeVertices = sorted_polytopeVertices(~isinf(sorted_polytopeVertices(:,2)));
 
-        Nrealvertices = floor(length(sorted_all_vertices(:,1))/3);
+        Nrealvertices = floor(length(sorted_polytopeVertices(:,1))/3);
         data = zeros(Nrealvertices*6,2);
         for ith_poly = 1:Nrealvertices
             row_offset = (ith_poly-1)*3;
-            neighbors = sorted_all_vertices(row_offset+1:row_offset+3,1);
+            neighbors = sorted_polytopeVertices(row_offset+1:row_offset+3,1);
 
             for jth_neighbor = 2:length(neighbors)
                 neigh_offset = (ith_poly-1)*6 + ((jth_neighbor-2)*3);
-                data(neigh_offset+1:neigh_offset+3,:) = [seed_points(neighbors(1),:); seed_points(neighbors(jth_neighbor),:); nan nan];
+                data(neigh_offset+1:neigh_offset+3,:) = [seedPoints(neighbors(1),:); seedPoints(neighbors(jth_neighbor),:); nan nan];
             end
         end
         plot(data(:,1),data(:,2),'-','Linewidth',0.5);
@@ -483,7 +485,7 @@ end % Ends the function
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
-function polytopes_with_corners = fcn_INTERNAL_addCorners(polytopes,seed_points,AABB)
+function polytopes_with_corners = fcn_INTERNAL_addCorners(polytopes,seedPoints,AABB)
 % This function loops through the corners of the AABB, and checks to see
 % that all are within polytopes. If they are not, it finds the closest
 % polytope to each missing corner (based on seed point location), finds the
@@ -509,10 +511,10 @@ for ith_missing = 1:length(missing_vertices(:,1))
     missing_point = missing_vertices(ith_missing,:);
 
     % Find closest seed point
-    distances_squared = sum((missing_point - seed_points).^2,2);
+    distances_squared = sum((missing_point - seedPoints).^2,2);
     [~,closest_poly] = min(distances_squared);
     vertices = polytopes(closest_poly).vertices;
-    interior_point = seed_points(closest_poly,:);
+    interior_point = seedPoints(closest_poly,:);
 
     % Find the polytope wall that is closest to the missing point
     [~, ~, wall_that_was_hit] = ...

@@ -1,4 +1,4 @@
-function poly_map_stats = fcn_MapGen_polytopesStatistics(...
+function polyMapStats = fcn_MapGen_polytopesStatistics(...
     polytopes,...
     varargin)
 % fcn_MapGen_polytopesStatistics calculates key statistics for the
@@ -6,7 +6,7 @@ function poly_map_stats = fcn_MapGen_polytopesStatistics(...
 %
 % FORMAT:
 %
-% [poly_map_stats] = ...
+% [polyMapStats] = ...
 %     fcn_MapGen_polytopesStatistics(...
 %     polytopes,...
 %     (fig_num))
@@ -25,7 +25,7 @@ function poly_map_stats = fcn_MapGen_polytopesStatistics(...
 %
 % OUTPUTS:
 %
-%     poly_map_stats: a structure whose fields contain the polytope map's
+%     polyMapStats: a structure whose fields contain the polytope map's
 %     statistics
 %     each of the fields in the struct are as follows:
 %     AABB is the axis aligned bounding box for the polytope field, bounding all polytopes
@@ -35,6 +35,7 @@ function poly_map_stats = fcn_MapGen_polytopesStatistics(...
 %     fcn_DebugTools_checkInputsToFunctions
 %     fcn_MapGen_polytopeFindVertexAngles
 %     fcn_MapGen_plotPolytopes
+%     fcn_Path_findSensorHitOnWall
 %
 % EXAMPLES:
 %
@@ -52,7 +53,14 @@ function poly_map_stats = fcn_MapGen_polytopesStatistics(...
 % 2025_04_25 by Sean Brennan
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-
+% 2025_07_10 by Sean Brennan
+% -- changed fcn_MapGen_findIntersectionOfSegments to use
+% fcn_Path_findSensorHitOnWall instead, as the Path function is much more
+% tested/debugged and regularly updated
+% -- updated some variable naming
+% -- clean-up of comments
+% 2025_07_10 by Sean Brennan
+% -- updated header debugging and input area to fix global flags
 
 % TO DO
 % -- none
@@ -64,12 +72,12 @@ function poly_map_stats = fcn_MapGen_polytopesStatistics(...
 % number.
 flag_max_speed = 0;
 if (nargin==2 && isequal(varargin{end},-1))
-    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_do_debug = 0; %     % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
 else
     % Check to see if we are externally setting debug mode to be "on"
-    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_do_debug = 0; %     % Flag to plot the results for debugging
     flag_check_inputs = 1; % Flag to perform input checking
     MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS");
     MATLABFLAG_MAPGEN_FLAG_DO_DEBUG = getenv("MATLABFLAG_MAPGEN_FLAG_DO_DEBUG");
@@ -197,7 +205,7 @@ for ith_poly = 1:Npolys
     % Calculate the angles, noting that the function gives outside angles,
     % so we have to subtract them from 180 degrees to get the interior
     % angles
-    [angles] = fcn_MapGen_polytopeFindVertexAngles(vertices);
+    [angles] = fcn_MapGen_polytopeFindVertexAngles(vertices, -1);
     all_angles(1:Nangles,ith_poly)  = pi - angles;
 
     % Calculate the other stats
@@ -265,40 +273,40 @@ point_density = length(polytopes)/total_area;
 linear_density = point_density.^0.5;
 
 
-poly_map_stats.Npolys = Npolys;
-poly_map_stats.NtotalVertices = NrealVertices;
+polyMapStats.Npolys = Npolys;
+polyMapStats.NtotalVertices = NrealVertices;
 avg_r_D = average_max_radius*linear_density;
 
 % AREA METRICS
-poly_map_stats.min_x = AABB(1);
-poly_map_stats.max_x = AABB(3);
-poly_map_stats.min_y = AABB(2);
-poly_map_stats.max_y = AABB(4);
+polyMapStats.min_x = AABB(1);
+polyMapStats.max_x = AABB(3);
+polyMapStats.min_y = AABB(2);
+polyMapStats.max_y = AABB(4);
 
-poly_map_stats.occupied_area = occupied_area;
-poly_map_stats.total_area = total_area;
-poly_map_stats.point_density = point_density;
-poly_map_stats.linear_density = linear_density;
+polyMapStats.occupied_area = occupied_area;
+polyMapStats.total_area = total_area;
+polyMapStats.point_density = point_density;
+polyMapStats.linear_density = linear_density;
 
-poly_map_stats.Nangles = length(angle_column_no_nan(:,1));
-poly_map_stats.average_vertex_angle = average_vertex_angle;
-poly_map_stats.std_vertex_angle = std_vertex_angle;
-poly_map_stats.angle_column_no_nan = angle_column_no_nan;
+polyMapStats.Nangles = length(angle_column_no_nan(:,1));
+polyMapStats.average_vertex_angle = average_vertex_angle;
+polyMapStats.std_vertex_angle = std_vertex_angle;
+polyMapStats.angle_column_no_nan = angle_column_no_nan;
 
-poly_map_stats.average_max_radius = average_max_radius;
-poly_map_stats.average_min_radius = average_min_radius;
-poly_map_stats.average_mean_radius = average_mean_radius;
-poly_map_stats.average_radius = average_radius;
-poly_map_stats.all_average_radius = all_mean_radius;
-poly_map_stats.all_radii = all_radii;
-poly_map_stats.average_sharpness = average_sharpness;
-poly_map_stats.std_max_radius = std_max_radius;
-poly_map_stats.average_side_length = average_side_length;
-poly_map_stats.std_side_length = std_side_length;
-poly_map_stats.total_perimeter = total_perimeter;
-poly_map_stats.avg_r_D = avg_r_D;
-poly_map_stats.NtotalVertices = NrealVertices;
-poly_map_stats.average_perimeter = average_perimeter;
+polyMapStats.average_max_radius = average_max_radius;
+polyMapStats.average_min_radius = average_min_radius;
+polyMapStats.average_mean_radius = average_mean_radius;
+polyMapStats.average_radius = average_radius;
+polyMapStats.all_average_radius = all_mean_radius;
+polyMapStats.all_radii = all_radii;
+polyMapStats.average_sharpness = average_sharpness;
+polyMapStats.std_max_radius = std_max_radius;
+polyMapStats.average_side_length = average_side_length;
+polyMapStats.std_side_length = std_side_length;
+polyMapStats.total_perimeter = total_perimeter;
+polyMapStats.avg_r_D = avg_r_D;
+polyMapStats.NtotalVertices = NrealVertices;
+polyMapStats.average_perimeter = average_perimeter;
 
 
 if flag_do_debug
@@ -348,7 +356,7 @@ Ntries = length(random_y_values_to_try);
 for ith_try = 1:Ntries
     % Find overlap for this y-case
     this_y = random_y_values_to_try(ith_try);
-    this_overlap = INTERNAL_fcn_findRatioOverlaps(...
+    this_overlap = fcn_INTERNAL_findRatioOverlaps(...
         this_y,AABB,all_walls_start_no_nan,all_walls_end_no_nan,...
         delta_y_range);
 
@@ -361,10 +369,10 @@ y_search_range = linspace(...
     AABB(2)+average_max_radius*2,...
     AABB(4)-average_max_radius*2,...
     10)';
-line_crossing_hits = INTERNAL_fcn_findLinearDensityStats(...
+line_crossing_hits = fcn_INTERNAL_findLinearDensityStats(...
     y_search_range, AABB,all_walls_start_no_nan,all_walls_end_no_nan);
-poly_map_stats.linear_density_mean = mean(line_crossing_hits);
-poly_map_stats.linear_density_std = std(line_crossing_hits);
+polyMapStats.linear_density_mean = mean(line_crossing_hits);
+polyMapStats.linear_density_std = std(line_crossing_hits);
 
 
 %% Plot results?
@@ -382,22 +390,22 @@ poly_map_stats.linear_density_std = std(line_crossing_hits);
 if flag_do_plot
 
     fprintf(1,'\n\nSUMMARY STATISTICS: \n');
-    fprintf(1,'\t Number of polytopes: %.0d\n',poly_map_stats.Npolys);
-    fprintf(1,'\t Number of vertices: %.0d\n',poly_map_stats.NtotalVertices);
+    fprintf(1,'\t Number of polytopes: %.0d\n',polyMapStats.Npolys);
+    fprintf(1,'\t Number of vertices: %.0d\n',polyMapStats.NtotalVertices);
 
     fprintf(1,'\n\t AREA METRICS:\n');
-    fprintf(1,'\t Min_x: %.2f\n',poly_map_stats.min_x);
-    fprintf(1,'\t Max_x: %.2f\n',poly_map_stats.max_x);
-    fprintf(1,'\t Min_y: %.2f\n',poly_map_stats.min_y);
-    fprintf(1,'\t Max_y: %.2f\n',poly_map_stats.max_y);
+    fprintf(1,'\t Min_x: %.2f\n',polyMapStats.min_x);
+    fprintf(1,'\t Max_x: %.2f\n',polyMapStats.max_x);
+    fprintf(1,'\t Min_y: %.2f\n',polyMapStats.min_y);
+    fprintf(1,'\t Max_y: %.2f\n',polyMapStats.max_y);
     fprintf(1,'\t Occupied Area: %.2f\n',occupied_area);
     fprintf(1,'\t Total Area: %.2f\n',total_area);
     fprintf(1,'\t Point density: %.2f\n',point_density);
     fprintf(1,'\t Theoretical Linear density: %.2f\n',linear_density);
-    fprintf(1,'\t Calculated Linear density: %.2f +/- %.4f\n',poly_map_stats.linear_density_mean,2*poly_map_stats.linear_density_std);
+    fprintf(1,'\t Calculated Linear density: %.2f +/- %.4f\n',polyMapStats.linear_density_mean,2*polyMapStats.linear_density_std);
 
     fprintf(1,'\n\t ANGLE METRICS:\n');
-    fprintf(1,'\t Total number of vertices: %.2f\n',poly_map_stats.Nangles);
+    fprintf(1,'\t Total number of vertices: %.2f\n',polyMapStats.Nangles);
     fprintf(1,'\t Average vertex angle (deg): %.2f\n',average_vertex_angle);
     fprintf(1,'\t Std dev vertex angle (deg): %.2f\n',std_vertex_angle);
 
@@ -498,7 +506,7 @@ end % Ends function
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function line_crossing_hits = INTERNAL_fcn_findLinearDensityStats(...
+function line_crossing_hits = fcn_INTERNAL_findLinearDensityStats(...
     y_search_range, AABB,walls_start,walls_end)
 
 flag_do_debug = 0;
@@ -529,7 +537,7 @@ end
 line_crossing_hits = zeros(length(y_search_range(:,1)),1);
 for ith_y = 1:length(y_search_range)
     this_y = y_search_range(ith_y);
-    polytopes_hit = INTERNAL_fcn_findPolysCrossedAtY(...
+    polytopes_hit = fcn_INTERNAL_findPolysCrossedAtY(...
         this_y,AABB,walls_start,walls_end);
     line_crossing_hits(ith_y,1) = length(polytopes_hit(:,1));
 
@@ -543,7 +551,7 @@ end
 
 end
 
-function polytopes_hit = INTERNAL_fcn_findPolysCrossedAtY(...
+function polytopes_hit = fcn_INTERNAL_findPolysCrossedAtY(...
     y_value,AABB,walls_start,walls_end)
 
 
@@ -553,23 +561,27 @@ bisector_start = [AABB(1)-0.1*width, y_value];
 bisector_end = [AABB(3)+0.1*width,  y_value];
 
 [~,~,walls_that_were_hit] = ...
-    fcn_MapGen_findIntersectionOfSegments(...
-    walls_start(:,1:2),...
-    walls_end(:,1:2),...
-    bisector_start,...
-    bisector_end,...
-    2);
+        fcn_Path_findSensorHitOnWall(...
+        walls_start(:,1:2),...   % wall start
+        walls_end(:,1:2),...     % wall end
+        bisector_start,...       % sensor_vector_start
+        bisector_end,...         % sensor_vector_end
+        (1), ...                 % (flag_search_return_type) -- 1 means ALL hits of any results,
+        (0), ...                 % (flag_search_range_type)  -- 0 means only if overlapping wall/sensor, ...
+        ([]),...                 % (tolerance) -- default is eps * 1000,
+        (-1));                   % (fig_num) -- -1 means to use "fast mode")
+
 polytopes_hit = unique(walls_start(walls_that_were_hit,3));
 end
 
-function ratio_overlaps = INTERNAL_fcn_findRatioOverlaps(...
+function ratio_overlaps = fcn_INTERNAL_findRatioOverlaps(...
     midpoint_y,AABB,all_walls_start_no_nan,all_walls_end_no_nan,...
     delta_y_range)
 
 flag_do_debug = 0;
 fig_for_debug = 999; %#ok<NASGU>
 
-original_polytopes_hit = INTERNAL_fcn_findPolysCrossedAtY(...
+original_polytopes_hit = fcn_INTERNAL_findPolysCrossedAtY(...
     midpoint_y,AABB,all_walls_start_no_nan,all_walls_end_no_nan);
 original_num_hit = length(original_polytopes_hit);
 
@@ -583,7 +595,7 @@ end
 ratio_overlaps = zeros(length(delta_y_range(:,1)),1);
 for ith_y = 1:length(delta_y_range)
     this_y = delta_y_range(ith_y)+midpoint_y;
-    new_polytopes_hit = INTERNAL_fcn_findPolysCrossedAtY(...
+    new_polytopes_hit = fcn_INTERNAL_findPolysCrossedAtY(...
         this_y,AABB,all_walls_start_no_nan,all_walls_end_no_nan);
     number_overlap = sum(ismember(new_polytopes_hit,original_polytopes_hit));
     ratio_overlaps(ith_y) = number_overlap/original_num_hit;
