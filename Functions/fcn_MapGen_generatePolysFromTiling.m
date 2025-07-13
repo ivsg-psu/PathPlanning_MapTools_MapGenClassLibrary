@@ -392,11 +392,6 @@ if flag_do_plots
         text(text_location(1,1),text_location(1,2),sprintf('%.0d',ith_poly));
     end
 
-    %     % number the polytopes at means
-    %     for ith_poly = 1:length(polytopes)
-    %         text_location = polytopes(ith_poly).mean;
-    %         text(text_location(1,1),text_location(1,2),sprintf('%.0d',ith_poly));
-    %     end
 
     % plot the connections between the polytope neighbors
     if 1==0
@@ -434,31 +429,6 @@ end
 end % Ends the function
 
 
-
-
-% Fill in neighbors - Note: this is SLOW. A much better way to do this
-% would be to sort the all-verticies by the point values, then cluster
-% the polytope indices together.
-
-%         if jth_neighbor~=ith_poly % Make sure not checking self
-%             vertices_neighbors = V(C{jth_neighbor},:); % Grab verticies
-%             vertices_neighbors = vertices_neighbors(~isinf(vertices_neighbors(:,1)),:);
-%             if any(ismember(vertices_open,vertices_neighbors)) % Any shared?
-%                 neighbors_vector = all_neighbors(row_offset+1:row_offset+Nvertices_per_poly,:);
-%                 if ~any(ismember(neighbors_vector,jth_neighbor))
-%                     next_index = find(isnan(neighbors_vector),1,'first');
-%                     if ~isempty(next_index)
-%                         neighbors_vector(next_index) = jth_neighbor;
-%                         all_neighbors(row_offset+1:row_offset+Nvertices_per_poly,:) = ...
-%                             neighbors_vector;
-%                     else
-%                         error('Need to make neighbors bigger');
-%                     end
-%                 end
-%             end
-%         end
-% end % Ends loop through neighbors
-
 %% Functions follow
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   ______                _   _
@@ -473,22 +443,61 @@ end % Ends the function
 
 function polytopes_with_corners = fcn_INTERNAL_addCorners(polytopes,seedPoints,AABB)
 % This function loops through the corners of the AABB, and checks to see
-% that all are within polytopes. If they are not, it finds the closest
-% polytope to each missing corner (based on seed point location), finds the
-% wall of the polytope that needs to be added, adds the corner in, then
-% trims that polytope down to appropriate size with the corner included.
+% that all are within or on polytopes. If they are not, it finds the
+% closest polytope to each missing corner (based on seed point location),
+% finds the wall of the polytope that needs to be added, adds the corner
+% in, then trims that polytope down to appropriate size with the corner
+% included.
+flag_do_debug = 0;
+fig_do_debug = 38383;
+
+% FOR DEBUGGING
+if 1==flag_do_debug
+    figure(fig_do_debug);
+
+    fcn_MapGen_plotPolytopes(polytopes,fig_do_debug,'b',2);
+
+end
 
 % Check that all the wall corners are inside polytopes
 walls = fcn_MapGen_convertAABBtoWalls(AABB, -1);
 test_points = walls(1:4,:);
-all_found = zeros(length(test_points(:,1)),1); % keep track of which vertices are hit
+
+
+NtestPoints = length(test_points(:,1));
+all_found = zeros(NtestPoints,1); %
+% 
+% keep track of which vertices are hit
+closestVertexPoints = nan(NtestPoints,2); % Keep track of which vertices are closest to each point
+closestDistances = inf(NtestPoints,1); % Keep track of closest distances of vertices 
+
 for poly = 1:length(polytopes)
     vertices = polytopes(poly).vertices;
-    in_polytope = inpolygon(test_points(:,1),test_points(:,2),vertices(:,1),vertices(:,2));
-    all_found = all_found + in_polytope;
-end
-missing_vertices = test_points(all_found==0,:);
+    
+    % Check if point contained in any poly
+    [in_polytope, on_polytope] = inpolygon(test_points(:,1),test_points(:,2),vertices(:,1),vertices(:,2));
+    all_found = all_found + in_polytope + on_polytope;
 
+    % Keep track of closest distances
+    for ith_testPoint = 1:length(test_points(:,1))
+        thisTestPoint = test_points(ith_testPoint,:);
+        distancesSquared = sum((vertices - thisTestPoint).^2,2);
+        [minDistanceSquared,indexMin] = min(distancesSquared);
+        if minDistanceSquared<closestDistances(ith_testPoint,1)
+            closestDistances(ith_testPoint,1) = minDistanceSquared;
+            closestVertexPoints(ith_testPoint,:) = vertices(indexMin,:);
+        end
+    end
+
+end
+
+% FOR DEBUGGING
+if 1==flag_do_debug
+    figure(fig_do_debug);
+    plot(closestVertexPoints(:,1), closestVertexPoints(:,2), 'r.','MarkerSize',20);
+end
+
+missing_vertices = test_points(all_found==0,:);
 
 % Loop through vertices that are NOT in polytopes, putting them in closest
 % one
@@ -496,11 +505,22 @@ polytopes_with_corners = polytopes; % Initialize output
 for ith_missing = 1:length(missing_vertices(:,1))
     missing_point = missing_vertices(ith_missing,:);
 
-    % Find closest seed point
+    % Find closest seed point to the missing vertex
     distances_squared = sum((missing_point - seedPoints).^2,2);
-    [~,closest_poly] = min(distances_squared);
-    vertices = polytopes(closest_poly).vertices;
-    interior_point = seedPoints(closest_poly,:);
+    [~,closest_poly_index] = min(distances_squared);
+    vertices = polytopes(closest_poly_index).vertices;
+    closestSeedPoint = seedPoints(closest_poly_index,:);
+
+    % Make sure seed point is inside closest poly. Sometimes it is not
+    [in_polytope, on_polytope] = inpolygon(closestSeedPoint(:,1),closestSeedPoint(:,2),vertices(:,1),vertices(:,2));
+    if 1==in_polytope || 1==on_polytope
+        interior_point = closestSeedPoint;
+    else
+        interior_point = mean(vertices,1,'omitmissing');
+    end
+
+    % BUG: following assumes seedPoints are inside polytopes. They are not
+    % sometimes
 
     % Find the polytope wall that is closest to the missing point
     [~, ~, wall_that_was_hit] = ...
@@ -509,7 +529,7 @@ for ith_missing = 1:length(missing_vertices(:,1))
         vertices(2:end,:),...    % wall end
         missing_point,...        % sensor_vector_start
         interior_point,...       % sensor_vector_end
-        (0), ...                 % (flag_search_return_type) -- 0 means first hit of any results, 
+        (0), ...                 % (flag_search_return_type) -- 0 means first hit of any results,
         (0), ...                 % (flag_search_range_type)  -- 0 means only if overlapping wall/sensor, ...
         ([]),...                 % (tolerance) -- default is eps * 1000,
         (-1));                   % (fig_num) -- -1 means to use "fast mode")
@@ -532,7 +552,8 @@ for ith_missing = 1:length(missing_vertices(:,1))
         cropped_vertices = flipud(cropped_vertices);
     end
 
+
     % re-enter info into polytope structure
-    polytopes_with_corners(closest_poly).vertices = cropped_vertices;
+    polytopes_with_corners(closest_poly_index).vertices = cropped_vertices;
 end
 end

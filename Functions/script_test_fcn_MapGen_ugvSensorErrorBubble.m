@@ -19,9 +19,16 @@ close all
 %% Generating Error Bubbles and Plotting
 
 % create polytopes
-stretch = [200, 200]; % stretch in the x and y directions
-Halton_range = [1 1000]; % range of Halton points to use to generate the tiling
-polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,stretch);
+seedGeneratorNames = 'haltonset';
+seedGeneratorRanges = [1 1000];
+AABBs = [0 0 1 1];
+mapStretchs = [200 200];
+[polytopes] = fcn_MapGen_voronoiTiling(...
+    seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
+    seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
+    (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
+    (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
+    (-1));
 
 % Plot the polytopes
 fig_num = 22;

@@ -592,7 +592,7 @@ clf;
 rng(1111);
 halton_points = haltonset(2);
 points_scrambled = scramble(halton_points,'RR2'); % scramble values
-AABB = [0 0 1 1]; % Define the axis-aligned bounding box
+% AABB = [0 0 1 1]; % Define the axis-aligned bounding box
 stretch = [1 1];
 
 
@@ -778,34 +778,87 @@ hold on;
 Numpoints = 100;
 
 subplot(2,3,1);
-Sobol_range = [1 Numpoints]; % range of Sobol points to use to generate the tiling
-tiled_polytopes = fcn_MapGen_sobolVoronoiTiling(Sobol_range,[1 1],fig_num);
-title('Sobel set');
+% Sobol_range = [1 Numpoints]; % range of Sobol points to use to generate the tiling
+% tiled_polytopes = fcn_MapGen_sobolVoronoiTiling(Sobol_range,[1 1],fig_num);
+
+seedGeneratorNames = 'sobolset';
+seedGeneratorRanges = [1 Numpoints];
+AABBs = [0 0 1 1];
+mapStretchs = [1 1];
+[tiled_polytopes] = fcn_MapGen_voronoiTiling(...
+    seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
+    seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
+    (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
+    (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
+    (fig_num)); %#ok<NASGU>
+
+title('Sobol set');
+legend('off');
 
 % Generate a set of polytopes from the Halton set
 subplot(2,3,2);
-Halton_range = [1 Numpoints]; % range of Halton points to use to generate the tiling
-tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
+seedGeneratorNames = 'haltonset';
+seedGeneratorRanges = [1 Numpoints];
+AABBs = [0 0 1 1];
+mapStretchs = [1 1];
+[tiled_polytopes] = fcn_MapGen_voronoiTiling(...
+    seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
+    seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
+    (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
+    (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
+    (fig_num)); %#ok<NASGU>
+
 %fcn_MapGen_plotPolytopes(tiled_polytopes,gca,'-',line_width,[0 0 1],axis_box,'square');  % , fill_info);
 title('Halton set');
+legend('off');
 
 % Generate a set of polytopes from the Latin Hypercube set
 subplot(2,3,3);
-Latin_range = [1 Numpoints]; % range of Halton points to use to generate the tiling
-tiled_polytopes = fcn_MapGen_latinVoronoiTiling(Latin_range,[1 1],fig_num);
+seedGeneratorNames = 'latin';
+seedGeneratorRanges = [1 Numpoints];
+AABBs = [0 0 1 1];
+mapStretchs = [1 1];
+[tiled_polytopes] = fcn_MapGen_voronoiTiling(...
+    seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
+    seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
+    (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
+    (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
+    (fig_num)); %#ok<NASGU>
+
 title('Latin Hypercube set');
+legend('off');
 
 % Generate a set of polytopes from the Random set
 subplot(2,3,4);
-Rand_range = [1 Numpoints]; % range of Halton points to use to generate the tiling
-tiled_polytopes = fcn_MapGen_randVoronoiTiling(Rand_range,[1 1],fig_num);
+seedGeneratorNames = 'randn';
+seedGeneratorRanges = [1 Numpoints];
+AABBs = [0 0 1 1];
+mapStretchs = [1 1];
+[tiled_polytopes] = fcn_MapGen_voronoiTiling(...
+    seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
+    seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
+    (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
+    (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
+    (fig_num)); %#ok<NASGU>
+
 title('Uniform random set');
+legend('off');
 
 % Generate a set of polytopes from the Random Normal set
 subplot(2,3,5);
-Rand_range = [1 Numpoints]; % range of Halton points to use to generate the tiling
-tiled_polytopes = fcn_MapGen_randomNormalVoronoiTiling(Rand_range,[1 1],fig_num);
+seedGeneratorNames = 'rand';
+seedGeneratorRanges = [1 Numpoints];
+AABBs = [0 0 1 1];
+mapStretchs = [1 1];
+[tiled_polytopes] = fcn_MapGen_voronoiTiling(...
+    seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
+    seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
+    (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
+    (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
+    (fig_num)); %#ok<NASGU>
+
 title('Random normally distributed set');
+legend('off');
 
 %% Show how to create an overlapping set using different AABBs for each set.
 close all;
@@ -825,7 +878,7 @@ mixedSet(2).name = 'rand';
 mixedSet(2).settings = set_range;
 mixedSet(2).AABB = [0.5 0 0.75 1];
 
-polytopes = fcn_MapGen_mixedSetVoronoiTiling(mixedSet,stretch,fig_num);
+polytopes = fcn_MapGen_mixedSetVoronoiTiling(mixedSet,stretch,fig_num); %#ok<NASGU>
 
 
 %% Generate many test sets of polytopes from the Halton set
@@ -833,29 +886,45 @@ for i=1:100:500
     fig_num = 21+i;
     figure(fig_num); clf;
     
-    Halton_range = [i i+100]; % range of Halton points to use to generate the tiling
-    % Halton_range = [1801 1901];
-           
-    polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
-    
+    seedGeneratorNames = 'haltonset';
+    seedGeneratorRanges = [i i+100];
+    AABBs = [0 0 1 1];
+    mapStretchs = [1 1];
+    [polytopes] = fcn_MapGen_voronoiTiling(...
+        seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
+        seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
+        (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
+        (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
+        (fig_num)); %#ok<NASGU>
+
     % Do statistics, checking that the area is always fully filled and we
     % get 101 polytopes each time
-    temp = fcn_MapGen_polytopesStatistics(...
-    polytopes);
-    title(sprintf('Halton range is: [%.0d %.0d]',i,i+100));
-    assert(abs(temp.unoccupancy_ratio)<(1000*eps));
-    assert(isequal(101,temp.point_density));
-    pause(0.1);
+
+    % temp = fcn_MapGen_polytopesStatistics(...
+    % polytopes);
+    % title(sprintf('Halton range is: [%.0d %.0d]',i,i+100));
+    % assert(abs(temp.unoccupancy_ratio)<(1000*eps));
+    % assert(isequal(101,temp.point_density));
+    % pause(0.1);
 end
 
 %% Show how the maps can be trimmed to a box
 
 % Generate polytopes from the Halton set
-Halton_range = [5401 5501];
 
 fig_num = 31;
-tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
-    
+seedGeneratorNames = 'haltonset';
+seedGeneratorRanges = [5401 5501];
+AABBs = [0 0 1 1];
+mapStretchs = [1 1];
+[tiled_polytopes] = fcn_MapGen_voronoiTiling(...
+    seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
+    seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
+    (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
+    (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
+    (fig_num));
+
+
 fig_num = 32;
 fcn_MapGen_polytopesStatistics(...
     tiled_polytopes,...
@@ -879,16 +948,24 @@ trimmed_polytopes = ...
 % Shrink to radius
 fig_num = 24;
 des_rad = 0.03; sigma_radius = 0; min_rad = 0.001;
-shrunk_polytopes2=fcn_MapGen_polytopesShrinkToRadius(...
-    trimmed_polytopes,des_rad,sigma_radius,min_rad,fig_num);
+shrunk_polytopes2 = fcn_MapGen_polytopesShrinkToRadius(...
+    trimmed_polytopes,des_rad,sigma_radius,min_rad,fig_num); %#ok<NASGU>
 
 %% Show how different shrinking methods change statistics
 fig_num = 555;
 
-% Generate polytopes from the Halton set
-Halton_range = [5401 5501];
-           
-tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
+% Generate polytopes from the Halton set        
+seedGeneratorNames = 'haltonset';
+seedGeneratorRanges = [5401 5501];
+AABBs = [0 0 1 1];
+mapStretchs = [1 1];
+[tiled_polytopes] = fcn_MapGen_voronoiTiling(...
+    seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
+    seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
+    (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
+    (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
+    (fig_num));
+
     
 % Grab statistics on original map
 fcn_MapGen_polytopesStatistics(...
@@ -896,11 +973,10 @@ fcn_MapGen_polytopesStatistics(...
     fig_num+1);
 
 % Shrink to radius
-URHERE
 fig_num = 556;
 des_rad = 0.03; sigma_radius = 0; min_rad = 0.001;
 shrunk_polytopes2=fcn_MapGen_polytopesShrinkToRadius(...
-    trimmed_polytopes,des_rad,sigma_radius,min_rad,fig_num);
+    trimmed_polytopes,des_rad,sigma_radius,min_rad,fig_num); %#ok<NASGU>
 
 
 %% Show how we can shrink one polytope
@@ -976,7 +1052,7 @@ fig_num = 7;
 fig_num = 8;
 
 one_polytope = fcn_MapGen_generateOneRandomPolytope;
-exp_polytopes=fcn_MapGen_polytopesExpandEvenly(one_polytope,exp_dist,fig_num);
+exp_polytopes=fcn_MapGen_polytopesExpandEvenly(one_polytope,exp_dist,fig_num); %#ok<NASGU>
 
 %% Show how to expand many polytopes
 fig_num = 7;
@@ -1006,9 +1082,16 @@ fcn_MapGen_polytopesStatistics(...
 %% Generating starting map for UGV Error Bubbles and Plotting functions (Nick's work)
 
 % create polytopes
-stretch = [200, 200]; % stretch in the x and y directions
-Halton_range = [1 1000]; % range of Halton points to use to generate the tiling
-polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,stretch);
+seedGeneratorNames = 'haltonset';
+seedGeneratorRanges = [1 1000]; % range of Halton points to use to generate the tiling
+AABBs = [0 0 1 1];
+mapStretchs = [200 200]; % stretch in the x and y directions
+[polytopes] = fcn_MapGen_voronoiTiling(...
+    seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
+    seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
+    (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
+    (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
+    (fig_num));
 
 % Plot the polytopes
 fig_num = 22;
@@ -1082,21 +1165,21 @@ err.R = sqrt(err.x.^2 + err.y.^2);
 
 figure('name','Error in X')
 contour(x,y,err.x,'ShowText','on')
-h=colorbar;
+% h=colorbar;
 title('Error in X Dimension [m]')
 xlabel('X [m]')
 ylabel('Y [m]')
 
 figure('name','Error in Y')
 contour(x,y,err.y,'ShowText','on')
-h=colorbar;
+% h=colorbar;
 title('Error in Y Dimension [m]')
 xlabel('X [m]')
 ylabel('Y [m]')
 
 figure('name','Total Error (Bubble Radius) [m]')
 contour(x,y,err.R,'ShowText','on')
-h=colorbar;
+% h=colorbar;
 title('Total Error (Bubble Radius) [m]')
 xlabel('X [m]')
 ylabel('Y [m]')

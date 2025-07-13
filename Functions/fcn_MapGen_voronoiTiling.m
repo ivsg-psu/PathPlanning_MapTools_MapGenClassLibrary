@@ -400,6 +400,8 @@ switch lower(name)
         seedPoints = rand_points.*scale + lower_value;
 
     otherwise
+        warning('on','backtrace');
+        warning('fcn_MapGen_voronoiTiling was given an unrecognized geenrator type: %s. An error will be thrown.', lower(name));
         error('Unknown method given');
 end
 
