@@ -1,27 +1,28 @@
 function [polytopes] = ...
-    fcn_MapGen_randomNormalVoronoiTiling(rand_range,varargin)
-% fcn_MapGen_randomNormalVoronoiTiling generates a map with
+    fcn_MapGen_sobolVoronoiTiling(Sobol_range,varargin)
+warning('on','backtrace');
+warning('fcn_MapGen_sobolVoronoiTiling is being deprecated. Use fcn_MapGen_voronoiTiling instead.');
+
+% fcn_MapGen_sobolVoronoiTiling generates a map with
 % obstacles perfectly tiled together using the Voronoi cells generated from
-% the random normal (randn) sequence with unit variance. See more about this at:
+% the Sobol sequence. See more about this at:
 % https://www.mathworks.com/help/stats/generating-quasi-random-numbers.html
 %
 % FORMAT:
 % 
 % [polytopes] = ...
-%    fcn_MapGen_randomNormalVoronoiTiling(rand_range,(stretch),(fig_num))
+%    fcn_MapGen_sobolVoronoiTiling(Sobol_range,(stretch),(fig_num))
 %
 % INPUTS:
 %
-%    rand_range: 1 x 2 vector of integers specifying the [low high] range
-%    of rand point indices to use to generate the tiling, where  
-%    low: the lowest point index to use in the rand sequence
-%    high: the highest point index to use in the rand sequence. NOTE: for
-%    random normal sequences, only the range of numbers is used, e.g. high
-%    minus low. So an input of [1 100] is the same as [2 101].
+%    Sobol_range: 1 x 2 vector of integers specifying the [low high] range
+%    of Sobol point indices to use to generate the tiling, where  
+%    low: the lowest point index to use in the Sobol sequence
+%    high: the highest point index to use in the Sobol sequence
 %     
 %    (OPTIONAL INPUTS)
 %
-%    stretch: [x,y] scaling factors to allow the values from the rand set
+%    stretch: [x,y] scaling factors to allow the values from the Sobol set
 %    to be scaled to fit maps shapes other than square
 %
 %      fig_num: a figure number to plot results. If set to -1, skips any
@@ -51,7 +52,7 @@ function [polytopes] = ...
 %
 % EXAMPLES:
 %      
-% See the script: script_test_fcn_MapGen_randomNormalVoronoiTiling
+% See the script: script_test_fcn_MapGen_sobolVoronoiTiling
 % for a full test suite.
 %
 % This function was written on 2019_06_13 by Seth Tau
@@ -67,9 +68,8 @@ function [polytopes] = ...
 % TO DO:
 % -- check cross product around entire polytope
 % -- add unit normal vectors for each edge
-% -- buffer the rand set to be sure polytopes are well formed on edges
+% -- buffer the Sobol set to be sure polytopes are well formed on edges
 % -- force correct number of polytopes?
-
 
 %% Debugging and Input checks
 
@@ -103,7 +103,6 @@ else
     debug_fig_num = []; %#ok<NASGU>
 end
 
-
 %% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   _____                   _
@@ -121,9 +120,9 @@ if (0==flag_max_speed)
         % Are there the right number of inputs?
         narginchk(1,3);
 
-        % Check the rand_range input
+        % Check the Sobol_range input
         fcn_DebugTools_checkInputsToFunctions(...
-            rand_range, '2column_of_integers');
+            Sobol_range, '2column_of_integers');
 
     end
 end
@@ -165,31 +164,21 @@ end
 %  |_|  |_|\__,_|_|_| |_|
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% pull rand set
-Npoints = max(rand_range) - min(rand_range) + 1;
-rand_points = 0.15*randn(Npoints*2,1)+0.5;
+%% pull Sobol set
+Sobol_points = sobolset(2);
+points_scrambled = scramble(Sobol_points,'MatousekAffineOwen'); % scramble values
 
-% Prevent random points from being outside the range. If they are, we
-% resample just those points
-flag_points_are_good = 0;
-while flag_points_are_good==0
-    bad_point_indices = find(rand_points>1 | rand_points<0);
-    if ~isempty(bad_point_indices)
-        rand_points(bad_point_indices) = 0.15*randn(length(bad_point_indices),1)+0.5;
-    else
-        flag_points_are_good = 1;
-    end    
-end
-rand_points = [rand_points(1:Npoints,1),rand_points(Npoints+1:end,1)];
-
-%% pick values from rand set
-seed_points = rand_points;
+%% pick values from Sobol set
+low_pt = Sobol_range(1,1);
+high_pt = Sobol_range(1,2);
+seed_points = points_scrambled(low_pt:high_pt,:);
 [V,C] = voronoin(seed_points);
 % V = V.*stretch;
 
 %% fill polytopes from tiling
 AABB = [0 0 1 1];
 polytopes = fcn_MapGen_generatePolysFromTiling(seed_points,V,C,AABB, stretch);
+
 
 %% Plot results?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -224,4 +213,5 @@ end
 
 
 end % Ends the function
+
 

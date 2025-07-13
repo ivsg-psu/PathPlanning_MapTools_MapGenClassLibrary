@@ -14,8 +14,6 @@ varargin...
 % creates polytopes given seed points, V and C matrices from Voronoi
 % tiling, and stretch matrix
 %
-%
-%
 % FORMAT:
 %
 %    [ ...
@@ -345,7 +343,8 @@ for ith_poly = 1:num_poly % pull each cell from the voronoi diagram
 end % Ends for loop for stretch
 
 % Fill in all the other fields
-polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes, [], -1);
+is_nonconvex = 1;
+polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes, (is_nonconvex), (-1));
 
 %§
 %% Plot the results (for debugging)?

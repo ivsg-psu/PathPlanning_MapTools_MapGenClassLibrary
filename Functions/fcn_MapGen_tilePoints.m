@@ -1,6 +1,6 @@
-function [tiled_points] = ...
+function [tiledPoints] = ...
    fcn_MapGen_tilePoints(...
-   input_points, tile_depth, AABB, varargin)
+   inputPoints, tileDepth, AABB, varargin)
 
 % fcn_MapGen_tilePoints - creates a tiling of points. 
 %
@@ -41,18 +41,18 @@ function [tiled_points] = ...
 %
 % FORMAT:
 %
-%    [tiled_points] = ...
+%    [tiledPoints] = ...
 %    fcn_MapGen_tilePoints(...
-%    input_points, tile_depth, AABB, (fig_num))
+%    inputPoints, tileDepth, AABB, (fig_num))
 %
 % INPUTS:
 %
-%     input_points: An Nx2 vector of points to be tiled. The points do not
+%     inputPoints: An Nx2 vector of points to be tiled. The points do not
 %     have to be within the AABB.
 %
-%     tile_depth: an integer specifying how "deep" the tiling should be.
+%     tileDepth: an integer specifying how "deep" the tiling should be.
 %     For example, an integer of 2 specifies that the tiling should be 2
-%     deep around the input_points.
+%     deep around the inputPoints.
 %
 %     AABB: the axis-aligned bounding box, in format of
 %     [xmin ymin xmax ymax], specifying the boundaries of the repeating
@@ -69,9 +69,9 @@ function [tiled_points] = ...
 %
 % OUTPUTS:
 %
-%     tiled_points: the resulting vertices of the tiled input_points. The
+%     tiledPoints: the resulting vertices of the tiled inputPoints. The
 %     points are ordered such that the resulting matrix is (N*(2d+1)^2)x2,
-%     where d is the tile_depth.
+%     where d is the tileDepth.
 %
 %
 % DEPENDENCIES:
@@ -89,9 +89,8 @@ function [tiled_points] = ...
 % This function was written on 2021_07_17 by Sean Brennan
 % Questions or comments? contact sbrennan@psu.edu
 
-%
+
 % REVISION HISTORY:
-%
 % 2023_02_23 by Sean Brennan
 % -- first write of function
 % 2023_03_13 by Sean Brennan
@@ -99,6 +98,8 @@ function [tiled_points] = ...
 % 2025_04_25 by Sean Brennan
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
+% 2025_07_10 by Sean Brennan
+% -- fixed variable names for clarity
 
 % TO DO
 % -- none
@@ -153,14 +154,14 @@ if (0==flag_max_speed)
         % Are there the right number of inputs?
         narginchk(3,4);
 
-        % Check the input_points input, make sure it has 2 columns
+        % Check the inputPoints input, make sure it has 2 columns
         fcn_DebugTools_checkInputsToFunctions(...
-            input_points, '2column_of_numbers');
+            inputPoints, '2column_of_numbers');
 
-        % Check the tile_depth input, make sure it has 1 column, 1 row and is
+        % Check the tileDepth input, make sure it has 1 column, 1 row and is
         % integer
         fcn_DebugTools_checkInputsToFunctions(...
-            tile_depth, 'positive_1column_of_integers',1);
+            tileDepth, 'positive_1column_of_integers',1);
 
         % Check the AABB input, make sure it is '4column_of_numbers' type, with
         % 1 row
@@ -204,8 +205,8 @@ end
 % supermatrix in one step.
 
 % Calculate the number of tiles to create, e.g. the K value
-Npoints = length(input_points);
-superMatrix_height = (2*tile_depth+1);
+Npoints = length(inputPoints);
+superMatrix_height = (2*tileDepth+1);
 NumTiles = superMatrix_height^2;
 
 if NumTiles<1 || ~isnumeric(NumTiles)
@@ -224,11 +225,11 @@ index_numbers = (1:NumTiles)';
 origin_point = AABB(1,1:2);
 range_xy_points  = AABB(1,3:4) - origin_point;
 
-% The center of the super matrix will be at an offset (tile_depth+1), so we
+% The center of the super matrix will be at an offset (tileDepth+1), so we
 % need to subtract that offset from the superMatrix I and J indices before
 % calculating the overall offsets.
-offset_superMatrix_I = superMatrix_I - (tile_depth+1);
-offset_superMatrix_J = superMatrix_J - (tile_depth+1);
+offset_superMatrix_I = superMatrix_I - (tileDepth+1);
+offset_superMatrix_J = superMatrix_J - (tileDepth+1);
 
 % Make each of the offsets one "big" offset matrix
 only_row_matrix_I = reshape(offset_superMatrix_I',1,NumTiles);
@@ -256,14 +257,14 @@ BIG_offsets = BIG_integer_offset_superMatrix.*range_xy_points;
 % are multiplicative. In other words, we want to make points that are 2
 % times away as y = 2*x if x is the point. This doesn't work if there's a
 % non-zero origin
-shifted_points = input_points - origin_point;
+shifted_points = inputPoints - origin_point;
 
 % We are going to need points to cover the entire tiling, so we repeat the
 % points across all tiles
 BIG_shifted_points = repmat(shifted_points,NumTiles,1);
 
-% Finally, calculate the tiled_points by transforming the points
-tiled_points = (BIG_shifted_points+BIG_offsets)+origin_point;
+% Finally, calculate the tiledPoints by transforming the points
+tiledPoints = (BIG_shifted_points+BIG_offsets)+origin_point;
 
 
 
@@ -289,8 +290,8 @@ if flag_do_plot
     grid on;
     grid minor;
     
-    % Plot the input_points
-    plot(input_points(:,1),input_points(:,2),'bo','Markersize',5);
+    % Plot the inputPoints
+    plot(inputPoints(:,1),inputPoints(:,2),'bo','Markersize',5);
     
     % Label the center
     center_of_label = origin_point + range_xy_points/2;
@@ -316,7 +317,7 @@ if flag_do_plot
     AABB_offsets = [offset_superMatrix_J offset_superMatrix_I].*range_xy_points;
     for ith_tile = 1:NumTiles
         range = (ith_tile-1)*Npoints + (1:Npoints)';
-        fig_handle = plot(tiled_points(range,1),tiled_points(range,2),'.','Markersize',10);
+        fig_handle = plot(tiledPoints(range,1),tiledPoints(range,2),'.','Markersize',10);
         
         if ith_tile~=centerTile
             % Plot the AABB in the same color

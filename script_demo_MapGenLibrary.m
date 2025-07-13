@@ -60,6 +60,25 @@
 % 2025_07_11 - Sean Brennan
 % -- in fcn_MapGen_generatePolysFromTiling, seems all arguments are
 %    optional. Need to fix this
+% -- make sure all function calls internal to functions have -1 speed set
+% for figure number
+% -- for all the tiling variants, deprecate the following
+%    % fcn_MapGen_sobolVoronoiTiling
+%    % fcn_MapGen_latinVoronoiTiling
+%    % Merge these to use fcn_MapGen_mixedSetVoronoiTiling and rename to 
+%    % fcn_MapGen_voronoiTiling
+% -- rewrite plotPolytopes using variable input arguments (see plotRoad
+%    % library). 
+%    % Then, fix call in fcn_MapGen_voronoiTiling to plot both all Voronoi
+%    cells and then all each individual Voronoi cell for each generator,
+%    with colors matched. Be sure to pass out plot handle (not figure
+%    handle) from plotting function. Also be sure to label DisplayName of
+%    plot to allow legends
+% -- Need to fix a bug where corners of AABBs are not being tiled. See 
+%    % DEMO case: Animate a set moving sideways in voronoiTiling
+% -- Fix bug in script_test...voronoiTiling. 
+%    %  Search for BUG: Produces error! set_range = [1 20];
+
 
 clear library_name library_folders library_url
 

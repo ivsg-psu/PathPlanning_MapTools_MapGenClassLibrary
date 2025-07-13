@@ -68,6 +68,8 @@ function [bounded_vertices] = ...
 % 2025_04_25 by Sean Brennan
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
+% 2025_07_13 by Sean Brennan
+% -- added error catching for single vertex triangles
 
 % TO DO
 % -- none
@@ -286,6 +288,8 @@ if any(isinf(all_vertices),'all') % Are there any infinite vertices
             vertices_no_repeats(1:bad_index-1,:)];
 
         if length(vertex_string(:,1))==1
+            warning('on','backtrace');
+            warning('A single vertex polytope was encountered. Unable to continue');
             error('single vertex "triangle" encountered');
         end
         

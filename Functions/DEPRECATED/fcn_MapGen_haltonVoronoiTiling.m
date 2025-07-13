@@ -1,5 +1,9 @@
 function [polytopes] = ...
     fcn_MapGen_haltonVoronoiTiling(Halton_range,varargin)
+
+warning('on','backtrace');
+warning('fcn_MapGen_haltonVoronoiTiling is being deprecated. Use fcn_MapGen_voronoiTiling instead.');
+
 % fcn_MapGen_haltonVoronoiTiling generates a map with
 % obstacles perfectly tiled together using the Voronoi cells generated from
 % the Halton sequence

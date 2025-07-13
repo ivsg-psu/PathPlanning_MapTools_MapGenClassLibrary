@@ -1,5 +1,9 @@
 function [polytopes] = ...
     fcn_MapGen_randVoronoiTiling(rand_range,varargin)
+
+warning('on','backtrace');
+warning('fcn_MapGen_randVoronoiTiling is being deprecated. Use fcn_MapGen_voronoiTiling instead.');
+
 % fcn_MapGen_randVoronoiTiling generates a map with
 % obstacles perfectly tiled together using the Voronoi cells generated from
 % the rand (rand) sequence. See more about this at:

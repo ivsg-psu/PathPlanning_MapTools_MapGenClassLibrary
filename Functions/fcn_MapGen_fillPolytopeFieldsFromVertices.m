@@ -196,15 +196,17 @@ for ith_poly = 1:num_poly
         elseif all(angles<=0)
             filled_polytopes(ith_poly).vertices = flipud(filled_polytopes(ith_poly).vertices);
         else
-            fprintf(1,'Verticies:\n');
-            for ith_vertex = 1:length(filled_polytopes(ith_poly).vertices)
-                fprintf(1,'%.2f %.2f\n',filled_polytopes(ith_poly).vertices(ith_vertex,1),filled_polytopes(ith_poly).vertices(ith_vertex,2))
-            end
-            fprintf(1,'\nAngles:\n');
-            for ith_angle = 1:length(angles)
-                fprintf(1,'%.2f\n',angles(ith_angle));
-            end
             if ~is_nonconvex
+                fprintf(1,'Verticies:\n');
+                for ith_vertex = 1:length(filled_polytopes(ith_poly).vertices)
+                    fprintf(1,'%.2f %.2f\n',filled_polytopes(ith_poly).vertices(ith_vertex,1),filled_polytopes(ith_poly).vertices(ith_vertex,2))
+                end
+                fprintf(1,'\nAngles:\n');
+                for ith_angle = 1:length(angles)
+                    fprintf(1,'%.2f\n',angles(ith_angle));
+                end
+                warning('on','backtrace');
+                warning('Non-convex polytope encountered. Code may break, forcing an error.');
                 error('All vertices must be organized counter-clockwise, e.g. with positive cross-products. This error will get thrown for nonconvex obstacles.  Did you mean intentionally create nonconvex obstalces? If so you must pass the "is_nonconvex" flag to fcn_MapGen_fillPolytopeFieldsFromVertices to turn off this error.');
             end
         end

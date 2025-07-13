@@ -1,5 +1,9 @@
 function [polytopes] = ...
     fcn_MapGen_latinVoronoiTiling(latin_range, varargin)
+
+warning('on','backtrace');
+warning('fcn_MapGen_latinVoronoiTiling is being deprecated. Use fcn_MapGen_voronoiTiling instead.');
+
 % fcn_MapGen_latinVoronoiTiling generates a map with
 % obstacles perfectly tiled together using the Voronoi cells generated from
 % the Latin Hypercube sequence. See more about this at:
