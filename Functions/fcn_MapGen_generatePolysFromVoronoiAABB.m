@@ -3,7 +3,7 @@ polytopes, ...
 polytopeVertices...
 ] = ...
 fcn_MapGen_generatePolysFromVoronoiAABB( ...
-seed_points, ...
+seedPoints, ...
 V, ...
 C, ...
 AABB, ...
@@ -14,15 +14,13 @@ varargin...
 % creates polytopes given seed points, V and C matrices from Voronoi
 % tiling, and stretch matrix
 %
-%
-%
 % FORMAT:
 %
 %    [ ...
 %    polytopes ...
 %    ] = ...
 %    fcn_MapGen_generatePolysFromVoronoiAABB( ...
-%    seed_points, ...
+%    seedPoints, ...
 %    V, ...
 %    C, ...
 %    AABB, ...
@@ -32,7 +30,7 @@ varargin...
 %
 % INPUTS:
 %
-%     seed_points: the list of seed points in [x y] format, where x and y
+%     seedPoints: an Nx2 list of seed points in [x y] format, where x and y
 %     are columns
 %
 %     V: the V matrix resulting from Voronoi calculations
@@ -54,15 +52,19 @@ varargin...
 %
 % OUTPUTS:
 %
-%     polytopes: the resulting polytopes after converting to polytope form.
-%
+%     polytopes: an array, N long, with each entry as a polytope
 %
 % DEPENDENCIES:
 %
 %     fcn_DebugTools_checkInputsToFunctions
-%     fcn_MapGen_cropPolytopeToRange
+%     fcn_MapGen_polytopeFillEmptyPoly
+%     fcn_MapGen_removeInfiniteVertices
+%     fcn_MapGen_isWithinABBB
 %     fcn_MapGen_fillPolytopeFieldsFromVertices
-%
+%     fcn_MapGen_convertAABBtoWalls
+%     fcn_Path_findSensorHitOnWall
+%     fcn_MapGen_cropPolytopeToRange
+%     fcn_MapGen_plotPolytopes
 %
 % EXAMPLES:
 %
@@ -86,7 +88,9 @@ varargin...
 % 2025_04_25 by Sean Brennan
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-
+% 2025_07_15 by Sean Brennan
+% -- cleaned variable naming to remove underscores
+% -- turned on fast mode for subfunctions
 
 % TO DO
 % -- none
@@ -98,12 +102,12 @@ varargin...
 % number.
 flag_max_speed = 0;
 if (nargin==6 && isequal(varargin{end},-1))
-    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_do_debug = 0; %     % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
 else
     % Check to see if we are externally setting debug mode to be "on"
-    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_do_debug = 0; %     % Flag to plot the results for debugging
     flag_check_inputs = 1; % Flag to perform input checking
     MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS");
     MATLABFLAG_MAPGEN_FLAG_DO_DEBUG = getenv("MATLABFLAG_MAPGEN_FLAG_DO_DEBUG");
@@ -142,9 +146,9 @@ if (0==flag_max_speed)
         % Are there the right number of inputs?
         narginchk(5,6);
 
-        % Check the seed_points input, make sure it is '2column_of_numbers' type
+        % Check the seedPoints input, make sure it is '2column_of_numbers' type
         fcn_DebugTools_checkInputsToFunctions(...
-            seed_points, '2column_of_numbers');
+            seedPoints, '2column_of_numbers');
 
         % Check the stretch input, make sure it is '2column_of_numbers' type
         fcn_DebugTools_checkInputsToFunctions(...
@@ -184,9 +188,8 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
 
-
 %% Initiate data structures
-num_poly = size(seed_points,1);
+num_poly = size(seedPoints,1);
 polytopes(num_poly)  = fcn_MapGen_polytopeFillEmptyPoly((-1));
 
 Npolys = length(polytopes);
@@ -232,11 +235,10 @@ for ith_poly = 1:Npolys
 
 end
 
-
 %% Remove infinite vertices
 [bounded_vertices] = ...
     fcn_MapGen_removeInfiniteVertices(...
-    polytopeVertices,seed_points,AABB,Nvertices_per_poly);
+    polytopeVertices,seedPoints,AABB,Nvertices_per_poly, -1);
 
 %% Crop vertices
 remove = 0; % keep track of how many cells to be removed
@@ -247,7 +249,7 @@ for poly = 1:num_poly % pull each cell from the voronoi diagram
     %     vertices = vertices(~isnan(vertices(:,1)));
     indices = bounded_vertices(:,1)==poly;
     vertices = bounded_vertices(indices,2:3);
-    interior_point = seed_points(poly,:);
+    interior_point = seedPoints(poly,:);
 
     %     % For debugging
     %     tolerance = 0.001;
@@ -264,13 +266,12 @@ for poly = 1:num_poly % pull each cell from the voronoi diagram
     %         disp('stop here');
     %     end
 
-
     % Are any vertices outside the AABB? If so, must crop them
-    if ~all(fcn_MapGen_isWithinABBB(AABB,vertices)==1)
+    if ~all(fcn_MapGen_isWithinABBB(AABB,vertices,-1)==1)
 
       % Crop vertices to allowable range
         [cropped_vertices] = ...
-            fcn_MapGen_cropPolytopeToRange(vertices, interior_point, AABB);
+            fcn_MapGen_cropPolytopeToRange(vertices, interior_point, AABB,-1);
     else
         cropped_vertices = vertices;
     end
@@ -302,7 +303,7 @@ end
 polytopes = polytopes(1:(num_poly-remove));
 
 % Check that all the wall corners are inside polytopes
-polytopes = INTERNAL_fcn_addCorners(polytopes,seed_points,AABB);
+polytopes = fcn_INTERNAL_addCorners(polytopes,seedPoints,AABB);
 
 % Apply the stretch
 num_poly = length(polytopes);
@@ -311,7 +312,7 @@ for poly = 1:num_poly % pull each cell from the voronoi diagram
 end % Ends for loop for stretch
 
 % Fill in all the other fields
-polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes);
+polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes,[], -1);
 
 %§
 %% Plot the results (for debugging)?
@@ -326,8 +327,6 @@ polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes);
 %                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-
 if flag_do_plot
 
     figure(fig_num);
@@ -337,27 +336,30 @@ if flag_do_plot
     new_axis = [AABB(1)-scale/2 AABB(3)+scale/2 AABB(2)-scale/2 AABB(4)+scale/2];
     axis(new_axis);
 
-    % plot the polytopes
+    % plot the polytopes    
     fcn_MapGen_plotPolytopes(polytopes,fig_num,'b',2);
 
     % plot all vertices
-    plot(polytopeVertices(:,2),polytopeVertices(:,3),'c','Linewidth',1);
-
+    plot(polytopeVertices(:,2),polytopeVertices(:,3),'.-', 'Color',0.8*[1 1 1],'Linewidth',1, 'MarkerSize',20, 'DisplayName','vertices');
 
     % plot the seed points in red
-    plot(seed_points(:,1),seed_points(:,2),'r.','Markersize',10);
+    plot(seedPoints(:,1),seedPoints(:,2),'r.','Markersize',10, 'DisplayName', 'seedPoints');
 
     % plot the means in black
     temp = zeros(length(polytopes),2);
     for ith_poly = 1:length(polytopes)
         temp(ith_poly,:) = polytopes(ith_poly).mean;
     end
-    plot(temp(:,1),temp(:,2),'ko','Markersize',3);
+    plot(temp(:,1),temp(:,2),'ko','Markersize',3,'DisplayName', 'polytope means');
 
-    % number the polytopes at seed points
-    for ith_poly = 1:length(polytopes)
-        text_location = seed_points(ith_poly,:);
-        text(text_location(1,1),text_location(1,2),sprintf('%.0d',ith_poly));
+    legend('Interpreter','none','location','best');
+
+    % number the polytopes at seed points?
+    if 1==flag_do_debug
+        for ith_poly = 1:length(polytopes)
+            text_location = seedPoints(ith_poly,:);
+            text(text_location(1,1),text_location(1,2),sprintf('%.0d',ith_poly));
+        end
     end
 
     %     % number the polytopes at means
@@ -386,7 +388,7 @@ if flag_do_plot
 
             for jth_neighbor = 2:length(neighbors)
                 neigh_offset = (ith_poly-1)*6 + ((jth_neighbor-2)*3);
-                data(neigh_offset+1:neigh_offset+3,:) = [seed_points(neighbors(1),:); seed_points(neighbors(jth_neighbor),:); nan nan];
+                data(neigh_offset+1:neigh_offset+3,:) = [seedPoints(neighbors(1),:); seedPoints(neighbors(jth_neighbor),:); nan nan];
             end
         end
         plot(data(:,1),data(:,2),'-','Linewidth',0.5);
@@ -439,7 +441,8 @@ end % Ends the function
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
-function polytopes_with_corners = INTERNAL_fcn_addCorners(polytopes,seed_points,AABB)
+%% fcn_INTERNAL_addCorners
+function polytopes_with_corners = fcn_INTERNAL_addCorners(polytopes,seedPoints,AABB)
 % This function loops through the corners of the AABB, and checks to see
 % that all are within polytopes. If they are not, it finds the closest
 % polytope to each missing corner (based on seed point location), finds the
@@ -447,7 +450,7 @@ function polytopes_with_corners = INTERNAL_fcn_addCorners(polytopes,seed_points,
 % trims that polytope down to appropriate size with the corner included.
 
 % Check that all the wall corners are inside polytopes
-walls = fcn_MapGen_convertAABBtoWalls(AABB);
+walls = fcn_MapGen_convertAABBtoWalls(AABB, -1);
 test_points = walls(1:4,:);
 all_found = zeros(length(test_points(:,1)),1); % keep track of which vertices are hit
 for poly = 1:length(polytopes)
@@ -465,10 +468,10 @@ for ith_missing = 1:length(missing_vertices(:,1))
     missing_point = missing_vertices(ith_missing,:);
 
     % Find closest seed point
-    distances_squared = sum((missing_point - seed_points).^2,2);
+    distances_squared = sum((missing_point - seedPoints).^2,2);
     [~,closest_poly] = min(distances_squared);
     vertices = polytopes(closest_poly).vertices;
-    interior_point = seed_points(closest_poly,:);
+    interior_point = seedPoints(closest_poly,:);
 
     % Find the polytope wall that is closest to the missing point
     [~, ~, wall_that_was_hit] = ...
@@ -491,7 +494,7 @@ for ith_missing = 1:length(missing_vertices(:,1))
 
     % Crop vertices to allowable range
     [cropped_vertices] = ...
-        fcn_MapGen_cropPolytopeToRange(shoved_vertices, interior_point, AABB);
+        fcn_MapGen_cropPolytopeToRange(shoved_vertices, interior_point, AABB, -1);
 
     % make sure cw
     vec1 = [cropped_vertices(2,:)-cropped_vertices(1,:),0]; % vector leading into point
@@ -504,4 +507,4 @@ for ith_missing = 1:length(missing_vertices(:,1))
     % re-enter info into polytope structure
     polytopes_with_corners(closest_poly).vertices = cropped_vertices;
 end
-end
+end % Ends fcn_INTERNAL_addCorners

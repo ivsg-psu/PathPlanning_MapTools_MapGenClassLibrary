@@ -8,35 +8,6 @@
 % -- first write of script
 % 2023_01_15 by Sean Brennan
 % -- added figure number
-%%%%%%%%%%%%%%§
-
-
-
-fig_num = 2;
-line_width = 3;
-clear polytopes
-polytopes(1).vertices = [0 0; 4 2; 2 4; 0 0];
-polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes);
-fcn_MapGen_plotPolytopes(polytopes,fig_num,'r-',line_width);
-
-assert(isequal(polytopes.vertices,[0,0;4,2;2,4;0,0]));
-assert(isequal(polytopes.xv,[0,4,2]));
-assert(isequal(polytopes.yv,[0,2,4]));
-assert(isequal(round(polytopes.distances,4),[4.4721;2.8284;4.4721]));
-assert(isequal(polytopes.mean,[2,2]));
-assert(isequal(polytopes.area,6));
-assert(isequal(round(polytopes.max_radius,4),2.8284));
-
-polytopes(2).vertices = [10 10; 14 21; 12 41; 10 10];
-polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes);
-fcn_MapGen_plotPolytopes(polytopes,fig_num,'r-',line_width);
-
-% script_test_fcn_MapGen_polytopeFindSelfIntersections
-% Tests function: fcn_MapGen_polytopeFindSelfIntersections
-
-% REVISION HISTORY:
-% 2021_08_03
-% -- first written by S. Brennan
 % 2025_07_11 - S. Brennan, sbrennan@psu.edu
 % -- updated script testing to standard form
 
@@ -61,50 +32,95 @@ close all
 close all;
 fprintf(1,'Figure: 1XXXXXX: DEMO cases\n');
 
-%% DEMO case: self-intersection
+%% DEMO case: basic demo
 fig_num = 10001;
-titleString = sprintf('DEMO case: self-intersection');
+titleString = sprintf('DEMO case: basic demo');
 fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
+clear polytopes
+polytopes(1).vertices = [0 0; 4 2; 2 4; 0 0];
 
-interiorPoint = [0.5 0.5];
+is_nonconvex = 0;
 
 % Call the function
-[projectedPoints] = ...
-    fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-    interiorPoint,...
-    verticesIncludingSelfIntersections,...
-    verticesIncludingSelfIntersections(1:end-1,:),...
-    verticesIncludingSelfIntersections(2:end,:),...
-    (fig_num));
+polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes, (is_nonconvex), (fig_num));
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(projectedPoints));
+assert(isstruct(polytopes));
+assert(isfield(polytopes,'vertices'));
+assert(isfield(polytopes,'xv'));
+assert(isfield(polytopes,'yv'));
+assert(isfield(polytopes,'distances'));
+assert(isfield(polytopes,'mean'));
+assert(isfield(polytopes,'area'));
+assert(isfield(polytopes,'max_radius'));
+assert(isfield(polytopes,'min_radius'));
+assert(isfield(polytopes,'mean_radius'));
+assert(isfield(polytopes,'radii'));
+assert(isfield(polytopes,'cost'));
+assert(isfield(polytopes,'parent_poly_id'));
 
 % Check variable sizes
-Nvertices = length(verticesIncludingSelfIntersections(:,1));
-assert(size(projectedPoints,1)==Nvertices);
-assert(size(projectedPoints,2)==2);
+assert(isequal(1,length(polytopes))); 
 
 % Check variable values
-assert(isequal(round(projectedPoints,4),round(...
-    [...
-    0         0
-    0         0
-    1.0000         0
-    0.7500    0.7500
-    0.6667    1.0000
-    0.6667    1.0000
-    0.5000    1.0000
-    0    1.0000
-    ]...
-    ,4)));
+assert(isequal(polytopes.vertices,[0,0;4,2;2,4;0,0]));
+assert(isequal(polytopes.xv,[0,4,2]));
+assert(isequal(polytopes.yv,[0,2,4]));
+assert(isequal(round(polytopes.distances,4),[4.4721;2.8284;4.4721]));
+assert(isequal(polytopes.mean,[2,2]));
+assert(isequal(polytopes.area,6));
+assert(isequal(round(polytopes.max_radius,4),2.8284));
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+%% DEMO case: two sets of vertices
+fig_num = 10002;
+titleString = sprintf('DEMO case: two sets of vertices');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+clear polytopes
+polytopes(1).vertices = [0 0; 4 2; 2 4; 0 0];
+polytopes(2).vertices = [10 10; 14 21; 12 41; 10 10];
+
+is_nonconvex = 0;
+
+% Call the function
+polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes, (is_nonconvex), (fig_num));
+
+sgtitle(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(isstruct(polytopes));
+assert(isfield(polytopes,'vertices'));
+assert(isfield(polytopes,'xv'));
+assert(isfield(polytopes,'yv'));
+assert(isfield(polytopes,'distances'));
+assert(isfield(polytopes,'mean'));
+assert(isfield(polytopes,'area'));
+assert(isfield(polytopes,'max_radius'));
+assert(isfield(polytopes,'min_radius'));
+assert(isfield(polytopes,'mean_radius'));
+assert(isfield(polytopes,'radii'));
+assert(isfield(polytopes,'cost'));
+assert(isfield(polytopes,'parent_poly_id'));
+
+% Check variable sizes
+assert(isequal(2,length(polytopes))); 
+
+% Check variable values
+assert(isequal(polytopes(1).vertices,[0,0;4,2;2,4;0,0]));
+assert(isequal(polytopes(1).xv,[0,4,2]));
+assert(isequal(polytopes(1).yv,[0,2,4]));
+assert(isequal(round(polytopes(1).distances,4),[4.4721;2.8284;4.4721]));
+assert(isequal(polytopes(1).mean,[2,2]));
+assert(isequal(polytopes(1).area,6));
+assert(isequal(round(polytopes(1).max_radius,4),2.8284));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -158,42 +174,40 @@ fig_num = 80001;
 fprintf(1,'Figure: %.0f: FAST mode, empty fig_num\n',fig_num);
 figure(fig_num); close(fig_num);
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
+clear polytopes
+polytopes(1).vertices = [0 0; 4 2; 2 4; 0 0];
 
-interiorPoint = [0.5 0.5];
+is_nonconvex = 0;
 
 % Call the function
-[projectedPoints] = ...
-    fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-    interiorPoint,...
-    verticesIncludingSelfIntersections,...
-    verticesIncludingSelfIntersections(1:end-1,:),...
-    verticesIncludingSelfIntersections(2:end,:),...
-    ([]));
+polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes, (is_nonconvex), ([]));
 
 % Check variable types
-assert(isnumeric(projectedPoints));
+assert(isstruct(polytopes));
+assert(isfield(polytopes,'vertices'));
+assert(isfield(polytopes,'xv'));
+assert(isfield(polytopes,'yv'));
+assert(isfield(polytopes,'distances'));
+assert(isfield(polytopes,'mean'));
+assert(isfield(polytopes,'area'));
+assert(isfield(polytopes,'max_radius'));
+assert(isfield(polytopes,'min_radius'));
+assert(isfield(polytopes,'mean_radius'));
+assert(isfield(polytopes,'radii'));
+assert(isfield(polytopes,'cost'));
+assert(isfield(polytopes,'parent_poly_id'));
 
 % Check variable sizes
-Nvertices = length(verticesIncludingSelfIntersections(:,1));
-assert(size(projectedPoints,1)==Nvertices);
-assert(size(projectedPoints,2)==2);
+assert(isequal(1,length(polytopes))); 
 
 % Check variable values
-assert(isequal(round(projectedPoints,4),round(...
-    [...
-    0         0
-    0         0
-    1.0000         0
-    0.7500    0.7500
-    0.6667    1.0000
-    0.6667    1.0000
-    0.5000    1.0000
-    0    1.0000
-    ]...
-    ,4)));
+assert(isequal(polytopes.vertices,[0,0;4,2;2,4;0,0]));
+assert(isequal(polytopes.xv,[0,4,2]));
+assert(isequal(polytopes.yv,[0,2,4]));
+assert(isequal(round(polytopes.distances,4),[4.4721;2.8284;4.4721]));
+assert(isequal(polytopes.mean,[2,2]));
+assert(isequal(polytopes.area,6));
+assert(isequal(round(polytopes.max_radius,4),2.8284));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -205,43 +219,40 @@ fig_num = 80002;
 fprintf(1,'Figure: %.0f: FAST mode, fig_num=-1\n',fig_num);
 figure(fig_num); close(fig_num);
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
+clear polytopes
+polytopes(1).vertices = [0 0; 4 2; 2 4; 0 0];
 
-interiorPoint = [0.5 0.5];
+is_nonconvex = 0;
 
 % Call the function
-[projectedPoints] = ...
-    fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-    interiorPoint,...
-    verticesIncludingSelfIntersections,...
-    verticesIncludingSelfIntersections(1:end-1,:),...
-    verticesIncludingSelfIntersections(2:end,:),...
-    (-1));
+polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes, (is_nonconvex), (-1));
 
 % Check variable types
-assert(isnumeric(projectedPoints));
+assert(isstruct(polytopes));
+assert(isfield(polytopes,'vertices'));
+assert(isfield(polytopes,'xv'));
+assert(isfield(polytopes,'yv'));
+assert(isfield(polytopes,'distances'));
+assert(isfield(polytopes,'mean'));
+assert(isfield(polytopes,'area'));
+assert(isfield(polytopes,'max_radius'));
+assert(isfield(polytopes,'min_radius'));
+assert(isfield(polytopes,'mean_radius'));
+assert(isfield(polytopes,'radii'));
+assert(isfield(polytopes,'cost'));
+assert(isfield(polytopes,'parent_poly_id'));
 
 % Check variable sizes
-Nvertices = length(verticesIncludingSelfIntersections(:,1));
-assert(size(projectedPoints,1)==Nvertices);
-assert(size(projectedPoints,2)==2);
+assert(isequal(1,length(polytopes))); 
 
 % Check variable values
-assert(isequal(round(projectedPoints,4),round(...
-    [...
-    0         0
-    0         0
-    1.0000         0
-    0.7500    0.7500
-    0.6667    1.0000
-    0.6667    1.0000
-    0.5000    1.0000
-    0    1.0000
-    ]...
-    ,4)));
-
+assert(isequal(polytopes.vertices,[0,0;4,2;2,4;0,0]));
+assert(isequal(polytopes.xv,[0,4,2]));
+assert(isequal(polytopes.yv,[0,2,4]));
+assert(isequal(round(polytopes.distances,4),[4.4721;2.8284;4.4721]));
+assert(isequal(polytopes.mean,[2,2]));
+assert(isequal(polytopes.area,6));
+assert(isequal(round(polytopes.max_radius,4),2.8284));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -254,11 +265,10 @@ fprintf(1,'Figure: %.0f: FAST mode comparisons\n',fig_num);
 figure(fig_num);
 close(fig_num);
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
+clear polytopes
+polytopes(1).vertices = [0 0; 4 2; 2 4; 0 0];
 
-interiorPoint = [0.5 0.5];
+is_nonconvex = 0;
 
 Niterations = 100;
 
@@ -266,13 +276,7 @@ Niterations = 100;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [projectedPoints] = ...
-        fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-        interiorPoint,...
-        verticesIncludingSelfIntersections,...
-        verticesIncludingSelfIntersections(1:end-1,:),...
-        verticesIncludingSelfIntersections(2:end,:),...
-        ([]));
+    polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes, (is_nonconvex), ([]));
 end
 slow_method = toc;
 
@@ -280,13 +284,7 @@ slow_method = toc;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [projectedPoints] = ...
-        fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-        interiorPoint,...
-        verticesIncludingSelfIntersections,...
-        verticesIncludingSelfIntersections(1:end-1,:),...
-        verticesIncludingSelfIntersections(2:end,:),...
-        (-1));
+    polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes, (is_nonconvex), (-1));
 end
 fast_method = toc;
 

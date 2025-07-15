@@ -59,6 +59,8 @@
 %    % corners of AAB were handled, where seedPoint for polytope was assumed
 %    % to always be inside the polytope. Added a catch case to fix - see
 %    % above
+% -- Deprecated fcn_MapGen_checkIfPointInsideConvexPolytope, using
+%    % inpolytope instead
 
 
 % TO-DO:
@@ -82,7 +84,16 @@
 %    with colors matched. Be sure to pass out plot handle (not figure
 %    handle) from plotting function. Also be sure to label DisplayName of
 %    plot to allow legends
-
+% -- rename fcn_MapGen_fillPolytopeFieldsFromVertices to be:
+%    % fcn_MapGen_polytopesFillFromVertices
+% -- rename fcn_MapGen_generateOneRandomPolytope to be:
+%    % fcn_MapGen_polytopeGenerateOneRandomPoly
+% -- copy example script out of
+% fcn_MapGen_generatePolysFromVoronoiAABBWithTiling into here!
+% 2025_07_09 - S. Brennan and K. Hayes
+% --  need a tool to check if polytope is convex in 
+%     % fcn_MapGen_fillPolytopeFieldsFromVertices. This is causing some of
+%     % the codes in Bounded_AStar to break
 
 clear library_name library_folders library_url
 
@@ -789,12 +800,12 @@ seedGeneratorNames = 'sobolset';
 seedGeneratorRanges = [1 Numpoints];
 AABBs = [0 0 1 1];
 mapStretchs = [1 1];
-[tiled_polytopes] = fcn_MapGen_voronoiTiling(...
+[~] = fcn_MapGen_voronoiTiling(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
     (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
-    (fig_num)); %#ok<NASGU>
+    (fig_num)); 
 
 title('Sobol set');
 legend('off');
@@ -805,12 +816,12 @@ seedGeneratorNames = 'haltonset';
 seedGeneratorRanges = [1 Numpoints];
 AABBs = [0 0 1 1];
 mapStretchs = [1 1];
-[tiled_polytopes] = fcn_MapGen_voronoiTiling(...
+[~] = fcn_MapGen_voronoiTiling(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
     (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
-    (fig_num)); %#ok<NASGU>
+    (fig_num)); 
 
 %fcn_MapGen_plotPolytopes(tiled_polytopes,gca,'-',line_width,[0 0 1],axis_box,'square');  % , fill_info);
 title('Halton set');
@@ -822,12 +833,12 @@ seedGeneratorNames = 'latin';
 seedGeneratorRanges = [1 Numpoints];
 AABBs = [0 0 1 1];
 mapStretchs = [1 1];
-[tiled_polytopes] = fcn_MapGen_voronoiTiling(...
+[~] = fcn_MapGen_voronoiTiling(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
     (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
-    (fig_num)); %#ok<NASGU>
+    (fig_num)); 
 
 title('Latin Hypercube set');
 legend('off');
@@ -838,12 +849,12 @@ seedGeneratorNames = 'randn';
 seedGeneratorRanges = [1 Numpoints];
 AABBs = [0 0 1 1];
 mapStretchs = [1 1];
-[tiled_polytopes] = fcn_MapGen_voronoiTiling(...
+[~] = fcn_MapGen_voronoiTiling(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
     (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
-    (fig_num)); %#ok<NASGU>
+    (fig_num)); 
 
 title('Uniform random set');
 legend('off');
@@ -854,12 +865,12 @@ seedGeneratorNames = 'rand';
 seedGeneratorRanges = [1 Numpoints];
 AABBs = [0 0 1 1];
 mapStretchs = [1 1];
-[tiled_polytopes] = fcn_MapGen_voronoiTiling(...
+[~] = fcn_MapGen_voronoiTiling(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
     (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
-    (fig_num)); %#ok<NASGU>
+    (fig_num)); 
 
 title('Random normally distributed set');
 legend('off');
@@ -894,12 +905,12 @@ for i=1:100:500
     seedGeneratorRanges = [i i+100];
     AABBs = [0 0 1 1];
     mapStretchs = [1 1];
-    [polytopes] = fcn_MapGen_voronoiTiling(...
+    [~] = fcn_MapGen_voronoiTiling(...
         seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
         seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
         (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
         (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
-        (fig_num)); %#ok<NASGU>
+        (fig_num)); 
 
     % Do statistics, checking that the area is always fully filled and we
     % get 101 polytopes each time

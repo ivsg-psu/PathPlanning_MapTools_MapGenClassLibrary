@@ -263,9 +263,9 @@ end
 
 % Plot polytope edges depending on line style
 if plots == 1 % basic plot
-    plot(polytope_plot_data_x,polytope_plot_data_y,line_spec,'linewidth',line_width)
+    plot(polytope_plot_data_x,polytope_plot_data_y,line_spec,'linewidth',line_width,'DisplayName','polytopes')
 else
-    plot(polytope_plot_data_x,polytope_plot_data_y,line_spec,'Color',color,'linewidth',line_width)
+    plot(polytope_plot_data_x,polytope_plot_data_y,line_spec,'Color',color,'linewidth',line_width,'DisplayName','polytopes')
 end
 
 

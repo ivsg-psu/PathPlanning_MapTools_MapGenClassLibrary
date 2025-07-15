@@ -1,4 +1,4 @@
-% script_compare_random_normal_to_halton.m
+% script_demo_compare_random_normal_to_halton.m
 % looks at various polytope field statistics for maps generated from Halton set
 % compared to maps generated from random normal set
 %
@@ -41,6 +41,7 @@ for tiles=25:25:1000
     std_all = [std_all, std];
     sharpness_all = [sharpness_all, sharpness];
 end
+
 % repeat with random set instead of Halton set
 N_int_actual_all_rand = [];
 rd_all_rand= [];

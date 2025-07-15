@@ -1,5 +1,5 @@
 function [ ...
-one_polytope ...
+onePolytope ...
 ] = ...
 fcn_MapGen_generateOneRandomPolytope( ...
 varargin...
@@ -8,12 +8,10 @@ varargin...
 % Generates a single random polytope by selecting one randomly from the 
 % Halton Set Voronoi method (HSV) tiling.
 % 
-% 
-% 
 % FORMAT:
 % 
 %    [ ...
-%    one_polytope ...
+%    onePolytope ...
 %    ] = ...
 %    fcn_MapGen_generateOneRandomPolytope( ...
 %    (fig_num) ...
@@ -29,10 +27,9 @@ varargin...
 %      variable types to be displayed as output and as well makes the input
 %      check process verbose.
 % 
-% 
 % OUTPUTS:
 % 
-%     one_polytope: one randomly generated polytope
+%     onePolytope: one randomly generated polytope
 % 
 % 
 % DEPENDENCIES:
@@ -59,7 +56,8 @@ varargin...
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
 % -- fixed call to fcn_MapGen_fillPolytopeFieldsFromVertices
-
+% 2025_07_15 by Sean Brennan
+% -- cleaned up variable naming one_polytope --> onePolytope
 
 % TO DO
 % -- none
@@ -110,7 +108,6 @@ end
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
 if 1 == flag_check_inputs
 
     % Are there the right number of inputs?
@@ -149,10 +146,6 @@ end
 %See: http://patorjk.com/software/taag/#p=display&f=Big&t=Main
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
-
-
-
-
 % Set up variables
 
 % Generate Voronoi tiling from Halton points
@@ -167,13 +160,17 @@ mapStretchs = [1 1];
     (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
     (-1));
 
-bounding_box = [0,0; 1,1];
-trim_polytopes = fcn_MapGen_polytopeCropEdges(polytopes,bounding_box);
+% NO NEED TO TRIM USING THE CODE BELOW - polytope field is already AABB
+% bounded with new revisions. Delete below once confirm that everything
+% works.
+% bounding_box = [0,0; 1,1];
+% trim_polytopes = fcn_MapGen_polytopeCropEdges(polytopes,bounding_box, -1);
+trim_polytopes = polytopes;
 
 % Pick a random polytope
 Npolys = length(trim_polytopes);
 rand_poly = 1+floor(rand*Npolys);
-one_polytope = trim_polytopes(rand_poly);
+onePolytope = trim_polytopes(rand_poly);
 
 
 %§
@@ -193,7 +190,7 @@ one_polytope = trim_polytopes(rand_poly);
 
 if flag_do_plot
     % Plot results
-    fcn_MapGen_plotPolytopes(one_polytope,fig_num,'-',2,[0.5 0 0])
+    fcn_MapGen_plotPolytopes(onePolytope,fig_num,'-',2,[0.5 0 0])
 end % Ends the flag_do_plot if statement    
 
 

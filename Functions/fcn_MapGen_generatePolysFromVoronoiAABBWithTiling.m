@@ -1,13 +1,4 @@
-function [ ...
-polytopes, ...
-all_vertices...
-] = ...
-fcn_MapGen_generatePolysFromVoronoiAABBWithTiling( ...
-seed_points, ...
-AABB, ...
-stretch, ...
-varargin...
-)
+function [polytopes, allVertices] = fcn_MapGen_generatePolysFromVoronoiAABBWithTiling(seedPoints, AABB, stretch, varargin)
 % fcn_MapGen_generatePolysFromVoronoiAABBWithTiling
 % creates polytopes given seed points, V and C matrices from Voronoi
 % tiling, and stretch matrix. This function is very similar to:
@@ -22,7 +13,7 @@ varargin...
 %    polytopes ...
 %    ] = ...
 %    fcn_MapGen_generatePolysFromVoronoiAABBWithTiling( ...
-%    seed_points, ...
+%    seedPoints, ...
 %    AABB, ...
 %    stretch, ...
 %    (fig_num) ...
@@ -30,7 +21,7 @@ varargin...
 %
 % INPUTS:
 %
-%     seed_points: the list of seed points in [x y] format, where x and y
+%     seedPoints: the list of seed points in [x y] format, where x and y
 %     are columns
 %
 %     AABB: the axis-aligned bounding box, in format of
@@ -52,13 +43,18 @@ varargin...
 %
 %     polytopes: the resulting polytopes after converting to polytope form.
 %
+%     allVertices: a Mx3 array with M>N where N is number of polytopes
+%     containing NaN values separating rows of real data. Each column
+%     consists of [polyID vertexX vertexY] data, when not nan values.
 %
 % DEPENDENCIES:
 %
 %     fcn_DebugTools_checkInputsToFunctions
-%     fcn_MapGen_cropPolytopeToRange
+%     fcn_MapGen_tilePoints
+%     fcn_MapGen_polytopeFillEmptyPoly
+%     fcn_MapGen_plotPolytopes
 %     fcn_MapGen_fillPolytopeFieldsFromVertices
-%
+%     fcn_MapGen_polytopesShrinkFromEdges
 %
 % EXAMPLES:
 %
@@ -79,7 +75,9 @@ varargin...
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
 % -- fixed docstrings to correct argument listing
-
+% 2025_07_15 by Sean Brennan
+% -- cleaned variable naming to remove underscores
+% -- turned on fast mode for subfunctions
 
 % TO DO
 % -- none
@@ -135,9 +133,9 @@ if (0==flag_max_speed)
         % Are there the right number of inputs?
         narginchk(3,4);
 
-        % Check the seed_points input, make sure it is '2column_of_numbers' type
+        % Check the seedPoints input, make sure it is '2column_of_numbers' type
         fcn_DebugTools_checkInputsToFunctions(...
-            seed_points, '2column_of_numbers');
+            seedPoints, '2column_of_numbers');
 
         % Check the AABB input, make sure it is '4column_of_numbers' type
         fcn_DebugTools_checkInputsToFunctions(...
@@ -162,7 +160,7 @@ if  4 == nargin && (0==flag_max_speed) % Only create a figure if NOT maximizing 
 else
     if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
         fig = figure;
-        fig_for_debug = fig.Number; 
+        fig_for_debug = fig.Number; %#ok<NASGU>
         flag_do_plot = 1;
     end
 end
@@ -183,26 +181,25 @@ end
  % Put one copy of the points in a perimeter around the points, tiled by
  % the AABB
 tile_depth = 1;
-Nseedpoints = length(seed_points);
-[tiled_original_seed_points] = fcn_MapGen_tilePoints(seed_points,tile_depth,AABB);
+Nseedpoints = length(seedPoints);
+[tiled_original_seedPoints] = fcn_MapGen_tilePoints(seedPoints,tile_depth,AABB, -1);
 
 % Calculate the resulting Voronoi diagram
-[V,C] = voronoin(tiled_original_seed_points);
+[V,C] = voronoin(tiled_original_seedPoints);
 
 % Choose the seed points from the middle area
 mid_tile_superindex = ceil((2*tile_depth+1)^2/2);
 mid_tile_range = ((Nseedpoints*(mid_tile_superindex-1)+1):Nseedpoints*mid_tile_superindex)';
-seed_points_to_use = tiled_original_seed_points(mid_tile_range,:);
+seedPoints_to_use = tiled_original_seedPoints(mid_tile_range,:);
 
 %% for each of the seed points, save the polytope for it
 % Start by initializing the data structure
-num_poly = size(seed_points_to_use,1);
+num_poly = size(seedPoints_to_use,1);
 polytopes(num_poly) = fcn_MapGen_polytopeFillEmptyPoly((-1));
-
 Npolys = length(polytopes);
 Nvertices_per_poly = 20; % Maximum estimate
 Nvertices_per_map = Npolys*Nvertices_per_poly;
-all_vertices = nan(Nvertices_per_map,3);
+allVertices = nan(Nvertices_per_map,3);
 % all_neighbors = nan(Nvertices_per_map,1);
 
 
@@ -222,12 +219,12 @@ if flag_do_debug
 end
 
 % Start the loop
-for ith_poly = 1:length(seed_points)
+for ith_poly = 1:length(seedPoints)
     % Find which seed index to use
     offset_seed_index = mid_tile_range(ith_poly);
 
     % Fill in seed_point
-    polytopes(ith_poly).seed_point = seed_points_to_use(ith_poly);
+    polytopes(ith_poly).seed_point = seedPoints_to_use(ith_poly);
 
 
     %     if ith_poly==50
@@ -244,7 +241,7 @@ for ith_poly = 1:length(seed_points)
     near_infinite = (distances_from_center/scale)>1E7;
     if any(near_infinite)
         warning('on','backtrace');
-        warning('Near-infinite vertex found for polytope: %.0d, for seed point: (%.3f, %.3f)', ith_poly,seed_points_to_use(ith_poly,1),seed_points_to_use(ith_poly,2))
+        warning('Near-infinite vertex found for polytope: %.0d, for seed point: (%.3f, %.3f)', ith_poly,seedPoints_to_use(ith_poly,1),seedPoints_to_use(ith_poly,2))
         vertices_open(near_infinite,:) = inf;
         % Remove repeated infinities
         vertices_open = unique(vertices_open,'rows','stable');
@@ -275,7 +272,7 @@ for ith_poly = 1:length(seed_points)
         end
 
         % Plot this one's seed point:
-        plot(seed_points_to_use(ith_poly,1),seed_points_to_use(ith_poly,2),'r.');
+        plot(seedPoints_to_use(ith_poly,1),seedPoints_to_use(ith_poly,2),'r.');
 
     end
 
@@ -285,8 +282,8 @@ for ith_poly = 1:length(seed_points)
         error('Need to resize the number of allowable vertices');
     else
         row_offset = (ith_poly-1)*Nvertices_per_poly;
-        all_vertices(row_offset+1:row_offset+Nvertices,1) = ith_poly;
-        all_vertices(row_offset+1:row_offset+Nvertices,2:3) = vertices;
+        allVertices(row_offset+1:row_offset+Nvertices,1) = ith_poly;
+        allVertices(row_offset+1:row_offset+Nvertices,2:3) = vertices;
     end
 end
 
@@ -302,7 +299,7 @@ for poly = 1:num_poly % pull each cell from the voronoi diagram
 end % Ends for loop for stretch
 
 %% Fill in all the other fields
-polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes);
+polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes, [], -1);
 
 %§
 %% Plot the results (for debugging)?
@@ -328,27 +325,30 @@ if flag_do_plot
     new_axis = [AABB(1)-scale/2 AABB(3)+scale/2 AABB(2)-scale/2 AABB(4)+scale/2];
     axis(new_axis);
 
-    % plot the polytopes
+    % plot the polytopes    
     fcn_MapGen_plotPolytopes(polytopes,fig_num,'b',2);
 
     % plot all vertices
-    plot(all_vertices(:,2),all_vertices(:,3),'c','Linewidth',1);
-
+    plot(allVertices(:,2),allVertices(:,3),'-', 'Color',0.8*[1 1 1],'Linewidth',1, 'MarkerSize',20, 'DisplayName','vertices');
 
     % plot the seed points in red
-    plot(seed_points(:,1),seed_points(:,2),'r.','Markersize',10);
+    plot(seedPoints(:,1),seedPoints(:,2),'r.','Markersize',10, 'DisplayName', 'seedPoints');
 
     % plot the means in black
     temp = zeros(length(polytopes),2);
     for ith_poly = 1:length(polytopes)
         temp(ith_poly,:) = polytopes(ith_poly).mean;
     end
-    plot(temp(:,1),temp(:,2),'ko','Markersize',3);
+    plot(temp(:,1),temp(:,2),'ko','Markersize',3,'DisplayName', 'polytope means');
 
-    % number the polytopes at seed points
-    for ith_poly = 1:length(polytopes)
-        text_location = seed_points(ith_poly,:);
-        text(text_location(1,1),text_location(1,2),sprintf('%.0d',ith_poly));
+    legend('Interpreter','none','location','best');
+
+    % number the polytopes at seed points?
+    if 1== flag_do_plot
+        for ith_poly = 1:length(polytopes)
+            text_location = seedPoints(ith_poly,:);
+            text(text_location(1,1),text_location(1,2),sprintf('%.0d',ith_poly));
+        end
     end
 
     %     % number the polytopes at means
@@ -360,24 +360,24 @@ if flag_do_plot
     % plot the connections between the polytope neighbors
     if 1==0
         % Clean up and sort the vertices so that we can associate neighbors
-        all_vertices_no_nan = all_vertices(~isnan(all_vertices(:,1)),:);
-        sorted_all_vertices = sortrows(all_vertices_no_nan,[2 3]);
+        allVertices_no_nan = allVertices(~isnan(allVertices(:,1)),:);
+        sorted_allVertices = sortrows(allVertices_no_nan,[2 3]);
 
         % Remove repeats
-        sorted_all_vertices = unique(sorted_all_vertices,'rows','stable');
+        sorted_allVertices = unique(sorted_allVertices,'rows','stable');
 
         % Remove infinities
-        sorted_all_vertices = sorted_all_vertices(~isinf(sorted_all_vertices(:,2)));
+        sorted_allVertices = sorted_allVertices(~isinf(sorted_allVertices(:,2)));
 
-        Nrealvertices = floor(length(sorted_all_vertices(:,1))/3);
+        Nrealvertices = floor(length(sorted_allVertices(:,1))/3);
         data = zeros(Nrealvertices*6,2);
         for ith_poly = 1:Nrealvertices
             row_offset = (ith_poly-1)*3;
-            neighbors = sorted_all_vertices(row_offset+1:row_offset+3,1);
+            neighbors = sorted_allVertices(row_offset+1:row_offset+3,1);
 
             for jth_neighbor = 2:length(neighbors)
                 neigh_offset = (ith_poly-1)*6 + ((jth_neighbor-2)*3);
-                data(neigh_offset+1:neigh_offset+3,:) = [seed_points(neighbors(1),:); seed_points(neighbors(jth_neighbor),:); nan nan];
+                data(neigh_offset+1:neigh_offset+3,:) = [seedPoints(neighbors(1),:); seedPoints(neighbors(jth_neighbor),:); nan nan];
             end
         end
         plot(data(:,1),data(:,2),'-','Linewidth',0.5);
@@ -399,12 +399,12 @@ if flag_do_plot
         %% plot the seed points in red
         subplot(2,3,1);
 
-        plot(seed_points(:,1),seed_points(:,2),'r.','Markersize',10);
+        plot(seedPoints(:,1),seedPoints(:,2),'r.','Markersize',10);
 
 
         % number the polytopes at seed points
         for ith_poly = 1:length(polytopes)
-            text_location = seed_points(ith_poly,:);
+            text_location = seedPoints(ith_poly,:);
             text(text_location(1,1),text_location(1,2),sprintf('%.0d',ith_poly));
         end
         axis(new_axis);
@@ -413,9 +413,9 @@ if flag_do_plot
         %% plot the tiled seed points
         subplot(2,3,2);
         cla;
-        plot(tiled_original_seed_points(:,1),tiled_original_seed_points(:,2),'b.','Markersize',20);
+        plot(tiled_original_seedPoints(:,1),tiled_original_seedPoints(:,2),'b.','Markersize',20);
         hold on;
-        plot(seed_points(:,1),seed_points(:,2),'r.','Markersize',10);
+        plot(seedPoints(:,1),seedPoints(:,2),'r.','Markersize',10);
 
         axis(new_axis);
         title('Tiled Seed points');
@@ -425,7 +425,7 @@ if flag_do_plot
         subplot(2,3,3);
 
         % Start the loop to calculate all the vertices
-        num_poly = size(tiled_original_seed_points,1);
+        num_poly = size(tiled_original_seedPoints,1);
         voronoi_polytopes(num_poly) = fcn_MapGen_polytopeFillEmptyPoly((-1));
 
         Npolys = length(voronoi_polytopes);
@@ -433,10 +433,10 @@ if flag_do_plot
         Nvertices_per_map = Npolys*Nvertices_per_poly;
         all_voronoi_vertices = nan(Nvertices_per_map,3);
 
-        for ith_poly = 1:length(tiled_original_seed_points(:,1))
+        for ith_poly = 1:length(tiled_original_seedPoints(:,1))
 
             % Fill in seed_point
-            voronoi_polytopes(ith_poly).seed_point = tiled_original_seed_points(ith_poly);
+            voronoi_polytopes(ith_poly).seed_point = tiled_original_seedPoints(ith_poly);
 
             % Get the verticies
             vertices_open = V(C{ith_poly},:);
@@ -460,7 +460,7 @@ if flag_do_plot
 
 
         % plot the tiled seed points in blue
-        plot(tiled_original_seed_points(:,1),tiled_original_seed_points(:,2),'b.','Markersize',20);
+        plot(tiled_original_seedPoints(:,1),tiled_original_seedPoints(:,2),'b.','Markersize',20);
         hold on;
 
         % plot all vertices
@@ -479,7 +479,7 @@ if flag_do_plot
 
 
         % plot the seed points in red
-        plot(seed_points(:,1),seed_points(:,2),'r.','Markersize',10);
+        plot(seedPoints(:,1),seedPoints(:,2),'r.','Markersize',10);
 
         axis(new_axis);
         title('Extract middle, tilable polytopes')
@@ -529,7 +529,7 @@ if flag_do_plot
 
         shrunk_polytopes=...
             fcn_MapGen_polytopesShrinkFromEdges(...
-            polytopes,des_gap_size);
+            polytopes,des_gap_size, -1);
 
         % plot the shrunk polytopes
         fcn_MapGen_plotPolytopes(shrunk_polytopes,gca,'r',2);
@@ -572,7 +572,7 @@ if flag_do_plot
         % areas.
 
         % Find the parts that stick out
-        all_points = all_vertices(~isnan(all_vertices(:,1)),2:3);
+        all_points = allVertices(~isnan(allVertices(:,1)),2:3);
         all_points_shifted = all_points - AABB(1:2);
         rounded_points = mod(all_points_shifted,1);
         x_indices_stick_out = find(all_points_shifted(:,1)~=rounded_points(:,1));

@@ -1,30 +1,19 @@
-function [ ...
-convex_hull_overlap_ratio,...
-A_overlap,...
-A_occupied...
-] = ...
-fcn_MapGen_calculateConvexHullOverlapRatio( ...
-polytopes, ...
-varargin...
-)
+function [convexHullOverlapRatio, areaOverlap, areaOccupied] = ...
+    fcn_MapGen_calculateConvexHullOverlapRatio(polytopes, varargin)
+
 % fcn_MapGen_calculateConvexHullOverlapRatio
 % calculates the convex hull of every obstacle.  The area of the overlap between
 % these hulls relative to the total occupied area
 %
 % FORMAT:
 %
-% function [ ...
-% convex_hull_overlap_ratio...
-% ] = ...
-% fcn_MapGen_calculateConvexHullOverlapRatio( ...
-% polytopes, ...
-% (fig_num)...
-% )
+%     [convexHullOverlapRatio, areaOverlap, areaOccupied] = ...
+%     fcn_MapGen_calculateConvexHullOverlapRatio( polytopes, (fig_num))
 %
 % INPUTS:
 %
 %     polytopes: the structure of 'polytopes' type that stores the
-%     polytopes to be expanded
+%     polytopes to be expanded. 
 %
 %     (optional inputs)
 %
@@ -34,23 +23,25 @@ varargin...
 %      variable types to be displayed as output and as well makes the input
 %      check process verbose.
 %
-%
 % OUTPUTS:
 %
 %     covex_hull_overlap_ratio: portion of overlapping convex hull area to total obstacle area
 %
+%     areaOverlap: area of overlap
+%
+%     areaOccupied: area occupied
 %
 % DEPENDENCIES:
 %
+%     fcn_DebugTools_checkInputsToFunctions
 %     MATLAB's polyshape object and union object function (method)
-%
 %
 % EXAMPLES:
 %
 % See the script: script_test_fcn_MapGen_calculateConvexHullOverlapRatio
 % for a full test suite.
 %
-% This function was written 23 Feb. 2024 by Steve Harnett
+% This function was written 2024_02_23 by Steve Harnett
 % Questions or comments? contact sjharnett@psu.edu
 
 %
@@ -65,6 +56,8 @@ varargin...
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
 % 2025_04_29 by Sean Brennan
 % -- Fixed script mis-labeling in the docstrings
+% 2025_07_15 by Sean Brennan
+% -- Fixed missing output descriptions in docstrings
 
 % TO DO
 % -- rewrite to move plotting to debug area only
@@ -158,59 +151,48 @@ end
 %See: http://patorjk.com/software/taag/#p=display&f=Big&t=Main
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
-clear exp_polytopes;
-A_overlap = 0;
-A_occupied = 0;
-conv_hull_polyshapes = [];
-for p = 1:length(polytopes)
-    this_polytope = polytopes(p); % look at one polytope
-    if flag_do_plot
-        figure(fig_num); hold on; box on; fill(this_polytope.vertices(:,1)',this_polytope.vertices(:,2),[0 0 1],'FaceAlpha',1);
-        if p == 1
-            leg_str = {'obstacles'};
-        else
-            leg_str{end+1} = ''; %#ok<AGROW>
-        end
-    end
+Npolytopes = length(polytopes);
+
+% Initialize variables
+areaOverlap = 0;
+areaOccupied = 0;
+conv_hull_polyshapes(Npolytopes) = polyshape; 
+
+% Loop through the polytopes, adding up area occupied
+for ith_polytope = 1:Npolytopes
+    this_polytope = polytopes(ith_polytope); % look at one polytope
+
     these_vertices = this_polytope.vertices(1:(end-1),:); % grab only non-repeating vertices
-    k = convhull(these_vertices); % find convex hull of vertices
+
+    % find convex hull of vertices
+    k = convhull(these_vertices); 
     convex_hull_vertices = [these_vertices(k,1),these_vertices(k,2)];
+
+
     this_conv_hull_polyshape = polyshape(convex_hull_vertices); % convert it to matlab polyshape
-    if flag_do_plot
-        figure(fig_num); hold on; box on; plot(this_conv_hull_polyshape,'FaceColor','green','FaceAlpha',0.2);
-        if p == 1
-            leg_str{end+1} = 'obs. convex hull'; %#ok<AGROW>
-        else
-            leg_str{end+1} = ''; %#ok<AGROW>
-        end
-    end
-    conv_hull_polyshapes = [conv_hull_polyshapes; this_conv_hull_polyshape]; %#ok<AGROW>
-    A_occupied = A_occupied+this_polytope.area;
+    conv_hull_polyshapes(ith_polytope) = this_conv_hull_polyshape; 
+    areaOccupied = areaOccupied + this_polytope.area;
 end
-flag_havent_plotted = 1;
-for i = 1:length(polytopes)
-    j = 1;
-    while j <= length(polytopes)
-        if j<=i
-            % if we checked 1,2 we don't need to check 2,1 so ignore j<i
-            % also don't want to check j=i because there is meaningless overlap
-            j = j+1;
-            continue;
-        end
-        overlap_polyshape = intersect(conv_hull_polyshapes(i),conv_hull_polyshapes(j));
-        if flag_do_plot
-            figure(fig_num); hold on; box on; plot(overlap_polyshape,'FaceColor','red');
-            if flag_havent_plotted
-                leg_str{end+1} = 'overlap'; %#ok<AGROW>
-                flag_havent_plotted = 0;
-            end
-        end
-        A_overlap = A_overlap + area(overlap_polyshape);
-        j = j+1;
+
+% Look at overlap by intersecting the convex hulls with each other
+NumOverlaps = ((Npolytopes-1)+1)/2 * (Npolytopes-1);
+overlap_polyshapes(NumOverlaps) = polyshape;
+Noverlaps = 0;
+for ith_polytope = 1:Npolytopes-1
+    % if we checked 1,2 we don't need to check 2,1 so ignore j<i
+    % also don't want to check j=i because there is meaningless overlap
+    for jth_overlap = (ith_polytope+1):Npolytopes
+        overlap_polyshape = intersect(conv_hull_polyshapes(ith_polytope),conv_hull_polyshapes(jth_overlap));  
+
+        Noverlaps = Noverlaps + 1;
+        overlap_polyshapes(Noverlaps) = overlap_polyshape; 
+
+        areaOverlap = areaOverlap + area(overlap_polyshape);
     end
 end
 
-convex_hull_overlap_ratio = A_overlap/A_occupied;
+% Calculate overlap ratio
+convexHullOverlapRatio = areaOverlap/areaOccupied;
 
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -224,9 +206,44 @@ convex_hull_overlap_ratio = A_overlap/A_occupied;
 %                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plot
-    title_str = sprintf('total obstacle area: %.3f\noverlapping convex hull area: %.3f\nconvex hull overlap ratio: %.3f',A_occupied,A_overlap,convex_hull_overlap_ratio);
-    figure(fig_num); title(title_str);
-    legend(leg_str)
+
+    % Prep the figure
+    figure(fig_num); 
+    hold on; 
+    box on;
+ 
+    % Loop through the polytopes, shading them
+    for ith_polytope = 1:Npolytopes
+        this_polytope = polytopes(ith_polytope); % look at one polytope
+        this_conv_hull_polyshape = conv_hull_polyshapes(ith_polytope);
+
+        h_fill = fill(this_polytope.vertices(:,1)',this_polytope.vertices(:,2),[0 0 1],'FaceAlpha',1);
+        if ith_polytope == 1
+            set(h_fill,'DisplayName',sprintf('Obstacles, Area: %.3f',areaOccupied));
+        else
+            set(h_fill,'HandleVisibility','off');
+        end
+
+        h_plot = plot(this_conv_hull_polyshape,'FaceColor','green','FaceAlpha',0.2);
+        if ith_polytope == 1
+            set(h_plot,'DisplayName','Convex hull of obstacles'); 
+        else
+            set(h_plot,'HandleVisibility','off');
+        end
+
+    end
+
+    for ith_overlap = 1:length(overlap_polyshapes)
+        h_overlap = plot(overlap_polyshape(ith_overlap),'FaceColor','red');
+        if 1==ith_overlap
+            set(h_overlap,'DisplayName',sprintf('Overlap, Area: %.3f, ratio: %.3f',areaOverlap,convexHullOverlapRatio));
+        else
+            set(h_overlap,'HandleVisibility','off');
+        end
+    end
+
+    legend('Interpreter','none');
+
 end
 
 end % Ends the function

@@ -1,4 +1,4 @@
-function polytopes = fcn_MapGen_voronoiTiling(seedGeneratorNames, seedGeneratorRanges, varargin)
+function [polytopes, eachGeneratorPolytopes] = fcn_MapGen_voronoiTiling(seedGeneratorNames, seedGeneratorRanges, varargin)
 % fcn_MapGen_voronoiTiling generates a map fully covered by polytope
 % obstacles that are tiled via Voronoi tilings. The tilings are specified
 % by one or more sets of seed points. Each seed point set can be specified
@@ -60,7 +60,9 @@ function polytopes = fcn_MapGen_voronoiTiling(seedGeneratorNames, seedGeneratorR
 %
 %     OUTPUTS:
 %
-%     POLYTOPES: a polytope structure. See fcn_MapGen_polytopeFillEmptyPoly
+%     polytopes: a polytope structure. See fcn_MapGen_polytopeFillEmptyPoly
+%
+%     eachGeneratorPolytopes: a cell array of polytopes for each generator
 %
 %     DEPENDENCIES:
 %
@@ -262,11 +264,16 @@ AABB_final = [min_xy_offset max_xy_offset];
 polytopes = fcn_MapGen_generatePolysFromTiling(all_points,V,C, AABB_final, totalMapStretch,[], -1);
 
 % Repeat for each generator set
-for ith_generator = 1:Ngenerators
-    [V,C] = voronoin(eachGeneratorSeedPoints{ith_generator});
-    eachGeneratorPolytopes{ith_generator,1} = fcn_MapGen_generatePolysFromTiling(eachGeneratorSeedPoints{ith_generator},V,C, AABB_final, totalMapStretch, [], -1);
+if Ngenerators>1
+    for ith_generator = 1:Ngenerators
+        [V,C] = voronoin(eachGeneratorSeedPoints{ith_generator});
+        eachGeneratorPolytopes{ith_generator,1} = fcn_MapGen_generatePolysFromTiling(...
+            eachGeneratorSeedPoints{ith_generator},V,C, AABB_final, totalMapStretch, [], -1);
+    end
+else
+    % the result will be the same
+    eachGeneratorPolytopes{1,1} = polytopes;
 end
-
 %% Plot results?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   _____       _
