@@ -907,7 +907,7 @@ seedGeneratorRanges{ith_set,1} = set_range;
 AABBs{ith_set,1} = [1 1 2 2];
 mapStretchs{ith_set,1} = mapStretch;
 
-Niterations = 10;
+Niterations = 5;
 
 % Do calculation without pre-calculation
 tic;

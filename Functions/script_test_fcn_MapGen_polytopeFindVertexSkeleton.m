@@ -111,9 +111,20 @@ vertices = [0 0; 10 0; 5 15; 4 17; 1 13; 0 5; 0 0];
 %% Random polytope calculation
 % Set up polytopes
 close all;
-polytopes = fcn_MapGen_haltonVoronoiTiling([1 100],[1 1]);
 
-edge_cut_step = 0.002;
+seedGeneratorNames = 'haltonset';
+seedGeneratorRanges = [1 100];
+AABBs = [0 0 1 1];
+mapStretchs = [1 1];
+[polytopes] = fcn_MapGen_voronoiTiling(...
+    seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
+    seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
+    (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
+    (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
+    (-1));
+
+
+edge_cut_step = 0.005;
 bounding_box = [0,0; 1,1];
 trim_polytopes = fcn_MapGen_polytopeCropEdges(polytopes,bounding_box);
 

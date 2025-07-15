@@ -75,10 +75,22 @@ for tiles=100 % a range can be input here to do fields with different numbers of
             % repeat this obstacle count, radius distribution, and radius goal multiple times
             for i = 1:1:5
                 if flag_do_plot
-                    tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1],fig_num);
+                    temp_fig_num = fig_num;
                 else
-                    tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1]);
+                    temp_fig_num = -1;
                 end
+                seedGeneratorNames = 'haltonset';
+                seedGeneratorRanges = Halton_range;
+                AABBs = [0 0 1 1];
+                mapStretchs = [1 1];
+                [tiled_polytopes] = fcn_MapGen_voronoiTiling(...
+                    seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
+                    seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
+                    (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
+                    (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
+                    (temp_fig_num));
+
+
                 des_rad = radii_goals; sigma_radius = sd_radius; min_rad = 0.001;
                 % TODO switch this to side shrinking to get gap distance as an output so it can be given to predictor as input
                 % shrinking may fail but should just result in a discarded data point

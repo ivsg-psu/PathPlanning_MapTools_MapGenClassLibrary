@@ -6,10 +6,22 @@
 % -- first written by S. Harnett
 
 fig_num = 75;
-Halton_range = [1 10]; % range of Halton points to use to generate the tiling
-tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1]);
+
+seedGeneratorNames = 'haltonset';
+seedGeneratorRanges = [1 10];
+AABBs = [0 0 1 1];
+mapStretchs = [1 1];
+[tiled_polytopes] = fcn_MapGen_voronoiTiling(...
+    seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
+    seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
+    (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
+    (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
+    (-1));
+
 des_rad = 0.1; sigma_radius = 0.02; min_rad = 0.001;
 [shrunk_field,mu_final,sigma_final] = fcn_MapGen_polytopesShrinkToRadius(tiled_polytopes,des_rad,sigma_radius,min_rad);
+warning('')
+warning('The following breaks when running line 25 in script_test_fcn_MapGen_polytopesPredictLenghtCostRatio')
 field_stats = fcn_MapGen_polytopesStatistics(shrunk_field);
 field_avg_r_D = field_stats.avg_r_D;
 field_stats_pre_shrink = fcn_MapGen_polytopesStatistics(tiled_polytopes);

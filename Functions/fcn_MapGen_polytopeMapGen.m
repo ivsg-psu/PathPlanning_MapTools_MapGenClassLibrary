@@ -55,7 +55,7 @@ function [map_polytopes,all_pts,mu_rad_final,sigma_rad_final] = ...
 % DEPENDENCIES:
 %
 %      fcn_DebugTools_checkInputsToFunctions
-%      fcn_MapGen_haltonVoronoiTiling
+%      fcn_MapGen_voronoiTiling
 %      fcn_MapGen_polytopeCropEdges
 %      fcn_MapGen_polytopesShrinkToRadius
 %      fcn_MapGen_plotPolytopes
@@ -169,7 +169,17 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % generate Voronoi tiling from Halton points
-tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(halton_range);
+seedGeneratorNames = 'haltonset';
+seedGeneratorRanges = halton_range;
+AABBs = [0 0 1 1];
+mapStretchs = [1 1];
+[tiled_polytopes] = fcn_MapGen_voronoiTiling(...
+    seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
+    seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
+    (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
+    (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
+    (-1));
+
 
 % remove the edge polytopes that extend past the high and low points
 trimmed_polytopes = ...

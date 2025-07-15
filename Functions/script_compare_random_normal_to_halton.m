@@ -16,7 +16,18 @@ std_all = [];
 sharpness_all = [];
 for tiles=25:25:1000
     Halton_range = [1 tiles]; % range of Halton points to use to generate the tiling
-    tiled_polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1]);
+    seedGeneratorNames = 'haltonset';
+    seedGeneratorRanges = Halton_range;
+    AABBs = [0 0 1 1];
+    mapStretchs = [1 1];
+    [tiled_polytopes] = fcn_MapGen_voronoiTiling(...
+        seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
+        seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
+        (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
+        (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
+        (-1));
+
+
     field_stats = fcn_MapGen_polytopesStatistics(tiled_polytopes);
     N_int_actual = field_stats.linear_density_mean;
     rd = field_stats.avg_r_D;
@@ -39,7 +50,19 @@ std_all_rand = [];
 sharpness_all_rand = [];
 for tiles=25:25:1000
     tile_range = [1 tiles];
-    tiled_polytopes = fcn_MapGen_randomNormalVoronoiTiling(tile_range,[1 1]);
+
+    seedGeneratorNames = 'randn';
+    seedGeneratorRanges = tile_range;
+    AABBs = [0 0 1 1];
+    mapStretchs = [1 1];
+    [tiled_polytopes] = fcn_MapGen_voronoiTiling(...
+        seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
+        seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
+        (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
+        (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
+        (-1));
+
+
     field_stats = fcn_MapGen_polytopesStatistics(tiled_polytopes);
     N_int_actual = field_stats.linear_density_mean;
     rd = field_stats.avg_r_D;

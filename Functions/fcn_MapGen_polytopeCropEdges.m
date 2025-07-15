@@ -39,7 +39,18 @@ function [trim_polytopes] = ...
 %
 % EXAMPLES:
 %
-%   polytopes = fcn_MapGen_haltonVoronoiTiling([1 1000]);
+%   % generate Voronoi tiling from Halton points
+%     seedGeneratorNames = 'haltonset';
+%     seedGeneratorRanges = [1 1000];
+%     AABBs = [0 0 1 1];
+%     mapStretchs = [1 1];
+%     [polytopes] = fcn_MapGen_voronoiTiling(...
+%         seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
+%         seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
+%         (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
+%         (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
+%         (-1));
+%     
 %   fig = fcn_plot_polytopes(polytopes,[],'b',2,[0 1 0 1]);
 %
 %   bounding_box = [0,1; 0,1];
@@ -73,12 +84,12 @@ function [trim_polytopes] = ...
 % number.
 flag_max_speed = 0;
 if (nargin==3 && isequal(varargin{end},-1))
-    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_do_debug = 0;     %    Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
 else
     % Check to see if we are externally setting debug mode to be "on"
-    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_do_debug = 0;     %    Flag to plot the results for debugging
     flag_check_inputs = 1; % Flag to perform input checking
     MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS");
     MATLABFLAG_MAPGEN_FLAG_DO_DEBUG = getenv("MATLABFLAG_MAPGEN_FLAG_DO_DEBUG");

@@ -1,32 +1,32 @@
-function [shrunk_polytopes,mu_final,sigma_final] = ...
+function [shrunkPolytopes,muFinal,sigmaFinal] = ...
     fcn_MapGen_polytopesShrinkToRadius(...
     polytopes,...
-    des_radius,...
-    sigma_radius,...
-    min_rad,...
+    desiredRadius,...
+    sigmaRadius,...
+    minRadius,...
     varargin)
 % fcn_MapGen_polytopesShrinkToRadius shrinks the polytopes to achieve the
 % desired mean radius and specified variance
 %
 % FORMAT:
 % 
-% [shrunk_polytopes,mu_final,sigma_final] = ...
+% [shrunkPolytopes,muFinal,sigmaFinal] = ...
 %     fcn_MapGen_polytopesShrinkToRadius(...
 %     polytopes,...
-%     des_radius,...
-%     sigma_radius,...
-%     min_rad,...
+%     desiredRadius,...
+%     sigmaRadius,...
+%     minRadius,...
 %     (fig_num))
 %
 % INPUTS:
 %
-%     POLYTOPES: original polytopes with same fields as shrunk_polytopes
+%     polytopes: original polytopes with same fields as shrunkPolytopes
 %
-%     DES_RAD: desired average max radius   
+%     desiredRadius: desired average max radius   
 %
-%     SIGMA_RADIUS: desired variance in the radii 
+%     sigmaRadius: desired variance in the radii 
 %
-%     MIN_RAD: minimum acceptable radius
+%     minRadius: minimum acceptable radius
 %
 %     (optional inputs)
 %
@@ -38,27 +38,17 @@ function [shrunk_polytopes,mu_final,sigma_final] = ...
 %
 % OUTPUTS:
 %
-%     SHRUNK_POLYTOPES: a 1-by-n seven field structure of shrunken polytopes, 
-%     where n <= number of polytopes with fields:
-%       vertices: a m+1-by-2 matrix of xy points with row1 = rowm+1, where m is
-%         the number of the individual polytope vertices
-%       xv: a 1-by-m vector of vertice x-coordinates
-%       yv: a 1-by-m vector of vertice y-coordinates
-%       distances: a 1-by-m vector of perimeter distances from one point to the
-%         next point, distances(i) = distance from vertices(i) to vertices(i+1)
-%       mean: centroid xy coordinate of the polytope
-%       area: area of the polytope
-%       max_radius: distance from the mean to the farthest vertex
+%     shrunkPolytopes: a structure of shrunken polytopes, 
 %
-%     MU_FINAL: final average maximum radius achieved
+%     muFinal: final average maximum radius achieved
 %
-%     SIGMA_FINAL: final variance achieved
+%     sigmaFinal: final variance achieved
 %   
 % DEPENDENCIES:
 % 
 %     fcn_DebugTools_checkInputsToFunctions
-%     fcn_MapGen_plotPolytopes
 %     fcn_MapGen_polytopeShrinkToRadius
+%     fcn_MapGen_plotPolytopes
 % 
 % EXAMPLES:
 %
@@ -84,6 +74,8 @@ function [shrunk_polytopes,mu_final,sigma_final] = ...
 % 2025_04_25 by Sean Brennan
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
+% 2025_07_14 by Sean Brennan
+% -- cleaned up variable naming for clarity and avoid underscores
 
 % TO DO
 % -- Vectorize the for loop if possible
@@ -147,17 +139,17 @@ if (0==flag_max_speed)
         fcn_DebugTools_checkInputsToFunctions(...
             polytopes, 'polytopes');
 
-        % Check the des_radius input
+        % Check the desiredRadius input
         fcn_DebugTools_checkInputsToFunctions(...
-            des_radius, 'positive_1column_of_numbers',1);
+            desiredRadius, 'positive_1column_of_numbers',1);
 
-        % Check the sigma_radius input
+        % Check the sigmaRadius input
         fcn_DebugTools_checkInputsToFunctions(...
-            sigma_radius, '1column_of_numbers',1);
+            sigmaRadius, '1column_of_numbers',1);
 
-        % Check the min_rad input
+        % Check the minRadius input
         fcn_DebugTools_checkInputsToFunctions(...
-            min_rad, 'positive_1column_of_numbers',1);
+            minRadius, 'positive_1column_of_numbers',1);
 
     end
 end
@@ -198,8 +190,8 @@ old_r_sigma = std(old_max_radii);
 
 if flag_do_debug
     fprintf(1,'Target distrubution statistics:\n');
-    fprintf(1,'\tMean: %.4f\n',des_radius);
-    fprintf(1,'\tStd dev: %.4f\n',sigma_radius);
+    fprintf(1,'\tMean: %.4f\n',desiredRadius);
+    fprintf(1,'\tStd dev: %.4f\n',sigmaRadius);
     
     fprintf(1,'Input distrubution statistics:\n');
     fprintf(1,'\tMean: %.4f\n',old_r_mu);
@@ -211,20 +203,20 @@ if flag_do_debug
     histogram(old_max_radii,20)
     title(sprintf('Histogram of input radii. Mean: %.4f, Std-dev: %.4f. Targets are: %.4f and %.4f',...
         old_r_mu,old_r_sigma,...
-        des_radius,...
-        sigma_radius));
+        desiredRadius,...
+        sigmaRadius));
 end
 
 
-if old_r_mu < des_radius
+if old_r_mu < desiredRadius
     error('cannot achieve the desired radius by shrinking because average radius is already smaller than desired radius')
 end
 
 %% determine desired distribution
-new_r_dist = normrnd(des_radius,sigma_radius,[Nradii,1]);
+new_r_dist = normrnd(desiredRadius,sigmaRadius,[Nradii,1]);
 
 % adjust to ensure the mean value is mu. SETH: is this necessary?
-new_r_dist = new_r_dist + (des_radius-mean(new_r_dist)); 
+new_r_dist = new_r_dist + (desiredRadius-mean(new_r_dist)); 
 
 
 if flag_do_debug
@@ -238,8 +230,8 @@ if flag_do_debug
     histogram(new_r_dist,20)
     title(sprintf('Histogram of target radii. Mean: %.4f, Std-dev: %.4f. Targets are: %.4f and %.4f',...
         new_r_mu,new_r_sigma,...
-        des_radius,...
-        sigma_radius));
+        desiredRadius,...
+        sigmaRadius));
    
 end
 
@@ -255,7 +247,7 @@ end
 % when other polytopes have small initial radii.
 
 max_r_dist = old_max_radii; % largest possible radius for each polytope
-min_r_dist = min_rad; % smallest possible radius
+min_r_dist = minRadius; % smallest possible radius
 Ntruncations = sum((new_r_dist>max_r_dist)+(new_r_dist<min_r_dist));
 
 % Warn the user:
@@ -282,26 +274,26 @@ end
 
 new_r_dist(new_r_dist>max_r_dist) = max_r_dist(new_r_dist>max_r_dist); % truncate any values that are too large
 new_r_dist(new_r_dist<min_r_dist) = min_r_dist; % truncate any values that are too small
-while abs(mean(new_r_dist) - des_radius) > 1e-10
-    new_r_dist = new_r_dist + (des_radius-mean(new_r_dist));
+while abs(mean(new_r_dist) - desiredRadius) > 1e-10
+    new_r_dist = new_r_dist + (desiredRadius-mean(new_r_dist));
     new_r_dist(new_r_dist>max_r_dist) = max_r_dist(new_r_dist>max_r_dist);
     new_r_dist(new_r_dist<min_r_dist) = min_r_dist;
 end
 
 if flag_do_debug
-    mu_final = mean(new_r_dist);
-    sigma_final = std(new_r_dist);
+    muFinal = mean(new_r_dist);
+    sigmaFinal = std(new_r_dist);
     fprintf(1,'Target distrubution statistics:\n');
-    fprintf(1,'\tMean: %.4f\n',mu_final);
-    fprintf(1,'\tStd dev: %.4f\n',sigma_final);
+    fprintf(1,'\tMean: %.4f\n',muFinal);
+    fprintf(1,'\tStd dev: %.4f\n',sigmaFinal);
 
    figure(fig_for_debug+2);  
    hold on;
    histogram(new_r_dist,20)
    title(sprintf('Histogram of bounded target radii. Mean: %.4f, Std-dev: %.4f. Targets are: %.4f and %.4f',...
-       mu_final,sigma_final,...
-       des_radius,...
-       sigma_radius));
+       muFinal,sigmaFinal,...
+       desiredRadius,...
+       sigmaRadius));
 
 end
 
@@ -329,14 +321,14 @@ end
 % than -2 times the minimum radius, to ensure we do not get singular
 % polytopes.
 change_in_radii = sort(old_max_radii)'-sort(new_r_dist);
-Num_goal_polys_smaller_than_start = sum(change_in_radii>=-2*min_rad);
+Num_goal_polys_smaller_than_start = sum(change_in_radii>=-2*minRadius);
 if  Num_goal_polys_smaller_than_start < Nradii
     error('distribution is unachievable with generated map')
 end
 
 % Initialize the shrunk polytopes structure array, and tolerance for
 % distance between vertices, below which vertices are merged into one.
-shrunk_polytopes = polytopes;
+shrunkPolytopes = polytopes;
 tolerance = 1e-5; % Units are (implied) kilometers
 
 % Loop through each polytope, shrinking it to the reference size
@@ -344,21 +336,21 @@ for ith_radii = 1:length(new_radii_sorted)
     shrinker = polytopes(ob_index(ith_radii)); % obstacle to be shrunk
     des_rad = new_radii_sorted(ith_radii);
         
-    % assign to shrunk_polytopes
-    shrunk_polytopes(ob_index(ith_radii)) = ...
+    % assign to shrunkPolytopes
+    shrunkPolytopes(ob_index(ith_radii)) = ...
         fcn_MapGen_polytopeShrinkToRadius(...
-        shrinker,des_rad,tolerance);
+        shrinker,des_rad,tolerance, -1);
 end
 
 % Fill in mu and sigma values from final result
-final_max_radii = [shrunk_polytopes.max_radius]';
-mu_final = mean(final_max_radii);
-sigma_final = std(final_max_radii);
+final_max_radii = [shrunkPolytopes.max_radius]';
+muFinal = mean(final_max_radii);
+sigmaFinal = std(final_max_radii);
 
 if flag_do_debug
     fprintf(1,'Final distrubution statistics:\n');
-    fprintf(1,'\tMean: %.4f\n',mu_final);
-    fprintf(1,'\tStd dev: %.4f\n',sigma_final);
+    fprintf(1,'\tMean: %.4f\n',muFinal);
+    fprintf(1,'\tStd dev: %.4f\n',sigmaFinal);
 end
 
 
@@ -382,7 +374,7 @@ if flag_do_plot
     fcn_MapGen_plotPolytopes(polytopes,fig_num,'r',2);
     
     % plot the shrunk in blue
-    fcn_MapGen_plotPolytopes(shrunk_polytopes,fig_num,'b',2);
+    fcn_MapGen_plotPolytopes(shrunkPolytopes,fig_num,'b',2);
 
 end
 

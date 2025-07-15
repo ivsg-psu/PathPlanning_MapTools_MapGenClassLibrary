@@ -100,7 +100,7 @@ function [polytopes,fig]=fcn_MapGen_nameToMap(...
 % DEPENDENCIES:
 %
 %      fcn_DebugTools_checkInputsToFunctions
-%      fcn_MapGen_haltonVoronoiTiling
+%      fcn_MapGen_voronoiTiling
 %      fcn_MapGen_polytopeCropEdges
 %      fcn_MapGen_polytopesShrinkToRadius
 %      fcn_MapGen_plotPolytopes
@@ -246,8 +246,18 @@ if sum(split_name=="HST")>0 % Check for Halton Set Tiling (HST)
     % generate base map based on the values following HST
     halton_range = ...
         [str2double(split_name(HST_index+1)),str2double(split_name(HST_index+2))];
-    base_polytopes = fcn_MapGen_haltonVoronoiTiling(halton_range);
-    
+    % generate Voronoi tiling from Halton points
+    seedGeneratorNames = 'haltonset';
+    seedGeneratorRanges = halton_range;
+    AABBs = [0 0 1 1];
+    mapStretchs = [1 1];
+    [base_polytopes] = fcn_MapGen_voronoiTiling(...
+        seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
+        seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
+        (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
+        (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
+        (-1));
+
 % elseif % check for other generating methods
 
     % generate using other method

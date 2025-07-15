@@ -52,20 +52,36 @@ function [fig] = fcn_MapGen_plotPolytopes(polytopes,fig_num,line_spec,line_width
 %      % BASIC example
 %      mapx = 1;
 %      mapy = 1;
-%      halton_range = [1 100]; % Sets the indices to use from halton set
-%      [polytopes] = fcn_MapGen_haltonVoronoiTiling(halton_range);
+%      seedGeneratorNames = 'haltonset';
+%      seedGeneratorRanges = [1 100];
+%      AABBs = [0 0 1 1];
+%      mapStretchs = [1 1];
+%      [polytopes] = fcn_MapGen_voronoiTiling(...
+%      seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
+%      seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
+%      (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
+%      (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
+%      (-1));
 %      fig1 = fcn_MapGen_plotPolytopes(polytopes,[],'-',2,[0.5 0 0]);
 %      fig2 = fcn_MapGen_plotPolytopes(polytopes,998,'-',2,[0 0 0.5],[0 mapx 0 mapy]);
 %      fig3 = fcn_MapGen_plotPolytopes(polytopes,999,'-',2,[0 0.5 0],[0 mapx 0 mapy],'square');
 %      fig4 = fcn_MapGen_plotPolytopes(polytopes,1000,'-',2,[0 0 0],[0 mapx 0 mapy],'square',[1 0 0 0 0.5]);
-%      halton_range = [101 200]; % Sets the indices to use from halton set
-%      [polytopes2] = fcn_MapGen_haltonVoronoiTiling(halton_range);
+%      seedGeneratorNames = 'haltonset';
+%      seedGeneratorRanges = [101 200];
+%      AABBs = [0 0 1 1];
+%      mapStretchs = [1 1];
+%      [polytopes2] = fcn_MapGen_voronoiTiling(...
+%     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
+%     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
+%     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
+%     (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
+%     (-1));
 %      fcn_MapGen_plotPolytopes(polytopes2,fig1,'r-',2)
 %      fcn_MapGen_plotPolytopes(polytopes2,fig2,'b--',2,[0 mapx 0 mapy])
 %      fcn_MapGen_plotPolytopes(polytopes2,fig3,'g-',3,[0 mapx 0 mapy],'square')
 %      fcn_MapGen_plotPolytopes(polytopes2,fig4,'k-',3,[0 mapx 0 mapy],'square',[1 0 0 0 0.5])
 %
-% For more examples, see: script_test_fcn_MapGen_plotPolytopes.m
+% For examples, see: script_test_fcn_MapGen_plotPolytopes.m
 %
 % This function was written on 2018_12_10 by Seth Tau
 % Questions or comments? sat5340@psu.edu

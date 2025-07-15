@@ -1,282 +1,16 @@
 % script_test_fcn_MapGen_snapToAABB
 % Tests: fcn_MapGen_snapToAABB
 
-%
 % REVISION HISTORY:
-%
 % 2021_07_14 by Sean Brennan
 % -- first write of script
 % 2025_04_24 by Sean Brennan
 % -- fixed calls to match revised function
-%%%%%%%%%%%%%%§
-
-close all;
-
-%% check input arguments?
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%   _____                     _______                    ___
-%  / ____|                   |__   __|                  / _ \
-% | (___  _ __   __ _ _ __      | |_   _ _ __   ___    | | | |
-%  \___ \| '_ \ / _` | '_ \     | | | | | '_ \ / _ \   | | | |
-%  ____) | | | | (_| | |_) |    | | |_| | |_) |  __/   | |_| |
-% |_____/|_| |_|\__,_| .__/     |_|\__, | .__/ \___|    \___/
-%                    | |            __/ | |
-%                    |_|           |___/|_|
-
-% See: http://patorjk.com/software/taag/#p=display&f=Big&t=Snap%20Type%20%20%200
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-%% Test case 0.1: inside, close to bottom
-fig_num = 001;
-figure(fig_num);
-clf;
-
-axis_aligned_bounding_box = [0 0 1 1];
-test_point = [0.3 0.2];
-snap_type = 0;
-
-[snap_point, wall_number] = fcn_MapGen_snapToAABB(axis_aligned_bounding_box, test_point, (snap_type), (fig_num) );
-
-assert(isequal([0.1667         0],round(snap_point,4)))
-assert(isequal(1,wall_number))
-
-
-%% Test case 0.2: inside, close to right
-fig_num = 002;
-figure(fig_num);
-clf;
-
-axis_aligned_bounding_box = [0 0 1 1];
-test_point = [0.8 0.4];
-snap_type = 0;
-
-[snap_point, wall_number] = fcn_MapGen_snapToAABB(axis_aligned_bounding_box, test_point, (snap_type), (fig_num) );
-
-assert(isequal([1.0000    0.3333],round(snap_point,4)))
-assert(isequal(2,wall_number))
-
-%% Test case 0.3: inside, close to top
-fig_num = 003;
-figure(fig_num);
-clf;
-
-axis_aligned_bounding_box = [0 0 1 1];
-test_point = [0.6 0.9];
-snap_type = 0;
-
-[snap_point, wall_number] = fcn_MapGen_snapToAABB(axis_aligned_bounding_box, test_point, (snap_type), (fig_num) );
-
-assert(isequal([0.6250    1.0000],round(snap_point,4)))
-assert(isequal(3,wall_number))
-
-%% Test case 0.4: inside, close to left
-fig_num = 004;
-figure(fig_num);
-clf;
-
-axis_aligned_bounding_box = [0 0 1 1];
-test_point = [0.2 0.7];
-snap_type = 0;
-
-[snap_point, wall_number] = fcn_MapGen_snapToAABB(axis_aligned_bounding_box, test_point, (snap_type), (fig_num) );
-
-assert(isequal([0    0.8333],round(snap_point,4)))
-assert(isequal(4,wall_number))
-
-
-%% Test case 0.5: outside, close to bottom
-fig_num = 005;
-figure(fig_num);
-clf;
-
-axis_aligned_bounding_box = [0 0 1 1];
-test_point = [0.3 -0.2];
-snap_type = 0;
-
-[snap_point, wall_number] = fcn_MapGen_snapToAABB(axis_aligned_bounding_box, test_point, (snap_type), (fig_num) );
-
-assert(isequal([0.3000   -0.2000],round(snap_point,4)))
-assert(isequal(1,wall_number))
-
-
-
-%% check snap type 1
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%   _____                     _______                   __
-%  / ____|                   |__   __|                 /_ |
-% | (___  _ __   __ _ _ __      | |_   _ _ __   ___     | |
-%  \___ \| '_ \ / _` | '_ \     | | | | | '_ \ / _ \    | |
-%  ____) | | | | (_| | |_) |    | | |_| | |_) |  __/    | |
-% |_____/|_| |_|\__,_| .__/     |_|\__, | .__/ \___|    |_|
-%                    | |            __/ | |
-%                    |_|           |___/|_|
-% See: http://patorjk.com/software/taag/#p=display&f=Big&t=Snap%20Type%20%20%201
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
-%% Test case 1.1: inside, close to bottom
-fig_num = 101;
-figure(fig_num);
-clf;
-
-axis_aligned_bounding_box = [0 0 1 1];
-test_point = [0.3 0.2];
-snap_type = 1;
-
-[snap_point, wall_number] = fcn_MapGen_snapToAABB(axis_aligned_bounding_box, test_point, (snap_type), (fig_num) );
-
-assert(isequal([0.3         0],round(snap_point,4)))
-assert(isequal(1,wall_number))
-
-
-%% Test case 1.2: inside, close to right
-fig_num = 102;
-figure(fig_num);
-clf;
-
-axis_aligned_bounding_box = [0 0 1 1];
-test_point = [0.8 0.4];
-snap_type = 1;
-
-[snap_point, wall_number] = fcn_MapGen_snapToAABB(axis_aligned_bounding_box, test_point, (snap_type), (fig_num) );
-
-assert(isequal([1.0000    0.4],round(snap_point,4)))
-assert(isequal(2,wall_number))
-
-%% Test case 1.3: inside, close to top
-fig_num = 103;
-figure(fig_num);
-clf;
-
-axis_aligned_bounding_box = [0 0 1 1];
-test_point = [0.6 0.9];
-snap_type = 1;
-
-[snap_point, wall_number] = fcn_MapGen_snapToAABB(axis_aligned_bounding_box, test_point, (snap_type), (fig_num) );
-
-assert(isequal([0.6    1.0000],round(snap_point,4)))
-assert(isequal(3,wall_number))
-
-%% Test case 1.4: inside, close to left
-fig_num = 104;
-figure(fig_num);
-clf;
-
-axis_aligned_bounding_box = [0 0 1 1];
-test_point = [0.2 0.7];
-snap_type = 1;
-
-[snap_point, wall_number] = fcn_MapGen_snapToAABB(axis_aligned_bounding_box, test_point, (snap_type), (fig_num) );
-
-assert(isequal([0    0.7],round(snap_point,4)))
-assert(isequal(4,wall_number))
-
-
-%% Test case 1.5: outside, close to bottom
-fig_num = 105;
-figure(fig_num);
-clf;
-
-axis_aligned_bounding_box = [0 0 1 1];
-test_point = [0.3 -0.2];
-snap_type = 1;
-
-[snap_point, wall_number] = fcn_MapGen_snapToAABB(axis_aligned_bounding_box, test_point, (snap_type), (fig_num) );
-
-assert(isequal([0.3000   -0.2000],round(snap_point,4)))
-assert(isequal(1,wall_number))
-
-%% Test case 1.6: inside, close to right
-fig_num = 106;
-figure(fig_num);
-clf;
-
-axis_aligned_bounding_box = [0 0 1 1];
-test_point = [1.2 0.4];
-snap_type = 1;
-
-[snap_point, wall_number] = fcn_MapGen_snapToAABB(axis_aligned_bounding_box, test_point, (snap_type), (fig_num) );
-
-assert(isequal([1.2000    0.4000],round(snap_point,4)))
-assert(isequal(2,wall_number))
-
-%% Test case 1.7: inside, close to top
-fig_num = 107;
-figure(fig_num);
-clf;
-
-axis_aligned_bounding_box = [0 0 1 1];
-test_point = [0.6 1.1];
-snap_type = 1;
-
-[snap_point, wall_number] = fcn_MapGen_snapToAABB(axis_aligned_bounding_box, test_point, (snap_type), (fig_num) );
-
-assert(isequal([0.6000    1.1000],round(snap_point,4)))
-assert(isequal(3,wall_number))
-
-
-%% Test case 1.8: inside, close to left
-fig_num = 108;
-figure(fig_num);
-clf;
-
-axis_aligned_bounding_box = [0 0 1 1];
-test_point = [-0.2 0.7];
-snap_type = 1;
-
-[snap_point, wall_number] = fcn_MapGen_snapToAABB(axis_aligned_bounding_box, test_point, (snap_type), (fig_num) );
-
-assert(isequal([-0.2000    0.7000],round(snap_point,4)))
-assert(isequal(4,wall_number))
-
-
-%% check snap type 2
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%   _____                     _______                   ___
-%  / ____|                   |__   __|                 |__ \
-% | (___  _ __   __ _ _ __      | |_   _ _ __   ___       ) |
-%  \___ \| '_ \ / _` | '_ \     | | | | | '_ \ / _ \     / /
-%  ____) | | | | (_| | |_) |    | | |_| | |_) |  __/    / /_
-% |_____/|_| |_|\__,_| .__/     |_|\__, | .__/ \___|   |____|
-%                    | |            __/ | |
-%                    |_|           |___/|_|
-% See: http://patorjk.com/software/taag/#p=display&f=Big&t=Snap%20Type%20%20%202
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
-
-%% Test case 2.9: user-defined vector
-fig_num = 209;
-figure(fig_num);
-clf;
-
-axis_aligned_bounding_box = [0 0 1 1];
-test_point = [0.2 0.7; 0.2 0.9];
-snap_type = 2;
-
-[snap_point, wall_number] = fcn_MapGen_snapToAABB(axis_aligned_bounding_box, test_point, (snap_type), (fig_num) );
-
-assert(isequal([0.2000    1.0000],round(snap_point,4)))
-assert(isequal(3,wall_number))
-
-
-% script_test_fcn_MapGen_polytopeFindSelfIntersections
-% Tests function: fcn_MapGen_polytopeFindSelfIntersections
-
-% REVISION HISTORY:
-% 2021_08_03
-% -- first written by S. Brennan
 % 2025_07_11 - S. Brennan, sbrennan@psu.edu
 % -- updated script testing to standard form
 
-%% Set up the workspace
-close all
+close all;
+
 
 %% Code demos start here
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -302,47 +36,30 @@ titleString = sprintf('DEMO case: self-intersection');
 fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
-
-interiorPoint = [0.5 0.5];
+axisAlignedBoundingBox = [0 0 1 1];
+testPoint = [0.3 0.2];
+snapType = 0;
 
 % Call the function
-[projectedPoints] = ...
-    fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-    interiorPoint,...
-    verticesIncludingSelfIntersections,...
-    verticesIncludingSelfIntersections(1:end-1,:),...
-    verticesIncludingSelfIntersections(2:end,:),...
-    (fig_num));
+[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(projectedPoints));
+assert(isnumeric(snapPoint));
+assert(isnumeric(wallNumber));
 
 % Check variable sizes
-Nvertices = length(verticesIncludingSelfIntersections(:,1));
-assert(size(projectedPoints,1)==Nvertices);
-assert(size(projectedPoints,2)==2);
+assert(isequal(size(snapPoint),[1 2]));
+assert(isequal(size(wallNumber),[1 1]));
 
 % Check variable values
-assert(isequal(round(projectedPoints,4),round(...
-    [...
-    0         0
-    0         0
-    1.0000         0
-    0.7500    0.7500
-    0.6667    1.0000
-    0.6667    1.0000
-    0.5000    1.0000
-    0    1.0000
-    ]...
-    ,4)));
+assert(isequal([0.1667         0],round(snapPoint,4)))
+assert(isequal(1,wallNumber))
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
+
 
 %% Test cases start here. These are very simple, usually trivial
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -358,16 +75,512 @@ assert(isequal(get(gcf,'Number'),fig_num));
 %
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=TESTS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Figures start with 2
+
+%% Snap Type 0
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   _____                     _______                    ___
+%  / ____|                   |__   __|                  / _ \
+% | (___  _ __   __ _ _ __      | |_   _ _ __   ___    | | | |
+%  \___ \| '_ \ / _` | '_ \     | | | | | '_ \ / _ \   | | | |
+%  ____) | | | | (_| | |_) |    | | |_| | |_) |  __/   | |_| |
+% |_____/|_| |_|\__,_| .__/     |_|\__, | .__/ \___|    \___/
+%                    | |            __/ | |
+%                    |_|           |___/|_|
+
+% See: http://patorjk.com/software/taag/#p=display&f=Big&t=Snap%20Type%20%20%200
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% All snap type 0 start with number 2
 
 close all;
-fprintf(1,'Figure: 2XXXXXX: TEST mode cases\n');
-% 
-% %% TEST case: simple crossing at origin
-% fig_num = 20001;
-% titleString = sprintf('TEST case: simple crossing at origin');
-% fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-% figure(fig_num); clf;
+fprintf(1,'Figure: 2XXXXXX: TEST mode cases with Snap Type 0\n');
+
+%% TEST case: inside, close to bottom
+fig_num = 20001;
+titleString = sprintf('TEST case: inside, close to bottom');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+axisAlignedBoundingBox = [0 0 1 1];
+testPoint = [0.3 0.2];
+snapType = 0;
+
+% Call the function
+[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
+
+sgtitle(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(isnumeric(snapPoint));
+assert(isnumeric(wallNumber));
+
+% Check variable sizes
+assert(isequal(size(snapPoint),[1 2]));
+assert(isequal(size(wallNumber),[1 1]));
+
+% Check variable values
+assert(isequal([0.1667         0],round(snapPoint,4)))
+assert(isequal(1,wallNumber))
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+
+%% TEST case: inside, close to right
+fig_num = 20002;
+titleString = sprintf('TEST case: inside, close to right');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+axisAlignedBoundingBox = [0 0 1 1];
+testPoint = [0.8 0.4];
+snapType = 0;
+
+% Call the function
+[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
+
+sgtitle(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(isnumeric(snapPoint));
+assert(isnumeric(wallNumber));
+
+% Check variable sizes
+assert(isequal(size(snapPoint),[1 2]));
+assert(isequal(size(wallNumber),[1 1]));
+
+% Check variable values
+assert(isequal([1.0000    0.3333],round(snapPoint,4)))
+assert(isequal(2,wallNumber))
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+%% TEST case: inside, close to top
+fig_num = 20003;
+titleString = sprintf('TEST case: inside, close to top');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+axisAlignedBoundingBox = [0 0 1 1];
+testPoint = [0.6 0.9];
+snapType = 0;
+
+% Call the function
+[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
+
+sgtitle(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(isnumeric(snapPoint));
+assert(isnumeric(wallNumber));
+
+% Check variable sizes
+assert(isequal(size(snapPoint),[1 2]));
+assert(isequal(size(wallNumber),[1 1]));
+
+% Check variable values
+assert(isequal([0.6250    1.0000],round(snapPoint,4)))
+assert(isequal(3,wallNumber))
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+%% TEST case: inside, close to left
+fig_num = 20004;
+titleString = sprintf('TEST case: inside, close to left');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+axisAlignedBoundingBox = [0 0 1 1];
+testPoint = [0.2 0.7];
+snapType = 0;
+
+% Call the function
+[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
+
+sgtitle(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(isnumeric(snapPoint));
+assert(isnumeric(wallNumber));
+
+% Check variable sizes
+assert(isequal(size(snapPoint),[1 2]));
+assert(isequal(size(wallNumber),[1 1]));
+
+% Check variable values
+assert(isequal([0    0.8333],round(snapPoint,4)))
+assert(isequal(4,wallNumber))
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+%% TEST case: outside, close to bottom
+fig_num = 20005;
+titleString = sprintf('TEST case: outside, close to bottom');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+axisAlignedBoundingBox = [0 0 1 1];
+testPoint = [0.3 -0.2];
+snapType = 0;
+
+% Call the function
+[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
+
+sgtitle(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(isnumeric(snapPoint));
+assert(isnumeric(wallNumber));
+
+% Check variable sizes
+assert(isequal(size(snapPoint),[1 2]));
+assert(isequal(size(wallNumber),[1 1]));
+
+% Check variable values
+assert(isequal([0.3000   -0.2000],round(snapPoint,4)))
+assert(isequal(1,wallNumber))
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+%% check snap type 1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   _____                     _______                   __
+%  / ____|                   |__   __|                 /_ |
+% | (___  _ __   __ _ _ __      | |_   _ _ __   ___     | |
+%  \___ \| '_ \ / _` | '_ \     | | | | | '_ \ / _ \    | |
+%  ____) | | | | (_| | |_) |    | | |_| | |_) |  __/    | |
+% |_____/|_| |_|\__,_| .__/     |_|\__, | .__/ \___|    |_|
+%                    | |            __/ | |
+%                    |_|           |___/|_|
+% See: http://patorjk.com/software/taag/#p=display&f=Big&t=Snap%20Type%20%20%201
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% All Snap Type 1 tests start with number 3
+close all;
+fprintf(1,'Figure: 3XXXXXX: TEST mode cases with Snap Type 1\n');
+
+%% TEST case: Snap type 1, inside, close to bottom
+fig_num = 30001;
+titleString = sprintf('TEST case: Snap type 1, inside, close to bottom');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+axisAlignedBoundingBox = [0 0 1 1];
+testPoint = [0.3 0.2];
+snapType = 1;
+
+% Call the function
+[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
+
+sgtitle(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(isnumeric(snapPoint));
+assert(isnumeric(wallNumber));
+
+% Check variable sizes
+assert(isequal(size(snapPoint),[1 2]));
+assert(isequal(size(wallNumber),[1 1]));
+
+% Check variable values
+assert(isequal([0.3         0],round(snapPoint,4)))
+assert(isequal(1,wallNumber))
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+%% TEST case: Snap type 1, inside, close to right
+fig_num = 30002;
+titleString = sprintf('TEST case: Snap type 1, inside, close to right');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+axisAlignedBoundingBox = [0 0 1 1];
+testPoint = [0.8 0.4];
+snapType = 1;
+
+% Call the function
+[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
+
+sgtitle(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(isnumeric(snapPoint));
+assert(isnumeric(wallNumber));
+
+% Check variable sizes
+assert(isequal(size(snapPoint),[1 2]));
+assert(isequal(size(wallNumber),[1 1]));
+
+% Check variable values
+assert(isequal([1.0000    0.4],round(snapPoint,4)))
+assert(isequal(2,wallNumber))
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+%% TEST case: Snap type 1, inside, close to top
+fig_num = 30003;
+titleString = sprintf('TEST case: Snap type 1, inside, close to top');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+axisAlignedBoundingBox = [0 0 1 1];
+testPoint = [0.6 0.9];
+snapType = 1;
+
+% Call the function
+[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
+
+sgtitle(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(isnumeric(snapPoint));
+assert(isnumeric(wallNumber));
+
+% Check variable sizes
+assert(isequal(size(snapPoint),[1 2]));
+assert(isequal(size(wallNumber),[1 1]));
+
+% Check variable values
+assert(isequal([0.6    1.0000],round(snapPoint,4)))
+assert(isequal(3,wallNumber))
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+
+%% TEST case: Snap type 1, inside, close to left
+fig_num = 30004;
+titleString = sprintf('TEST case: Snap type 1, inside, close to left');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+axisAlignedBoundingBox = [0 0 1 1];
+testPoint = [0.2 0.7];
+snapType = 1;
+
+% Call the function
+[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
+
+sgtitle(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(isnumeric(snapPoint));
+assert(isnumeric(wallNumber));
+
+% Check variable sizes
+assert(isequal(size(snapPoint),[1 2]));
+assert(isequal(size(wallNumber),[1 1]));
+
+% Check variable values
+assert(isequal([0    0.7],round(snapPoint,4)))
+assert(isequal(4,wallNumber))
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+%% TEST case: Snap type 1, inside, close to bottom
+fig_num = 30005;
+titleString = sprintf('TEST case: Snap type 1, inside, close to bottom');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+axisAlignedBoundingBox = [0 0 1 1];
+testPoint = [0.3 -0.2];
+snapType = 1;
+
+% Call the function
+[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
+
+sgtitle(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(isnumeric(snapPoint));
+assert(isnumeric(wallNumber));
+
+% Check variable sizes
+assert(isequal(size(snapPoint),[1 2]));
+assert(isequal(size(wallNumber),[1 1]));
+
+% Check variable values
+assert(isequal([0.3000   -0.2000],round(snapPoint,4)))
+assert(isequal(1,wallNumber))
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+%% TEST case: Snap type 1, outside, close to right
+fig_num = 30006;
+titleString = sprintf('TEST case: Snap type 1, outside, close to right');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+axisAlignedBoundingBox = [0 0 1 1];
+testPoint = [1.2 0.4];
+snapType = 1;
+
+% Call the function
+[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
+
+sgtitle(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(isnumeric(snapPoint));
+assert(isnumeric(wallNumber));
+
+% Check variable sizes
+assert(isequal(size(snapPoint),[1 2]));
+assert(isequal(size(wallNumber),[1 1]));
+
+% Check variable values
+assert(isequal([1.2000    0.4000],round(snapPoint,4)))
+assert(isequal(2,wallNumber))
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+%% TEST case: Snap type 1, outside, close to top
+fig_num = 30006;
+titleString = sprintf('TEST case: Snap type 1, outside, close to top');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+axisAlignedBoundingBox = [0 0 1 1];
+testPoint = [0.6 1.1];
+snapType = 1;
+
+% Call the function
+[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
+
+sgtitle(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(isnumeric(snapPoint));
+assert(isnumeric(wallNumber));
+
+% Check variable sizes
+assert(isequal(size(snapPoint),[1 2]));
+assert(isequal(size(wallNumber),[1 1]));
+
+% Check variable values
+assert(isequal([0.6000    1.1000],round(snapPoint,4)))
+assert(isequal(3,wallNumber))
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+%% TEST case: Snap type 1, outside, close to top
+fig_num = 30007;
+titleString = sprintf('TEST case: Snap type 1, outside, close to top');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+axisAlignedBoundingBox = [0 0 1 1];
+testPoint = [0.6 1.1];
+snapType = 1;
+
+% Call the function
+[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
+
+sgtitle(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(isnumeric(snapPoint));
+assert(isnumeric(wallNumber));
+
+% Check variable sizes
+assert(isequal(size(snapPoint),[1 2]));
+assert(isequal(size(wallNumber),[1 1]));
+
+% Check variable values
+assert(isequal([0.6000    1.1000],round(snapPoint,4)))
+assert(isequal(3,wallNumber))
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+%% TEST case: Snap type 1, outside, close to left
+fig_num = 30008;
+titleString = sprintf('TEST case: Snap type 1, outside, close to left');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+axisAlignedBoundingBox = [0 0 1 1];
+testPoint = [-0.2 0.7];
+snapType = 1;
+
+% Call the function
+[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
+
+sgtitle(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(isnumeric(snapPoint));
+assert(isnumeric(wallNumber));
+
+% Check variable sizes
+assert(isequal(size(snapPoint),[1 2]));
+assert(isequal(size(wallNumber),[1 1]));
+
+% Check variable values
+assert(isequal([-0.2000    0.7000],round(snapPoint,4)))
+assert(isequal(4,wallNumber))
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+%% check snap type 2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   _____                     _______                   ___
+%  / ____|                   |__   __|                 |__ \
+% | (___  _ __   __ _ _ __      | |_   _ _ __   ___       ) |
+%  \___ \| '_ \ / _` | '_ \     | | | | | '_ \ / _ \     / /
+%  ____) | | | | (_| | |_) |    | | |_| | |_) |  __/    / /_
+% |_____/|_| |_|\__,_| .__/     |_|\__, | .__/ \___|   |____|
+%                    | |            __/ | |
+%                    |_|           |___/|_|
+% See: http://patorjk.com/software/taag/#p=display&f=Big&t=Snap%20Type%20%20%202
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% All snap type 2's start with the number 4
+close all;
+fprintf(1,'Figure: 4XXXXXX: TEST mode cases with Snap Type 2\n');
+
+%% TEST case: Snap type 2, user-defined vector
+fig_num = 40001;
+titleString = sprintf('TEST case: Snap type 2, user-defined vector');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+axisAlignedBoundingBox = [0 0 1 1];
+testPoint = [0.2 0.7; 0.2 0.9];
+snapType = 2;
+
+% Call the function
+[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
+
+sgtitle(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(isnumeric(snapPoint));
+assert(isnumeric(wallNumber));
+
+% Check variable sizes
+assert(isequal(size(snapPoint),[1 2]));
+assert(isequal(size(wallNumber),[1 1]));
+
+% Check variable values
+assert(isequal([0.2000    1.0000],round(snapPoint,4)))
+assert(isequal(3,wallNumber))
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
 
 
 %% Fast Mode Tests
@@ -393,42 +606,24 @@ fig_num = 80001;
 fprintf(1,'Figure: %.0f: FAST mode, empty fig_num\n',fig_num);
 figure(fig_num); close(fig_num);
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
-
-interiorPoint = [0.5 0.5];
+axisAlignedBoundingBox = [0 0 1 1];
+testPoint = [0.3 0.2];
+snapType = 0;
 
 % Call the function
-[projectedPoints] = ...
-    fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-    interiorPoint,...
-    verticesIncludingSelfIntersections,...
-    verticesIncludingSelfIntersections(1:end-1,:),...
-    verticesIncludingSelfIntersections(2:end,:),...
-    ([]));
+[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), ([]) );
 
 % Check variable types
-assert(isnumeric(projectedPoints));
+assert(isnumeric(snapPoint));
+assert(isnumeric(wallNumber));
 
 % Check variable sizes
-Nvertices = length(verticesIncludingSelfIntersections(:,1));
-assert(size(projectedPoints,1)==Nvertices);
-assert(size(projectedPoints,2)==2);
+assert(isequal(size(snapPoint),[1 2]));
+assert(isequal(size(wallNumber),[1 1]));
 
 % Check variable values
-assert(isequal(round(projectedPoints,4),round(...
-    [...
-    0         0
-    0         0
-    1.0000         0
-    0.7500    0.7500
-    0.6667    1.0000
-    0.6667    1.0000
-    0.5000    1.0000
-    0    1.0000
-    ]...
-    ,4)));
+assert(isequal([0.1667         0],round(snapPoint,4)))
+assert(isequal(1,wallNumber))
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -440,43 +635,24 @@ fig_num = 80002;
 fprintf(1,'Figure: %.0f: FAST mode, fig_num=-1\n',fig_num);
 figure(fig_num); close(fig_num);
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
-
-interiorPoint = [0.5 0.5];
+axisAlignedBoundingBox = [0 0 1 1];
+testPoint = [0.3 0.2];
+snapType = 0;
 
 % Call the function
-[projectedPoints] = ...
-    fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-    interiorPoint,...
-    verticesIncludingSelfIntersections,...
-    verticesIncludingSelfIntersections(1:end-1,:),...
-    verticesIncludingSelfIntersections(2:end,:),...
-    (-1));
+[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (-1) );
 
 % Check variable types
-assert(isnumeric(projectedPoints));
+assert(isnumeric(snapPoint));
+assert(isnumeric(wallNumber));
 
 % Check variable sizes
-Nvertices = length(verticesIncludingSelfIntersections(:,1));
-assert(size(projectedPoints,1)==Nvertices);
-assert(size(projectedPoints,2)==2);
+assert(isequal(size(snapPoint),[1 2]));
+assert(isequal(size(wallNumber),[1 1]));
 
 % Check variable values
-assert(isequal(round(projectedPoints,4),round(...
-    [...
-    0         0
-    0         0
-    1.0000         0
-    0.7500    0.7500
-    0.6667    1.0000
-    0.6667    1.0000
-    0.5000    1.0000
-    0    1.0000
-    ]...
-    ,4)));
-
+assert(isequal([0.1667         0],round(snapPoint,4)))
+assert(isequal(1,wallNumber))
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -489,11 +665,9 @@ fprintf(1,'Figure: %.0f: FAST mode comparisons\n',fig_num);
 figure(fig_num);
 close(fig_num);
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
-
-interiorPoint = [0.5 0.5];
+axisAlignedBoundingBox = [0 0 1 1];
+testPoint = [0.3 0.2];
+snapType = 0;
 
 Niterations = 100;
 
@@ -501,13 +675,7 @@ Niterations = 100;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [projectedPoints] = ...
-        fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-        interiorPoint,...
-        verticesIncludingSelfIntersections,...
-        verticesIncludingSelfIntersections(1:end-1,:),...
-        verticesIncludingSelfIntersections(2:end,:),...
-        ([]));
+    [snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), ([]) );
 end
 slow_method = toc;
 
@@ -515,13 +683,7 @@ slow_method = toc;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [projectedPoints] = ...
-        fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-        interiorPoint,...
-        verticesIncludingSelfIntersections,...
-        verticesIncludingSelfIntersections(1:end-1,:),...
-        verticesIncludingSelfIntersections(2:end,:),...
-        (-1));
+    [snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (-1) );
 end
 fast_method = toc;
 

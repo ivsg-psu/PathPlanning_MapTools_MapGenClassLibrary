@@ -13,8 +13,17 @@
 close all;
 
 %% Generate a set of polytopes from the Halton set
-Halton_range = [20 40]; % range of Halton points to use to generate the tiling
-polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1]);
+seedGeneratorNames = 'haltonset';
+seedGeneratorRanges = [20 40];
+AABBs = [0 0 1 1];
+mapStretchs = [1 1];
+[polytopes] = fcn_MapGen_voronoiTiling(...
+    seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
+    seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
+    (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
+    (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
+    (-1));
+
 
 poly_size_stats = fcn_MapGen_polytopesRadiusDistributions(polytopes);
 % script_test_fcn_MapGen_polytopeFindSelfIntersections

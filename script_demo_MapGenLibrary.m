@@ -45,8 +45,21 @@
 % 2025_07_11 - Sean Brennan
 % -- updated DebugTools library
 % -- added PathClass library to use this function (better) rather than
-%    fcn_MapGen_findIntersectionOfSegments
-%    
+%    % fcn_MapGen_findIntersectionOfSegments
+% -- for all the tiling variants, deprecated the following
+%    % fcn_MapGen_sobolVoronoiTiling
+%    % fcn_MapGen_latinVoronoiTiling
+%    % (etc)
+%    % Merged these to use fcn_MapGen_mixedSetVoronoiTiling and renamed
+%    % this to fcn_MapGen_voronoiTiling. Created output from voronoiTiling
+%    % that preserves the polytopes and seedPoints for each generator
+%    % function
+% -- Fixed a bug where corners of AABBs are not being tiled in voronoiTiling
+% -- Fixed bug in script_test...voronoiTiling. Error was thrown due to how
+%    % corners of AAB were handled, where seedPoint for polytope was assumed
+%    % to always be inside the polytope. Added a catch case to fix - see
+%    % above
+
 
 % TO-DO:
 % -- add debug library utility, and switch functions to this. Done?
@@ -61,23 +74,14 @@
 % -- in fcn_MapGen_generatePolysFromTiling, seems all arguments are
 %    optional. Need to fix this
 % -- make sure all function calls internal to functions have -1 speed set
-% for figure number
-% -- for all the tiling variants, deprecate the following
-%    % fcn_MapGen_sobolVoronoiTiling
-%    % fcn_MapGen_latinVoronoiTiling
-%    % Merge these to use fcn_MapGen_mixedSetVoronoiTiling and rename to 
-%    % fcn_MapGen_voronoiTiling
+%    % for figure number
 % -- rewrite plotPolytopes using variable input arguments (see plotRoad
-%    % library). 
+%    % library?). 
 %    % Then, fix call in fcn_MapGen_voronoiTiling to plot both all Voronoi
 %    cells and then all each individual Voronoi cell for each generator,
 %    with colors matched. Be sure to pass out plot handle (not figure
 %    handle) from plotting function. Also be sure to label DisplayName of
 %    plot to allow legends
-% -- Need to fix a bug where corners of AABBs are not being tiled. See 
-%    % DEMO case: Animate a set moving sideways in voronoiTiling
-% -- Fix bug in script_test...voronoiTiling. 
-%    %  Search for BUG: Produces error! set_range = [1 20];
 
 
 clear library_name library_folders library_url

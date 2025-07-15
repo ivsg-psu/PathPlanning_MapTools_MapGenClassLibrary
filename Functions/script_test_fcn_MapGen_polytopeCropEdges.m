@@ -6,7 +6,16 @@
 % -- first written by S. Brennan.
 
 close all;
-polytopes = fcn_MapGen_haltonVoronoiTiling([1 1000]);
+seedGeneratorNames = 'haltonset';
+seedGeneratorRanges = [1 1000];
+AABBs = [0 0 1 1];
+mapStretchs = [1 1];
+[polytopes] = fcn_MapGen_voronoiTiling(...
+    seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
+    seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
+    (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
+    (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
+    (-1));
 
 fig_num = 2;
 bounding_box = [0,0; 1,1];

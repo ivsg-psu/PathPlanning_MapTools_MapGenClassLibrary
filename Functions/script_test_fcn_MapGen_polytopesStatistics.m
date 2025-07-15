@@ -15,8 +15,16 @@ fig_num = 12;
 figure(fig_num);
 clf;
 
-Halton_range = [200 220]; % range of Halton points to use to generate the tiling
-polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1]);
+seedGeneratorNames = 'haltonset';
+seedGeneratorRanges = [200 220];
+AABBs = [0 0 1 1];
+mapStretchs = [1 1];
+[polytopes] = fcn_MapGen_voronoiTiling(...
+    seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
+    seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
+    (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
+    (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
+    (fig_num));
 
 pre_shrink_stats = fcn_MapGen_polytopesStatistics(...
     polytopes,...
@@ -49,9 +57,18 @@ if 1==0
     figure(fig_num);
     clf;
 
+    seedGeneratorNames = 'haltonset';
+    seedGeneratorRanges = [200 301];
+    AABBs = [0 0 1 1];
+    mapStretchs = [1 1];
+    [polytopes] = fcn_MapGen_voronoiTiling(...
+        seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
+        seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
+        (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
+        (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
+        (fig_num));
+
     shrinkage = 0.001;
-    Halton_range = [200 301]; % range of Halton points to use to generate the tiling
-    polytopes = fcn_MapGen_haltonVoronoiTiling(Halton_range,[1 1]);
     shrunk_polytopes_edge = polytopes;
     for ith_poly = 1:length(polytopes)
         shrunk_polytopes_edge(ith_poly) = ...
