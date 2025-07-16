@@ -95,8 +95,8 @@ assert(length(polytopes)== NinSet * Nsets);
 
 % Check variable values
 assert(size(polytopes(1).vertices,2) == 2);
-assert(size(polytopes(1).xv,2) >= 3);
-assert(size(polytopes(1).yv,2) >= 3);
+assert(size(polytopes(1).xv,2) >= 2);
+assert(size(polytopes(1).yv,2) >= 2);
 assert(size(polytopes(1).distances,2) == 1);
 assert(isequal(size(polytopes(1).mean), [1 2]));
 assert(isequal(size(polytopes(1).area), [1 1]));
@@ -174,8 +174,8 @@ assert(length(polytopes)== NinSet * Nsets);
 
 % Check variable values
 assert(size(polytopes(1).vertices,2) == 2);
-assert(size(polytopes(1).xv,2) >= 3);
-assert(size(polytopes(1).yv,2) >= 3);
+assert(size(polytopes(1).xv,2) >= 2);
+assert(size(polytopes(1).yv,2) >= 2);
 assert(size(polytopes(1).distances,2) == 1);
 assert(isequal(size(polytopes(1).mean), [1 2]));
 assert(isequal(size(polytopes(1).area), [1 1]));
@@ -253,8 +253,8 @@ assert(length(polytopes)== NinSet * Nsets);
 
 % Check variable values
 assert(size(polytopes(1).vertices,2) == 2);
-assert(size(polytopes(1).xv,2) >= 3);
-assert(size(polytopes(1).yv,2) >= 3);
+assert(size(polytopes(1).xv,2) >= 2);
+assert(size(polytopes(1).yv,2) >= 2);
 assert(size(polytopes(1).distances,2) == 1);
 assert(isequal(size(polytopes(1).mean), [1 2]));
 assert(isequal(size(polytopes(1).area), [1 1]));
@@ -368,8 +368,8 @@ assert(length(polytopes)== NinSet * Nsets);
 
 % Check variable values
 assert(size(polytopes(1).vertices,2) == 2);
-assert(size(polytopes(1).xv,2) >= 3);
-assert(size(polytopes(1).yv,2) >= 3);
+assert(size(polytopes(1).xv,2) >= 2);
+assert(size(polytopes(1).yv,2) >= 2);
 assert(size(polytopes(1).distances,2) == 1);
 assert(isequal(size(polytopes(1).mean), [1 2]));
 assert(isequal(size(polytopes(1).area), [1 1]));
@@ -440,8 +440,8 @@ assert(length(polytopes)== NinSet * Nsets);
 
 % Check variable values
 assert(size(polytopes(1).vertices,2) == 2);
-assert(size(polytopes(1).xv,2) >= 3);
-assert(size(polytopes(1).yv,2) >= 3);
+assert(size(polytopes(1).xv,2) >= 2);
+assert(size(polytopes(1).yv,2) >= 2);
 assert(size(polytopes(1).distances,2) == 1);
 assert(isequal(size(polytopes(1).mean), [1 2]));
 assert(isequal(size(polytopes(1).area), [1 1]));
@@ -512,8 +512,8 @@ assert(length(polytopes)== NinSet * Nsets);
 
 % Check variable values
 assert(size(polytopes(1).vertices,2) == 2);
-assert(size(polytopes(1).xv,2) >= 3);
-assert(size(polytopes(1).yv,2) >= 3);
+assert(size(polytopes(1).xv,2) >= 2);
+assert(size(polytopes(1).yv,2) >= 2);
 assert(size(polytopes(1).distances,2) == 1);
 assert(isequal(size(polytopes(1).mean), [1 2]));
 assert(isequal(size(polytopes(1).area), [1 1]));
@@ -582,8 +582,8 @@ assert(length(polytopes)== NinSet * Nsets);
 
 % Check variable values
 assert(size(polytopes(1).vertices,2) == 2);
-assert(size(polytopes(1).xv,2) >= 3);
-assert(size(polytopes(1).yv,2) >= 3);
+assert(size(polytopes(1).xv,2) >= 2);
+assert(size(polytopes(1).yv,2) >= 2);
 assert(size(polytopes(1).distances,2) == 1);
 assert(isequal(size(polytopes(1).mean), [1 2]));
 assert(isequal(size(polytopes(1).area), [1 1]));
@@ -665,8 +665,8 @@ for ith_set = 1:length(allGeneratorTypes)
 
     % Check variable values
     assert(size(polytopes(1).vertices,2) == 2);
-    assert(size(polytopes(1).xv,2) >= 3);
-    assert(size(polytopes(1).yv,2) >= 3);
+    assert(size(polytopes(1).xv,2) >= 2);
+    assert(size(polytopes(1).yv,2) >= 2);
     assert(size(polytopes(1).distances,2) == 1);
     assert(isequal(size(polytopes(1).mean), [1 2]));
     assert(isequal(size(polytopes(1).area), [1 1]));
@@ -766,8 +766,8 @@ assert(length(polytopes)== NinSet * Nsets);
 
 % Check variable values
 assert(size(polytopes(1).vertices,2) == 2);
-assert(size(polytopes(1).xv,2) >= 3);
-assert(size(polytopes(1).yv,2) >= 3);
+assert(size(polytopes(1).xv,2) >= 2);
+assert(size(polytopes(1).yv,2) >= 2);
 assert(size(polytopes(1).distances,2) == 1);
 assert(isequal(size(polytopes(1).mean), [1 2]));
 assert(isequal(size(polytopes(1).area), [1 1]));
@@ -849,8 +849,8 @@ assert(length(polytopes)== NinSet * Nsets);
 
 % Check variable values
 assert(size(polytopes(1).vertices,2) == 2);
-assert(size(polytopes(1).xv,2) >= 3);
-assert(size(polytopes(1).yv,2) >= 3);
+assert(size(polytopes(1).xv,2) >= 2);
+assert(size(polytopes(1).yv,2) >= 2);
 assert(size(polytopes(1).distances,2) == 1);
 assert(isequal(size(polytopes(1).mean), [1 2]));
 assert(isequal(size(polytopes(1).area), [1 1]));

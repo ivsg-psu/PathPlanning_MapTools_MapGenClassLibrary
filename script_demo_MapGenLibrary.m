@@ -72,6 +72,10 @@
 %    Possible approach: generate convex polytopes, and then carve
 %    subpolytopes out of these
 % -- need codes to generate 3D obstacles randomly via Halton set
+% 2025_07_09 - S. Brennan and K. Hayes
+% --  need a tool to check if polytope is convex in 
+%     % fcn_MapGen_fillPolytopeFieldsFromVertices. This is causing some of
+%     % the codes in Bounded_AStar to break
 % 2025_07_11 - Sean Brennan
 % -- in fcn_MapGen_generatePolysFromTiling, seems all arguments are
 %    optional. Need to fix this
@@ -92,10 +96,7 @@
 %    % fcn_MapGen_generatePolysFromVoronoiAABBWithTiling into here!
 % -- rewrite fcn_MapGen_increasePolytopeVertexCount to use linspace between
 %    % X and Y vertices rather than interpolation. MUCH simpler.
-% 2025_07_09 - S. Brennan and K. Hayes
-% --  need a tool to check if polytope is convex in 
-%     % fcn_MapGen_fillPolytopeFieldsFromVertices. This is causing some of
-%     % the codes in Bounded_AStar to break
+% -- rework fcn_MapGen_polytopesPredictLengthCostRatio - code is very messy
 
 clear library_name library_folders library_url
 

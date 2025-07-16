@@ -345,7 +345,7 @@ for ith_radii = 1:length(new_radii_sorted)
     % assign to shrunkPolytopes
     shrunkPolytopes(ob_index(ith_radii)) = ...
         fcn_MapGen_polytopeShrinkToRadius(...
-        shrinker,des_rad,tolerance, -1);
+        shrinker,des_rad, -1);
 end
 
 % Fill in mu and sigma values from final result

@@ -3,11 +3,9 @@ function [field_small_choice_angles,field_big_choice_angles,r_lc_estimates] =...
 % fcn_MapGen_polytopesPredictLengthCostRatio
 % Given an polytope field, predict the length cost ratio from geometry
 %
-%
-%
 % FORMAT:
-% [field_small_choice_angles,field_big_choice_angles,r_lc_estimates] =...
-%  fcn_MapGen_polytopesPredictLengthCostRatio(pre_shrink_polytopes,polytopes,gap_size,travel_direction)
+% [field_small_choice_angles, field_big_choice_angles, r_lc_estimates] =...
+%  fcn_MapGen_polytopesPredictLengthCostRatio(pre_shrink_polytopes,polytopes,gap_size,travel_direction, fig_num)
 %
 % INPUTS:
 %     pre_shrink_polytopes - the fully tiled field
@@ -27,10 +25,8 @@ function [field_small_choice_angles,field_big_choice_angles,r_lc_estimates] =...
 %
 % OUTPUTS:
 %
-%
 %     field_small_choice_angles - array of all smaller (likely chosen) deflection angles for the field
 %     field_big_choice_angles - array of all larger (likely unchosen) deflection angles for the field
-%     r_lc_estimates - struct of different cost ratio estimation methods
 %     r_lc_estimates - struct of different cost ratio estimation methods
 %
 % DEPENDENCIES:
@@ -52,6 +48,9 @@ function [field_small_choice_angles,field_big_choice_angles,r_lc_estimates] =...
 % 2025_04_25 by Sean Brennan
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
+% 2025_07_16 by Sean Brennan
+% -- cleaned up documentation and typos
+% -- turned on fast mode for all internal calls to external functions
 
 % TO DO
 % -- none
@@ -121,7 +120,7 @@ if  6 == nargin && (0==flag_max_speed) % Only create a figure if NOT maximizing 
 else
     if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
         fig = figure;
-        fig_for_debug = fig.Number; %#ok<NASGU>
+        fig_for_debug = fig.Number; 
         flag_do_plot = 1;
     end
 end
@@ -138,11 +137,10 @@ end
 %See: http://patorjk.com/software/taag/#p=display&f=Big&t=Main
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
-fig_num = 12;
-field_stats_pre_shrink = fcn_MapGen_polytopesStatistics(pre_shrink_polytopes);
+field_stats_pre_shrink = fcn_MapGen_polytopesStatistics(pre_shrink_polytopes, -1);
 R_bar_initial = field_stats_pre_shrink.average_max_radius;
 shrink_ang = field_stats_pre_shrink.average_vertex_angle;
-field_stats = fcn_MapGen_polytopesStatistics(polytopes);
+field_stats = fcn_MapGen_polytopesStatistics(polytopes, -1);
 field_avg_r_D = field_stats.avg_r_D;
 field_away_normals = [];
 field_away_angles = [];
@@ -153,14 +151,14 @@ field_chosen_side_length = [];
 for j=1:length(polytopes)
     shrinker = polytopes(j);
     vertices = shrinker.vertices;
-    if flag_do_plot
+    if flag_do_debug
         [angles, unit_in_vectors, unit_out_vectors] =...
             fcn_MapGen_polytopeFindVertexAngles(...
-            vertices,fig_num);
+            vertices,fig_for_debug);
     else
         [angles, unit_in_vectors, unit_out_vectors] =...
             fcn_MapGen_polytopeFindVertexAngles(...
-            vertices);
+            vertices, -1);
     end
     mean_vectors = (unit_out_vectors-unit_in_vectors)/2;
     length_mean_vectors = sum(mean_vectors.^2,2).^0.5;
@@ -274,7 +272,7 @@ rounded_side_and_ang( any(rounded_side_and_ang==0,2), : ) = [];
 divergence_heights = rounded_side_and_ang(:,1).*sin(rounded_side_and_ang(:,2));
 linear_density = field_stats.linear_density;
 linear_density_int = round(linear_density,0);
-unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(pre_shrink_polytopes,polytopes,gap_size);
+unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(pre_shrink_polytopes, polytopes, gap_size, -1);
 N_int_from_shrink_dist = (sqrt(unocc_ests.A_unocc_est_poly_fit)*1)/(gap_size*sind(shrink_ang/2));
 N_int_actual = field_stats.linear_density_mean;
 N_int_linear = linear_density*(1-(gap_size/2)/R_bar_initial);

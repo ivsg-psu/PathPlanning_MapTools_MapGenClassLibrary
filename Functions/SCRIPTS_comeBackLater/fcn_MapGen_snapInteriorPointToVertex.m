@@ -1,29 +1,18 @@
-function new_cost_polytopes = ...
-    fcn_polytope_editing_set_all_costs(polytopes, des_cost, varargin)
-% fcn_polytope_editing_set_all_costs
-% sets the cost of all obstacles in a field to a desired cost value
+function output_pts = fcn_MapGen_snapInteriorPointToVertex(polytopes, pts_to_test, varargin)
+% fcn_MapGen_snapInteriorPointToVertex
+% if a point is in a polytope, it places the point on the nearest vertex of polytope
 %
 % FORMAT:
 %
-% new_cost_polytopes = ...
-% fcn_polytope_editing_set_all_costs(polytopes, des_cost, (fig_num))
+% output_pts = fcn_MapGen_snapInteriorPointToVertex(polytopes, pts_to_test, (fig_num))
 %
 % INPUTS:
 %
-% POLYTOPES: a 1-by-n seven field structure of shrunken polytopes,
-% where n <= number of polytopes with fields:
-%   vertices: a m+1-by-2 matrix of xy points with row1 = rowm+1, where m is
-%     the number of the individual polytope vertices
-%   xv: a 1-by-m vector of vertice x-coordinates
-%   yv: a 1-by-m vector of vertice y-coordinates
-%   distances: a 1-by-m vector of perimeter distances from one point to the
-%     next point, distances(i) = distance from vertices(i) to vertices(i+1)
-%   mean: centroid xy coordinate of the polytope
-%   area: area of the polytope
+%     polytopes: the structure of 'polytopes' type that stores the
+%     polytopes to be expanded
 %
-% des_cost: value of cost of polytope traversal in fraction above free space traversal cost
-% i.e. a des_cost of 0.2 means the traversal cost of crossing a polytope is 1.2 times harder
-% than traversing free space outside of polytopes
+%     pts_to_test: Nx2 matrix of (X,Y) points for N points to snap to vertices, if interior to
+%           a polytope in 'polytopes'
 %
 %     (optional inputs)
 %
@@ -35,28 +24,36 @@ function new_cost_polytopes = ...
 %
 % OUTPUTS:
 %
+%     output_pts: Nx2 matrix of N (X,Y) positions.  For each of the N points in pts_to_test,
+%       the row in 'output_pts' is either the nearest polytope verticex if the input point was internal
+%       to a polytope in 'polytopes' or the output point is the same as the input point if the input
+%       is not within any polytope
 %
-% NEW_COST_POLYTOPES: a new polytope structure containing the same polytopes, with their costs
-%   modified accordingly
+%
 % DEPENDENCIES:
+%
+%     MATLAB's polyshape object and isInterior polyshape function (method)
+%
 %
 % EXAMPLES:
 %
-% For additional examples, see: script_planning_performed_at_multiple_costs.m
+% See the script: script_test_fcn_MapGen_snapInteriorPointToVertex
+% for a full test suite.
 %
-% This function was written in 2022_05 by Steve Harentt
-% Questions or comments? sjh6473@psu.edu
-%
+% This function was written 5 Feb. 2024 by Steve Harnett
+% Questions or comments? contact sjharnett@psu.edu
 
-% Revision History:
+%
+% REVISION HISTORY:
+%
+% 2024_02_05, Steve Harnett
+% -- first write of script
 % 2025_04_25 by Sean Brennan
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
 
 % TO DO
-% -- it may be possibel to speed this up with setfield() or extract field instead of a loop
-% -- a good feature to add would be to allow for specification of a mean and standard deviation
-%    of costs so that a cost distribution can be applied instead of a fixed uniform cost
+% -- none
 
 %% Debugging and Input checks
 
@@ -108,14 +105,14 @@ if (0==flag_max_speed)
         % Are there the right number of inputs?
         narginchk(2,3);
 
-        % Check the polytopes input, make sure it is 'polytopes' type
-        fcn_DebugTools_checkInputsToFunctions(...
-            polytopes, 'polytopes');
-
-
-        % Check the exp_dist input, make sure it is 'positive_column_of_numbers' type
-        fcn_DebugTools_checkInputsToFunctions(...
-            des_cost, 'positive_1column_of_numbers',1);
+        % % Check the polytopes input, make sure it is 'polytopes' type
+        % fcn_DebugTools_checkInputsToFunctions(...
+        %     polytopes, 'polytopes');
+        % 
+        % 
+        % % Check the exp_dist input, make sure it is 'positive_column_of_numbers' type
+        % fcn_DebugTools_checkInputsToFunctions(...
+        %     exp_dist, 'positive_1column_of_numbers',1);
 
     end
 end
@@ -149,11 +146,26 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
 
-
-for poly_idx = 1:length(polytopes)
-    polytopes(poly_idx) = setfield(polytopes(poly_idx),'cost',des_cost);
+output_pts = pts_to_test;
+for p = 1:length(polytopes)
+    these_verts = polytopes(p).vertices;
+    this_polyshape = polyshape(these_verts);
+    % is point in but not on polyshape?
+    [is_in,is_on] = isinterior(this_polyshape,pts_to_test); %#ok<ASGLU>
+    pts_in = find(is_in);
+    if isempty(pts_in)
+        continue
+    end
+    for pt_in_idx = 1:length(pts_in)
+        pt_to_test = pts_to_test(pts_in(pt_in_idx),:);
+        % if it is, get distance to all vertices
+        vert_to_start_deltas = these_verts - pt_to_test;
+        vert_to_start_distances = vert_to_start_deltas(:,1).^2 + vert_to_start_deltas(:,2).^2;
+        [min_value, idx_of_min] = min(vert_to_start_distances); %#ok<ASGLU>
+        % set this point to the nearest vertex
+        output_pts(pts_in(pt_in_idx),:) = these_verts(idx_of_min,:);
+    end
 end
-new_cost_polytopes = polytopes;
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   _____       _

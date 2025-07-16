@@ -1,23 +1,32 @@
-function expandedPolytopes = fcn_MapGen_polytopesExpandEvenlyForConcave(polytopes, expansionDistance, varargin)
+function new_cost_polytopes = fcn_polytope_editing_set_all_costs(polytopes, desiredCost, varargin)
+warning('on','backtrace');
+warning('fcn_polytope_editing_set_all_costs is being deprecated. Use fcn_MapGen_polytopesSetCosts instead.');
 
-% fcn_MapGen_polytopesExpandEvenlyForConcave
-% Expands an obstacle out by expansionDistance on all sides using matlab's polyshape object
-% and the polybuffer object function (method). The utility of this is that this
-% method is compatible with nonconvex polytopes while the implementation of
-% fcn_MapGen_polytopesExpandEvenly is not.
+% fcn_polytope_editing_set_all_costs
+% sets the cost of all obstacles in a field to a desired cost value
 %
 % FORMAT:
 %
-%    expandedPolytopes = fcn_MapGen_polytopesExpandEvenlyForConcave(polytopes, expansionDistance,(fig_num))
+%      new_cost_polytopes = fcn_polytope_editing_set_all_costs(polytopes, desiredCost, (fig_num))
 %
 % INPUTS:
 %
-%     polytopes: the structure of 'polytopes' type that stores the
-%     polytopes to be expanded
+% POLYTOPES: a 1-by-n seven field structure of shrunken polytopes,
+% where n <= number of polytopes with fields:
+%   vertices: a m+1-by-2 matrix of xy points with row1 = rowm+1, where m is
+%     the number of the individual polytope vertices
+%   xv: a 1-by-m vector of vertice x-coordinates
+%   yv: a 1-by-m vector of vertice y-coordinates
+%   distances: a 1-by-m vector of perimeter distances from one point to the
+%     next point, distances(i) = distance from vertices(i) to vertices(i+1)
+%   mean: centroid xy coordinate of the polytope
+%   area: area of the polytope
 %
-%     expansionDistance: distance to expand the obstacle
+%      desiredCost: value of cost of polytope traversal in fraction above free space traversal cost
+%      i.e. a desiredCost of 0.2 means the traversal cost of crossing a polytope is 1.2 times harder
+%      than traversing free space outside of polytopes
 %
-%     (optional inputs)
+%      (optional inputs)
 %
 %      fig_num: a figure number to plot results. If set to -1, skips any
 %      input checking or debugging, no figures will be generated, and sets
@@ -27,39 +36,27 @@ function expandedPolytopes = fcn_MapGen_polytopesExpandEvenlyForConcave(polytope
 %
 % OUTPUTS:
 %
-%     expandedPolytopes: structure of expanded polytopes
-%
+% NEW_COST_POLYTOPES: a new polytope structure containing the same polytopes, with their costs
+%   modified accordingly
 % DEPENDENCIES:
-%
-%     fcn_DebugTools_checkInputsToFunctions
-%     fcn_MapGen_fillPolytopeFieldsFromVertices
-%     fcn_MapGen_plotPolytopes
-%     MATLAB's polyshape object and polybuffer object function (method)
 %
 % EXAMPLES:
 %
-% See the script: script_test_fcn_MapGen_polytopesExpandEvenlyForConcave
-% for a full test suite.
+% For additional examples, see: script_planning_performed_at_multiple_costs.m
 %
-% This function was written 5 Feb. 2024 by Steve Harnett
-% Questions or comments? contact sjharnett@psu.edu
+% This function was written in 2022_05 by Steve Harentt
+% Questions or comments? sjh6473@psu.edu
+%
 
-%
-% REVISION HISTORY:
-%
-% 2024_02_05, Steve Harnett
-% -- first write of script
+% Revision History:
 % 2025_04_25 by Sean Brennan
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-% 2025_07_16 by Sean Brennan
-% -- cleaned up header comments
-% -- replaced exp_dist with expansionDistance
-% -- changed plotPolytopes to new format
-% -- turned on fast mode on sub-function calls
 
 % TO DO
-% -- none
+% -- it may be possibel to speed this up with setfield() or extract field instead of a loop
+% -- a good feature to add would be to allow for specification of a mean and standard deviation
+%    of costs so that a cost distribution can be applied instead of a fixed uniform cost
 
 %% Debugging and Input checks
 
@@ -68,12 +65,12 @@ function expandedPolytopes = fcn_MapGen_polytopesExpandEvenlyForConcave(polytope
 % number.
 flag_max_speed = 0;
 if (nargin==3 && isequal(varargin{end},-1))
-    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_do_debug = 0; %      % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
 else
     % Check to see if we are externally setting debug mode to be "on"
-    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_do_debug = 0; %      % Flag to plot the results for debugging
     flag_check_inputs = 1; % Flag to perform input checking
     MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS");
     MATLABFLAG_MAPGEN_FLAG_DO_DEBUG = getenv("MATLABFLAG_MAPGEN_FLAG_DO_DEBUG");
@@ -92,8 +89,6 @@ if flag_do_debug
 else
     debug_fig_num = []; %#ok<NASGU>
 end
-
-
 %% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   _____                   _
@@ -117,9 +112,10 @@ if (0==flag_max_speed)
         fcn_DebugTools_checkInputsToFunctions(...
             polytopes, 'polytopes');
 
-        % Check the expansionDistance input, make sure it is 'positive_column_of_numbers' type
+
+        % Check the exp_dist input, make sure it is 'positive_column_of_numbers' type
         fcn_DebugTools_checkInputsToFunctions(...
-            expansionDistance, 'positive_1column_of_numbers',1);
+            desiredCost, 'positive_1column_of_numbers',1);
 
     end
 end
@@ -140,7 +136,6 @@ else
     end
 end
 
-
 %% Start of main code
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   __  __       _
@@ -153,16 +148,10 @@ end
 %See: http://patorjk.com/software/taag/#p=display&f=Big&t=Main
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
-clear expandedPolytopes;
-for p = 1:length(polytopes)
-    this_polytope = polytopes(p); % look at one polytope
-    this_polyshape = polyshape(this_polytope.vertices); % convert it to matlab polyshape
-    scaled_polyshape = polybuffer(this_polyshape,expansionDistance,'JointType','miter','MiterLimit',2); % use polyshape to enlarge it by a buffer
-    new_vertices = scaled_polyshape.Vertices; % extract the vertices from the polyshape
-    new_vertices = [new_vertices; new_vertices(1,:)]; %#ok<AGROW> % duplicate first vertex at end of array
-    expandedPolytopes(p).vertices = new_vertices; %#ok<AGROW> % store vertices in expanded poly struct array
+for poly_idx = 1:length(polytopes)
+    polytopes(poly_idx).cost = setfield(polytopes(poly_idx),'cost',desiredCost);
 end
-expandedPolytopes= fcn_MapGen_fillPolytopeFieldsFromVertices(expandedPolytopes,1, -1); % fill polytopes from vertices
+new_cost_polytopes = polytopes;
 
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -176,31 +165,9 @@ expandedPolytopes= fcn_MapGen_fillPolytopeFieldsFromVertices(expandedPolytopes,1
 %                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-
 if flag_do_plot
     figure(fig_num)
-
-    % LineWidth = 2;
-    % fcn_MapGen_OLD_plotPolytopes(polytopes,fig_num,'r-',LineWidth);
-    plotFormat.LineWidth = 2;
-    plotFormat.MarkerSize = 10;
-    plotFormat.LineStyle = '-';
-    plotFormat.Color = [1 0 0];
-    fillFormat = [];
-    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
-
-    % fcn_MapGen_OLD_plotPolytopes(expandedPolytopes,fig_num,'b-',LineWidth,'square');
-    plotFormat.LineWidth = 2;
-    plotFormat.MarkerSize = 10;
-    plotFormat.LineStyle = '-';
-    plotFormat.Color = [0 0 1];
-    fillFormat = [];
-    h_plot = fcn_MapGen_plotPolytopes(expandedPolytopes, (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
-    legend('Original','Expanded')
-    box on
-    xlabel('X Position')
-    ylabel('Y Position')
+    clf;
 
 end % Ends the flag_do_plot if statement
 

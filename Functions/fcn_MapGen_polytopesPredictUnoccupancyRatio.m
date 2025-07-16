@@ -4,8 +4,6 @@ function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(...
 % Given a polytope field, both before and after shrinking, use different
 % methods to predict linear and area unoccupancy (which is 1-occupancy)
 %
-%
-%
 % FORMAT:
 % unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(...
 %     pre_shrink_polytopes,polytopes,des_gap_size, (fig_num))

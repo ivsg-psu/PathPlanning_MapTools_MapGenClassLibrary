@@ -1,39 +1,26 @@
-function [shrunkPolytope] = ...
-    fcn_MapGen_polytopeShrinkToRadius(...
-    shrinker,...
-    new_radius,...
-    tolerance,...
-    varargin)
+function shrunkPolytope = fcn_MapGen_polytopeShrinkToRadius(shrinker, newRadius, varargin)
 % fcn_MapGen_polytopesShrinkToRadius shrinks the polytopes to achieve the
 % specified maximum radius. The vertices are all porportionally pulled
 % toward the centroid location such that the new maximum radius matches the
 % specified maximum radius.
 %
 % FORMAT:
-% 
-% shrunkPolytope = fcn_MapGen_polytopeShrinkToRadius(...
-%     shrinker,...
-%     new_radius,...
-%     tolerance,...
-%     (fig_num))
+%     shrunkPolytope = fcn_MapGen_polytopeShrinkToRadius(shrinker, newRadius, (fig_num))
 %
 % INPUTS:
 %
 %     shrinker: original polytope with same fields as shrunkPolytopes
 %     below
 %
-%     new_radius: desired polytope radius
-%
-%     tolerance: distance tolerance below which points of a polytope are
-%     merged together
+%     newRadius: desired polytope radius
 %     
 %    (OPTIONAL INPUTS)
 %
-%      fig_num: a figure number to plot results. If set to -1, skips any
-%      input checking or debugging, no figures will be generated, and sets
-%      up code to maximize speed. As well, if given, this forces the
-%      variable types to be displayed as output and as well makes the input
-%      check process verbose.
+%     fig_num: a figure number to plot results. If set to -1, skips any
+%     input checking or debugging, no figures will be generated, and sets
+%     up code to maximize speed. As well, if given, this forces the
+%     variable types to be displayed as output and as well makes the input
+%     check process verbose.
 %
 % OUTPUTS:
 %
@@ -44,10 +31,10 @@ function [shrunkPolytope] = ...
 % 
 %     fcn_DebugTools_checkInputsToFunctions
 %     fcn_MapGen_fillPolytopeFieldsFromVertices
+%     fcn_MapGen_plotPolytopes
 % 
-% % EXAMPLES:
+% EXAMPLES:
 %      
-%
 % For additional examples, see: script_test_fcn_MapGen_polytopeShrinkToRadius
 %
 % This function was written on 2019_08_29 by Seth Tau
@@ -65,6 +52,8 @@ function [shrunkPolytope] = ...
 % -- fixed call to fcn_MapGen_fillPolytopeFieldsFromVertices
 % 2025_07_16 by Sean Brennan
 % -- cleaned up documentation and typos
+% -- removed tolerance input as it wasn't being used
+% -- turned on fast mode for all internal calls to external functions
 
 % TO DO
 % -- Vectorize the for loop if possible
@@ -77,7 +66,7 @@ function [shrunkPolytope] = ...
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 flag_max_speed = 0;
-if (nargin==4 && isequal(varargin{end},-1))
+if (nargin==3 && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -119,26 +108,22 @@ end
     
 if flag_check_inputs
     % Are there the right number of inputs?
-    narginchk(3,4);
+    narginchk(2,3);
     
     % Check the shrinker input
     fcn_DebugTools_checkInputsToFunctions(...
         shrinker, 'polytopes');
     
-    % Check the new_radius input
+    % Check the newRadius input
     fcn_DebugTools_checkInputsToFunctions(...
-        new_radius, 'positive_1column_of_numbers',1);
-    
-    % Check the tolerance input
-    fcn_DebugTools_checkInputsToFunctions(...
-        tolerance, 'positive_1column_of_numbers',1);  
+        newRadius, 'positive_1column_of_numbers',1);
     
 end
     
 
 % Does user want to show the plots?
 flag_do_plot = 0; % Default is no plotting
-if  4 == nargin && (0==flag_max_speed) % Only create a figure if NOT maximizing speed
+if  3 == nargin && (0==flag_max_speed) % Only create a figure if NOT maximizing speed
     temp = varargin{end}; % Last argument is always figure number
     if ~isempty(temp) % Make sure the user is not giving empty input
         fig_num = temp;
@@ -172,7 +157,7 @@ centroid = shrinker.mean;
 rad = shrinker.max_radius;
 
 % determine scale factor
-scale = new_radius/rad;
+scale = newRadius/rad;
 
 % calculation error can sometimes make the scale greater than 1, so if we
 % are doing shrinking, check that actual shrinking is happening!
@@ -183,7 +168,7 @@ if scale < 1
 end
 
 % fill in other fields from the vertices field
-shrunkPolytope = fcn_MapGen_fillPolytopeFieldsFromVertices(shrunkPolytope);
+shrunkPolytope = fcn_MapGen_fillPolytopeFieldsFromVertices(shrunkPolytope, [], -1);
 
 
 %% Plot results?

@@ -31,13 +31,11 @@ function expandedPolytopes  = fcn_MapGen_polytopesExpandEvenly( polytopes, expan
 %
 %     expandedPolytopes: structure of expanded polytopes
 %
-%
 % DEPENDENCIES:
 %
 %     fcn_DebugTools_checkInputsToFunctions
 %     fcn_MapGen_fillPolytopeFieldsFromVertices
 %     fcn_MapGen_plotPolytopes
-%
 %
 % EXAMPLES:
 %
@@ -71,6 +69,7 @@ function expandedPolytopes  = fcn_MapGen_polytopesExpandEvenly( polytopes, expan
 % -- cleaned up header comments
 % -- replaced exp_dist with expansionDistance
 % -- changed plotPolytopes to new format
+% -- turned on fast mode on sub-function calls
 
 % TO DO
 % -- none
@@ -132,10 +131,6 @@ if (0==flag_max_speed)
         fcn_DebugTools_checkInputsToFunctions(...
             polytopes, 'polytopes');
 
-        %     % Check the delta input, make sure it is 'positive_column_of_numbers' type
-        %     fcn_DebugTools_checkInputsToFunctions(...
-        %         delta, 'positive_column_of_numbers',1);
-
         % Check the expansionDistance input, make sure it is 'positive_column_of_numbers' type
         fcn_DebugTools_checkInputsToFunctions(...
             expansionDistance, 'positive_1column_of_numbers',1);
@@ -189,7 +184,7 @@ for ith_poly = 1:size(polytopes,2) % check each obstacle
     expandedPolytopes(ith_poly).vertices = centroid + scale*(vertices-centroid);
 
     % fill in other fields from the vertices field
-    expandedPolytopes(ith_poly) = fcn_MapGen_fillPolytopeFieldsFromVertices(expandedPolytopes(ith_poly));
+    expandedPolytopes(ith_poly) = fcn_MapGen_fillPolytopeFieldsFromVertices(expandedPolytopes(ith_poly),[], -1);
 
 end
 

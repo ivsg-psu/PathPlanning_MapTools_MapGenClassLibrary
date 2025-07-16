@@ -1,84 +1,52 @@
-% script_test_fcn_MapGen_polytopesExpandEvenly
-% Tests: fcn_MapGen_polytopesExpandEvenly
+% script_test_fcn_MapGen_snapInteriorPointToVertex
+% tests function: fcn_MapGen_snapInteriorPointToVertex
 
 %
 % REVISION HISTORY:
-%§
-% 2018_11_17, Seth Tau
+%
+% 2024_04_19 by S. Harnett
 % -- first write of script
-% 2021_04_28, Seth Tau
-% -- Adjusted example code ,
-% 2021_06_26 S. Brennan
-% -- Rebased code
+% 2025_04_28 by S. Harnett
+% -- fix legends
+%%%%%%%%%%%%%%§
 
-% Prep the workspace
 
-polytopes = fcn_MapGen_generateOneRandomPolytope(-1);
+%% run snapInteriorPointToVertex function
+flag_do_plot = 1;
+% convex polytope
+convex_polytope(1).vertices = [0 0; 1 1; -1 2; -2 1; -1 0; 0 0];
+convex_polytope(2).vertices = [convex_polytope(1).vertices(:,1) + 4, convex_polytope(1).vertices(:,2) - 2];
+polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(convex_polytope);
+pts_to_test = [0 0.5; -1 -1; 4 -1; 4.1 -1];
 
-%%
-polytopes = fcn_MapGen_polytopeFillEmptyPoly(-1);
+output_pts = fcn_MapGen_snapInteriorPointToVertex(polytopes, pts_to_test);
 
-polytopes.vertices = [
-    1.0000    0.5217
-    1.0000    0.5242
-    0.9300    0.6329
-    0.8472    0.6479
-    0.8921    0.5627
-    1.0000    0.5217
-];
-polytopes.xv = [1 1 0.9300 0.8472 0.8921];
-polytopes.yv = [0.5217 0.5242 0.6329 0.6479 0.5627];
-polytopes.distances = [
-    0.0025
-    0.1293
-    0.0842
-    0.0963
-    0.1154];
-polytopes.mean = [0.9204 0.5894];
-polytopes.area = 0.0079;
-polytopes.max_radius = 0.1045;
+% plot the map
+if flag_do_plot
+    fig = 111; % figure to plot on
+    line_spec = 'b-'; % edge line plotting
+    line_width = 2; % linewidth of the edge
+    axes_limits = [-3 5 -3 5]; % x and y axes limits
+    axis_style = 'square'; % plot axes style
+    figure
+    % fcn_MapGen_plotPolytopes(polytopes,fig,line_spec,line_width,axes_limits,axis_style);
+    hold on
+    box on
+    title('function result')
+    xlabel('x [km]')
+    ylabel('y [km]')
+    plot(pts_to_test(1,1), pts_to_test(1,2),'rd')
+    plot(pts_to_test(2,1), pts_to_test(2,2),'bd')
+    plot(pts_to_test(3,1), pts_to_test(3,2),'gd')
+    plot(pts_to_test(4,1), pts_to_test(4,2),'kd')
+    plot(output_pts(1,1), output_pts(1,2),'rx')
+    plot(output_pts(2,1), output_pts(2,2),'bx')
+    plot(output_pts(3,1), output_pts(3,2),'gx')
+    plot(output_pts(4,1), output_pts(4,2),'kx')
+    legend('polytope','pt. 1 init.','pt. 2 init.','pt. 3 init.','pt. 4 init.','pt. 1 snapped','pt. 2 snapped','pt. 3 snapped','pt. 4 snapped')
+end
 
-% Set parameters
-% delta = 0.01; % Set the delta value (what is this used for?)
-expansionDistance = 0.04; % Set the expansion distance
-fig_num = 221; % Set the figure number
-
-% Call the function
-exp_polytopes=fcn_MapGen_polytopesExpandEvenly(polytopes, expansionDistance, fig_num);
-
-assert(isequal(round(exp_polytopes.area,4),0.0150));
-assert(isequal(round(exp_polytopes.max_radius,4),0.1445));
-
-% Call the OLD function
-% exp_polytopes=fcn_MapGen_polytopesExpandEvenly_OLD(polytopes,delta,expansionDistance,fig_num);
-
-%% Second test
-% Generate a map from a name
-map_name = "HST 30 450 SQT 0 1 0 1 SMV 0.02 0.005 1e-6 1234";
-plot_flag = 1; disp_name = [1, 0.05 -0.05, 0.5 0.5 0.5, 10];
-line_style = '-'; line_width = 2; color = [0 0 1];
-axis_limits = [0 1 -0.1 1]; axis_style = 'square';
-fill_info = [1 1 0 1 0.5];
-fig_num = 7;
-
-[polytopes,fig]=fcn_MapGen_nameToMap(...
-    map_name,...
-    plot_flag,...
-    disp_name,...
-    fig_num,...
-    line_style,...
-    line_width,....
-    color,...
-    axis_limits,...
-    axis_style,...
-    fill_info);
-
-% Set expansion parameters
-expansionDistance = 0.01; % Set the expansion distance
-fig_num = 222; % Set the figure number
-
-% Call the function
-exp_polytopes=fcn_MapGen_polytopesExpandEvenly(polytopes,expansionDistance,fig_num);
+assert(true)
 % script_test_fcn_MapGen_polytopeFindSelfIntersections
 % Tests function: fcn_MapGen_polytopeFindSelfIntersections
 

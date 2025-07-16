@@ -287,7 +287,7 @@ if any(isinf(all_vertices),'all') % Are there any infinite vertices
             [vertices_no_repeats(bad_index+1:end,:); ...
             vertices_no_repeats(1:bad_index-1,:)];
 
-        if length(vertex_string(:,1))==1
+        if length(vertex_string(:,1))==1 %#ok<ISCL>
             warning('on','backtrace');
             warning('A single vertex polytope was encountered. Unable to continue');
             error('single vertex "triangle" encountered');
@@ -297,21 +297,7 @@ if any(isinf(all_vertices),'all') % Are there any infinite vertices
             % Plot the vertex_string
             plot(vertex_string(:,1),vertex_string(:,2),'b.-');
         end
-        
-        %         [cropped_vertices,~] = ...
-        %             fcn_MapGen_cropVerticesByWallIntersections(vertex_string,walls);
-        %
-        %         if flag_do_debug
-        %             % Plot the cropped_vertices
-        %             plot(cropped_vertices(:,1),cropped_vertices(:,2),'g.-');
-        %         end
-        %
-        %         prior_point = cropped_vertices(end,:);
-        %         prior_point_lead_in = cropped_vertices(end-1,:);
-        %         next_point = cropped_vertices(1,:);
-        %         start_data = [];
-        %         end_data = cropped_vertices(1:end,:);
-        
+               
         % Find the prior and next points relative to the bad index point
         % The prior_point and next_point are not used as vertices themselves,
         % but rather to create new vertices by snapping to the bounding polygon
@@ -330,14 +316,14 @@ if any(isinf(all_vertices),'all') % Are there any infinite vertices
         % basically it means we have to calculate the boundary ourselves.
         isInside = fcn_MapGen_isWithinABBB(AABB, [prior_point; next_point], -1);        
         if isInside(1)
-            new_prior = INTERNAL_fcn_MapGen_findMissingBoundaryPoint(...
+            new_prior = fcn_INTERNAL_MapGen_findMissingBoundaryPoint(...
                 prior_point,prior_point_lead_in, bad_poly,AABB,sorted_all_vertices,seed_points);
         else
             new_prior = prior_point;
         end
         
         if isInside(2)
-            new_next = INTERNAL_fcn_MapGen_findMissingBoundaryPoint(...
+            new_next = fcn_INTERNAL_MapGen_findMissingBoundaryPoint(...
                 next_point,next_point_lead_in, bad_poly,AABB,sorted_all_vertices,seed_points);
         else
             new_next = next_point;
@@ -484,8 +470,8 @@ end % Ends the function
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
-
-function new_point = INTERNAL_fcn_MapGen_findMissingBoundaryPoint(...
+%% fcn_INTERNAL_MapGen_findMissingBoundaryPoint
+function new_point = fcn_INTERNAL_MapGen_findMissingBoundaryPoint(...
     test_point,incoming_point, bad_poly,AABB,sorted_all_vertices,seed_points)
 % The goal of this funtion is to replace a missing bounary point on a
 % polytope. This usually occurs because a polytope is specified as having a
@@ -610,4 +596,4 @@ if flag_do_debug
 end
 
 
-end % Ends INTERNAL_fcn_MapGen_findMissingBoundaryPoint
+end % Ends fcn_INTERNAL_MapGen_findMissingBoundaryPoint

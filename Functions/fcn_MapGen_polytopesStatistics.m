@@ -1,15 +1,10 @@
-function polyMapStats = fcn_MapGen_polytopesStatistics(...
-    polytopes,...
-    varargin)
+function polyMapStats = fcn_MapGen_polytopesStatistics(polytopes, varargin)
 % fcn_MapGen_polytopesStatistics calculates key statistics for the
 % polytopes
 %
 % FORMAT:
 %
-% [polyMapStats] = ...
-%     fcn_MapGen_polytopesStatistics(...
-%     polytopes,...
-%     (fig_num))
+% [polyMapStats] = fcn_MapGen_polytopesStatistics( polytopes, (fig_num))
 %
 % INPUTS:
 %
