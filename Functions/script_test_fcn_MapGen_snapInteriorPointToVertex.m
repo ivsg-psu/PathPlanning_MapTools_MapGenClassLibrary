@@ -28,7 +28,7 @@ if flag_do_plot
     axes_limits = [-3 5 -3 5]; % x and y axes limits
     axis_style = 'square'; % plot axes style
     figure
-    fcn_MapGen_plotPolytopes(polytopes,fig,line_spec,line_width,axes_limits,axis_style);
+    % fcn_MapGen_plotPolytopes(polytopes,fig,line_spec,line_width,axes_limits,axis_style);
     hold on
     box on
     title('function result')

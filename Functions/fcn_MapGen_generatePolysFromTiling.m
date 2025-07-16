@@ -371,7 +371,14 @@ if flag_do_plots
     axis(new_axis);
 
     % plot the polytopes
-    fcn_MapGen_plotPolytopes(polytopes,fig_num,'b',2);
+    % fcn_MapGen_OLD_plotPolytopes(polytopes,fig_num,'b',2);
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [0 0 1];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+
 
     % plot all vertices
     plot(polytopeVertices(:,2),polytopeVertices(:,3),'c','Linewidth',1);
@@ -455,7 +462,14 @@ fig_do_debug = 38383;
 if 1==flag_do_debug
     figure(fig_do_debug);
 
-    fcn_MapGen_plotPolytopes(polytopes,fig_do_debug,'b',2);
+    % fcn_MapGen_OLD_plotPolytopes(polytopes,fig_do_debug,'b',2);
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [0 0 1];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+
 
 end
 

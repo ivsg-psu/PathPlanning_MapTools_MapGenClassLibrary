@@ -1,46 +1,9 @@
-% script_test_fcn_MapGen_polytopeMapGen
-% Tests function: fcn_MapGen_polytopeMapGen
+% script_test_fcn_MapGen_polytopeFindVertexAngles
+% Tests function: fcn_MapGen_polytopeFindVertexAngles
 
 % REVISION HISTORY:
-% 2021_06_06
-% -- first written by S. Brennan.
-
-close all
-
-% generate Voronoi tiling from Halton points
-Halton_range = [1 200]; % range of Halton points to use to generate the tiling
-% remove the edge polytope that extend past the high and low points
-xlow = 0; xhigh = 1; ylow = 0; yhigh = 1;
-bounding_box = [xlow ylow; xhigh yhigh];
-
-% shink the polytopes so that they are no longer tiled
-des_radius = 0.03; % desired average maximum radius
-sigma_radius = 0.002; % desired standard deviation in maximum radii
-min_rad = 0.0001; % minimum possible maximum radius for any obstacle
-shrink_seed = 1111; % seed used for randomizing the shrinking process
-fig_num = 1;
-
-[map_polytopes,all_pts] = ...
-    fcn_MapGen_polytopeMapGen(...
-    Halton_range,bounding_box,...
-    des_radius,sigma_radius,min_rad,shrink_seed,fig_num);
-
-assert(true);
-
-% Initiate the plot
-fig = 103; % figure to plot on
-line_spec = 'b-'; % edge line plotting
-line_width = 2; % linewidth of the edge
-axes_limits = [0 1 0 1]; % x and y axes limits
-axis_style = 'square'; % plot axes style
-fcn_MapGen_plotPolytopes(map_polytopes,fig,line_spec,line_width,axes_limits,axis_style);
-
-% script_test_fcn_MapGen_polytopeFindSelfIntersections
-% Tests function: fcn_MapGen_polytopeFindSelfIntersections
-
-% REVISION HISTORY:
-% 2021_08_03
-% -- first written by S. Brennan
+% 2021_08_01
+% -- first written by S. Brennan 
 % 2025_07_11 - S. Brennan, sbrennan@psu.edu
 % -- updated script testing to standard form
 
@@ -65,50 +28,112 @@ close all
 close all;
 fprintf(1,'Figure: 1XXXXXX: DEMO cases\n');
 
-%% DEMO case: self-intersection
+%% DEMO case: Basic example of vertex calculation - a square
 fig_num = 10001;
-titleString = sprintf('DEMO case: self-intersection');
+titleString = sprintf('DEMO case: Basic example of vertex calculation - a square');
 fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
-
-interiorPoint = [0.5 0.5];
+vertices = [0 0; 1 0; 1 1; 0 1; 0 0];
 
 % Call the function
-[projectedPoints] = ...
-    fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-    interiorPoint,...
-    verticesIncludingSelfIntersections,...
-    verticesIncludingSelfIntersections(1:end-1,:),...
-    verticesIncludingSelfIntersections(2:end,:),...
-    (fig_num));
+[angles, unitInVectors, unitOutVectors] = fcn_MapGen_polytopeFindVertexAngles(vertices, (fig_num));
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(projectedPoints));
+assert(isnumeric(angles));
+assert(isnumeric(unitInVectors));
+assert(isnumeric(unitOutVectors));
 
 % Check variable sizes
-Nvertices = length(verticesIncludingSelfIntersections(:,1));
-assert(size(projectedPoints,1)==Nvertices);
-assert(size(projectedPoints,2)==2);
+Nvertices = length(vertices(:,1));
+assert(isequal(size(angles),[Nvertices-1 1]));
+assert(isequal(size(unitInVectors),[Nvertices-1 2]));
+assert(isequal(size(unitInVectors),[Nvertices-1 2]));
 
 % Check variable values
-assert(isequal(round(projectedPoints,4),round(...
-    [...
-    0         0
-    0         0
-    1.0000         0
-    0.7500    0.7500
-    0.6667    1.0000
-    0.6667    1.0000
-    0.5000    1.0000
-    0    1.0000
-    ]...
-    ,4)));
+assert(1000*eps>abs(360-sum(angles)*180/pi));
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+
+%% DEMO case: Basic example of vertex calculation - a triange
+fig_num = 10002;
+titleString = sprintf('DEMO case: Basic example of vertex calculation - a triangle');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+vertices = [0 0; 1 1; 0 1; 0 0];
+
+% Call the function
+[angles, unitInVectors, unitOutVectors] = fcn_MapGen_polytopeFindVertexAngles(vertices, (fig_num));
+
+sgtitle(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(isnumeric(angles));
+assert(isnumeric(unitInVectors));
+assert(isnumeric(unitOutVectors));
+
+% Check variable sizes
+Nvertices = length(vertices(:,1));
+assert(isequal(size(angles),[Nvertices-1 1]));
+assert(isequal(size(unitInVectors),[Nvertices-1 2]));
+assert(isequal(size(unitInVectors),[Nvertices-1 2]));
+
+% Check variable values
+assert(1000*eps>abs(360-sum(angles)*180/pi));
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+%% DEMO case: Random polytope
+fig_num = 10003;
+titleString = sprintf('DEMO case: Random polytope');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+% Set up polytopes
+seedGeneratorNames = 'haltonset';
+seedGeneratorRanges = [1 100];
+AABBs = [0 0 1 1];
+mapStretchs = [1 1];
+[polytopes] = fcn_MapGen_voronoiTiling(...
+    seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
+    seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
+    (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
+    (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
+    (-1));
+
+
+bounding_box = [0,0; 1,1];
+trim_polytopes = fcn_MapGen_polytopeCropEdges(polytopes,bounding_box,-1);
+
+% Pick a random polytope
+Npolys = length(trim_polytopes);
+rand_poly = 1+floor(rand*Npolys);
+shrinker = trim_polytopes(rand_poly);
+
+% Call the function
+[angles, unitInVectors, unitOutVectors] = fcn_MapGen_polytopeFindVertexAngles(shrinker.vertices, (fig_num));
+
+sgtitle(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(isnumeric(angles));
+assert(isnumeric(unitInVectors));
+assert(isnumeric(unitOutVectors));
+
+% Check variable sizes
+Nvertices = length(shrinker.vertices(:,1));
+assert(isequal(size(angles),[Nvertices-1 1]));
+assert(isequal(size(unitInVectors),[Nvertices-1 2]));
+assert(isequal(size(unitInVectors),[Nvertices-1 2]));
+
+% Check variable values
+assert(1000*eps>abs(360-sum(angles)*180/pi));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -162,42 +187,24 @@ fig_num = 80001;
 fprintf(1,'Figure: %.0f: FAST mode, empty fig_num\n',fig_num);
 figure(fig_num); close(fig_num);
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
-
-interiorPoint = [0.5 0.5];
+vertices = [0 0; 1 0; 1 1; 0 1; 0 0];
 
 % Call the function
-[projectedPoints] = ...
-    fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-    interiorPoint,...
-    verticesIncludingSelfIntersections,...
-    verticesIncludingSelfIntersections(1:end-1,:),...
-    verticesIncludingSelfIntersections(2:end,:),...
-    ([]));
+[angles, unitInVectors, unitOutVectors] = fcn_MapGen_polytopeFindVertexAngles(vertices, ([]));
 
 % Check variable types
-assert(isnumeric(projectedPoints));
+assert(isnumeric(angles));
+assert(isnumeric(unitInVectors));
+assert(isnumeric(unitOutVectors));
 
 % Check variable sizes
-Nvertices = length(verticesIncludingSelfIntersections(:,1));
-assert(size(projectedPoints,1)==Nvertices);
-assert(size(projectedPoints,2)==2);
+Nvertices = length(vertices(:,1));
+assert(isequal(size(angles),[Nvertices-1 1]));
+assert(isequal(size(unitInVectors),[Nvertices-1 2]));
+assert(isequal(size(unitInVectors),[Nvertices-1 2]));
 
 % Check variable values
-assert(isequal(round(projectedPoints,4),round(...
-    [...
-    0         0
-    0         0
-    1.0000         0
-    0.7500    0.7500
-    0.6667    1.0000
-    0.6667    1.0000
-    0.5000    1.0000
-    0    1.0000
-    ]...
-    ,4)));
+assert(1000*eps>abs(360-sum(angles)*180/pi));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -209,43 +216,24 @@ fig_num = 80002;
 fprintf(1,'Figure: %.0f: FAST mode, fig_num=-1\n',fig_num);
 figure(fig_num); close(fig_num);
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
-
-interiorPoint = [0.5 0.5];
+vertices = [0 0; 1 0; 1 1; 0 1; 0 0];
 
 % Call the function
-[projectedPoints] = ...
-    fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-    interiorPoint,...
-    verticesIncludingSelfIntersections,...
-    verticesIncludingSelfIntersections(1:end-1,:),...
-    verticesIncludingSelfIntersections(2:end,:),...
-    (-1));
+[angles, unitInVectors, unitOutVectors] = fcn_MapGen_polytopeFindVertexAngles(vertices, (-1));
 
 % Check variable types
-assert(isnumeric(projectedPoints));
+assert(isnumeric(angles));
+assert(isnumeric(unitInVectors));
+assert(isnumeric(unitOutVectors));
 
 % Check variable sizes
-Nvertices = length(verticesIncludingSelfIntersections(:,1));
-assert(size(projectedPoints,1)==Nvertices);
-assert(size(projectedPoints,2)==2);
+Nvertices = length(vertices(:,1));
+assert(isequal(size(angles),[Nvertices-1 1]));
+assert(isequal(size(unitInVectors),[Nvertices-1 2]));
+assert(isequal(size(unitInVectors),[Nvertices-1 2]));
 
 % Check variable values
-assert(isequal(round(projectedPoints,4),round(...
-    [...
-    0         0
-    0         0
-    1.0000         0
-    0.7500    0.7500
-    0.6667    1.0000
-    0.6667    1.0000
-    0.5000    1.0000
-    0    1.0000
-    ]...
-    ,4)));
-
+assert(1000*eps>abs(360-sum(angles)*180/pi));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -258,11 +246,7 @@ fprintf(1,'Figure: %.0f: FAST mode comparisons\n',fig_num);
 figure(fig_num);
 close(fig_num);
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
-
-interiorPoint = [0.5 0.5];
+vertices = [0 0; 1 0; 1 1; 0 1; 0 0];
 
 Niterations = 100;
 
@@ -270,13 +254,7 @@ Niterations = 100;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [projectedPoints] = ...
-        fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-        interiorPoint,...
-        verticesIncludingSelfIntersections,...
-        verticesIncludingSelfIntersections(1:end-1,:),...
-        verticesIncludingSelfIntersections(2:end,:),...
-        ([]));
+    [angles, unitInVectors, unitOutVectors] = fcn_MapGen_polytopeFindVertexAngles(vertices, ([]));
 end
 slow_method = toc;
 
@@ -284,13 +262,7 @@ slow_method = toc;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [projectedPoints] = ...
-        fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-        interiorPoint,...
-        verticesIncludingSelfIntersections,...
-        verticesIncludingSelfIntersections(1:end-1,:),...
-        verticesIncludingSelfIntersections(2:end,:),...
-        (-1));
+    [angles, unitInVectors, unitOutVectors] = fcn_MapGen_polytopeFindVertexAngles(vertices, (-1));
 end
 fast_method = toc;
 
@@ -369,3 +341,4 @@ end
 % [V,C] = voronoin(seed_points);
 % % V = V.*stretch;
 % end % Ends fcn_INTERNAL_loadExampleData
+  

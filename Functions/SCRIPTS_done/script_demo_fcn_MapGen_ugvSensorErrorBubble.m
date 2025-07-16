@@ -32,10 +32,16 @@ mapStretchs = [200 200];
 
 % Plot the polytopes
 fig_num = 22;
-line_width = 2;
-axis_limits = [0 200 0 200];
-axis_stype = 'square';
-fcn_MapGen_plotPolytopes(polytopes,fig_num,'b',line_width,axis_limits,axis_stype);
+% line_width = 2;
+% axis_limits = [0 200 0 200];
+% axis_stype = 'square';
+% fcn_MapGen_OLD_plotPolytopes(polytopes,fig_num,'b',line_width,axis_limits,axis_stype);
+plotFormat.LineWidth = 2;
+plotFormat.MarkerSize = 10;
+plotFormat.LineStyle = '-';
+plotFormat.Color = [0 0 1];
+fillFormat = [];
+h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
 
 
 % remove the edge polytopes that extend past the high and low points
@@ -75,8 +81,22 @@ ax.ugv1=gca;
 % end
 % hold off
 
-fcn_MapGen_plotPolytopes(shrunk_polytopes2,fig_num,'k',line_width,axis_limits,axis_stype);
-fcn_MapGen_plotPolytopes(error_polytopes,fig_num,'r',line_width,axis_limits,axis_stype);
+% fcn_MapGen_OLD_plotPolytopes(shrunk_polytopes2,fig_num,'k',line_width,axis_limits,axis_stype);
+plotFormat.LineWidth = 2;
+plotFormat.MarkerSize = 10;
+plotFormat.LineStyle = '-';
+plotFormat.Color = [0 0 0];
+fillFormat = [];
+h_plot = fcn_MapGen_plotPolytopes(shrunk_polytopes2, (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
+
+% fcn_MapGen_OLD_plotPolytopes(error_polytopes,fig_num,'r',line_width,axis_limits,axis_stype);
+plotFormat.LineWidth = 2;
+plotFormat.MarkerSize = 10;
+plotFormat.LineStyle = '-';
+plotFormat.Color = [1 0 0];
+fillFormat = [];
+h_plot = fcn_MapGen_plotPolytopes(error_polytopes, (plotFormat), (fillFormat), (fig_num)); 
+
 xlabel('X Distance [m]')
 ylabel('Y Distance [m]')
 title('UGV Positioning Bubbles')
@@ -104,14 +124,14 @@ err.R = sqrt(err.x.^2 + err.y.^2);
 
 figure('name','Error in X')
 contour(x,y,err.x,'ShowText','on')
-h=colorbar;
+% h=colorbar;
 title('Error in X Dimension [m]')
 xlabel('X [m]')
 ylabel('Y [m]')
 
 figure('name','Error in Y')
 contour(x,y,err.y,'ShowText','on')
-h=colorbar;
+% h=colorbar;
 title('Error in Y Dimension [m]')
 xlabel('X [m]')
 ylabel('Y [m]')

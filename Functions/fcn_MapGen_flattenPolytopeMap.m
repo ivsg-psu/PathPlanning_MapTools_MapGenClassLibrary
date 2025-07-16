@@ -155,7 +155,14 @@ end
 
 % convert polytopes to polyshapes
 if flag_do_plot
-    fcn_MapGen_plotPolytopes(polytopes,1000,'-',2,[0 0 0],[],'square',[1 0 0 0 0.5]);
+    %fcn_MapGen_OLD_plotPolytopes(polytopes,1000,'-',2,[0 0 0],[],'square',[1 0 0 0 0.5]);
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [0 0 0];
+    fillFormat = [1 0 0 0 0.5];
+    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+
 end
 polyshapes = [];
 if flag_do_plot
@@ -241,17 +248,44 @@ if ~isempty(r) && ~isempty(c)
     end
     polytopes = [polytopes, p3_new_tris];
     if flag_do_plot
-        fcn_MapGen_plotPolytopes(polytopes,1000,'-',2,[0 0 0],[],'square',[1 0 0 0 0.5]);
-        title('originaly polytopes')
+        % fcn_MapGen_P:D_plotPolytopes(polytopes,1000,'-',2,[0 0 0],[],'square',[1 0 0 0 0.5]);
+        plotFormat.LineWidth = 2;
+        plotFormat.MarkerSize = 10;
+        plotFormat.LineStyle = '-';
+        plotFormat.Color = [0 0 0];
+        fillFormat = [1 0 0 0 0.5];
+        h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+
+        title('original polytopes')
         if p1_new.area > eps
-            fcn_MapGen_plotPolytopes(polytopes,1000,'-',2,[0 0 0],[],'square',[1 0 0 0 0.5]);
+            % fcn_MapGen_OLD_plotPolytopes(polytopes,1000,'-',2,[0 0 0],[],'square',[1 0 0 0 0.5]);
+            plotFormat.LineWidth = 2;
+            plotFormat.MarkerSize = 10;
+            plotFormat.LineStyle = '-';
+            plotFormat.Color = [0 0 0];
+            fillFormat = [1 0 0 0 0.5];
+            h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
             title('triangulated parent 1, less, intersection')
         end
         if p2_new.area > eps
-            fcn_MapGen_plotPolytopes(polytopes,1000,'-',2,[0 0 0],[],'square',[1 0 0 0 0.5]);
+            % fcn_MapGen_OLD_plotPolytopes(polytopes,1000,'-',2,[0 0 0],[],'square',[1 0 0 0 0.5]);
+            plotFormat.LineWidth = 2;
+            plotFormat.MarkerSize = 10;
+            plotFormat.LineStyle = '-';
+            plotFormat.Color = [0 0 0];
+            fillFormat = [1 0 0 0 0.5];
+            h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+
             title('triangulated parent 2, less intersection')
         end
-        fcn_MapGen_plotPolytopes(polytopes,1000,'-',2,[0 0 0],[],'square',[1 0 0 0 0.5]);
+        % fcn_MapGen_OLD_plotPolytopes(polytopes,1000,'-',2,[0 0 0],[],'square',[1 0 0 0 0.5]);
+        plotFormat.LineWidth = 2;
+        plotFormat.MarkerSize = 10;
+        plotFormat.LineStyle = '-';
+        plotFormat.Color = [0 0 0];
+        fillFormat = [1 0 0 0 0.5];
+        h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+
         title('triangulated intersection')
     end
     % remove r(1), c(1) from truth table
@@ -269,7 +303,13 @@ small_poly_logical = extractfield(flattened_polytopes,'area')<1e-10;
 [small_poly_indecies] = find(small_poly_logical==1);
 flattened_polytopes(small_poly_indecies) = [];
 if true
-    fcn_MapGen_plotPolytopes(polytopes,1000,'-',2,[0 0 0],[],'square',[1 0 0 0 0.5]);
+    % fcn_MapGen_OLD_plotPolytopes(polytopes,1000,'-',2,[0 0 0],[],'square',[1 0 0 0 0.5]);
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [0 0 0];
+    fillFormat = [1 0 0 0 0.5];
+    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
     title('final obstacle field')
 end
 end

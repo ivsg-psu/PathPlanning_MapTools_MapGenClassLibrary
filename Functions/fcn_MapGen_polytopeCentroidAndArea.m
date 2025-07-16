@@ -1,26 +1,10 @@
-function [ ...
-Centroid, ...
-Area ...
-] = ...
-fcn_MapGen_polytopeCentroidAndArea( ...
-vertices, ...
-varargin...
-)
+function [centroid, area] = fcn_MapGen_polytopeCentroidAndArea( vertices, varargin)
 % fcn_MapGen_polytopeCentroidAndArea
 % calculates the centroid and area of a closed polytope.
 % 
-% 
-% 
 % FORMAT:
 % 
-%    [ ...
-%    Centroid, ...
-%    Area ...
-%    ] = ...
-%    fcn_MapGen_polytopeCentroidAndArea( ...
-%    vertices, ...
-%    (fig_num) ...
-%    )
+%    [centroid, area] = fcn_MapGen_polytopeCentroidAndArea( vertices, (fig_num))
 % 
 % INPUTS:
 % 
@@ -37,11 +21,10 @@ varargin...
 % 
 % OUTPUTS:
 % 
-%     Centroid: the calculated centroid of the polytope, given as 
+%     centroid: the calculated centroid of the polytope, given as 
 %     [x-coordinate y_coordinate]
 % 
-%     Area: the unsigned area enclosed by the polytope
-% 
+%     area: the unsigned area enclosed by the polytope
 % 
 % DEPENDENCIES:
 % 
@@ -68,12 +51,13 @@ varargin...
 % -- rebased code to MapGen format
 % 2022_02_17 - S. Brennan
 % -- Fixed bug when someone passes a line segment or repeated point
-% sequence, causing Area to be zero. Get a divide-by-zero problem. This is
+% sequence, causing area to be zero. Get a divide-by-zero problem. This is
 % fixed now via an if-statement check which uses the mean of points if A=0.
 % 2025_04_25 by Sean Brennan
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-
+% 2025_0716 by Sean Brennan
+% -- cleaned up header
 
 % TO DO
 % -- none
@@ -178,16 +162,16 @@ yip1 = vertices(2:end,2);
 % signed area
 A = sum(xi.*yip1 - xip1.*yi)/2; 
 
-% Centroid calculation
+% centroid calculation
 if A>0
     Cx = sum((xi+xip1).*(xi.*yip1 - xip1.*yi))/(6*A); % centroid x coordinate
     Cy = sum((yi+yip1).*(xi.*yip1 - xip1.*yi))/(6*A); % centroid x coordinate
-    Centroid = [Cx, Cy];
+    centroid = [Cx, Cy];
 else
-    Centroid = [mean(xi) mean(yi)];
+    centroid = [mean(xi) mean(yi)];
 end
 
-Area = abs(A); % unsigned area
+area = abs(A); % unsigned area
 
 
 %§
@@ -210,7 +194,7 @@ if flag_do_plot
     
     plot(vertices(:,1),vertices(:,2),'b-','linewidth',2);
     
-    plot(Cx,Cy,'go','Markersize',10);
+    plot(centroid(:,1),centroid(:,2),'go','Markersize',10);
     
 end % Ends the flag_do_plot if statement    
 

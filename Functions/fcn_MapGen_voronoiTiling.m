@@ -292,8 +292,14 @@ if flag_do_plot
     hold on
 
     % plot the polytopes
-    % FIX THIS FOR BETTER CLARITY
-    fcn_MapGen_plotPolytopes(polytopes,fig_num,'b',2);
+    % fcn_MapGen_OLD_plotPolytopes(polytopes,fig_num,'b',2);
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [0 0 1];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
+
 
     % plot the seed points for each Generator
     colorEachGenerator = zeros(Ngenerators,3);
@@ -303,19 +309,27 @@ if flag_do_plot
         h_plot = plot(moved_seed_points(:,1),moved_seed_points(:,2),'.','Markersize',10,'DisplayName',sprintf('Seed points %.0f',ith_generator));
         colorEachGenerator(ith_generator,:) = get(h_plot,'Color');
 
-        % % Plot the polys for each genrator
+        % Plot the polys for each generator?
         % (COMMENTED OUT BECAUSE IT LOOKS MESSY)
-        % fcn_MapGen_plotPolytopes(eachGeneratorPolytopes{ith_generator,1},fig_num,'b',1,colorEachGenerator(ith_generator,:));
+        if 1==0
+            % fcn_MapGen_plotPolytopes(eachGeneratorPolytopes{ith_generator,1},fig_num,'b',1,colorEachGenerator(ith_generator,:));
+            plotFormat.LineWidth = 1;
+            plotFormat.MarkerSize = 10;
+            plotFormat.LineStyle = '-';
+            plotFormat.Color = colorEachGenerator(ith_generator,:);
+            fillFormat = [];
+            h_plot = fcn_MapGen_plotPolytopes(eachGeneratorPolytopes{ith_generator,1}, (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
 
-        % % plot the means
-        % (COMMENTED OUT BECAUSE THE MEANS INCLUDE MESSY POLYTOPES THAT ARE
-        % NOT INSIDE CORRECT AREAS)
-        % NpolysThisGenerator = length(eachGeneratorPolytopes{ith_generator,1});
-        % temp = zeros(NpolysThisGenerator,2);
-        % for ith_poly = 1:NpolysThisGenerator
-        %     temp(ith_poly,:) = eachGeneratorPolytopes{ith_generator,1}(ith_poly).mean;
-        % end
-        % plot(temp(:,1),temp(:,2),'o','Markersize',3,'Color',colorEachGenerator(ith_generator,:),'DisplayName',sprintf('Means %.0f',ith_generator))
+            % plot the means
+            % (COMMENTED OUT BECAUSE THE MEANS INCLUDE MESSY POLYTOPES THAT ARE
+            % NOT INSIDE CORRECT AREAS)
+            NpolysThisGenerator = length(eachGeneratorPolytopes{ith_generator,1});
+            temp = zeros(NpolysThisGenerator,2);
+            for ith_poly = 1:NpolysThisGenerator
+                temp(ith_poly,:) = eachGeneratorPolytopes{ith_generator,1}(ith_poly).mean;
+            end
+            plot(temp(:,1),temp(:,2),'o','Markersize',3,'Color',colorEachGenerator(ith_generator,:),'DisplayName',sprintf('Means %.0f',ith_generator))
+        end
 
     end
 

@@ -190,7 +190,13 @@ onePolytope = trim_polytopes(rand_poly);
 
 if flag_do_plot
     % Plot results
-    fcn_MapGen_plotPolytopes(onePolytope,fig_num,'-',2,[0.5 0 0])
+    % fcn_MapGen_OLD_plotPolytopes(onePolytope,fig_num,'-',2,[0.5 0 0])
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [0.5 0 0];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(onePolytope, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
 end % Ends the flag_do_plot if statement    
 
 

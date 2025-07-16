@@ -1,18 +1,18 @@
-function [trim_polytopes] = ...
-    fcn_MapGen_polytopeCropEdges(polytopes,bounding_box,varargin)
+function [trimmedPolytopes] = ...
+    fcn_MapGen_polytopeCropEdges(polytopes,boundingBox,varargin)
 % fcn_MapGen_polytopeCropEdges removes polytopes that extend
 % beyond the boundaries specified
 %
 % FORMAT:
 %
-% [trim_polytopes] = ...
-%     fcn_MapGen_polytopeCropEdges(polytopes,bounding_box,(fig_num))
+% [trimmedPolytopes] = ...
+%     fcn_MapGen_polytopeCropEdges(polytopes,boundingBox,(fig_num))
 %
 % INPUTS:
 %
-%     polytopes: the original polytopes with the same fields as trim_polytopes
+%     polytopes: the original polytopes with the same fields as trimmedPolytopes
 %
-%     bounding_box: a 2 x 2 matrix of [xlow ylow; xhigh yhigh] in which all
+%     boundingBox: a 2 x 2 matrix of [xlow ylow; xhigh yhigh] in which all
 %     the polytopes must exist, e.g. the corner coordinates of the
 %     axis-aligned bounding box.
 %
@@ -25,7 +25,7 @@ function [trim_polytopes] = ...
 %
 % OUTPUTS:
 %
-%     TRIM_POLYTOPES: a 1-by-n seven field structure of polytopes within the
+%     trimmedPolytopes: a 1-by-n seven field structure of polytopes within the
 %     boundaries, where n <= number of polytopes with fields:
 %     vertices: a m+1-by-2 matrix of xy points with row1 = rowm+1, where m is
 %     the number of the individual polytope vertices
@@ -36,6 +36,9 @@ function [trim_polytopes] = ...
 %     mean: centroid xy coordinate of the polytope
 %     area: area of the polytope
 %
+% DEPENDENCIES:
+%
+%     fcn_MapGen_plotPolytopes
 %
 % EXAMPLES:
 %
@@ -53,9 +56,9 @@ function [trim_polytopes] = ...
 %     
 %   fig = fcn_plot_polytopes(polytopes,[],'b',2,[0 1 0 1]);
 %
-%   bounding_box = [0,1; 0,1];
-%   trim_polytopes = fcn_MapGen_polytopeCropEdges(polytopes,bounding_box);
-%   fcn_plot_polytopes(trim_polytopes,fig,'g',2,[0 1 0 1]);
+%   boundingBox = [0,1; 0,1];
+%   trimmedPolytopes = fcn_MapGen_polytopeCropEdges(polytopes,boundingBox);
+%   fcn_plot_polytopes(trimmedPolytopes,fig,'g',2,[0 1 0 1]);
 %
 % For additional examples, see: script_test_fcn_MapGen_polytopeCropEdges
 %
@@ -132,9 +135,9 @@ if (0==flag_max_speed)
         fcn_DebugTools_checkInputsToFunctions(...
             polytopes, 'polytopes');
 
-        % Check the bounding_box input
+        % Check the boundingBox input
         fcn_DebugTools_checkInputsToFunctions(...
-            bounding_box, '2column_of_numbers',2);
+            boundingBox, '2column_of_numbers',2);
 
     end
 end
@@ -166,26 +169,34 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-xlow = bounding_box(1,1);
-ylow = bounding_box(1,2);
-xhigh = bounding_box(2,1);
-yhigh = bounding_box(2,2);
+xlow = boundingBox(1,1);
+ylow = boundingBox(1,2);
+xhigh = boundingBox(2,1);
+yhigh = boundingBox(2,2);
 
 Npolys = length(polytopes);
 
 % Preallocate the polytopes
-trim_polytopes(Npolys) = fcn_MapGen_polytopeFillEmptyPoly((-1));
+trimmedPolytopes(Npolys) = fcn_MapGen_polytopeFillEmptyPoly((-1));
 
 keep = 0; % number of polytopes to keep
+allVertices = [];
 for poly = 1:Npolys % check each polytope within polytopes
+    allVertices = [allVertices; polytopes(poly).vertices; nan nan]; %#ok<AGROW>
     xv = polytopes(poly).xv;
     yv = polytopes(poly).yv;
     if sum((xv<xlow)+(xv>xhigh)+(yv<ylow)+(yv>yhigh))==0 % if the x or y vertices are inside of the bounds
         keep = keep + 1;
-        trim_polytopes(keep) = polytopes(poly);
+        trimmedPolytopes(keep) = polytopes(poly);
     end
 end
-trim_polytopes = trim_polytopes(1:keep); % Save only the ones that were filled
+
+if 1==0
+    figure(3838);
+    plot(allVertices(:,1),allVertices(:,2),'.-','MarkerSize',20,'LineWidth',3);
+end
+
+trimmedPolytopes = trimmedPolytopes(1:keep); % Save only the ones that were filled
 
 %% Plot results?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -204,10 +215,34 @@ if flag_do_plot
     hold on
 
     % Plot the input polytopes in red
-    fcn_MapGen_plotPolytopes(polytopes,fig_num,'r',2,[xlow xhigh ylow yhigh]);
+    % fcn_MapGen_OLD_plotPolytopes(polytopes,fig_num,'r',2,[xlow xhigh ylow yhigh]);
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [1 0 0];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(fig_num)); 
+    set(h_plot,'DisplayName','polytopes');
 
+    % Plot the bounding box in black
+    boxVertices = [boundingBox(1,1) boundingBox(1,2);
+        boundingBox(2,1) boundingBox(1,2);
+        boundingBox(2,1) boundingBox(2,2);
+        boundingBox(1,1) boundingBox(2,2);
+        boundingBox(1,1) boundingBox(1,2)];
+    plot(boxVertices(:,1),boxVertices(:,2),'k-','LineWidth',3,'DisplayName','boundingBox');
+    
     % plot the tiled_polytopes in blue
-    fcn_MapGen_plotPolytopes(trim_polytopes,fig_num,'b',2,[xlow xhigh ylow yhigh]);
+    % fcn_MapGen_OLD_plotPolytopes(trimmedPolytopes,fig_num,'b',2,[xlow xhigh ylow yhigh]);
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [0 0 1];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(trimmedPolytopes, (plotFormat), (fillFormat), (fig_num)); 
+    set(h_plot,'DisplayName','trimmedPolytopes');
+
+    legend('Interpreter','none','Location','best');
 
 end
 

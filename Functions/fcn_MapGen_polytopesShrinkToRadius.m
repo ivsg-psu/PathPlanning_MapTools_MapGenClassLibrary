@@ -197,7 +197,13 @@ if flag_do_debug
     fprintf(1,'\tMean: %.4f\n',old_r_mu);
     fprintf(1,'\tStd dev: %.4f\n',old_r_sigma);
     
-    fcn_MapGen_plotPolytopes(polytopes,fig_for_debug,'b',2);
+    % fcn_MapGen_OLD_plotPolytopes(polytopes,fig_for_debug,'b',2);
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [0 0 1];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat), (fillFormat), (fig_for_debug)); %#ok<NASGU>
     
     figure(fig_for_debug+1);
     histogram(old_max_radii,20)
@@ -371,10 +377,22 @@ if flag_do_plot
     hold on
     
     % Plot the input polytopes in red
-    fcn_MapGen_plotPolytopes(polytopes,fig_num,'r',2);
+    % fcn_MapGen_OLD_plotPolytopes(polytopes,fig_num,'r',2);
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [1 0 0];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
     
     % plot the shrunk in blue
-    fcn_MapGen_plotPolytopes(shrunkPolytopes,fig_num,'b',2);
+    % fcn_MapGen_OLD_plotPolytopes(shrunkPolytopes,fig_num,'b',2);
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [0 0 1];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(shrunkPolytopes, (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
 
 end
 

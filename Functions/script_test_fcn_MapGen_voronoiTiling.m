@@ -275,9 +275,6 @@ assert(isequal(get(gcf,'Number'),fig_num));
 if 1==1
     % Animate the polytopes
     axis([0 1 0 1]);
-    % line_width = 2;
-    % axis_stype = 'equal';
-    % fcn_MapGen_plotPolytopes(polytopes,fig_num,'b',line_width,axis_limits,axis_stype);
     axis equal;
     step = 0.01;
     for ith_step = 0:step:2

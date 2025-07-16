@@ -1,4 +1,4 @@
-function [shrunk_polytopes] = ...
+function [shrunkPolytopes] = ...
     fcn_MapGen_polytopesShrinkFromEdges(...
     polytopes,...
     des_gap_size,...
@@ -8,7 +8,7 @@ function [shrunk_polytopes] = ...
 %
 % FORMAT:
 %
-% [shrunk_polytopes] = ...
+% [shrunkPolytopes] = ...
 %     fcn_MapGen_polytopesShrinkFromEdges(...
 %     polytopes,...
 %     des_gap_size,...
@@ -16,7 +16,7 @@ function [shrunk_polytopes] = ...
 %
 % INPUTS:
 %
-%     POLYTOPES: original polytopes with same fields as shrunk_polytopes
+%     POLYTOPES: original polytopes with same fields as shrunkPolytopes
 %
 %     DES_GAP_SIZE: desired normal gap size between polytopes, note this is
 %     relative, not absolute e.g. if the input polytopes have no gap and a
@@ -35,7 +35,7 @@ function [shrunk_polytopes] = ...
 %
 % OUTPUTS:
 %
-%     SHRUNK_POLYTOPES: a 1-by-n seven field structure of shrunken polytopes,
+%     shrunkPolytopes: a 1-by-n seven field structure of shrunken polytopes,
 %     where n <= number of polytopes with fields:
 %       vertices: a m+1-by-2 matrix of xy points with row1 = rowm+1, where m is
 %         the number of the individual polytope vertices
@@ -176,7 +176,14 @@ if flag_do_debug
     fprintf(1,'Input field statistics:\n');
     fprintf(1,'\tAvg Max Rad: %.4f\n',initial_average_max_rad);
 
-    fcn_MapGen_plotPolytopes(polytopes,fig_for_debug,'b',2);
+    % fcn_MapGen_OLD_plotPolytopes(polytopes,fig_for_debug,'b',2);
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [0 0 1];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat), (fillFormat), (fig_for_debug)); %#ok<NASGU>
+
 end
 
 %% shrink polytopes to achieve the distribution
@@ -187,23 +194,23 @@ end
 
 % Initialize the shrunk polytopes structure array, and tolerance for
 % distance between vertices, below which vertices are merged into one.
-clear shrunk_polytopes
+clear shrunkPolytopes
 shrinker = polytopes(1); % obstacle to be shrunk
 temp = ...
     fcn_MapGen_polytopeShrinkFromEdges(...
     shrinker,des_gap_size/2);
-shrunk_polytopes(length(polytopes)) = temp;
+shrunkPolytopes(length(polytopes)) = temp;
 
 % Loop through each polytope, shrinking it to the reference size
 for ith_poly = 1:length(polytopes)
     shrinker = polytopes(ith_poly); % obstacle to be shrunk
 
     if isnan(shrinker.vertices(1,1)) % Degenerate
-        shrunk_polytopes(ith_poly)=shrinker;
+        shrunkPolytopes(ith_poly)=shrinker;
     else
-        % assign to shrunk_polytopes
+        % assign to shrunkPolytopes
         % gap_size over 2 is the normal distance to pull edges in
-        shrunk_polytopes(ith_poly) = ...
+        shrunkPolytopes(ith_poly) = ...
             fcn_MapGen_polytopeShrinkFromEdges(...
             shrinker,des_gap_size/2);
     end
@@ -212,7 +219,7 @@ end
 
 
 if flag_do_debug
-    final_stats = fcn_MapGen_polytopesStatistics(shrunk_polytopes);
+    final_stats = fcn_MapGen_polytopesStatistics(shrunkPolytopes);
     final_average_max_rad = final_stats.average_max_radius;
     fprintf(1,'Final distrubution statistics:\n');
     fprintf(1,'\tAvg mag rad: %.4f\n',final_average_max_rad);
@@ -235,10 +242,23 @@ if flag_do_plot
     hold on
 
     % Plot the input polytopes in red
-    fcn_MapGen_plotPolytopes(polytopes,fig_num,'r',2);
+    % fcn_MapGen_OLD_plotPolytopes(polytopes,fig_num,'r',2);
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [1 0 0];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
 
     % plot the shrunk in blue
-    fcn_MapGen_plotPolytopes(shrunk_polytopes,fig_num,'b',2);
+    fcn_MapGen_plotPolytopes(shrunkPolytopes,fig_num,'b',2);
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [0 0 1];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(shrunkPolytopes, (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
+
 
 end
 

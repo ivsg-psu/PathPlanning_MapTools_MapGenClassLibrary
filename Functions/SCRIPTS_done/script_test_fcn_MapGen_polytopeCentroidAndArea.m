@@ -1,44 +1,11 @@
-% script_test_fcn_MapGen_polytopeFindSelfIntersections
-% Tests function: fcn_MapGen_polytopeFindSelfIntersections
+% script_test_fcn_MapGen_polytopeCentroidAndArea
+% Tests: fcn_MapGen_polytopeCentroidAndArea
 
+%
 % REVISION HISTORY:
-% 2021_08_03
-% -- first written by S. Brennan
-
-close all;
-
-
-%% Basic example of self-intersection
-fig_num = 1;
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-vertices_with_self_intersects = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices,fig_num);
-
-fig_num = 11;
-interior_point = [0.5 0.5];
-[projected_points] = ...
-    fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-    interior_point,...
-    vertices_with_self_intersects,...
-    vertices_with_self_intersects(1:end-1,:),...
-    vertices_with_self_intersects(2:end,:),...
-    fig_num);
-
-assert(isequal(round(projected_points,4),[0,0; 0,0; 1,0; 0.75,0.75; 0.6667,1; 0.6667,1; 0.5,1; 0,1]));
-
-    fig_num = 12;
-[cropped_vertices] = ...
-    fcn_MapGen_polytopeRemoveColinearVertices(...,
-    projected_points,...
-    fig_num);
-
-assert(isequal(round(cropped_vertices,4),[0,0; 1,0; 0.75,0.75; 0.6667,1; 0,1]));
-% script_test_fcn_MapGen_polytopeFindSelfIntersections
-% Tests function: fcn_MapGen_polytopeFindSelfIntersections
-
-% REVISION HISTORY:
-% 2021_08_03
-% -- first written by S. Brennan
+%
+% 2021_07_02 by Sean Brennan
+% -- first write of script
 % 2025_07_11 - S. Brennan, sbrennan@psu.edu
 % -- updated script testing to standard form
 
@@ -63,50 +30,31 @@ close all
 close all;
 fprintf(1,'Figure: 1XXXXXX: DEMO cases\n');
 
-%% DEMO case: self-intersection
+%% DEMO case: basic demo
 fig_num = 10001;
-titleString = sprintf('DEMO case: self-intersection');
+titleString = sprintf('DEMO case: basic demo');
 fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
-
-interiorPoint = [0.5 0.5];
+x = [3; 4; 2; -1; -2; -3; -4; -2; 1; 2; 3];
+y = [1; 2; 2; 3; 2; -1; -2; -3; -3; -2; 1];
 
 % Call the function
-[projectedPoints] = ...
-    fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-    interiorPoint,...
-    verticesIncludingSelfIntersections,...
-    verticesIncludingSelfIntersections(1:end-1,:),...
-    verticesIncludingSelfIntersections(2:end,:),...
-    (fig_num));
+[centroid,area] = fcn_MapGen_polytopeCentroidAndArea([x,y],(fig_num));
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(projectedPoints));
+assert(isnumeric(centroid));
+assert(isnumeric(area));
 
 % Check variable sizes
-Nvertices = length(verticesIncludingSelfIntersections(:,1));
-assert(size(projectedPoints,1)==Nvertices);
-assert(size(projectedPoints,2)==2);
+assert(isequal(size(centroid),[1 2])); 
+assert(isequal(size(area),[1 1])); 
 
 % Check variable values
-assert(isequal(round(projectedPoints,4),round(...
-    [...
-    0         0
-    0         0
-    1.0000         0
-    0.7500    0.7500
-    0.6667    1.0000
-    0.6667    1.0000
-    0.5000    1.0000
-    0    1.0000
-    ]...
-    ,4)));
+assert(isequal(round(centroid,4),[-0.1462,-0.2222]));
+assert(isequal(round(area,4),28.5));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -160,42 +108,23 @@ fig_num = 80001;
 fprintf(1,'Figure: %.0f: FAST mode, empty fig_num\n',fig_num);
 figure(fig_num); close(fig_num);
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
-
-interiorPoint = [0.5 0.5];
+x = [3; 4; 2; -1; -2; -3; -4; -2; 1; 2; 3];
+y = [1; 2; 2; 3; 2; -1; -2; -3; -3; -2; 1];
 
 % Call the function
-[projectedPoints] = ...
-    fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-    interiorPoint,...
-    verticesIncludingSelfIntersections,...
-    verticesIncludingSelfIntersections(1:end-1,:),...
-    verticesIncludingSelfIntersections(2:end,:),...
-    ([]));
+[centroid,area] = fcn_MapGen_polytopeCentroidAndArea([x,y], ([]));
 
 % Check variable types
-assert(isnumeric(projectedPoints));
+assert(isnumeric(centroid));
+assert(isnumeric(area));
 
 % Check variable sizes
-Nvertices = length(verticesIncludingSelfIntersections(:,1));
-assert(size(projectedPoints,1)==Nvertices);
-assert(size(projectedPoints,2)==2);
+assert(isequal(size(centroid),[1 2])); 
+assert(isequal(size(area),[1 1])); 
 
 % Check variable values
-assert(isequal(round(projectedPoints,4),round(...
-    [...
-    0         0
-    0         0
-    1.0000         0
-    0.7500    0.7500
-    0.6667    1.0000
-    0.6667    1.0000
-    0.5000    1.0000
-    0    1.0000
-    ]...
-    ,4)));
+assert(isequal(round(centroid,4),[-0.1462,-0.2222]));
+assert(isequal(round(area,4),28.5));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -207,43 +136,23 @@ fig_num = 80002;
 fprintf(1,'Figure: %.0f: FAST mode, fig_num=-1\n',fig_num);
 figure(fig_num); close(fig_num);
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
-
-interiorPoint = [0.5 0.5];
+x = [3; 4; 2; -1; -2; -3; -4; -2; 1; 2; 3];
+y = [1; 2; 2; 3; 2; -1; -2; -3; -3; -2; 1];
 
 % Call the function
-[projectedPoints] = ...
-    fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-    interiorPoint,...
-    verticesIncludingSelfIntersections,...
-    verticesIncludingSelfIntersections(1:end-1,:),...
-    verticesIncludingSelfIntersections(2:end,:),...
-    (-1));
+[centroid,area] = fcn_MapGen_polytopeCentroidAndArea([x,y], (-1));
 
 % Check variable types
-assert(isnumeric(projectedPoints));
+assert(isnumeric(centroid));
+assert(isnumeric(area));
 
 % Check variable sizes
-Nvertices = length(verticesIncludingSelfIntersections(:,1));
-assert(size(projectedPoints,1)==Nvertices);
-assert(size(projectedPoints,2)==2);
+assert(isequal(size(centroid),[1 2])); 
+assert(isequal(size(area),[1 1])); 
 
 % Check variable values
-assert(isequal(round(projectedPoints,4),round(...
-    [...
-    0         0
-    0         0
-    1.0000         0
-    0.7500    0.7500
-    0.6667    1.0000
-    0.6667    1.0000
-    0.5000    1.0000
-    0    1.0000
-    ]...
-    ,4)));
-
+assert(isequal(round(centroid,4),[-0.1462,-0.2222]));
+assert(isequal(round(area,4),28.5));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -256,11 +165,8 @@ fprintf(1,'Figure: %.0f: FAST mode comparisons\n',fig_num);
 figure(fig_num);
 close(fig_num);
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
-
-interiorPoint = [0.5 0.5];
+x = [3; 4; 2; -1; -2; -3; -4; -2; 1; 2; 3];
+y = [1; 2; 2; 3; 2; -1; -2; -3; -3; -2; 1];
 
 Niterations = 100;
 
@@ -268,13 +174,7 @@ Niterations = 100;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [projectedPoints] = ...
-        fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-        interiorPoint,...
-        verticesIncludingSelfIntersections,...
-        verticesIncludingSelfIntersections(1:end-1,:),...
-        verticesIncludingSelfIntersections(2:end,:),...
-        ([]));
+    [centroid,area] = fcn_MapGen_polytopeCentroidAndArea([x,y], ([]));
 end
 slow_method = toc;
 
@@ -282,13 +182,7 @@ slow_method = toc;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [projectedPoints] = ...
-        fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-        interiorPoint,...
-        verticesIncludingSelfIntersections,...
-        verticesIncludingSelfIntersections(1:end-1,:),...
-        verticesIncludingSelfIntersections(2:end,:),...
-        (-1));
+    [centroid,area] = fcn_MapGen_polytopeCentroidAndArea([x,y], (-1));
 end
 fast_method = toc;
 

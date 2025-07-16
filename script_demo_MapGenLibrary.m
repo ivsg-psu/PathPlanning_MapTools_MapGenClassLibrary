@@ -77,7 +77,7 @@
 %    optional. Need to fix this
 % -- make sure all function calls internal to functions have -1 speed set
 %    % for figure number
-% -- rewrite plotPolytopes using variable input arguments (see plotRoad
+% -- rewrote plotPolytopes using variable input arguments (see plotRoad
 %    % library?). 
 %    % Then, fix call in fcn_MapGen_voronoiTiling to plot both all Voronoi
 %    cells and then all each individual Voronoi cell for each generator,
@@ -100,9 +100,9 @@
 clear library_name library_folders library_url
 
 ith_library = 1;
-library_name{ith_library}    = 'DebugTools_v2025_07_10';
+library_name{ith_library}    = 'DebugTools_v2025_07_15';
 library_folders{ith_library} = {'Functions','Data'};
-library_url{ith_library}     = 'https://github.com/ivsg-psu/Errata_Tutorials_DebugTools/archive/refs/tags/DebugTools_v2025_07_10.zip';
+library_url{ith_library}     = 'https://github.com/ivsg-psu/Errata_Tutorials_DebugTools/archive/refs/tags/DebugTools_v2025_07_15.zip';
 
 ith_library = ith_library+1;
 library_name{ith_library}    = 'PathClass_v2025_07_06';
@@ -126,7 +126,7 @@ library_url{ith_library}     = 'https://github.com/ivsg-psu/PathPlanning_PathToo
 
 
 %% Clear paths and folders, if needed
-if 1==0
+if 1==1
     clear flag_MapGen_Folders_Initialized
     fcn_INTERNAL_clearUtilitiesFromPathAndFolders;
 

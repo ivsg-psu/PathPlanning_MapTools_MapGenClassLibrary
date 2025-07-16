@@ -1,4 +1,4 @@
-function [shrunk_polytope] = ...
+function [shrunkPolytope] = ...
     fcn_MapGen_polytopeShrinkToRadius(...
     shrinker,...
     new_radius,...
@@ -6,13 +6,12 @@ function [shrunk_polytope] = ...
     varargin)
 % fcn_MapGen_polytopesShrinkToRadius shrinks the polytopes to achieve the
 % specified maximum radius. The vertices are all porportionally pulled
-% toward the cetroid location such that the new maximum radius matches the
+% toward the centroid location such that the new maximum radius matches the
 % specified maximum radius.
 %
 % FORMAT:
 % 
-% [shrunk_polytopes,mu_final,sigma_final] = ...
-%     fcn_MapGen_polytopesShrinkToRadius(...
+% shrunkPolytope = fcn_MapGen_polytopeShrinkToRadius(...
 %     shrinker,...
 %     new_radius,...
 %     tolerance,...
@@ -20,7 +19,7 @@ function [shrunk_polytope] = ...
 %
 % INPUTS:
 %
-%     shrinker: original polytope with same fields as shrunk_polytopes
+%     shrinker: original polytope with same fields as shrunkPolytopes
 %     below
 %
 %     new_radius: desired polytope radius
@@ -38,17 +37,8 @@ function [shrunk_polytope] = ...
 %
 % OUTPUTS:
 %
-%     SHRUNK_POLYTOPES: a 1-by-n seven field structure of shrunken polytopes, 
-%     where n <= number of polytopes with fields:
-%       vertices: a m+1-by-2 matrix of xy points with row1 = rowm+1, where m is
-%         the number of the individual polytope vertices
-%       xv: a 1-by-m vector of vertice x-coordinates
-%       yv: a 1-by-m vector of vertice y-coordinates
-%       distances: a 1-by-m vector of perimeter distances from one point to the
-%         next point, distances(i) = distance from vertices(i) to vertices(i+1)
-%       mean: centroid xy coordinate of the polytope
-%       area: area of the polytope
-%       max_radius: distance from the mean to the farthest vertex
+%     shrunkPolytope: a polytope structure containing the shrunken input
+%     polytope
 %   
 % DEPENDENCIES:
 % 
@@ -73,6 +63,8 @@ function [shrunk_polytope] = ...
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
 % -- fixed call to fcn_MapGen_fillPolytopeFieldsFromVertices
+% 2025_07_16 by Sean Brennan
+% -- cleaned up documentation and typos
 
 % TO DO
 % -- Vectorize the for loop if possible
@@ -172,7 +164,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Initialize the result:
-shrunk_polytope = shrinker;
+shrunkPolytope = shrinker;
 
 % pull values
 vertices = shrinker.vertices;
@@ -187,11 +179,11 @@ scale = new_radius/rad;
 if scale < 1 
     % find new vertices
     new_vert = centroid + scale*(vertices-centroid);
-    shrunk_polytope.vertices = new_vert;
+    shrunkPolytope.vertices = new_vert;
 end
 
 % fill in other fields from the vertices field
-shrunk_polytope = fcn_MapGen_fillPolytopeFieldsFromVertices(shrunk_polytope);
+shrunkPolytope = fcn_MapGen_fillPolytopeFieldsFromVertices(shrunkPolytope);
 
 
 %% Plot results?
@@ -214,10 +206,22 @@ if flag_do_plot
     plot(centroid(:,1),centroid(:,2),'ko','Markersize',10);
     
     % Plot the input shrinker in red
-    fcn_MapGen_plotPolytopes(shrinker,fig_num,'r',2);
+    % fcn_MapGen_plotPolytopes(shrinker,fig_num,'r',2);
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [1 0 0];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(shrinker, (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
     
     % plot the output polytope in blue
-    fcn_MapGen_plotPolytopes(shrunk_polytope,fig_num,'b',2);
+    % fcn_MapGen_OLD_plotPolytopes(shrunkPolytope,fig_num,'b',2);
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [0 0 1];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(shrunkPolytope, (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
 
 end
 

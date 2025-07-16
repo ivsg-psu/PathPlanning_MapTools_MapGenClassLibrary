@@ -1,5 +1,5 @@
 function [ ...
-exp_polytopes ...
+expandedPolytopes ...
 ] = ...
 fcn_MapGen_polytopesExpandEvenlyForConcave( ...
 polytopes, ...
@@ -17,7 +17,7 @@ varargin...
 % FORMAT:
 %
 %    [ ...
-%    exp_polytopes ...
+%    expandedPolytopes ...
 %    ] = ...
 %    fcn_MapGen_polytopesExpandEvenlyForConcave( ...
 %    polytopes, ...
@@ -43,7 +43,7 @@ varargin...
 %
 % OUTPUTS:
 %
-%     exp_polytopes: structure of expanded polytopes
+%     expandedPolytopes: structure of expanded polytopes
 %
 %
 % DEPENDENCIES:
@@ -167,16 +167,16 @@ end
 %See: http://patorjk.com/software/taag/#p=display&f=Big&t=Main
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
-clear exp_polytopes;
+clear expandedPolytopes;
 for p = 1:length(polytopes)
     this_polytope = polytopes(p); % look at one polytope
     this_polyshape = polyshape(this_polytope.vertices); % convert it to matlab polyshape
     scaled_polyshape = polybuffer(this_polyshape,exp_dist,'JointType','miter','MiterLimit',2); % use polyshape to enlarge it by a buffer
     new_vertices = scaled_polyshape.Vertices; % extract the vertices from the polyshape
     new_vertices = [new_vertices; new_vertices(1,:)]; %#ok<AGROW> % duplicate first vertex at end of array
-    exp_polytopes(p).vertices = new_vertices; %#ok<AGROW> % store vertices in expanded poly struct array
+    expandedPolytopes(p).vertices = new_vertices; %#ok<AGROW> % store vertices in expanded poly struct array
 end
-exp_polytopes= fcn_MapGen_fillPolytopeFieldsFromVertices(exp_polytopes,1); % fill polytopes from vertices
+expandedPolytopes= fcn_MapGen_fillPolytopeFieldsFromVertices(expandedPolytopes,1); % fill polytopes from vertices
 
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -196,9 +196,22 @@ if flag_do_plot
     figure(fig_num)
     clf;
 
-    LineWidth = 2;
-    fcn_MapGen_plotPolytopes(polytopes,fig_num,'r-',LineWidth);
-    fcn_MapGen_plotPolytopes(exp_polytopes,fig_num,'b-',LineWidth,'square');
+    % LineWidth = 2;
+    % fcn_MapGen_OLD_plotPolytopes(polytopes,fig_num,'r-',LineWidth);
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [1 0 0];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(expandedPolytopes, (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
+
+    % fcn_MapGen_OLD_plotPolytopes(expandedPolytopes,fig_num,'b-',LineWidth,'square');
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [0 0 1];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(expandedPolytopes, (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
     legend('Original','Expanded')
     box on
     xlabel('X Position')

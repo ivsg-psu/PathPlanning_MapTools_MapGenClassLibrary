@@ -27,7 +27,7 @@ polytopes.vertices = [
 ];
 
 polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes,1);
-fcn_MapGen_plotPolytopes(polytopes,1,'r',2);
+% fcn_MapGen_plotPolytopes(polytopes,1,'r',2);
 % Set parameters
 exp_dist = 0.04; % Set the expansion distance
 
@@ -72,7 +72,7 @@ end
 exp_polytopes=fcn_MapGen_polytopesExpandEvenlyForConcave(polytopes,exp_dist);
 line_width =2;
 fig_num = 1;
-fcn_MapGen_plotPolytopes(exp_polytopes,fig_num,'g-',line_width);
+% fcn_MapGen_plotPolytopes(exp_polytopes,fig_num,'g-',line_width);
 legend('original','*ExpandEvenly','','scale method','*ExpandEvenlyForConvex');
 % script_test_fcn_MapGen_polytopeFindSelfIntersections
 % Tests function: fcn_MapGen_polytopeFindSelfIntersections

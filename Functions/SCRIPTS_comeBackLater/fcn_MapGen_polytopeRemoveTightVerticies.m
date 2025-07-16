@@ -1,5 +1,5 @@
 function [ ...
-    cleaned_polytope ...
+    cleanedPolytope ...
     ] = ...
     fcn_MapGen_polytopeRemoveTightVerticies( ...
     polytope, ...
@@ -18,7 +18,7 @@ function [ ...
 % FORMAT:
 %
 %    [ ...
-%    cleaned_polytope ...
+%    cleanedPolytope ...
 %    ] = ...
 %    fcn_MapGen_polytopeRemoveTightVerticies( ...
 %    polytope, ...
@@ -45,7 +45,7 @@ function [ ...
 %
 % OUTPUTS:
 %
-%     cleaned_polytope: the resulting polytope after close edges are
+%     cleanedPolytope: the resulting polytope after close edges are
 %     removed.
 %
 %
@@ -212,8 +212,8 @@ else % singular shape (i.e. point) or no shape
 end
 
 % adjust polytopes
-cleaned_polytope.vertices = [new_vert; new_vert(1,:)];
-cleaned_polytope = fcn_MapGen_fillPolytopeFieldsFromVertices(cleaned_polytope);
+cleanedPolytope.vertices = [new_vert; new_vert(1,:)];
+cleanedPolytope = fcn_MapGen_fillPolytopeFieldsFromVertices(cleanedPolytope);
 
 %§
 %% Plot the results (for debugging)?
@@ -236,10 +236,22 @@ if flag_do_plot
     plot(centroid(:,1),centroid(:,2),'ko','Markersize',10);
 
     % Plot the input polytope in red
-    fcn_MapGen_plotPolytopes(polytope,fig_num,'r',2);
+    % fcn_MapGen_OLD_plotPolytopes(polytope,fig_num,'r',2);
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [1 0 0];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(polytope, (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
 
     % plot the output polytope in blue
-    fcn_MapGen_plotPolytopes(cleaned_polytope,fig_num,'b',2);
+    % fcn_MapGen_OLD_plotPolytopes(cleanedPolytope,fig_num,'b',2);
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [0 0 1];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(cleanedPolytope, (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
 
 end % Ends the flag_do_plot if statement
 

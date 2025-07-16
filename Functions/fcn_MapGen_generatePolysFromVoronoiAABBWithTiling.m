@@ -259,16 +259,35 @@ for ith_poly = 1:length(seedPoints)
         % Replot the poly before this one in blue (to cover it up)
         line_width = 3;
         if ith_poly>1
-            fcn_MapGen_plotPolytopes(polytopes(ith_poly-1),fig_debug,'b-',line_width);
+            % fcn_MapGen_OLD_plotPolytopes(polytopes(ith_poly-1),fig_debug,'b-',line_width);
+            plotFormat.LineWidth = line_width;
+            plotFormat.MarkerSize = 10;
+            plotFormat.LineStyle = '-';
+            plotFormat.Color = [0 0 1];
+            fillFormat = [];
+            h_plot = fcn_MapGen_plotPolytopes(polytopes(ith_poly-1), (plotFormat),(fillFormat),(fig_debug)); %#ok<NASGU>
         end
 
         % Plot this one in red
-        fcn_MapGen_plotPolytopes(polytopes(ith_poly),fig_debug,'r-',line_width);
+        % fcn_MapGen_OLD_plotPolytopes(polytopes(ith_poly),fig_debug,'r-',line_width);
+        plotFormat.LineWidth = line_width;
+        plotFormat.MarkerSize = 10;
+        plotFormat.LineStyle = '-';
+        plotFormat.Color = [1 0 0];
+        fillFormat = [];
+        h_plot = fcn_MapGen_plotPolytopes(polytopes(ith_poly), (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
         title(sprintf('Polytope: %.0d',ith_poly));
 
         % Is it the last poly? Plot it in blue
         if ith_poly==Npolys
-            fcn_MapGen_plotPolytopes(polytopes(ith_poly),fig_debug,'b-',line_width);
+            % fcn_MapGen_OLD_plotPolytopes(polytopes(ith_poly),fig_debug,'b-',line_width);
+            plotFormat.LineWidth = line_width;
+            plotFormat.MarkerSize = 10;
+            plotFormat.LineStyle = '-';
+            plotFormat.Color = [0 0 1];
+            fillFormat = [];
+            h_plot = fcn_MapGen_plotPolytopes(polytopes(ith_poly), (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+
         end
 
         % Plot this one's seed point:
@@ -326,7 +345,13 @@ if flag_do_plot
     axis(new_axis);
 
     % plot the polytopes    
-    fcn_MapGen_plotPolytopes(polytopes,fig_num,'b',2);
+    % fcn_MapGen_OLD_plotPolytopes(polytopes,fig_num,'b',2);
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [0 0 1];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
 
     % plot all vertices
     plot(allVertices(:,2),allVertices(:,3),'-', 'Color',0.8*[1 1 1],'Linewidth',1, 'MarkerSize',20, 'DisplayName','vertices');
@@ -474,7 +499,14 @@ if flag_do_plot
         subplot(2,3,4);
 
         % plot the polytopes on current axis
-        fcn_MapGen_plotPolytopes(polytopes,gca,'b',2);
+        % fcn_MapGen_OLD_plotPolytopes(polytopes,gca,'b',2);
+        plotFormat.LineWidth = 2;
+        plotFormat.MarkerSize = 10;
+        plotFormat.LineStyle = '-';
+        plotFormat.Color = [0 0 1];
+        fillFormat = [];
+        h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+
         hold on;
 
 
@@ -489,35 +521,56 @@ if flag_do_plot
         subplot(2,3,5);
 
         % plot the polytopes
-        fcn_MapGen_plotPolytopes(polytopes,gca,'b',5);
+        % fcn_MapGen_OLD_plotPolytopes(polytopes,gca,'b',5);
+        plotFormat.LineWidth = 5;
+        plotFormat.MarkerSize = 10;
+        plotFormat.LineStyle = '-';
+        plotFormat.Color = [0 0 1];
+        fillFormat = [];
+        h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+
+
         hold on;
 
         xscale = AABB(3)-AABB(1);
         yscale = AABB(4)-AABB(2);
 
+        plotFormat.LineWidth = 2;
+        plotFormat.MarkerSize = 10;
+        plotFormat.LineStyle = '-';
+        fillFormat = [];
+
         shifted_left_up = fcn_INTERNAL_shift_polys(polytopes,-xscale,yscale);
-        fcn_MapGen_plotPolytopes(shifted_left_up,gca,'-',2);
+        % fcn_MapGen_OLD_plotPolytopes(shifted_left_up,gca,'-',2);
+        h_plot = fcn_MapGen_plotPolytopes(shifted_left_up, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
 
         shifted_left = fcn_INTERNAL_shift_polys(polytopes,-xscale,0);
-        fcn_MapGen_plotPolytopes(shifted_left,gca,'-',2);
+        % fcn_MapGen_OLD_plotPolytopes(shifted_left,gca,'-',2);
+        h_plot = fcn_MapGen_plotPolytopes(shifted_left, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
 
         shifted_left_down = fcn_INTERNAL_shift_polys(polytopes,-xscale,-yscale);
-        fcn_MapGen_plotPolytopes(shifted_left_down,gca,'-',2);
+        % fcn_MapGen_OLD_plotPolytopes(shifted_left_down,gca,'-',2);
+        h_plot = fcn_MapGen_plotPolytopes(shifted_left_down, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
 
         shifted_up = fcn_INTERNAL_shift_polys(polytopes,0,yscale);
-        fcn_MapGen_plotPolytopes(shifted_up,gca,'-',2);
+        % fcn_MapGen_OLD_plotPolytopes(shifted_up,gca,'-',2);
+        h_plot = fcn_MapGen_plotPolytopes(shifted_up, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
 
         shifted_down = fcn_INTERNAL_shift_polys(polytopes,0,-yscale);
-        fcn_MapGen_plotPolytopes(shifted_down,gca,'-',2);
+        % fcn_MapGen_OLD_plotPolytopes(shifted_down,gca,'-',2);
+        h_plot = fcn_MapGen_plotPolytopes(shifted_down, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
 
         shifted_right_up = fcn_INTERNAL_shift_polys(polytopes,xscale,yscale);
-        fcn_MapGen_plotPolytopes(shifted_right_up,gca,'-',2);
+        % fcn_MapGen_OLD_plotPolytopes(shifted_right_up,gca,'-',2);
+        h_plot = fcn_MapGen_plotPolytopes(shifted_right_up, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
 
         shifted_right = fcn_INTERNAL_shift_polys(polytopes,xscale,0);
-        fcn_MapGen_plotPolytopes(shifted_right,gca,'-',2);
+        % fcn_MapGen_OLD_plotPolytopes(shifted_right,gca,'-',2);
+        h_plot = fcn_MapGen_plotPolytopes(shifted_right, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
 
         shifted_right_down = fcn_INTERNAL_shift_polys(polytopes,xscale,-yscale);
-        fcn_MapGen_plotPolytopes(shifted_right_down,gca,'-',2);
+        % fcn_MapGen_OLD_plotPolytopes(shifted_right_down,gca,'-',2);
+        h_plot = fcn_MapGen_plotPolytopes(shifted_right_down, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
 
         axis(new_axis);
         title('Polytopes can tile');
@@ -535,30 +588,43 @@ if flag_do_plot
         fcn_MapGen_plotPolytopes(shrunk_polytopes,gca,'r',2);
         hold on;
 
+        plotFormat.LineWidth = 5;
+        plotFormat.MarkerSize = 10;
+        plotFormat.LineStyle = '-';
+        plotFormat.Color = [0 0 1];
+        fillFormat = [];        
 
         shifted_left_up = fcn_INTERNAL_shift_polys(shrunk_polytopes,-xscale,yscale);
-        fcn_MapGen_plotPolytopes(shifted_left_up,gca,'b-',2);
+        % fcn_MapGen_OLD_plotPolytopes(shifted_left_up,gca,'b-',2);
+        h_plot = fcn_MapGen_plotPolytopes(shifted_left_up, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
 
         shifted_left = fcn_INTERNAL_shift_polys(shrunk_polytopes,-xscale,0);
-        fcn_MapGen_plotPolytopes(shifted_left,gca,'b-',2);
+        % fcn_MapGen_OLD_plotPolytopes(shifted_left,gca,'b-',2);
+        h_plot = fcn_MapGen_plotPolytopes(shifted_left, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
 
         shifted_left_down = fcn_INTERNAL_shift_polys(shrunk_polytopes,-xscale,-yscale);
-        fcn_MapGen_plotPolytopes(shifted_left_down,gca,'b-',2);
+        % fcn_MapGen_OLD_plotPolytopes(shifted_left_down,gca,'b-',2);
+        h_plot = fcn_MapGen_plotPolytopes(shifted_left_down, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
 
         shifted_up = fcn_INTERNAL_shift_polys(shrunk_polytopes,0,yscale);
-        fcn_MapGen_plotPolytopes(shifted_up,gca,'b-',2);
+        % fcn_MapGen_OLD_plotPolytopes(shifted_up,gca,'b-',2);
+        h_plot = fcn_MapGen_plotPolytopes(shifted_up, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
 
         shifted_down = fcn_INTERNAL_shift_polys(shrunk_polytopes,0,-yscale);
-        fcn_MapGen_plotPolytopes(shifted_down,gca,'b-',2);
+        % fcn_MapGen_OLD_plotPolytopes(shifted_down,gca,'b-',2);
+        h_plot = fcn_MapGen_plotPolytopes(shifted_down, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
 
         shifted_right_up = fcn_INTERNAL_shift_polys(shrunk_polytopes,xscale,yscale);
-        fcn_MapGen_plotPolytopes(shifted_right_up,gca,'b-',2);
+        % fcn_MapGen_OLD_plotPolytopes(shifted_right_up,gca,'b-',2);
+        h_plot = fcn_MapGen_plotPolytopes(shifted_right_up, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
 
         shifted_right = fcn_INTERNAL_shift_polys(shrunk_polytopes,xscale,0);
-        fcn_MapGen_plotPolytopes(shifted_right,gca,'b-',2);
+        % fcn_MapGen_OLD_plotPolytopes(shifted_right,gca,'b-',2);
+        h_plot = fcn_MapGen_plotPolytopes(shifted_right, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
 
         shifted_right_down = fcn_INTERNAL_shift_polys(shrunk_polytopes,xscale,-yscale);
-        fcn_MapGen_plotPolytopes(shifted_right_down,gca,'b-',2);
+        % fcn_MapGen_OLD_plotPolytopes(shifted_right_down,gca,'b-',2);
+        h_plot = fcn_MapGen_plotPolytopes(shifted_right_down, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
 
         axis(new_axis);
         title('Shrunk from edge polytopes, with tiling');
@@ -596,7 +662,13 @@ if flag_do_plot
         axis(new_axis);
 
         % plot the polytopes
-        fcn_MapGen_plotPolytopes(polytopes,tiling_fig_num,'b',2);
+        % fcn_MapGen_OLD_plotPolytopes(polytopes,tiling_fig_num,'b',2);
+        plotFormat.LineWidth = 2;
+        plotFormat.MarkerSize = 10;
+        plotFormat.LineStyle = '-';
+        plotFormat.Color = [0 0 1];
+        fillFormat = [];
+        h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(fig_debug)); %#ok<NASGU>
 
         % plot all vertices
         plot(all_points(:,1),all_points(:,2),'c.','Linewidth',1);
@@ -665,32 +737,6 @@ end
 
 
 end % Ends the function
-
-
-
-
-% Fill in neighbors - Note: this is SLOW. A much better way to do this
-% would be to sort the all-verticies by the point values, then cluster
-% the polytope indices together.
-
-%         if jth_neighbor~=ith_poly % Make sure not checking self
-%             vertices_neighbors = V(C{jth_neighbor},:); % Grab verticies
-%             vertices_neighbors = vertices_neighbors(~isinf(vertices_neighbors(:,1)),:);
-%             if any(ismember(vertices_open,vertices_neighbors)) % Any shared?
-%                 neighbors_vector = all_neighbors(row_offset+1:row_offset+Nvertices_per_poly,:);
-%                 if ~any(ismember(neighbors_vector,jth_neighbor))
-%                     next_index = find(isnan(neighbors_vector),1,'first');
-%                     if ~isempty(next_index)
-%                         neighbors_vector(next_index) = jth_neighbor;
-%                         all_neighbors(row_offset+1:row_offset+Nvertices_per_poly,:) = ...
-%                             neighbors_vector;
-%                     else
-%                         error('Need to make neighbors bigger');
-%                     end
-%                 end
-%             end
-%         end
-% end % Ends loop through neighbors
 
 %% Functions follow
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

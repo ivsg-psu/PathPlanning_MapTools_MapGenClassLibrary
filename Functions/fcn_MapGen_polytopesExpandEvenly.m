@@ -1,5 +1,5 @@
 function [ ...
-exp_polytopes ...
+expandedPolytopes ...
 ] = ...
 fcn_MapGen_polytopesExpandEvenly( ...
 polytopes, ...
@@ -17,7 +17,7 @@ varargin...
 % FORMAT:
 %
 %    [ ...
-%    exp_polytopes ...
+%    expandedPolytopes ...
 %    ] = ...
 %    fcn_MapGen_polytopesExpandEvenly( ...
 %    polytopes, ...
@@ -44,7 +44,7 @@ varargin...
 %
 % OUTPUTS:
 %
-%     exp_polytopes: structure of expanded polytopes
+%     expandedPolytopes: structure of expanded polytopes
 %
 %
 % DEPENDENCIES:
@@ -185,7 +185,7 @@ end
 %See: http://patorjk.com/software/taag/#p=display&f=Big&t=Main
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
-exp_polytopes = polytopes; % both structures will be the same size
+expandedPolytopes = polytopes; % both structures will be the same size
 
 for ith_poly = 1:size(polytopes,2) % check each obstacle
 
@@ -198,10 +198,10 @@ for ith_poly = 1:size(polytopes,2) % check each obstacle
     scale = (rad+exp_dist)/rad;
 
     % Calculate new vertices
-    exp_polytopes(ith_poly).vertices = centroid + scale*(vertices-centroid);
+    expandedPolytopes(ith_poly).vertices = centroid + scale*(vertices-centroid);
 
     % fill in other fields from the vertices field
-    exp_polytopes(ith_poly) = fcn_MapGen_fillPolytopeFieldsFromVertices(exp_polytopes(ith_poly));
+    expandedPolytopes(ith_poly) = fcn_MapGen_fillPolytopeFieldsFromVertices(expandedPolytopes(ith_poly));
 
 end
 
@@ -224,9 +224,23 @@ if flag_do_plot
     figure(fig_num)
     clf;
 
-    LineWidth = 2;
-    fcn_MapGen_plotPolytopes(polytopes,fig_num,'r-',LineWidth);
-    fcn_MapGen_plotPolytopes(exp_polytopes,fig_num,'b-',LineWidth,'square');
+    % LineWidth = 2;
+    % fcn_MapGen_OLD_plotPolytopes(polytopes,fig_num,'r-',LineWidth);
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [1 0 0];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(expandedPolytopes, (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
+
+    % fcn_MapGen_OLD_plotPolytopes(expandedPolytopes,fig_num,'b-',LineWidth,'square');
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [0 0 1];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(expandedPolytopes, (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
+
     legend('Original','Expanded')
     box on
     xlabel('X Position')

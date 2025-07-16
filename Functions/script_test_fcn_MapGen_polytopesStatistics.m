@@ -85,7 +85,7 @@ if 1==0
     h_plot = subplot(2,3,1);
     hold on;
     line_width = 2;
-    fcn_MapGen_plotPolytopes(polytopes,h_plot,'r',line_width);
+    % fcn_MapGen_plotPolytopes(polytopes,h_plot,'r',line_width);
 end
 
 % script_test_fcn_MapGen_polytopeFindSelfIntersections

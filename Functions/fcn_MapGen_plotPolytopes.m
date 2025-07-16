@@ -1,94 +1,55 @@
-function [fig] = fcn_MapGen_plotPolytopes(polytopes,fig_num,line_spec,line_width,varargin)
-% fcn_MapGen_plotPolytopes plots a set of polytopes given user-defined
-% inputs
+function h_plot = fcn_MapGen_plotPolytopes(polytopes, varargin)
+%fcn_MapGen_plotPolytopes    plots XY data with user-defined formatting strings
+% 
+% FORMAT:
 %
-% [FIG_HANDLE]=fcn_MapGen_plotPolytopes(POLYTOPES,FIG_NUM,LINE_SPEC,LINE_WIDTH)
-% returns:
-% a figure with the polytopes plotted as specified
+%      h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat), (fillFormat), (fig_num))
 %
-% with inputs:
-% POLYTOPES: a 1-by-n seven field structure, where n <= number of polytopes
-%   with fields:
-%   vertices: a m+1-by-2 matrix of xy points with row1 = rowm+1, where m is
-%     the number of the individual polytope vertices
-%   xv: a 1-by-m vector of vertice x-coordinates
-%   yv: a 1-by-m vector of vertice y-coordinates
-%   distances: a 1-by-m vector of perimeter distances from one point to the
-%     next point, distances(i) = distance from vertices(i) to vertices(i+1)
-%   mean: average xy coordinate of the polytope
-%   area: area of the polytope
-%   max_radius: distance from the mean to the farthest vertex
-% FIG_NUM: figure number to plot the values on
-% LINE_SPEC: a string, line specifications such as color, 'r', and line or
-% point type, '--'
-% LINE_WIDTH: width of the line to be plotted
-% By default the axes will be determined by the plot function
+% INPUTS:  
 %
-% [FIG]=fcn_MapGen_plotPolytopes(POLYTOPES,FIG_NUM,LINE_SPEC,LINE_WIDTH,COLOR)
-% allows the user to specify the input:
-% COLOR: a 1-by-3 vector to specify the RGB plot colors [Red Green Blue],
-% where 0 <= Red,Green,Blue <= 1
+%      polytopes: an array of structures containing polytope information.
+%      
+%      (OPTIONAL INPUTS)
 %
-% [FIG]=fcn_MapGen_plotPolytopes(POLYTOPES,FIG_NUM,LINE_SPEC,LINE_WIDTH,AXIS_LIMITS)
-% allows the user to specify the input:
-% AXIS_LIMTS: a 1-by-4 vector to specify the start and end of the x and y
-% axes, [xstart xend ystart yend]
+%      plotFormat: one of the following:
+%      
+%          * a format string, e.g. 'b-', that dictates the plot style
+%          * a [1x3] color vector specifying the RGB ratios from 0 to 1
+%          * a structure whose subfields for the plot properties to change, for example:
+%            plotFormat.LineWidth = 3;
+%            plotFormat.MarkerSize = 10;
+%            plotFormat.Color = [1 0.5 0.5];
+%            A full list of properties can be found by examining the plot
+%            handle, for example: h_plot = plot(1:10); get(h_plot)
 %
-% [FIG]=fcn_MapGen_plotPolytopes(POLYTOPES,FIG_NUM,LINE_SPEC,LINE_WIDTH,AXIS_STYLE)
-% allows the user to specify the input:
-% AXIS_STYLE: controls the style of the axis, such as square or equal
+%      fillFormat: a 1-by-5 vector to specify wether or not there is fill,
+%      the color of fill, and the opacity of the fill [Y/N, R, G, B,
+%      alpha]. Default is [0 0 0 0 0];
 %
-% [FIG]=fcn_MapGen_plotPolytopes(POLYTOPES,FIG_NUM,LINE_SPEC,LINE_WIDTH,FILL_INFO)
-% allows the user to specify the input:
-% FILL_INFO: a 1-by-5 vector to specify wether or not there is fill, the
-% color of fill, and the opacity of the fill [Y/N, R, G, B, alpha]
+%      fig_num: a figure number to plot results. If set to -1, skips any
+%      input checking or debugging, no figures will be generated, and sets
+%      up code to maximize speed.
 %
-% [FIG]=fcn_MapGen_plotPolytopes(POLYTOPES,FIG_NUM,LINE_SPEC,LINE_WIDTH,COLOR,AXIS_LIMITS,AXIS_STYLE,FILL_INFO)
-% allows the user to specify any combination of all four inputs in any
-% order after LINE_WIDTH
+% OUTPUTS:
 %
-% Examples:
+%      h_plot: the handle to the plotting result
 %
-%      % BASIC example
-%      mapx = 1;
-%      mapy = 1;
-%      seedGeneratorNames = 'haltonset';
-%      seedGeneratorRanges = [1 100];
-%      AABBs = [0 0 1 1];
-%      mapStretchs = [1 1];
-%      [polytopes] = fcn_MapGen_voronoiTiling(...
-%      seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
-%      seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
-%      (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
-%      (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
-%      (-1));
-%      fig1 = fcn_MapGen_plotPolytopes(polytopes,[],'-',2,[0.5 0 0]);
-%      fig2 = fcn_MapGen_plotPolytopes(polytopes,998,'-',2,[0 0 0.5],[0 mapx 0 mapy]);
-%      fig3 = fcn_MapGen_plotPolytopes(polytopes,999,'-',2,[0 0.5 0],[0 mapx 0 mapy],'square');
-%      fig4 = fcn_MapGen_plotPolytopes(polytopes,1000,'-',2,[0 0 0],[0 mapx 0 mapy],'square',[1 0 0 0 0.5]);
-%      seedGeneratorNames = 'haltonset';
-%      seedGeneratorRanges = [101 200];
-%      AABBs = [0 0 1 1];
-%      mapStretchs = [1 1];
-%      [polytopes2] = fcn_MapGen_voronoiTiling(...
-%     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
-%     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
-%     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
-%     (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
-%     (-1));
-%      fcn_MapGen_plotPolytopes(polytopes2,fig1,'r-',2)
-%      fcn_MapGen_plotPolytopes(polytopes2,fig2,'b--',2,[0 mapx 0 mapy])
-%      fcn_MapGen_plotPolytopes(polytopes2,fig3,'g-',3,[0 mapx 0 mapy],'square')
-%      fcn_MapGen_plotPolytopes(polytopes2,fig4,'k-',3,[0 mapx 0 mapy],'square',[1 0 0 0 0.5])
+% DEPENDENCIES:
 %
-% For examples, see: script_test_fcn_MapGen_plotPolytopes.m
+%      (none)
 %
-% This function was written on 2018_12_10 by Seth Tau
-% Questions or comments? sat5340@psu.edu
+% EXAMPLES:
 %
+%       See the script:
+% 
+%       script_test_fcn_MapGen_plotPolytopes.m 
+%  
+%       for a full test suite.
+%
+% This function was written on 2021_06_06 by Sean Brennan
+% Questions or comments? sbrennan@psu.edu
 
-
-% REVISION HISTORY:
+% Revision history
 % 2021_06_06 - S.Brennan
 % -- revised from fcn_plot_polytopes
 % -- added revisions to prep for MapGen library
@@ -102,17 +63,18 @@ function [fig] = fcn_MapGen_plotPolytopes(polytopes,fig_num,line_spec,line_width
 % 2025_04_25 by Sean Brennan
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-
-% TO DO
-% -- none
+% 2025_07_16 - Sean Brennan
+% -- imported plot structure into format from fcn_plotRoad_plotXY
 
 %% Debugging and Input checks
+
+% REPLACE!!!!
 
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 flag_max_speed = 0;
-if (nargin>=2 && isequal(fig_num,-1))
+if (nargin==4 && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -120,11 +82,11 @@ else
     % Check to see if we are externally setting debug mode to be "on"
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 1; % Flag to perform input checking
-    MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS");
-    MATLABFLAG_MAPGEN_FLAG_DO_DEBUG = getenv("MATLABFLAG_MAPGEN_FLAG_DO_DEBUG");
-    if ~isempty(MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_MAPGEN_FLAG_DO_DEBUG)
-        flag_do_debug = str2double(MATLABFLAG_MAPGEN_FLAG_DO_DEBUG);
-        flag_check_inputs  = str2double(MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS);
+    MATLABFLAG_PLOTROAD_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_PLOTROAD_FLAG_CHECK_INPUTS");
+    MATLABFLAG_PLOTROAD_FLAG_DO_DEBUG = getenv("MATLABFLAG_PLOTROAD_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_PLOTROAD_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_PLOTROAD_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_PLOTROAD_FLAG_DO_DEBUG); 
+        flag_check_inputs  = str2double(MATLABFLAG_PLOTROAD_FLAG_CHECK_INPUTS);
     end
 end
 
@@ -139,7 +101,7 @@ else
 end
 
 
-%% check input arguments?
+%% check input arguments
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   _____                   _
 %  |_   _|                 | |
@@ -152,106 +114,78 @@ end
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-if (0==flag_max_speed)
-    if 1 == flag_check_inputs
-
+if 0==flag_max_speed
+    if flag_check_inputs == 1
         % Are there the right number of inputs?
-        narginchk(4,8);
+        narginchk(1,4);
 
-        % % Check the polytopes input, make sure it is 'polytopes' type
+        % Check the polytopes input
         % fcn_DebugTools_checkInputsToFunctions(...
         %     polytopes, 'polytopes');
-        % 
-        % 
-        % % Check the exp_dist input, make sure it is 'positive_column_of_numbers' type
-        % fcn_DebugTools_checkInputsToFunctions(...
-        %     exp_dist, 'positive_1column_of_numbers',1);
 
     end
 end
 
 
+% Set plotting defaults
+plotFormat = 'k';
 
-%% open figures
-if isempty(fig_num)
-    fig = figure; % create new figure with next default index
-else
-    % check to see that the handle is an axis. If so, use it and don't just
-    % go to a new figure
-    if isgraphics(fig_num,'axes')
-        axes(fig_num);
-    else
-        fig = figure(fig_num); % open specific figure
-    end
-end
-hold on % allow multiple plot calls
+% formatting_type type is an integer to save the type of formatting. 
+% The numbers refer to 1: a string is given or 2: a color is given, or 3: a structure is given
+formatting_type = 1;  
 
-%% determine color and axis values
-plots = 1; % basic plot
-color = []; axis_limits = []; axis_style = []; fill_info = [0 0 0 0 0]; % initialize empty values
-if nargin > 4
-    for arg = 1:nargin-4
-        argument = varargin{arg};
-        arg_size = length(argument);
-        if ischar(argument)
-            axis_style = argument; % axis style (ie square or equal)
-        elseif arg_size == 0
-            % Do nothing - user left it blank
-        elseif arg_size == 3
-            color = argument; % color to plot polytopes
-            plots = 2; % specific color plot
-        elseif arg_size == 4
-            axis_limits = argument; % limits of x and y axes
-        elseif arg_size == 5
-            fill_info = argument; % all the fill information [Y/N R G B alpha]
+% Check to see if user specifies plotFormat?
+if 2 <= nargin
+    input = varargin{1};
+    if ~isempty(input)
+        plotFormat = input;
+        if ischar(plotFormat) && length(plotFormat)<=4
+            formatting_type = 1;
+        elseif isnumeric(plotFormat)  % Numbers are a color style
+            formatting_type = 2;
+        elseif isstruct(plotFormat)  % Structures give properties
+            formatting_type = 3;
         else
             warning('on','backtrace');
-            warning('Invalid argument. Argument ignored.')
+            warning('An unkown input format is detected - throwing an error.')
+            error('Unknown plotFormat input detected')
         end
     end
 end
 
-
-% if nargin == 4
-%     plots = 1; % basic plot
-% else % nargin > 4
-%     if length(varargin{1}) == 3 % first optional argument is color
-%         color = varargin{1}; % color to plot polytopes
-%         plots = 2; % plot polytopes with special color
-%         if nargin == 8 % color, limits, limit style, and fill info specified
-%             axis_limits = varargin{2}; % limits of x and y axes
-%             axis_style = varargin{3}; % axis style (ie square or equal)
-%             fill_info = varargin{4}; % all the fill information [Y/N R G B alpha]
-%         elseif nargin == 7 % color, limits, and limit style or fill info
-%             axis_limits = varargin{2}; % limits of x and y axes
-%             if ischar(varargin{3}) % limit style specified
-%                 axis_style = varargin{3}; % axis style (ie square or equal)
-%             else % fill info specified
-%                 fill_info = varargin{3}; % all the fill information [Y/N R G B alpha]
-%             end
-%         elseif nargin == 6 % only color and limits specified
-%             if length(varargin{2}
-%             axis_limits = varargin{2}; % limits of x and y axes
-%         end
-%     elseif length(varargin{1}) == 4 % first optional argument is axis limits
-%         plots = 1; % basic plot
-%         axis_limits = varargin{1}; % limits of x and y axes
-%         if nargin == 6 % only color and limits specified
-%             axis_style = varargin{2}; % axis style (ie square or equal)
-%         end
-%     else % first optional argument is fill info
-%
-%     end
-% end
-
-%% plot polytopes
-% Plot polytope as filled object, using 'fill'
-if fill_info(1) == 1
-    for polys = 1:size(polytopes,2)
-        filler = fill(polytopes(polys).vertices(:,1)',polytopes(polys).vertices(:,2)',fill_info(2:4));
-        filler.FaceAlpha = polytopes(polys).cost;
+% Set fillFormat defaults
+fillFormat = [0 0 0 0 0]; % initialize empty values
+if 2 <= nargin
+    temp = varargin{2};
+    if ~isempty(temp)
+        fillFormat = temp;
     end
 end
+
+% Does user want to specify fig_num?
+flag_do_plots = 0;
+if (0==flag_max_speed) &&  (2<=nargin)
+    temp = varargin{end};
+    if ~isempty(temp)
+        fig_num = temp;
+        flag_do_plots = 1;
+    end
+end
+
+
+%% Solve for the Maxs and Mins
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   __  __       _       
+%  |  \/  |     (_)      
+%  | \  / | __ _ _ _ __  
+%  | |\/| |/ _` | | '_ \ 
+%  | |  | | (_| | | | | |
+%  |_|  |_|\__,_|_|_| |_|
+% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Initialize the output
+h_plot = 0;
 
 % Fill in the x and y data
 polytope_plot_data_x = [];
@@ -261,19 +195,104 @@ for polys = 1:size(polytopes,2) % plot each polytope
     polytope_plot_data_y = [polytope_plot_data_y; polytopes(polys).vertices(:,2); nan]; %#ok<AGROW>
 end
 
-% Plot polytope edges depending on line style
-if plots == 1 % basic plot
-    plot(polytope_plot_data_x,polytope_plot_data_y,line_spec,'linewidth',line_width,'DisplayName','polytopes')
-else
-    plot(polytope_plot_data_x,polytope_plot_data_y,line_spec,'Color',color,'linewidth',line_width,'DisplayName','polytopes')
+%% Plot the results (for debugging)?
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   _____       _                 
+%  |  __ \     | |                
+%  | |  | | ___| |__  _   _  __ _ 
+%  | |  | |/ _ \ '_ \| | | |/ _` |
+%  | |__| |  __/ |_) | |_| | (_| |
+%  |_____/ \___|_.__/ \__,_|\__, |
+%                            __/ |
+%                           |___/ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if flag_do_plots
+    % check whether the figure already has data
+    temp_h = figure(fig_num);
+    flag_rescale_axis = 0; 
+    if isempty(get(temp_h,'Children'))
+        flag_rescale_axis = 0; % Set to 1 to force rescaling
+    end        
+
+    hold on;
+    axis equal
+
+    xlabel('X [m]');
+    ylabel('Y [m]');
+
+    % make plots
+    if formatting_type==1
+        finalPlotFormat = fcn_DebugTools_extractPlotFormatFromString(plotFormat, (-1));
+    elseif formatting_type==2
+        finalPlotFormat.Color = plotFormat;
+    elseif formatting_type==3        
+        finalPlotFormat = plotFormat;
+    else
+        warning('on','backtrace');
+        warning('An unkown input format is detected in the main code - throwing an error.')
+        error('Unknown plot type')
+    end
+
+    % If plotting only one point, make sure point style is filled
+    NplotPoints = length(polytope_plot_data_x(:,1));
+    if NplotPoints==1
+        if ~isfield(plotFormat,'Marker') || strcmp(plotFormat.Marker,'none')
+            finalPlotFormat.Marker = '.';
+            finalPlotFormat.LineStyle = 'none';
+        end
+    end
+
+
+    % Do plotting
+    % Plot polytope as filled object, using 'fill'
+    if fillFormat(1) == 1
+        for polys = 1:size(polytopes,2)
+            filler = fill(polytopes(polys).vertices(:,1)',polytopes(polys).vertices(:,2)',fillFormat(2:4));
+            filler.FaceAlpha = polytopes(polys).cost;
+        end
+    end
+
+
+    % Plot polytope edges depending on line style
+    h_plot = plot(polytope_plot_data_x,polytope_plot_data_y);    
+    list_fieldNames = fieldnames(finalPlotFormat);
+    for ith_field = 1:length(list_fieldNames)
+        thisField = list_fieldNames{ith_field};
+        h_plot.(thisField) = finalPlotFormat.(thisField);
+    end
+
+    % Make axis slightly larger?
+    if flag_rescale_axis
+        temp = axis;
+        %     temp = [min(points(:,1)) max(points(:,1)) min(points(:,2)) max(points(:,2))];
+        axis_range_x = temp(2)-temp(1);
+        axis_range_y = temp(4)-temp(3);
+        percent_larger = 0.3;
+        axis([temp(1)-percent_larger*axis_range_x, temp(2)+percent_larger*axis_range_x,  temp(3)-percent_larger*axis_range_y, temp(4)+percent_larger*axis_range_y]);
+    end
+
+    axis equal
+    axis tight
+
+end % Ends check if plotting
+
+if flag_do_debug
+    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
 end
 
+end % Ends main function
 
-axis(axis_limits);
-axis(axis_style);
-
-
-
+%% Functions follow
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   ______                _   _
+%  |  ____|              | | (_)
+%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___
+%  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
+%  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
+%  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
+%
+% See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
 
 

@@ -26,12 +26,19 @@ output_pts = fcn_MapGen_snapInteriorPointToVertex(polytopes, pts_to_test);
 % plot the map
 if flag_do_plot
     fig = 111; % figure to plot on
-    line_spec = 'b-'; % edge line plotting
-    line_width = 2; % linewidth of the edge
-    axes_limits = [-3 5 -3 5]; % x and y axes limits
-    axis_style = 'square'; % plot axes style
+    % line_spec = 'b-'; % edge line plotting
+    % line_width = 2; % linewidth of the edge
+    % axes_limits = [-3 5 -3 5]; % x and y axes limits
+    % axis_style = 'square'; % plot axes style
     figure
-    fcn_MapGen_plotPolytopes(polytopes,fig,line_spec,line_width,axes_limits,axis_style);
+    % fcn_MapGen_OLD_plotPolytopes(polytopes,fig,line_spec,line_width,axes_limits,axis_style);
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [0 0 1];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat), (fillFormat), (fig)); %#ok<NASGU>
+
     hold on
     box on
     title('function result')
@@ -89,11 +96,18 @@ output_pts = [start_midway; finish_init; other_pt];
 
 if flag_do_plot
     fig = 121; % figure to plot on
-    line_spec = 'b-'; % edge line plotting
-    line_width = 2; % linewidth of the edge
-    axes_limits = [-3 5 -3 5]; % x and y axes limits
-    axis_style = 'square'; % plot axes style
-    fcn_MapGen_plotPolytopes(polytopes,fig,line_spec,line_width,axes_limits,axis_style);
+    % line_spec = 'b-'; % edge line plotting
+    % line_width = 2; % linewidth of the edge
+    % axes_limits = [-3 5 -3 5]; % x and y axes limits
+    % axis_style = 'square'; % plot axes style
+    % fcn_MapGen_OLD_plotPolytopes(polytopes,fig,line_spec,line_width,axes_limits,axis_style);
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [0 0 1];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat), (fillFormat), (fig)); 
+    
 
     title('legacy script result')
     hold on

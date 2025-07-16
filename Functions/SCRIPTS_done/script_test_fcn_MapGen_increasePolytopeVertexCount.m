@@ -296,8 +296,4 @@ mapStretchs = [1 1];
     (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
     (-1));
 
-
-% fcn_MapGen_plotPolytopes(polytopes,1000,'-',2,[0 0 0],axis_box,'square',[1 0 0 0 0.5]);
-
-
 end % Ends fcn_INTERNAL_loadExampleData

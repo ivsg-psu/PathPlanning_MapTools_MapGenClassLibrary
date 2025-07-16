@@ -228,8 +228,14 @@ for ith_poly = 1:Npolys
         polytopes(ith_poly).max_radius/polytopes(ith_poly).min_radius;
     all_areas(ith_poly,1) = polytopes(ith_poly).area;
 
-    % Plot the input polytopes in red
-    %fcn_MapGen_plotPolytopes(polytopes(ith_poly),fig_num,'r',2);
+    % % Plot the input polytopes in red
+    % % fcn_MapGen_OLD_plotPolytopes(polytopes(ith_poly),fig_num,'r',2);
+    % plotFormat.LineWidth = 2;
+    % plotFormat.MarkerSize = 10;
+    % plotFormat.LineStyle = '-';
+    % plotFormat.Color = [1 0 0];
+    % fillFormat = [];
+    % h_plot = fcn_MapGen_plotPolytopes(polytopes(ith_poly), (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
 
 end
 
@@ -318,7 +324,13 @@ if flag_do_debug
     axis(new_axis);
 
     % plot the polytopes
-    fcn_MapGen_plotPolytopes(polytopes,fig_for_debug,'b',2);
+    % fcn_MapGen_OLD_plotPolytopes(polytopes,fig_for_debug,'b',2);
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [0 0 1];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat), (fillFormat), (fig_for_debug)); %#ok<NASGU>
 
     % plot all vertices
     plot(all_walls_start_no_nan(:,1),all_walls_start_no_nan(:,2),'c.','Markersize',10);

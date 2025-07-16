@@ -1,26 +1,14 @@
-% script_test_fcn_MapGen_polytopeCentroidAndArea
-% Tests: fcn_MapGen_polytopeCentroidAndArea
+% script_test_fcn_MapGen_polytopeRemoveColinearVertices
+% Tests function: fcn_MapGen_polytopeRemoveColinearVertices
 
-%
 % REVISION HISTORY:
-%
-% 2021_07_02 by Sean Brennan
-% -- first write of script
-%%%%%%%%%%%%%%§
+% 2021_08_03
+% -- first written by S. Brennan
 
-fig_num = 7;
+close all;
 
-x = [3; 4; 2; -1; -2; -3; -4; -2; 1; 2; 3];
-y = [1; 2; 2; 3; 2; -1; -2; -3; -3; -2; 1];
-[Centroid,Area] = fcn_MapGen_polytopeCentroidAndArea([x,y],fig_num);
 
-assert(isequal(round(Centroid,4),[-0.1462,-0.2222]));
-assert(isequal(round(Area,4),28.5));
-
-figure(2);
-plot(x,y,'g-','linewidth',2)
-hold on
-plot(Centroid(:,1),Centroid(:,2),'kx','linewidth',1)
+%% Basic example of self-intersection being "cleaned"
 
 % script_test_fcn_MapGen_polytopeFindSelfIntersections
 % Tests function: fcn_MapGen_polytopeFindSelfIntersections
@@ -52,50 +40,45 @@ close all
 close all;
 fprintf(1,'Figure: 1XXXXXX: DEMO cases\n');
 
-%% DEMO case: self-intersection
+%% DEMO case: colinear points being removed
 fig_num = 10001;
-titleString = sprintf('DEMO case: self-intersection');
+titleString = sprintf('DEMO case: colinear points being removed');
 fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
 vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
 
-interiorPoint = [0.5 0.5];
+vertices_with_self_intersects = fcn_MapGen_polytopeFindSelfIntersections(vertices,-1);
 
-% Call the function
-[projectedPoints] = ...
+interior_point = [0.5 0.5];
+[inputVertices] = ...
     fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-    interiorPoint,...
-    verticesIncludingSelfIntersections,...
-    verticesIncludingSelfIntersections(1:end-1,:),...
-    verticesIncludingSelfIntersections(2:end,:),...
-    (fig_num));
+    interior_point,...
+    vertices_with_self_intersects,...
+    vertices_with_self_intersects(1:end-1,:),...
+    vertices_with_self_intersects(2:end,:),...
+    -1);
+
+% assert(isequal(round(inputVertices,4),[0,0; 0,0; 1,0; 0.75,0.75; 0.6667,1; 0.6667,1; 0.5,1; 0,1]));
+    
+% Call the function
+[cleanedVertices] = ...
+    fcn_MapGen_polytopeRemoveColinearVertices(...,
+    inputVertices,...
+    fig_num);
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(projectedPoints));
+assert(isnumeric(cleanedVertices));
 
 % Check variable sizes
-Nvertices = length(verticesIncludingSelfIntersections(:,1));
-assert(size(projectedPoints,1)==Nvertices);
-assert(size(projectedPoints,2)==2);
+Nvertices = length(inputVertices(:,1));
+assert(size(cleanedVertices,1)<=Nvertices);
+assert(size(cleanedVertices,2)==2);
 
 % Check variable values
-assert(isequal(round(projectedPoints,4),round(...
-    [...
-    0         0
-    0         0
-    1.0000         0
-    0.7500    0.7500
-    0.6667    1.0000
-    0.6667    1.0000
-    0.5000    1.0000
-    0    1.0000
-    ]...
-    ,4)));
+assert(isequal(round(cleanedVertices,4),[0,0; 1,0; 0.6667,1; 0,1]));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -150,41 +133,36 @@ fprintf(1,'Figure: %.0f: FAST mode, empty fig_num\n',fig_num);
 figure(fig_num); close(fig_num);
 
 vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
 
-interiorPoint = [0.5 0.5];
+vertices_with_self_intersects = fcn_MapGen_polytopeFindSelfIntersections(vertices,-1);
 
-% Call the function
-[projectedPoints] = ...
+interior_point = [0.5 0.5];
+[inputVertices] = ...
     fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-    interiorPoint,...
-    verticesIncludingSelfIntersections,...
-    verticesIncludingSelfIntersections(1:end-1,:),...
-    verticesIncludingSelfIntersections(2:end,:),...
+    interior_point,...
+    vertices_with_self_intersects,...
+    vertices_with_self_intersects(1:end-1,:),...
+    vertices_with_self_intersects(2:end,:),...
+    -1);
+
+% assert(isequal(round(inputVertices,4),[0,0; 0,0; 1,0; 0.75,0.75; 0.6667,1; 0.6667,1; 0.5,1; 0,1]));
+    
+% Call the function
+[cleanedVertices] = ...
+    fcn_MapGen_polytopeRemoveColinearVertices(...,
+    inputVertices,...
     ([]));
 
 % Check variable types
-assert(isnumeric(projectedPoints));
+assert(isnumeric(cleanedVertices));
 
 % Check variable sizes
-Nvertices = length(verticesIncludingSelfIntersections(:,1));
-assert(size(projectedPoints,1)==Nvertices);
-assert(size(projectedPoints,2)==2);
+Nvertices = length(inputVertices(:,1));
+assert(size(cleanedVertices,1)<=Nvertices);
+assert(size(cleanedVertices,2)==2);
 
 % Check variable values
-assert(isequal(round(projectedPoints,4),round(...
-    [...
-    0         0
-    0         0
-    1.0000         0
-    0.7500    0.7500
-    0.6667    1.0000
-    0.6667    1.0000
-    0.5000    1.0000
-    0    1.0000
-    ]...
-    ,4)));
+assert(isequal(round(cleanedVertices,4),[0,0; 1,0; 0.6667,1; 0,1]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -197,42 +175,36 @@ fprintf(1,'Figure: %.0f: FAST mode, fig_num=-1\n',fig_num);
 figure(fig_num); close(fig_num);
 
 vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
 
-interiorPoint = [0.5 0.5];
+vertices_with_self_intersects = fcn_MapGen_polytopeFindSelfIntersections(vertices,-1);
 
-% Call the function
-[projectedPoints] = ...
+interior_point = [0.5 0.5];
+[inputVertices] = ...
     fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-    interiorPoint,...
-    verticesIncludingSelfIntersections,...
-    verticesIncludingSelfIntersections(1:end-1,:),...
-    verticesIncludingSelfIntersections(2:end,:),...
+    interior_point,...
+    vertices_with_self_intersects,...
+    vertices_with_self_intersects(1:end-1,:),...
+    vertices_with_self_intersects(2:end,:),...
+    -1);
+
+% assert(isequal(round(inputVertices,4),[0,0; 0,0; 1,0; 0.75,0.75; 0.6667,1; 0.6667,1; 0.5,1; 0,1]));
+    
+% Call the function
+[cleanedVertices] = ...
+    fcn_MapGen_polytopeRemoveColinearVertices(...,
+    inputVertices,...
     (-1));
 
 % Check variable types
-assert(isnumeric(projectedPoints));
+assert(isnumeric(cleanedVertices));
 
 % Check variable sizes
-Nvertices = length(verticesIncludingSelfIntersections(:,1));
-assert(size(projectedPoints,1)==Nvertices);
-assert(size(projectedPoints,2)==2);
+Nvertices = length(inputVertices(:,1));
+assert(size(cleanedVertices,1)<=Nvertices);
+assert(size(cleanedVertices,2)==2);
 
 % Check variable values
-assert(isequal(round(projectedPoints,4),round(...
-    [...
-    0         0
-    0         0
-    1.0000         0
-    0.7500    0.7500
-    0.6667    1.0000
-    0.6667    1.0000
-    0.5000    1.0000
-    0    1.0000
-    ]...
-    ,4)));
-
+assert(isequal(round(cleanedVertices,4),[0,0; 1,0; 0.6667,1; 0,1]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -246,10 +218,19 @@ figure(fig_num);
 close(fig_num);
 
 vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
 
-interiorPoint = [0.5 0.5];
+vertices_with_self_intersects = fcn_MapGen_polytopeFindSelfIntersections(vertices,-1);
+
+interior_point = [0.5 0.5];
+[inputVertices] = ...
+    fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
+    interior_point,...
+    vertices_with_self_intersects,...
+    vertices_with_self_intersects(1:end-1,:),...
+    vertices_with_self_intersects(2:end,:),...
+    -1);
+
+% assert(isequal(round(inputVertices,4),[0,0; 0,0; 1,0; 0.75,0.75; 0.6667,1; 0.6667,1; 0.5,1; 0,1]));
 
 Niterations = 100;
 
@@ -257,12 +238,9 @@ Niterations = 100;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [projectedPoints] = ...
-        fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-        interiorPoint,...
-        verticesIncludingSelfIntersections,...
-        verticesIncludingSelfIntersections(1:end-1,:),...
-        verticesIncludingSelfIntersections(2:end,:),...
+    [cleanedVertices] = ...
+        fcn_MapGen_polytopeRemoveColinearVertices(...,
+        inputVertices,...
         ([]));
 end
 slow_method = toc;
@@ -271,12 +249,9 @@ slow_method = toc;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [projectedPoints] = ...
-        fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-        interiorPoint,...
-        verticesIncludingSelfIntersections,...
-        verticesIncludingSelfIntersections(1:end-1,:),...
-        verticesIncludingSelfIntersections(2:end,:),...
+    [cleanedVertices] = ...
+        fcn_MapGen_polytopeRemoveColinearVertices(...,
+        inputVertices,...
         (-1));
 end
 fast_method = toc;

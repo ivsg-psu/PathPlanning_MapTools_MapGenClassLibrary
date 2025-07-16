@@ -1,7 +1,4 @@
-function [angles, unit_in_vectors, unit_out_vectors] = ...
-    fcn_MapGen_polytopeFindVertexAngles(...
-    vertices,...
-    varargin)
+function [angles, unitInVectors, unitOutVectors] = fcn_MapGen_polytopeFindVertexAngles(vertices, varargin)
 % fcn_MapGen_polytopeFindVertexAngles finds the angles, in radians, of each
 % vertex relative to each other within a polytope. Note that the 1st angle
 % corresponds to the 1st vertex, which is located at the 1nd point in the
@@ -15,10 +12,7 @@ function [angles, unit_in_vectors, unit_out_vectors] = ...
 %
 % FORMAT:
 %
-% [angles, unit_in_vectors, unit_out_vectors] = ...
-%     fcn_MapGen_polytopeFindVertexAngles(...
-%     vertices,...
-%     (fig_num))
+%     [angles, unitInVectors, unitOutVectors] = fcn_MapGen_polytopeFindVertexAngles(vertices, (fig_num))
 %
 % INPUTS:
 %
@@ -37,9 +31,9 @@ function [angles, unit_in_vectors, unit_out_vectors] = ...
 %     angles: an Nx1 column of angles, one for each vertex. Returns NaN if
 %     polytope is degenerate, e.g. a single repeating point.
 %
-%     unit_in_vectors: the Nx2 matrix of unit vectors leading into each vertex
+%     unitInVectors: the Nx2 matrix of unit vectors leading into each vertex
 %
-%     unit_out_vectors: the Nx2 matrix of unit vectors leading out of each vertex
+%     unitOutVectors: the Nx2 matrix of unit vectors leading out of each vertex
 %
 % DEPENDENCIES:
 %
@@ -165,20 +159,20 @@ in_vectors = calculation_vertices(2:end-1,:)- calculation_vertices(1:end-2,:);
 out_vectors = calculation_vertices(3:end,:)- calculation_vertices(2:end-1,:);
 
 % Convert both to unit vectors
-unit_in_vectors = in_vectors./(sum(in_vectors.^2,2).^0.5);
-unit_out_vectors   = out_vectors./(sum(out_vectors.^2,2).^0.5);
+unitInVectors = in_vectors./(sum(in_vectors.^2,2).^0.5);
+unitOutVectors   = out_vectors./(sum(out_vectors.^2,2).^0.5);
 
 % Do the cross product, and pull out only z-component result
 % cross_products = cross([unit_starting_vector zeros(Nangles,1)],[unit_ending_vector zeros(Nangles,1)]);
 % cross_result = cross_products(:,3);
-cross_result = crossProduct(unit_in_vectors,unit_out_vectors);
+cross_result = crossProduct(unitInVectors,unitOutVectors);
 
 
 % Grab the angle via cross product
 angles_cross = asin(cross_result);
 
 % Do the dot product, and grab angle via dot product
-dot_products = dot(unit_in_vectors,unit_out_vectors,2);
+dot_products = dot(unitInVectors,unitOutVectors,2);
 angles_dot = acos(dot_products);
 
 % Calculate the angles

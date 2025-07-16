@@ -42,15 +42,22 @@ function [map_polytopes,all_pts,mu_rad_final,sigma_rad_final] = ...
 %
 % OUTPUTS:
 %
-%     map_polytopes: an N x 2 matrix representing the [x y] vector of starting
-%     points of the "walls", where N is # of wall segments
+%     map_polytopes: an N size array of polytopes
 %
-%     all_pts: an N x 2 matrix representing the [x y] vector of ending
-%     points of the "walls", where N is # of wall segments
+%     all_pts: an M x 5 matrix representing, for each vertex:
+%        [x y point_id obs_id flag_beg_end]
+%        where 
+%        * x and y are the coordinate positions
+%        * point_id is the point's index in the map
+%        * obs_id is the polytope index where the vertex belongs
+%        * beg_end is a flag that is 1 if the point is either at beginning 
+%          or end of the polytope encirclement
 %
-%     mu_rad_final:
+%     mu_rad_final: the final mean value (mu) of the radius across all
+%     polytopes.
 %
-%     sigma_rad_final
+%     sigma_rad_final: the final standard deviation (sigma) of radii across
+%     all polytopes
 %
 % DEPENDENCIES:
 %
@@ -85,7 +92,7 @@ function [map_polytopes,all_pts,mu_rad_final,sigma_rad_final] = ...
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 flag_max_speed = 0;
-if (nargin==3 && isequal(varargin{end},-1))
+if (nargin==7 && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -173,6 +180,7 @@ seedGeneratorNames = 'haltonset';
 seedGeneratorRanges = halton_range;
 AABBs = [0 0 1 1];
 mapStretchs = [1 1];
+
 [tiled_polytopes] = fcn_MapGen_voronoiTiling(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
@@ -183,13 +191,13 @@ mapStretchs = [1 1];
 
 % remove the edge polytopes that extend past the high and low points
 trimmed_polytopes = ...
-    fcn_MapGen_polytopeCropEdges(tiled_polytopes,bounding_box);
+    fcn_MapGen_polytopeCropEdges(tiled_polytopes,bounding_box,-1);
 
 % shink the polytopes so that they are no longer tiled
 rng(shrink_seed) % set the random number generator with the shrink seed
 [map_polytopes,mu_rad_final,sigma_rad_final] = ...
     fcn_MapGen_polytopesShrinkToRadius(trimmed_polytopes,...
-    des_radius,sigma_radius,min_rad);
+    des_radius, sigma_radius, min_rad, -1);
 
 % gather data on all the points by looping through the polytopes
 point_tot = length([map_polytopes.xv]); % total number of vertices in the polytopes
@@ -202,7 +210,7 @@ for poly = 1:size(map_polytopes,2) % check each polytope
     curpt = curpt+verts;
 end
 obs_id = [map_polytopes.obs_id];
-all_pts = [[map_polytopes.xv];[map_polytopes.yv];1:point_tot;obs_id;beg_end]'; % all points [x y point_id obs_id beg_end]
+all_pts = [[map_polytopes.xv];[map_polytopes.yv];1:point_tot;obs_id;beg_end]'; % all points [x y point_id obs_id flag_beg_end]
 
 %% Plot results?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -221,13 +229,31 @@ if flag_do_plot
     hold on
 
     % plot the tiled_polytopes
-    fcn_MapGen_plotPolytopes(tiled_polytopes,fig_num,'b',2,[0 1 0 1]);
+    % fcn_MapGen_OLD_plotPolytopes(tiled_polytopes,fig_num,'b',2,[0 1 0 1]);
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [0 0 1];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(tiled_polytopes, (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
 
     % plot the trimmed_polytopes
-    fcn_MapGen_plotPolytopes(trimmed_polytopes,fig_num,'g',2,[0 1 0 1]);
+    % fcn_MapGen_OLD_plotPolytopes(trimmed_polytopes,fig_num,'g',2,[0 1 0 1]);
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [0 1 0];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(trimmed_polytopes, (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
 
     % plot the map_polytopes
-    fcn_MapGen_plotPolytopes(map_polytopes,fig_num,'r',2,[0 1 0 1]);
+    % fcn_MapGen_OLD_plotPolytopes(map_polytopes,fig_num,'r',2,[0 1 0 1]);
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [1 0 0];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(map_polytopes, (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
 
 end
 

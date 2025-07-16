@@ -1,4 +1,4 @@
-function [shrunk_polytopes,mu_final,sigma_final] = ...
+function [shrunkPolytopes,mu_final,sigma_final] = ...
     fcn_MapGen_polytopesShrinkToRadius(...
     polytopes,...
     des_radius,...
@@ -10,7 +10,7 @@ function [shrunk_polytopes,mu_final,sigma_final] = ...
 %
 % FORMAT:
 % 
-% [shrunk_polytopes,mu_final,sigma_final] = ...
+% [shrunkPolytopes,mu_final,sigma_final] = ...
 %     fcn_MapGen_polytopeShrinkToRadius(...
 %     polytopes,...
 %     des_radius,...
@@ -20,7 +20,7 @@ function [shrunk_polytopes,mu_final,sigma_final] = ...
 %
 % INPUTS:
 %
-%     POLYTOPES: original polytopes with same fields as shrunk_polytopes
+%     POLYTOPES: original polytopes with same fields as shrunkPolytopes
 %
 %     DES_RAD: desired average max radius   
 %
@@ -38,7 +38,7 @@ function [shrunk_polytopes,mu_final,sigma_final] = ...
 %
 % OUTPUTS:
 %
-%     SHRUNK_POLYTOPES: a 1-by-n seven field structure of shrunken polytopes, 
+%     shrunkPolytopes: a 1-by-n seven field structure of shrunken polytopes, 
 %     where n <= number of polytopes with fields:
 %       vertices: a m+1-by-2 matrix of xy points with row1 = rowm+1, where m is
 %         the number of the individual polytope vertices
@@ -180,7 +180,15 @@ end
 radii = [polytopes.max_radius];
 
 if flag_do_debug
-    fcn_MapGen_plotPolytopes(polytopes,fig_for_debug,'b',2);
+    % fcn_MapGen_OLD_plotPolytopes(polytopes,fig_for_debug,'b',2);    
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [0 0 1];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(fig_for_debug)); %#ok<NASGU>
+
+
     
     figure(fig_for_debug+1);
     histogram(radii,20)
@@ -234,7 +242,7 @@ if sum((sort(radii)'-sort(r_dist))>=-2*min_rad) < r_size
     error('distribution is unachievable with generated map')
 end
 
-shrunk_polytopes = polytopes;
+shrunkPolytopes = polytopes;
 for idx = 1:length(new_rads)
     shrinker = polytopes(ob_ind(idx)); % obstacle to be shrunk
     
@@ -276,8 +284,8 @@ for idx = 1:length(new_rads)
         shrinker.max_radius = shrinker.max_radius*scale;
     end
     
-    % assign to shrunk_polytopes
-    shrunk_polytopes(ob_ind(idx)) = shrinker;
+    % assign to shrunkPolytopes
+    shrunkPolytopes(ob_ind(idx)) = shrinker;
 end
 
 %% Plot results?
@@ -297,10 +305,22 @@ if flag_do_plot
     hold on
     
     % Plot the input polytopes in red
-    fcn_MapGen_plotPolytopes(polytopes,fig_num,'r',2,[0 1 0 1]);
+    % fcn_MapGen_OLD_plotPolytopes(polytopes,fig_num,'r',2,[0 1 0 1]);
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [1 0 0];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
     
     % plot the shrunk in blue
-    fcn_MapGen_plotPolytopes(shrunk_polytopes,fig_num,'b',2,[0 1 0 1]);
+    % fcn_MapGen_OLD_plotPolytopes(shrunkPolytopes,fig_num,'b',2,[0 1 0 1]);
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [0 0 1];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(shrunkPolytopes, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
 
 end
 

@@ -7,27 +7,8 @@
 % script_test_fcn_MapGen_polytopeCropEdges as a template
 
 %% Set up variables
-fig_num = 1;
 
-seedGeneratorNames = 'haltonset';
-seedGeneratorRanges = [1 100];
-AABBs = [0 0 1 1];
-mapStretchs = [1 1];
-[polytopes] = fcn_MapGen_voronoiTiling(...
-    seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
-    seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
-    (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
-    (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
-    (fig_num));
-
-
-bounding_box = [0,0; 1,1];
-trim_polytopes = fcn_MapGen_polytopeCropEdges(polytopes,bounding_box,fig_num);
-
-% Pick a random polytope
-Npolys = length(trim_polytopes);
-rand_poly = 1+floor(rand*Npolys);
-shrinker = trim_polytopes(rand_poly);
+shrinker = fcn_INTERNAL_loadExampleData;
 
 % Basic example of uniform shrinking
 fig_num = 11;
@@ -41,8 +22,11 @@ shrunk_polytope =...
 
 assert(isequal(round(shrunk_polytope.max_radius,4),round(orig_radius*ratio,4)));
 
-% Iterative example of uniform shrinking
+%% Iterative example of uniform shrinking
 fig_num = 2;
+
+shrinker = fcn_INTERNAL_loadExampleData;
+
 orig_radius = shrinker.max_radius;
 ratios = (0.99:-0.05:0);
 
@@ -55,12 +39,16 @@ for ith_ratio = 1:length(ratios)
     pause(0.01);
 end
 
+%%
 % Show results of increasing the tolerance distance to merge points.
 % So that points merge earlier than they would, thus allowing one to see
 % the effects of merging points around the polytope.
 fig_num = 3;
 figure(fig_num);
 clf;
+
+shrinker = fcn_INTERNAL_loadExampleData;
+
 orig_radius = shrinker.max_radius;
 ratios = (0.99:-0.05:0);
 
@@ -74,7 +62,7 @@ for ith_ratio = 1:length(ratios)
 end
 
 % plot the last output polytope in black
-fcn_MapGen_plotPolytopes(shrunk_polytope,fig_num,'k.',2);
+% fcn_MapGen_plotPolytopes(shrunk_polytope,fig_num,'k.',2);
 % script_test_fcn_MapGen_polytopeFindSelfIntersections
 % Tests function: fcn_MapGen_polytopeFindSelfIntersections
 
@@ -393,19 +381,26 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
 
-% %% fcn_INTERNAL_loadExampleData
-% function [seed_points, V, C] = fcn_INTERNAL_loadExampleData
-%
-%
-% % pull halton set
-% halton_points = haltonset(2);
-% points_scrambled = scramble(halton_points,'RR2'); % scramble values
-%
-% % pick values from halton set
-% Halton_range = [1801 1901];
-% low_pt = Halton_range(1,1);
-% high_pt = Halton_range(1,2);
-% seed_points = points_scrambled(low_pt:high_pt,:);
-% [V,C] = voronoin(seed_points);
-% % V = V.*stretch;
-% end % Ends fcn_INTERNAL_loadExampleData
+%% fcn_INTERNAL_loadExampleData
+function shrinker = fcn_INTERNAL_loadExampleData
+
+seedGeneratorNames = 'haltonset';
+seedGeneratorRanges = [1 100];
+AABBs = [0 0 1 1];
+mapStretchs = [1 1];
+[polytopes] = fcn_MapGen_voronoiTiling(...
+    seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
+    seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
+    (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
+    (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
+    (-1));
+
+
+bounding_box = [0,0; 1,1];
+trim_polytopes = fcn_MapGen_polytopeCropEdges(polytopes,bounding_box,-1);
+
+% Pick a random polytope
+Npolys = length(trim_polytopes);
+rand_poly = 1+floor(rand*Npolys);
+shrinker = trim_polytopes(rand_poly);
+end % Ends fcn_INTERNAL_loadExampleData

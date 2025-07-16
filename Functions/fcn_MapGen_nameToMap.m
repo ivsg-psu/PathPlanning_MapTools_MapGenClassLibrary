@@ -321,16 +321,28 @@ fig = []; % set value empty to return as default. Value is filled below if plott
 if flag_do_plot
     figure(fig_num)
 
-    if length(varargin)>3 % detailed plotting
-        [fig] = fcn_MapGen_plotPolytopes(polytopes,varargin{1},varargin{2},varargin{3},varargin{4:end});
-    else % basic plotting
-        [fig] = fcn_MapGen_plotPolytopes(polytopes,varargin{1},varargin{2},varargin{3});
+    temp_fig_num = varargin{1};
+    clear plotFormat
+
+    plotFormat = fcn_DebugTools_extractPlotFormatFromString(varargin{2}, (-1));
+    plotFormat.LineWidth = varargin{3};
+
+    fillFormat = [];
+    if length(varargin)>=4
+        plotFormat.Color = varargin{4};
+    end
+    if length(varargin)>=7
+        fillFormat = varargin{7};
     end
     
+    % [fig] = fcn_MapGen_OLD_plotPolytopes(polytopes,varargin{1},varargin{2},varargin{3},varargin{4:end});
+    fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(temp_fig_num)); 
+
     % Show the name
     if disp_name(1) == 1 % add map_name to plot
         text(disp_name(2),disp_name(3),map_name,'color',disp_name(4:6),'FontSize',disp_name(7));
     end
+    fig = gcf;
 end
 
 if flag_do_debug

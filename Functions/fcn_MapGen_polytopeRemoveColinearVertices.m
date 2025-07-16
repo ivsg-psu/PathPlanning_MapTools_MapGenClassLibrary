@@ -1,6 +1,6 @@
-function [cropped_vertices] = ...
+function [cleanedVertices] = ...
     fcn_MapGen_polytopeRemoveColinearVertices(...,
-    vertices,...
+    inputVertices,...
     varargin)
 
 % Given a set of vertices that may have multiple points in a line on the
@@ -9,14 +9,14 @@ function [cropped_vertices] = ...
 %
 % FORMAT:
 % 
-% [cropped_vertices] = ...
+% [cleanedVertices] = ...
 %    fcn_MapGen_polytopeRemoveColinearVertices(...
-%     vertices,...
+%     inputVertices,...
 %     (fig_num))
 %
 % INPUTS:
 %
-%     vertices: an Nx2 matrix of [x y] vertices
+%     inputVertices: an Nx2 matrix of [x y] vertices
 %
 %    (OPTIONAL INPUTS)
 %
@@ -28,7 +28,7 @@ function [cropped_vertices] = ...
 %
 % OUTPUTS:
 %
-%     cropped_vertices: an Mx2 matrix of [x y] points, where no vertices
+%     cleanedVertices: an Mx2 matrix of [x y] points, where no vertices
 %     are repeated
 %   
 % DEPENDENCIES:
@@ -106,7 +106,7 @@ if (0==flag_max_speed)
 
         % Check the vertices input
         fcn_DebugTools_checkInputsToFunctions(...
-            vertices, '2column_of_numbers');
+            inputVertices, '2column_of_numbers');
 
     end
 end
@@ -141,35 +141,37 @@ end
 
 
 % Remove repeats
-[cropped_vertices,~,~] = unique(vertices,'rows','stable');
+[cleanedVertices,~,~] = unique(inputVertices,'rows','stable');
 
 % Use the cross-product to eliminate co-linear points
-Npoints = length(cropped_vertices(:,1));
+Npoints = length(cleanedVertices(:,1));
 good_indices = zeros(Npoints,1);
 
 for ith_point = 1:Npoints
     
     if ith_point>1
-        previous_vector = [cropped_vertices(ith_point,:)-cropped_vertices(ith_point-1,:), 0];
+        previous_vector = [cleanedVertices(ith_point,:)-cleanedVertices(ith_point-1,:), 0];
     else % must wrap around
-        previous_vector = [cropped_vertices(end,:)-cropped_vertices(1,:), 0];
+        previous_vector = [cleanedVertices(end,:)-cleanedVertices(1,:), 0];
     end
     
     if ith_point<Npoints
-        subsequent_vector = [cropped_vertices(ith_point+1,:)-cropped_vertices(ith_point,:), 0];
+        subsequent_vector = [cleanedVertices(ith_point+1,:)-cleanedVertices(ith_point,:), 0];
     else % must wrap around
-        subsequent_vector = [cropped_vertices(1,:)-cropped_vertices(Npoints,:), 0];
+        subsequent_vector = [cleanedVertices(1,:)-cleanedVertices(Npoints,:), 0];
     end
     
     cross_result = cross(previous_vector,subsequent_vector);
     
-    if cross_result(1,3)~=0
+    % Keep only points that "bend", e.g. have a non-zero cross-product
+    tolerance = 1000*eps;
+    if abs(cross_result(1,3))>tolerance
         good_indices(ith_point,:) = 1;
     end
 end
 
 % Final polytope
-cropped_vertices = cropped_vertices(good_indices>0,:);
+cleanedVertices = cleanedVertices(good_indices>0,:);
 
 
 
@@ -187,16 +189,17 @@ cropped_vertices = cropped_vertices(good_indices>0,:);
 
 if flag_do_plot
     figure(fig_num);
-    grid on
-    grid minor
+
     hold on
     axis equal
     
     % Plot the input vertices
-    plot(vertices(:,1),vertices(:,2),'r-');
+    plot(inputVertices(:,1),inputVertices(:,2),'r.-','MarkerSize',20,'DisplayName','inputVerticies');
     
     % Plot the cropped_vertices
-    plot(cropped_vertices(:,1),cropped_vertices(:,2),'ko');    
+    plot(cleanedVertices(:,1),cleanedVertices(:,2),'ko','MarkerSize',10,'DisplayName','cleanedVertices');
+
+    legend('Interpreter','none','Location','best');
 
 end
 

@@ -1,4 +1,4 @@
-function [shrunk_polytope, new_vertices, new_projection_vectors, cut_distance] = ...
+function [shrunkPolytope, new_vertices, new_projection_vectors, cut_distance] = ...
     fcn_MapGen_polytopeShrinkFromEdges(...
     shrinker,...
     edge_cut,...
@@ -20,7 +20,7 @@ function [shrunk_polytope, new_vertices, new_projection_vectors, cut_distance] =
 %
 % FORMAT:
 %
-% [shrunk_polytope, (new_vertices, new_projection_vectors, cut_distance)]= ...
+% [shrunkPolytope, (new_vertices, new_projection_vectors, cut_distance)]= ...
 %     fcn_MapGen_polytopeShrinkFromEdges(...
 %     shrinker,...
 %     edge_cut,...
@@ -28,7 +28,7 @@ function [shrunk_polytope, new_vertices, new_projection_vectors, cut_distance] =
 %
 % OR:
 %
-% [shrunk_polytope, (new_vertices, new_projection_vectors, cut_distance)]= ...
+% [shrunkPolytope, (new_vertices, new_projection_vectors, cut_distance)]= ...
 %     fcn_MapGen_polytopeShrinkFromEdges(...
 %     shrinker,...
 %     edge_cut,...
@@ -37,7 +37,7 @@ function [shrunk_polytope, new_vertices, new_projection_vectors, cut_distance] =
 %
 % INPUTS:
 %
-%     shrinker: original polytope with same fields as shrunk_polytopes
+%     shrinker: original polytope with same fields as shrunkPolytopes
 %     below
 %
 %     edge_cut: desired cut distance from each edge
@@ -58,7 +58,7 @@ function [shrunk_polytope, new_vertices, new_projection_vectors, cut_distance] =
 %
 % OUTPUTS:
 %
-%     SHRUNK_POLYTOPES: a 1-by-n seven field structure of shrunken polytopes,
+%     shrunkPolytopeS: a 1-by-n seven field structure of shrunken polytopes,
 %     where n <= number of polytopes with fields:
 %       vertices: a m+1-by-2 matrix of xy points with row1 = rowm+1, where m is
 %         the number of the individual polytope vertices
@@ -249,10 +249,10 @@ final_vertices = template_vertices + new_projection_vectors{shape_index}*additio
 
 %% STEP 3. Convert the resulting verticies into the standard polytope form
 % Fill in the results
-shrunk_polytope.vertices = final_vertices;
+shrunkPolytope.vertices = final_vertices;
 
 % fill in other fields from the vertices field
-shrunk_polytope = fcn_MapGen_fillPolytopeFieldsFromVertices(shrunk_polytope);
+shrunkPolytope = fcn_MapGen_fillPolytopeFieldsFromVertices(shrunkPolytope);
 
 
 
@@ -276,10 +276,22 @@ if flag_do_plot
     axis equal
 
     % Plot the input shrinker in red
-    fcn_MapGen_plotPolytopes(shrinker,fig_num,'r',2);
+    % fcn_MapGen_plotPolytopes(shrinker,fig_num,'r',2);
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [1 0 0];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(shrinker, (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
 
     % plot the output polytope in blue
-    fcn_MapGen_plotPolytopes(shrunk_polytope,fig_num,'b',2);
+    % fcn_MapGen_OLD_plotPolytopes(shrunkPolytope,fig_num,'b',2);
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [0 0 1];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(shrunkPolytope, (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
 
 end
 

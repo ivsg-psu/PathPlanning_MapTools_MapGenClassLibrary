@@ -253,14 +253,21 @@ if flag_do_plot
     hold on
 
     % plot the polytopes
-    fcn_MapGen_plotPolytopes(filled_polytopes,fig_num,'b',2);
+    % fcn_MapGen_OLD_plotPolytopes(filled_polytopes,fig_num,'b',2);
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [0 0 1];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(filled_polytopes, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
 
     % plot the means in black
     temp = zeros(length(filled_polytopes),2);
     for ith_poly = 1:length(filled_polytopes)
         temp(ith_poly,:) = filled_polytopes(ith_poly).mean;
     end
-    plot(temp(:,1),temp(:,2),'ko','Markersize',3);
+    plot(temp(:,1),temp(:,2),'ko','Markersize',3,'DisplayName','mean');
+
 end % Ends the flag_do_plot if statement
 
 if flag_do_debug
