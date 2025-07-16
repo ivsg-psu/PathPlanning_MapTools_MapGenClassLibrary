@@ -89,7 +89,9 @@
 % -- rename fcn_MapGen_generateOneRandomPolytope to be:
 %    % fcn_MapGen_polytopeGenerateOneRandomPoly
 % -- copy example script out of
-% fcn_MapGen_generatePolysFromVoronoiAABBWithTiling into here!
+%    % fcn_MapGen_generatePolysFromVoronoiAABBWithTiling into here!
+% -- rewrite fcn_MapGen_increasePolytopeVertexCount to use linspace between
+%    % X and Y vertices rather than interpolation. MUCH simpler.
 % 2025_07_09 - S. Brennan and K. Hayes
 % --  need a tool to check if polytope is convex in 
 %     % fcn_MapGen_fillPolytopeFieldsFromVertices. This is causing some of
@@ -124,7 +126,7 @@ library_url{ith_library}     = 'https://github.com/ivsg-psu/PathPlanning_PathToo
 
 
 %% Clear paths and folders, if needed
-if 1==1
+if 1==0
     clear flag_MapGen_Folders_Initialized
     fcn_INTERNAL_clearUtilitiesFromPathAndFolders;
 

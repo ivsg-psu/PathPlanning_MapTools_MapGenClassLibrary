@@ -1,29 +1,9 @@
-% script_test_fcn_MapGen_isWithinABBB
-% Tests: fcn_MapGen_isWithinABBB
-
-%
-% REVISION HISTORY:
-%
-% 2021_07_11 by Sean Brennan
-% -- first write of script
-%%%%%%%%%%%%%%§
-
-
-
-AABB = [0 0 1 1];
-test_points = randn(100,2);
-fig_num = 1;
-isInside = fcn_MapGen_isWithinABBB(AABB,test_points,fig_num);
-
-assert(true);
-
-
-% script_test_fcn_MapGen_polytopeFindSelfIntersections
-% Tests function: fcn_MapGen_polytopeFindSelfIntersections
+% script_test_fcn_MapGen_nameToMap
+% Tests function: fcn_MapGen_nameToMap
 
 % REVISION HISTORY:
-% 2021_08_03
-% -- first written by S. Brennan
+% 2021_06_06
+% -- first written by S. Brennan.
 % 2025_07_11 - S. Brennan, sbrennan@psu.edu
 % -- updated script testing to standard form
 
@@ -48,50 +28,97 @@ close all
 close all;
 fprintf(1,'Figure: 1XXXXXX: DEMO cases\n');
 
-%% DEMO case: self-intersection
+%% DEMO case: basic demo
 fig_num = 10001;
-titleString = sprintf('DEMO case: self-intersection');
+titleString = sprintf('DEMO case: basic demo');
 fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
+map_name = "HST 1 100 SQT 0 1 0 1 SMV 0.01 0.001 1e-6 1111";
+plot_flag = 1; 
+disp_name = 0; 
 
-interiorPoint = [0.5 0.5];
+line_style = 'r-';
+line_width = 2;
 
 % Call the function
-[projectedPoints] = ...
-    fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-    interiorPoint,...
-    verticesIncludingSelfIntersections,...
-    verticesIncludingSelfIntersections(1:end-1,:),...
-    verticesIncludingSelfIntersections(2:end,:),...
-    (fig_num));
+[polytopes, h_fig] = fcn_MapGen_nameToMap(map_name, plot_flag, disp_name, (fig_num), (line_style), (line_width));
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(projectedPoints));
+assert(isstruct(polytopes));
+assert(isfield(polytopes,'vertices'));
+assert(isfield(polytopes,'xv'));
+assert(isfield(polytopes,'yv'));
+assert(isfield(polytopes,'distances'));
+assert(isfield(polytopes,'mean'));
+assert(isfield(polytopes,'area'));
+assert(isfield(polytopes,'max_radius'));
+assert(isfield(polytopes,'min_radius'));
+assert(isfield(polytopes,'mean_radius'));
+assert(isfield(polytopes,'radii'));
+assert(isfield(polytopes,'cost'));
+assert(isfield(polytopes,'parent_poly_id'));
+assert(ishandle(h_fig));
 
 % Check variable sizes
-Nvertices = length(verticesIncludingSelfIntersections(:,1));
-assert(size(projectedPoints,1)==Nvertices);
-assert(size(projectedPoints,2)==2);
+Npolys = 100;
+assert(isequal(Npolys,length(polytopes))); 
+assert(isequal(size(h_fig),[1 1]));
 
 % Check variable values
-assert(isequal(round(projectedPoints,4),round(...
-    [...
-    0         0
-    0         0
-    1.0000         0
-    0.7500    0.7500
-    0.6667    1.0000
-    0.6667    1.0000
-    0.5000    1.0000
-    0    1.0000
-    ]...
-    ,4)));
+assert(isequal(h_fig.Number,fig_num));
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+%% DEMO case: advanced demo
+fig_num = 10002;
+titleString = sprintf('DEMO case: advanced demo');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+map_name = "HST 30 450 SQT 0 1 0 1 SMV 0.02 0.005 1e-6 1234";
+plot_flag = 1; 
+disp_name = [1, 0.05 -0.05, 0.5 0.5 0.5, 10];
+
+line_style = '-'; 
+line_width = 2; 
+color = [0 0 1];
+axis_limits = [0 1 -0.1 1]; 
+axis_style = 'square';
+fill_info = [1 1 0 1 0.5];
+
+% Call the function
+[polytopes, h_fig] = fcn_MapGen_nameToMap(map_name, plot_flag, disp_name,...
+    (fig_num), (line_style), (line_width), (color), (axis_limits), (axis_style), (fill_info));
+
+sgtitle(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(isstruct(polytopes));
+assert(isfield(polytopes,'vertices'));
+assert(isfield(polytopes,'xv'));
+assert(isfield(polytopes,'yv'));
+assert(isfield(polytopes,'distances'));
+assert(isfield(polytopes,'mean'));
+assert(isfield(polytopes,'area'));
+assert(isfield(polytopes,'max_radius'));
+assert(isfield(polytopes,'min_radius'));
+assert(isfield(polytopes,'mean_radius'));
+assert(isfield(polytopes,'radii'));
+assert(isfield(polytopes,'cost'));
+assert(isfield(polytopes,'parent_poly_id'));
+assert(ishandle(h_fig));
+
+% Check variable sizes
+Npolys = 421;
+assert(isequal(Npolys,length(polytopes))); 
+assert(isequal(size(h_fig),[1 1]));
+
+% Check variable values
+assert(isequal(h_fig.Number,fig_num));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -145,42 +172,39 @@ fig_num = 80001;
 fprintf(1,'Figure: %.0f: FAST mode, empty fig_num\n',fig_num);
 figure(fig_num); close(fig_num);
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
+map_name = "HST 1 100 SQT 0 1 0 1 SMV 0.01 0.001 1e-6 1111";
+plot_flag = 1; 
+disp_name = 0; 
 
-interiorPoint = [0.5 0.5];
+line_style = 'r-';
+line_width = 2;
 
 % Call the function
-[projectedPoints] = ...
-    fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-    interiorPoint,...
-    verticesIncludingSelfIntersections,...
-    verticesIncludingSelfIntersections(1:end-1,:),...
-    verticesIncludingSelfIntersections(2:end,:),...
-    ([]));
+[polytopes, h_fig] = fcn_MapGen_nameToMap(map_name, plot_flag, disp_name, ([]), (line_style), (line_width));
 
 % Check variable types
-assert(isnumeric(projectedPoints));
+assert(isstruct(polytopes));
+assert(isfield(polytopes,'vertices'));
+assert(isfield(polytopes,'xv'));
+assert(isfield(polytopes,'yv'));
+assert(isfield(polytopes,'distances'));
+assert(isfield(polytopes,'mean'));
+assert(isfield(polytopes,'area'));
+assert(isfield(polytopes,'max_radius'));
+assert(isfield(polytopes,'min_radius'));
+assert(isfield(polytopes,'mean_radius'));
+assert(isfield(polytopes,'radii'));
+assert(isfield(polytopes,'cost'));
+assert(isfield(polytopes,'parent_poly_id'));
+assert(isempty(h_fig));
 
 % Check variable sizes
-Nvertices = length(verticesIncludingSelfIntersections(:,1));
-assert(size(projectedPoints,1)==Nvertices);
-assert(size(projectedPoints,2)==2);
+Npolys = 100;
+assert(isequal(Npolys,length(polytopes))); 
+% assert(isempty((size(h_fig),[1 1]));
 
 % Check variable values
-assert(isequal(round(projectedPoints,4),round(...
-    [...
-    0         0
-    0         0
-    1.0000         0
-    0.7500    0.7500
-    0.6667    1.0000
-    0.6667    1.0000
-    0.5000    1.0000
-    0    1.0000
-    ]...
-    ,4)));
+% assert(isequal(h_fig.Number,fig_num));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -192,43 +216,39 @@ fig_num = 80002;
 fprintf(1,'Figure: %.0f: FAST mode, fig_num=-1\n',fig_num);
 figure(fig_num); close(fig_num);
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
+map_name = "HST 1 100 SQT 0 1 0 1 SMV 0.01 0.001 1e-6 1111";
+plot_flag = 1; 
+disp_name = 0; 
 
-interiorPoint = [0.5 0.5];
+line_style = 'r-';
+line_width = 2;
 
 % Call the function
-[projectedPoints] = ...
-    fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-    interiorPoint,...
-    verticesIncludingSelfIntersections,...
-    verticesIncludingSelfIntersections(1:end-1,:),...
-    verticesIncludingSelfIntersections(2:end,:),...
-    (-1));
+[polytopes, h_fig] = fcn_MapGen_nameToMap(map_name, plot_flag, disp_name, (-1), (line_style), (line_width));
 
 % Check variable types
-assert(isnumeric(projectedPoints));
+assert(isstruct(polytopes));
+assert(isfield(polytopes,'vertices'));
+assert(isfield(polytopes,'xv'));
+assert(isfield(polytopes,'yv'));
+assert(isfield(polytopes,'distances'));
+assert(isfield(polytopes,'mean'));
+assert(isfield(polytopes,'area'));
+assert(isfield(polytopes,'max_radius'));
+assert(isfield(polytopes,'min_radius'));
+assert(isfield(polytopes,'mean_radius'));
+assert(isfield(polytopes,'radii'));
+assert(isfield(polytopes,'cost'));
+assert(isfield(polytopes,'parent_poly_id'));
+assert(isempty(h_fig));
 
 % Check variable sizes
-Nvertices = length(verticesIncludingSelfIntersections(:,1));
-assert(size(projectedPoints,1)==Nvertices);
-assert(size(projectedPoints,2)==2);
+Npolys = 100;
+assert(isequal(Npolys,length(polytopes))); 
+% assert(isempty((size(h_fig),[1 1]));
 
 % Check variable values
-assert(isequal(round(projectedPoints,4),round(...
-    [...
-    0         0
-    0         0
-    1.0000         0
-    0.7500    0.7500
-    0.6667    1.0000
-    0.6667    1.0000
-    0.5000    1.0000
-    0    1.0000
-    ]...
-    ,4)));
-
+% assert(isequal(h_fig.Number,fig_num));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -241,25 +261,20 @@ fprintf(1,'Figure: %.0f: FAST mode comparisons\n',fig_num);
 figure(fig_num);
 close(fig_num);
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
+map_name = "HST 1 100 SQT 0 1 0 1 SMV 0.01 0.001 1e-6 1111";
+plot_flag = 1; 
+disp_name = 0; 
 
-interiorPoint = [0.5 0.5];
+line_style = 'r-';
+line_width = 2;
 
-Niterations = 100;
+Niterations = 10;
 
 % Do calculation without pre-calculation
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [projectedPoints] = ...
-        fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-        interiorPoint,...
-        verticesIncludingSelfIntersections,...
-        verticesIncludingSelfIntersections(1:end-1,:),...
-        verticesIncludingSelfIntersections(2:end,:),...
-        ([]));
+    [polytopes, h_fig] = fcn_MapGen_nameToMap(map_name, plot_flag, disp_name, ([]), (line_style), (line_width));
 end
 slow_method = toc;
 
@@ -267,13 +282,7 @@ slow_method = toc;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [projectedPoints] = ...
-        fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-        interiorPoint,...
-        verticesIncludingSelfIntersections,...
-        verticesIncludingSelfIntersections(1:end-1,:),...
-        verticesIncludingSelfIntersections(2:end,:),...
-        (-1));
+    [polytopes, h_fig] = fcn_MapGen_nameToMap(map_name, plot_flag, disp_name, (-1), (line_style), (line_width));
 end
 fast_method = toc;
 

@@ -1,34 +1,11 @@
-% script_test_fcn_MapGen_nameToMap
-% Tests function: fcn_MapGen_nameToMap
+% script_test_fcn_MapGen_increasePolytopeVertexCount
+% Tests: fcn_MapGen_increasePolytopeVertexCount
 
+%
 % REVISION HISTORY:
-% 2021_06_06
-% -- first written by S. Brennan.
-
-close all;
-
-%% Basic Example:
-map_name = "HST 1 100 SQT 0 1 0 1 SMV 0.01 0.001 1e-6 1111";
-plot_flag = 1; disp_name = 0; fig_num = []; line_style = 'r-';
-line_width = 2;
-[polytopes,fig]=...
-    fcn_MapGen_nameToMap(map_name,plot_flag,disp_name,fig_num,line_style,line_width); %#ok<*ASGLU>
-
-assert(true);
-
-%% Advanced Example
-map_name = "HST 30 450 SQT 0 1 0 1 SMV 0.02 0.005 1e-6 1234";
-plot_flag = 1; disp_name = [1, 0.05 -0.05, 0.5 0.5 0.5, 10];
-fig_num = 999; line_style = '-'; line_width = 2; color = [0 0 1];
-axis_limits = [0 1 -0.1 1]; axis_style = 'square';
-fill_info = [1 1 0 1 0.5];
-[polytopes,fig]=fcn_MapGen_nameToMap(map_name,plot_flag,disp_name,fig_num,line_style,line_width,color,axis_limits,axis_style,fill_info);
-% script_test_fcn_MapGen_polytopeFindSelfIntersections
-% Tests function: fcn_MapGen_polytopeFindSelfIntersections
-
-% REVISION HISTORY:
-% 2021_08_03
-% -- first written by S. Brennan
+%
+% 2022_10_21 by Steve Harnett
+% -- first write of script
 % 2025_07_11 - S. Brennan, sbrennan@psu.edu
 % -- updated script testing to standard form
 
@@ -53,50 +30,43 @@ close all
 close all;
 fprintf(1,'Figure: 1XXXXXX: DEMO cases\n');
 
-%% DEMO case: self-intersection
+
+%% DEMO case: basic demo, one polytope set
 fig_num = 10001;
-titleString = sprintf('DEMO case: self-intersection');
+titleString = sprintf('DEMO case: basic demo, one polytope set');
 fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
+% Load test data
+polytopes = fcn_INTERNAL_loadExampleData;
 
-interiorPoint = [0.5 0.5];
+resolution = 0.05;
 
 % Call the function
-[projectedPoints] = ...
-    fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-    interiorPoint,...
-    verticesIncludingSelfIntersections,...
-    verticesIncludingSelfIntersections(1:end-1,:),...
-    verticesIncludingSelfIntersections(2:end,:),...
-    (fig_num));
+interpolatedPolytopes = fcn_MapGen_increasePolytopeVertexCount(polytopes,resolution/2, fig_num);
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(projectedPoints));
+assert(isstruct(interpolatedPolytopes));
+assert(isfield(interpolatedPolytopes,'vertices'));
+assert(isfield(interpolatedPolytopes,'xv'));
+assert(isfield(interpolatedPolytopes,'yv'));
+assert(isfield(interpolatedPolytopes,'distances'));
+assert(isfield(interpolatedPolytopes,'mean'));
+assert(isfield(interpolatedPolytopes,'area'));
+assert(isfield(interpolatedPolytopes,'max_radius'));
+assert(isfield(interpolatedPolytopes,'min_radius'));
+assert(isfield(interpolatedPolytopes,'mean_radius'));
+assert(isfield(interpolatedPolytopes,'radii'));
+assert(isfield(interpolatedPolytopes,'cost'));
+assert(isfield(interpolatedPolytopes,'parent_poly_id'));
 
 % Check variable sizes
-Nvertices = length(verticesIncludingSelfIntersections(:,1));
-assert(size(projectedPoints,1)==Nvertices);
-assert(size(projectedPoints,2)==2);
+assert(isequal(length(polytopes),length(interpolatedPolytopes))); 
 
 % Check variable values
-assert(isequal(round(projectedPoints,4),round(...
-    [...
-    0         0
-    0         0
-    1.0000         0
-    0.7500    0.7500
-    0.6667    1.0000
-    0.6667    1.0000
-    0.5000    1.0000
-    0    1.0000
-    ]...
-    ,4)));
+% (can't - randomly generated!)
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -150,42 +120,34 @@ fig_num = 80001;
 fprintf(1,'Figure: %.0f: FAST mode, empty fig_num\n',fig_num);
 figure(fig_num); close(fig_num);
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
+% Load test data
+polytopes = fcn_INTERNAL_loadExampleData;
 
-interiorPoint = [0.5 0.5];
+resolution = 0.05;
 
 % Call the function
-[projectedPoints] = ...
-    fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-    interiorPoint,...
-    verticesIncludingSelfIntersections,...
-    verticesIncludingSelfIntersections(1:end-1,:),...
-    verticesIncludingSelfIntersections(2:end,:),...
-    ([]));
+interpolatedPolytopes = fcn_MapGen_increasePolytopeVertexCount(polytopes,resolution/2, ([]));
 
 % Check variable types
-assert(isnumeric(projectedPoints));
+assert(isstruct(interpolatedPolytopes));
+assert(isfield(interpolatedPolytopes,'vertices'));
+assert(isfield(interpolatedPolytopes,'xv'));
+assert(isfield(interpolatedPolytopes,'yv'));
+assert(isfield(interpolatedPolytopes,'distances'));
+assert(isfield(interpolatedPolytopes,'mean'));
+assert(isfield(interpolatedPolytopes,'area'));
+assert(isfield(interpolatedPolytopes,'max_radius'));
+assert(isfield(interpolatedPolytopes,'min_radius'));
+assert(isfield(interpolatedPolytopes,'mean_radius'));
+assert(isfield(interpolatedPolytopes,'radii'));
+assert(isfield(interpolatedPolytopes,'cost'));
+assert(isfield(interpolatedPolytopes,'parent_poly_id'));
 
 % Check variable sizes
-Nvertices = length(verticesIncludingSelfIntersections(:,1));
-assert(size(projectedPoints,1)==Nvertices);
-assert(size(projectedPoints,2)==2);
+assert(isequal(length(polytopes),length(interpolatedPolytopes))); 
 
 % Check variable values
-assert(isequal(round(projectedPoints,4),round(...
-    [...
-    0         0
-    0         0
-    1.0000         0
-    0.7500    0.7500
-    0.6667    1.0000
-    0.6667    1.0000
-    0.5000    1.0000
-    0    1.0000
-    ]...
-    ,4)));
+% (can't - randomly generated!)
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -197,43 +159,34 @@ fig_num = 80002;
 fprintf(1,'Figure: %.0f: FAST mode, fig_num=-1\n',fig_num);
 figure(fig_num); close(fig_num);
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
+% Load test data
+polytopes = fcn_INTERNAL_loadExampleData;
 
-interiorPoint = [0.5 0.5];
+resolution = 0.05;
 
 % Call the function
-[projectedPoints] = ...
-    fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-    interiorPoint,...
-    verticesIncludingSelfIntersections,...
-    verticesIncludingSelfIntersections(1:end-1,:),...
-    verticesIncludingSelfIntersections(2:end,:),...
-    (-1));
+interpolatedPolytopes = fcn_MapGen_increasePolytopeVertexCount(polytopes,resolution/2, (-1));
 
 % Check variable types
-assert(isnumeric(projectedPoints));
+assert(isstruct(interpolatedPolytopes));
+assert(isfield(interpolatedPolytopes,'vertices'));
+assert(isfield(interpolatedPolytopes,'xv'));
+assert(isfield(interpolatedPolytopes,'yv'));
+assert(isfield(interpolatedPolytopes,'distances'));
+assert(isfield(interpolatedPolytopes,'mean'));
+assert(isfield(interpolatedPolytopes,'area'));
+assert(isfield(interpolatedPolytopes,'max_radius'));
+assert(isfield(interpolatedPolytopes,'min_radius'));
+assert(isfield(interpolatedPolytopes,'mean_radius'));
+assert(isfield(interpolatedPolytopes,'radii'));
+assert(isfield(interpolatedPolytopes,'cost'));
+assert(isfield(interpolatedPolytopes,'parent_poly_id'));
 
 % Check variable sizes
-Nvertices = length(verticesIncludingSelfIntersections(:,1));
-assert(size(projectedPoints,1)==Nvertices);
-assert(size(projectedPoints,2)==2);
+assert(isequal(length(polytopes),length(interpolatedPolytopes))); 
 
 % Check variable values
-assert(isequal(round(projectedPoints,4),round(...
-    [...
-    0         0
-    0         0
-    1.0000         0
-    0.7500    0.7500
-    0.6667    1.0000
-    0.6667    1.0000
-    0.5000    1.0000
-    0    1.0000
-    ]...
-    ,4)));
-
+% (can't - randomly generated!)
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -246,25 +199,18 @@ fprintf(1,'Figure: %.0f: FAST mode comparisons\n',fig_num);
 figure(fig_num);
 close(fig_num);
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
+% Load test data
+polytopes = fcn_INTERNAL_loadExampleData;
 
-interiorPoint = [0.5 0.5];
+resolution = 0.05;
 
-Niterations = 100;
+Niterations = 10;
 
 % Do calculation without pre-calculation
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [projectedPoints] = ...
-        fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-        interiorPoint,...
-        verticesIncludingSelfIntersections,...
-        verticesIncludingSelfIntersections(1:end-1,:),...
-        verticesIncludingSelfIntersections(2:end,:),...
-        ([]));
+    interpolatedPolytopes = fcn_MapGen_increasePolytopeVertexCount(polytopes,resolution/2, ([]));
 end
 slow_method = toc;
 
@@ -272,13 +218,7 @@ slow_method = toc;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [projectedPoints] = ...
-        fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-        interiorPoint,...
-        verticesIncludingSelfIntersections,...
-        verticesIncludingSelfIntersections(1:end-1,:),...
-        verticesIncludingSelfIntersections(2:end,:),...
-        (-1));
+    interpolatedPolytopes = fcn_MapGen_increasePolytopeVertexCount(polytopes,resolution/2, (-1));
 end
 fast_method = toc;
 
@@ -341,19 +281,23 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
 
-% %% fcn_INTERNAL_loadExampleData
-% function [seed_points, V, C] = fcn_INTERNAL_loadExampleData
-%
-%
-% % pull halton set
-% halton_points = haltonset(2);
-% points_scrambled = scramble(halton_points,'RR2'); % scramble values
-%
-% % pick values from halton set
-% Halton_range = [1801 1901];
-% low_pt = Halton_range(1,1);
-% high_pt = Halton_range(1,2);
-% seed_points = points_scrambled(low_pt:high_pt,:);
-% [V,C] = voronoin(seed_points);
-% % V = V.*stretch;
-% end % Ends fcn_INTERNAL_loadExampleData
+%% fcn_INTERNAL_loadExampleData
+function polytopes = fcn_INTERNAL_loadExampleData
+% axis_box = [0 1 0 1];
+
+seedGeneratorNames = 'haltonset';
+seedGeneratorRanges = [1 100];
+AABBs = [0 0 1 1];
+mapStretchs = [1 1];
+[polytopes] = fcn_MapGen_voronoiTiling(...
+    seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
+    seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
+    (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
+    (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
+    (-1));
+
+
+% fcn_MapGen_plotPolytopes(polytopes,1000,'-',2,[0 0 0],axis_box,'square',[1 0 0 0 0.5]);
+
+
+end % Ends fcn_INTERNAL_loadExampleData

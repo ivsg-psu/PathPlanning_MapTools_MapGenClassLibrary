@@ -4,6 +4,10 @@ function [ in_polytope ] = ...
     vertices, ...
     varargin...
     )
+
+warning('on','backtrace');
+warning('fcn_MapGen_checkIfPointInsideConvexPolytope is being deprecated. Use inpolygon instead.');
+
 % fcn_MapGen_checkIfPointInsideConvexPolytope
 % Given an convex polytope, checks if point is within the polytope
 %

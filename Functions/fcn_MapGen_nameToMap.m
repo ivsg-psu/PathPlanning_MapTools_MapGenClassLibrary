@@ -59,7 +59,7 @@ function [polytopes,fig]=fcn_MapGen_nameToMap(...
 %
 %     axis_style: controls the style of the axis, such as square or equal
 %
-%     fill_info: a 1-by-5 vector to specify wether or not there is fill,
+%     fill_info: a 1-by-5 vector to specify whether or not there is fill,
 %     the color of fill, and the opacity of the fill [Y/N, R, G, B, alpha]
 %
 %
@@ -278,7 +278,7 @@ if sum(split_name=="SQT")>0 % check for square triming (SQT)
         str2double(split_name(SQT_index+2)),str2double(split_name(SQT_index+4))];
     
     trim_polytopes = fcn_MapGen_polytopeCropEdges(...
-        base_polytopes,bounding_box);
+        base_polytopes,bounding_box, -1);
 % elseif % check for other trim methods
     % trim polytopes
 else % no trim method specified
@@ -297,7 +297,7 @@ if sum(split_name=="SMV")>0 % check for shrinking to mean and variance (SMV)
         trim_polytopes,str2double(...
         split_name(SMV_index+1)),...
         str2double(split_name(SMV_index+2)),...
-        str2double(split_name(SMV_index+3)));
+        str2double(split_name(SMV_index+3)), -1);
 % elseif % check for other shrink methods
     % trim polytopes
 else % no trim method specified

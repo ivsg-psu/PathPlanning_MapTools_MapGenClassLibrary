@@ -1,4 +1,8 @@
-function [isInside] = fcn_MapGen_isCrossingAABB(AABB, test_points, varargin)
+function [isInside] = fcn_MapGen_isCrossingAABB(AABB, testPoints, varargin)
+
+warning('on','backtrace');
+warning('fcn_MapGen_isCrossingAABB is being deprecated. Use fcn_Path_findSensorHitOnWall instead.');
+
 % fcn_MapGen_isCrossingAABB
 % Checks if the line segments between every pair of test points are intersecting
 % the given axis-aligned bounding box,
@@ -17,7 +21,7 @@ function [isInside] = fcn_MapGen_isCrossingAABB(AABB, test_points, varargin)
 %    ] = ...
 %    fcn_MapGen_isWithinABBB( ...
 %    AABB, ...
-%    test_points, ...
+%    testPoints, ...
 %    (fig_num) ...
 %    )
 %
@@ -26,7 +30,7 @@ function [isInside] = fcn_MapGen_isCrossingAABB(AABB, test_points, varargin)
 %     AABB: the Axis-Aligned Bounding Box, defined in form of [xmin ymin
 %     xmax ymax]
 %
-%     test_points: the test points to check, in form of [x y] where x and
+%     testPoints: the test points to check, in form of [x y] where x and
 %     y are scalar or column vectors
 %
 %     (optional inputs)
@@ -175,9 +179,9 @@ end
 %See: http://patorjk.com/software/taag/#p=display&f=Big&t=Main
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
-num_pts = size(test_points,1); % number of rows in test points
-xs = test_points(:,1); % extract all x coords
-ys = test_points(:,2); % extract all y coords
+num_pts = size(testPoints,1); % number of rows in test points
+xs = testPoints(:,1); % extract all x coords
+ys = testPoints(:,2); % extract all y coords
 % make a matrix of all x coord down the col, repeated
 % also make a matrix of all x coord along the row, repeated
 % then do the same for y

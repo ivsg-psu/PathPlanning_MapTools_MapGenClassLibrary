@@ -1,52 +1,34 @@
-function [ ...
-isInside ...
-] = ...
-fcn_MapGen_isWithinABBB( ...
-AABB, ...
-test_points, ...
-varargin...
-)
+function isInside = fcn_MapGen_isWithinABBB(AABB, testPoints, varargin)
 % fcn_MapGen_isWithinABBB
 % Checks if the points are within the given axis-aligned bounding box,
 % AABB, returning a vector of 1' or 0's the same length as the nubmer of
 % rows of points. Each point must be strictly within the AABB - e.g. this
 % function returns "false" if a point is on the "wall" of the AABB.
 % 
-% 
-% 
 % FORMAT:
 % 
-%    [ ...
-%    isInside ...
-%    ] = ...
-%    fcn_MapGen_isWithinABBB( ...
-%    AABB, ...
-%    test_points, ...
-%    (fig_num) ...
-%    )
+%     isInside = fcn_MapGen_isWithinABBB(AABB, testPoints, (fig_num))
 % 
 % INPUTS:
 % 
 %     AABB: the Axis-Aligned Bounding Box, defined in form of [xmin ymin 
 %     xmax ymax]
 % 
-%     test_points: the test points to check, in form of [x y] where x and 
+%     testPoints: the test points to check, in form of [x y] where x and 
 %     y are scalar or column vectors
 % 
 %     (optional inputs)
 %
-%      fig_num: a figure number to plot results. If set to -1, skips any
-%      input checking or debugging, no figures will be generated, and sets
-%      up code to maximize speed. As well, if given, this forces the
-%      variable types to be displayed as output and as well makes the input
-%      check process verbose.
-% 
+%     fig_num: a figure number to plot results. If set to -1, skips any
+%     input checking or debugging, no figures will be generated, and sets
+%     up code to maximize speed. As well, if given, this forces the
+%     variable types to be displayed as output and as well makes the input
+%     check process verbose.
 % 
 % OUTPUTS:
 % 
 %     isInside: a column of 1's or 0's, one for each test point, with 1 
 %     meaning that the test point is within the AABB
-% 
 % 
 % DEPENDENCIES:
 % 
@@ -134,9 +116,9 @@ if (0==flag_max_speed)
         fcn_DebugTools_checkInputsToFunctions(...
             AABB, '4column_of_numbers',1);
 
-        % Check the test_points input, make sure it is '2column_of_numbers' type
+        % Check the testPoints input, make sure it is '2column_of_numbers' type
         fcn_DebugTools_checkInputsToFunctions(...
-            test_points, '2column_of_numbers');
+            testPoints, '2column_of_numbers');
 
     end
 end
@@ -176,10 +158,10 @@ end
 % % See: https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
 % % for details on axis-aligned bounding boxes (AABB)
 
-isInside = (test_points(:,1)>AABB(1,1))  & ...
-    (test_points(:,2)>AABB(1,2))  & ...
-    (test_points(:,1)<AABB(1,3))  & ...
-    (test_points(:,2)<AABB(1,4));
+isInside = (testPoints(:,1)>AABB(1,1))  & ...
+    (testPoints(:,2)>AABB(1,2))  & ...
+    (testPoints(:,1)<AABB(1,3))  & ...
+    (testPoints(:,2)<AABB(1,4));
 
 
 %§
@@ -208,16 +190,16 @@ if flag_do_plot
     % Plot the walls
     plot(walls(:,1),walls(:,2),'k-');
     
-    % Plot the test_points
+    % Plot the testPoints
     
     % plot(...
-    %     [test_points(:,1); test_points(1,1)],...
-    %     [test_points(:,2); test_points(1,2)],...
+    %     [testPoints(:,1); testPoints(1,1)],...
+    %     [testPoints(:,2); testPoints(1,2)],...
     %     '.-');
-    plot(test_points(:,1), test_points(:,2),'k.');
+    plot(testPoints(:,1), testPoints(:,2),'k.');
     
     % Plot the interior points with green
-    plot(test_points(isInside,1),test_points(isInside,2),'go');
+    plot(testPoints(isInside,1),testPoints(isInside,2),'go');
     
 end % Ends the flag_do_plot if statement
 

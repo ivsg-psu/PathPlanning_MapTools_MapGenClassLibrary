@@ -1,54 +1,11 @@
-% script_test_fcn_MapGen_increasePolytopeVertexCount
-% Tests: fcn_MapGen_increasePolytopeVertexCount
+% script_test_fcn_MapGen_isWithinABBB
+% Tests: fcn_MapGen_isWithinABBB
 
 %
 % REVISION HISTORY:
 %
-% 2022_10_21 by Steve Harnett
+% 2021_07_11 by Sean Brennan
 % -- first write of script
-%%%%%%%%%%%%%%§
-
-close all;
-%% tests two sets of overlapping polytopes
-fig_num = 1;
-figure(fig_num);
-clf;
-
-
-axis_box = [0 1 0 1];
-
-seedGeneratorNames = 'haltonset';
-seedGeneratorRanges = [1 100];
-AABBs = [0 0 1 1];
-mapStretchs = [1 1];
-[polytopes] = fcn_MapGen_voronoiTiling(...
-    seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
-    seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
-    (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
-    (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
-    (-1));
-
-
-fcn_MapGen_plotPolytopes(polytopes,1000,'-',2,[0 0 0],axis_box,'square',[1 0 0 0 0.5]);
-resolution = 0.05;
-interpolated_polytopes = fcn_MapGen_increasePolytopeVertexCount(polytopes,resolution/2, fig_num);
-
-
-second_fig_num = 2;
-figure(second_fig_num);
-clf;
-
-fcn_MapGen_plotPolytopes(interpolated_polytopes,second_fig_num,'-',2,[0 0 0],axis_box,'square',[1 0 0 0 0.5]);
-
-% assert that there are more vertices now than there were before
-assert(size(extractfield(polytopes,'vertices'),2)<size(extractfield(interpolated_polytopes,'vertices'),2));
-
-% script_test_fcn_MapGen_polytopeFindSelfIntersections
-% Tests function: fcn_MapGen_polytopeFindSelfIntersections
-
-% REVISION HISTORY:
-% 2021_08_03
-% -- first written by S. Brennan
 % 2025_07_11 - S. Brennan, sbrennan@psu.edu
 % -- updated script testing to standard form
 
@@ -73,50 +30,30 @@ close all
 close all;
 fprintf(1,'Figure: 1XXXXXX: DEMO cases\n');
 
-%% DEMO case: self-intersection
+%% DEMO case: basic demo
 fig_num = 10001;
 titleString = sprintf('DEMO case: self-intersection');
 fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
-
-interiorPoint = [0.5 0.5];
+AABB = [0 0 1 1];
+testPoints = randn(100,2);
 
 % Call the function
-[projectedPoints] = ...
-    fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-    interiorPoint,...
-    verticesIncludingSelfIntersections,...
-    verticesIncludingSelfIntersections(1:end-1,:),...
-    verticesIncludingSelfIntersections(2:end,:),...
-    (fig_num));
+isInside = fcn_MapGen_isWithinABBB( AABB, testPoints, (fig_num));
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(projectedPoints));
+assert(islogical(isInside));
 
 % Check variable sizes
-Nvertices = length(verticesIncludingSelfIntersections(:,1));
-assert(size(projectedPoints,1)==Nvertices);
-assert(size(projectedPoints,2)==2);
+Nvertices = length(testPoints(:,1));
+assert(size(isInside,1)==Nvertices);
+assert(size(isInside,2)==1);
 
 % Check variable values
-assert(isequal(round(projectedPoints,4),round(...
-    [...
-    0         0
-    0         0
-    1.0000         0
-    0.7500    0.7500
-    0.6667    1.0000
-    0.6667    1.0000
-    0.5000    1.0000
-    0    1.0000
-    ]...
-    ,4)));
+% Cannot check as they are randomly generated
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -170,42 +107,22 @@ fig_num = 80001;
 fprintf(1,'Figure: %.0f: FAST mode, empty fig_num\n',fig_num);
 figure(fig_num); close(fig_num);
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
-
-interiorPoint = [0.5 0.5];
+AABB = [0 0 1 1];
+testPoints = randn(100,2);
 
 % Call the function
-[projectedPoints] = ...
-    fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-    interiorPoint,...
-    verticesIncludingSelfIntersections,...
-    verticesIncludingSelfIntersections(1:end-1,:),...
-    verticesIncludingSelfIntersections(2:end,:),...
-    ([]));
+isInside = fcn_MapGen_isWithinABBB( AABB, testPoints, ([]));
 
 % Check variable types
-assert(isnumeric(projectedPoints));
+assert(islogical(isInside));
 
 % Check variable sizes
-Nvertices = length(verticesIncludingSelfIntersections(:,1));
-assert(size(projectedPoints,1)==Nvertices);
-assert(size(projectedPoints,2)==2);
+Nvertices = length(testPoints(:,1));
+assert(size(isInside,1)==Nvertices);
+assert(size(isInside,2)==1);
 
 % Check variable values
-assert(isequal(round(projectedPoints,4),round(...
-    [...
-    0         0
-    0         0
-    1.0000         0
-    0.7500    0.7500
-    0.6667    1.0000
-    0.6667    1.0000
-    0.5000    1.0000
-    0    1.0000
-    ]...
-    ,4)));
+% Cannot check as they are randomly generated
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -217,43 +134,22 @@ fig_num = 80002;
 fprintf(1,'Figure: %.0f: FAST mode, fig_num=-1\n',fig_num);
 figure(fig_num); close(fig_num);
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
-
-interiorPoint = [0.5 0.5];
+AABB = [0 0 1 1];
+testPoints = randn(100,2);
 
 % Call the function
-[projectedPoints] = ...
-    fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-    interiorPoint,...
-    verticesIncludingSelfIntersections,...
-    verticesIncludingSelfIntersections(1:end-1,:),...
-    verticesIncludingSelfIntersections(2:end,:),...
-    (-1));
+isInside = fcn_MapGen_isWithinABBB( AABB, testPoints, (-1));
 
 % Check variable types
-assert(isnumeric(projectedPoints));
+assert(islogical(isInside));
 
 % Check variable sizes
-Nvertices = length(verticesIncludingSelfIntersections(:,1));
-assert(size(projectedPoints,1)==Nvertices);
-assert(size(projectedPoints,2)==2);
+Nvertices = length(testPoints(:,1));
+assert(size(isInside,1)==Nvertices);
+assert(size(isInside,2)==1);
 
 % Check variable values
-assert(isequal(round(projectedPoints,4),round(...
-    [...
-    0         0
-    0         0
-    1.0000         0
-    0.7500    0.7500
-    0.6667    1.0000
-    0.6667    1.0000
-    0.5000    1.0000
-    0    1.0000
-    ]...
-    ,4)));
-
+% Cannot check as they are randomly generated
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -266,11 +162,8 @@ fprintf(1,'Figure: %.0f: FAST mode comparisons\n',fig_num);
 figure(fig_num);
 close(fig_num);
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
-
-interiorPoint = [0.5 0.5];
+AABB = [0 0 1 1];
+testPoints = randn(100,2);
 
 Niterations = 100;
 
@@ -278,13 +171,7 @@ Niterations = 100;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [projectedPoints] = ...
-        fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-        interiorPoint,...
-        verticesIncludingSelfIntersections,...
-        verticesIncludingSelfIntersections(1:end-1,:),...
-        verticesIncludingSelfIntersections(2:end,:),...
-        ([]));
+    isInside = fcn_MapGen_isWithinABBB( AABB, testPoints, ([]));
 end
 slow_method = toc;
 
@@ -292,13 +179,7 @@ slow_method = toc;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [projectedPoints] = ...
-        fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-        interiorPoint,...
-        verticesIncludingSelfIntersections,...
-        verticesIncludingSelfIntersections(1:end-1,:),...
-        verticesIncludingSelfIntersections(2:end,:),...
-        (-1));
+    isInside = fcn_MapGen_isWithinABBB( AABB, testPoints, (-1));
 end
 fast_method = toc;
 
