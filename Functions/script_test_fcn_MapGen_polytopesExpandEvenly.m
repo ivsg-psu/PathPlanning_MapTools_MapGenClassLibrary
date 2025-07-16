@@ -12,22 +12,11 @@
 % -- Rebased code
 
 % Prep the workspace
-close all;
-clear polytopes;
-polytopes = fcn_MapGen_generateOneRandomPolytope;
 
-% xv = [-2 -1 1 2 2 1 -1 -2];
-% yv = [-1 -2 -2 -1 1 2 2 1];
-% polytopes.vertices = [[xv xv(1)]' [yv yv(1)]'];
-% polytopes.xv = xv;
-% polytopes.yv = yv;
-%
-% polytopes.distances = sum((polytopes(1).vertices(1:end-1,:)-polytopes(1).vertices(2:end,:)).^2,2).^0.5;
-% [Cx,Cy,polytopes.area] = fcn_MapGen_polytopeCentroidAndArea([xv xv(1)],[yv yv(1)]);
-% polytopes.mean = [Cx, Cy];
-% polytopes.max_radius = max(sum((polytopes.vertices(1:end-1,:)-ones(length(xv),1)*polytopes.mean).^2,2).^0.5);
+polytopes = fcn_MapGen_generateOneRandomPolytope(-1);
 
-
+%%
+polytopes = fcn_MapGen_polytopeFillEmptyPoly(-1);
 
 polytopes.vertices = [
     1.0000    0.5217
@@ -51,17 +40,17 @@ polytopes.max_radius = 0.1045;
 
 % Set parameters
 % delta = 0.01; % Set the delta value (what is this used for?)
-exp_dist = 0.04; % Set the expansion distance
+expansionDistance = 0.04; % Set the expansion distance
 fig_num = 221; % Set the figure number
 
 % Call the function
-exp_polytopes=fcn_MapGen_polytopesExpandEvenly(polytopes,exp_dist,fig_num);
+exp_polytopes=fcn_MapGen_polytopesExpandEvenly(polytopes, expansionDistance, fig_num);
 
 assert(isequal(round(exp_polytopes.area,4),0.0150));
 assert(isequal(round(exp_polytopes.max_radius,4),0.1445));
 
 % Call the OLD function
-% exp_polytopes=fcn_MapGen_polytopesExpandEvenly_OLD(polytopes,delta,exp_dist,fig_num);
+% exp_polytopes=fcn_MapGen_polytopesExpandEvenly_OLD(polytopes,delta,expansionDistance,fig_num);
 
 %% Second test
 % Generate a map from a name
@@ -85,11 +74,11 @@ fig_num = 7;
     fill_info);
 
 % Set expansion parameters
-exp_dist = 0.01; % Set the expansion distance
+expansionDistance = 0.01; % Set the expansion distance
 fig_num = 222; % Set the figure number
 
 % Call the function
-exp_polytopes=fcn_MapGen_polytopesExpandEvenly(polytopes,exp_dist,fig_num);
+exp_polytopes=fcn_MapGen_polytopesExpandEvenly(polytopes,expansionDistance,fig_num);
 % script_test_fcn_MapGen_polytopeFindSelfIntersections
 % Tests function: fcn_MapGen_polytopeFindSelfIntersections
 

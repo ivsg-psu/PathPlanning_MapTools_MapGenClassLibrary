@@ -1,46 +1,31 @@
-function [ ...
-expandedPolytopes ...
-] = ...
-fcn_MapGen_polytopesExpandEvenly( ...
-polytopes, ...
-exp_dist, ...
-varargin...
-)
+function expandedPolytopes  = fcn_MapGen_polytopesExpandEvenly( polytopes, expansionDistance, varargin)
 % fcn_MapGen_polytopesExpandEvenly
-% Expands an obstacle out by exp_dist on all sides.  This function works as intended
-% with convex polytopes.  There is counterintuitive behavior with non-convex polytopes
-% that can be avoided by using fcn_MapGen_polytopesExpandEvenlyForConcave which implements
-% MATLAB's polyshape object and polybuffer method (object function).
-%
-%
+% Expands an obstacle out by expansionDistance on all sides.  This function works as intended
+% with convex polytopes.  
+% 
+% NOTE: There can be counterintuitive behavior with non-convex polytopes
+% that can be avoided by using fcn_MapGen_polytopesExpandEvenlyForConcave
+% which implements MATLAB's polyshape object and polybuffer method (object
+% function).
 %
 % FORMAT:
 %
-%    [ ...
-%    expandedPolytopes ...
-%    ] = ...
-%    fcn_MapGen_polytopesExpandEvenly( ...
-%    polytopes, ...
-%    delta, ...
-%    exp_dist, ...
-%    (fig_num) ...
-%    )
+%     expandedPolytopes  = fcn_MapGen_polytopesExpandEvenly( polytopes, expansionDistance,(fig_num))
 %
 % INPUTS:
 %
 %     polytopes: the structure of 'polytopes' type that stores the
 %     polytopes to be expanded
 %
-%     exp_dist: distance to expand the obstacle
+%     expansionDistance: distance to expand the obstacle
 %
 %     (optional inputs)
 %
-%      fig_num: a figure number to plot results. If set to -1, skips any
-%      input checking or debugging, no figures will be generated, and sets
-%      up code to maximize speed. As well, if given, this forces the
-%      variable types to be displayed as output and as well makes the input
-%      check process verbose.
-%
+%     fig_num: a figure number to plot results. If set to -1, skips any
+%     input checking or debugging, no figures will be generated, and sets
+%     up code to maximize speed. As well, if given, this forces the
+%     variable types to be displayed as output and as well makes the input
+%     check process verbose.
 %
 % OUTPUTS:
 %
@@ -82,7 +67,10 @@ varargin...
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
 % -- fixed call to fcn_MapGen_fillPolytopeFieldsFromVertices
-
+% 2025_07_16 by Sean Brennan
+% -- cleaned up header comments
+% -- replaced exp_dist with expansionDistance
+% -- changed plotPolytopes to new format
 
 % TO DO
 % -- none
@@ -148,9 +136,9 @@ if (0==flag_max_speed)
         %     fcn_DebugTools_checkInputsToFunctions(...
         %         delta, 'positive_column_of_numbers',1);
 
-        % Check the exp_dist input, make sure it is 'positive_column_of_numbers' type
+        % Check the expansionDistance input, make sure it is 'positive_column_of_numbers' type
         fcn_DebugTools_checkInputsToFunctions(...
-            exp_dist, 'positive_1column_of_numbers',1);
+            expansionDistance, 'positive_1column_of_numbers',1);
 
     end
 end
@@ -195,7 +183,7 @@ for ith_poly = 1:size(polytopes,2) % check each obstacle
     rad = polytopes(ith_poly).max_radius;
 
     % Calculate scale
-    scale = (rad+exp_dist)/rad;
+    scale = (rad+expansionDistance)/rad;
 
     % Calculate new vertices
     expandedPolytopes(ith_poly).vertices = centroid + scale*(vertices-centroid);
@@ -231,7 +219,8 @@ if flag_do_plot
     plotFormat.LineStyle = '-';
     plotFormat.Color = [1 0 0];
     fillFormat = [];
-    h_plot = fcn_MapGen_plotPolytopes(expandedPolytopes, (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
+    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat), (fillFormat), (fig_num)); 
+    set(h_plot,'DisplayName','polytopes')
 
     % fcn_MapGen_OLD_plotPolytopes(expandedPolytopes,fig_num,'b-',LineWidth,'square');
     plotFormat.LineWidth = 2;
@@ -239,7 +228,8 @@ if flag_do_plot
     plotFormat.LineStyle = '-';
     plotFormat.Color = [0 0 1];
     fillFormat = [];
-    h_plot = fcn_MapGen_plotPolytopes(expandedPolytopes, (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
+    h_plot = fcn_MapGen_plotPolytopes(expandedPolytopes, (plotFormat), (fillFormat), (fig_num)); 
+    set(h_plot,'DisplayName','expandedPolytopes')
 
     legend('Original','Expanded')
     box on
