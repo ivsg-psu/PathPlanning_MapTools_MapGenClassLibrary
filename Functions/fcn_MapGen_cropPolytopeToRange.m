@@ -102,7 +102,7 @@ else
     end
 end
 
-% flag_do_debug = 1;
+flag_do_debug = 1;
 
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
@@ -158,12 +158,11 @@ if  4 == nargin && (0==flag_max_speed) % Only create a figure if NOT maximizing 
         fig_num = temp;
         flag_do_plot = 1; % Set flag to do plotting
     end
-else
-    if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
-        fig = figure;
-        fig_for_debug = fig.Number; %#ok<NASGU>
-        flag_do_plot = 1;
-    end
+end
+
+if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
+    fig = figure;
+    fig_for_debug = fig.Number;
 end
 
 %% Start of main code
@@ -194,7 +193,7 @@ walls = fcn_MapGen_convertAABBtoWalls(AABB, -1);
 
 % Open the figure if doing debugging
 if flag_do_debug
-    figure(1);
+    figure(fig_for_debug);
     clf;
     hold on;
 
@@ -223,7 +222,7 @@ interiorPoint = ...
 
 if flag_do_debug
     % Plot the new interior point
-    figure(1);
+    figure(fig_for_debug);
     plot(interiorPoint(:,1),interiorPoint(:,2),'ro');
 
 end
@@ -237,7 +236,7 @@ vertices_no_infinite = vertices;
     fcn_INTERNAL_findAllPoints(vertices_no_infinite, walls);
 
 if flag_do_debug
-    figure(1);
+    figure(fig_for_debug);
     % Plot the all_points locations
     plot(all_points(:,1),all_points(:,2),'kx');
 end
@@ -252,17 +251,21 @@ if all(flag_vertices_outside) && (flag_was_intersection==0)
     croppedVertices = walls;
 else
 
+    % Remove any infinite points
+    % all_points_no_inf = all_points(~isinf(all_points(:,1)),:);
+    all_points_no_inf = all_points; 
+
     % From the interior point, project all_points back onto the wall to create
-    % a polytope limited by the bounding box.    
+    % a polytope limited by the bounding box.
     [projected_points] = ...
         fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
         interiorPoint,...
-        all_points,...
+        all_points_no_inf,...
         walls(1:end-1,:),...
         walls(2:end,:), -1);
 
     if flag_do_debug
-        figure(1);
+        figure(fig_for_debug);
         % Plot the projected_points locations
         plot(projected_points(:,1),projected_points(:,2),'go-');
     end

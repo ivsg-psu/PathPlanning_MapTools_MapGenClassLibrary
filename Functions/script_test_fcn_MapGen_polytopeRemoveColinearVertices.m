@@ -294,6 +294,23 @@ assert(~any(figHandles==fig_num));
 % close all;
 
 %% BUG
+fig_num = 90001;
+fprintf(1,'Figure: %.0f: BUG case \n',fig_num);
+figure(fig_num);
+close(fig_num);
+
+inputVertices =[
+                  0                   0
+                   0                   0
+   0.000000020000000                   0
+   0.500000000000000                   0
+   0.500000000000000   0.500000000000000
+   0.500000000000000   0.500000000000000
+                   0   0.500000000000000
+                   0   0.000000019999999];
+
+[cleanedVertices] = fcn_MapGen_polytopeRemoveColinearVertices( inputVertices, 90001);
+
 
 %% Fail conditions
 if 1==0

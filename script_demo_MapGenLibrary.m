@@ -97,6 +97,7 @@
 % -- rewrite fcn_MapGen_increasePolytopeVertexCount to use linspace between
 %    % X and Y vertices rather than interpolation. MUCH simpler.
 % -- rework fcn_MapGen_polytopesPredictLengthCostRatio - code is very messy
+% FIX case 20005 in fcn_MapGen_cropPolytopeToRange
 
 clear library_name library_folders library_url
 

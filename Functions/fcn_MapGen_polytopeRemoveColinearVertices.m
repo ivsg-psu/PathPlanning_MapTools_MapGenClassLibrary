@@ -1,7 +1,4 @@
-function [cleanedVertices] = ...
-    fcn_MapGen_polytopeRemoveColinearVertices(...,
-    inputVertices,...
-    varargin)
+function cleanedVertices = fcn_MapGen_polytopeRemoveColinearVertices(inputVertices, varargin)
 
 % Given a set of vertices that may have multiple points in a line on the
 % same edge, this function returns an equivalent polytope with no repeats
@@ -9,22 +6,19 @@ function [cleanedVertices] = ...
 %
 % FORMAT:
 % 
-% [cleanedVertices] = ...
-%    fcn_MapGen_polytopeRemoveColinearVertices(...
-%     inputVertices,...
-%     (fig_num))
+%     cleanedVertices = fcn_MapGen_polytopeRemoveColinearVertices(inputVertices, (fig_num))
 %
 % INPUTS:
 %
 %     inputVertices: an Nx2 matrix of [x y] vertices
 %
-%    (OPTIONAL INPUTS)
+%     (OPTIONAL INPUTS)
 %
-%      fig_num: a figure number to plot results. If set to -1, skips any
-%      input checking or debugging, no figures will be generated, and sets
-%      up code to maximize speed. As well, if given, this forces the
-%      variable types to be displayed as output and as well makes the input
-%      check process verbose.
+%     fig_num: a figure number to plot results. If set to -1, skips any
+%     input checking or debugging, no figures will be generated, and sets
+%     up code to maximize speed. As well, if given, this forces the
+%     variable types to be displayed as output and as well makes the input
+%     check process verbose.
 %
 % OUTPUTS:
 %
@@ -141,7 +135,7 @@ end
 
 
 % Remove repeats
-[cleanedVertices,~,~] = unique(inputVertices,'rows','stable');
+[cleanedVertices,~,~] = unique(round(inputVertices,7),'rows','stable');
 
 % Use the cross-product to eliminate co-linear points
 Npoints = length(cleanedVertices(:,1));
