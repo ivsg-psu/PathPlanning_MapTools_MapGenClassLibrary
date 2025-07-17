@@ -5,7 +5,7 @@ function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(...
 % methods to predict linear and area unoccupancy (which is 1-occupancy)
 %
 % FORMAT:
-% unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(...
+%     unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(...
 %     pre_shrink_polytopes,polytopes,des_gap_size, (fig_num))
 %
 % INPUTS:
@@ -49,6 +49,10 @@ function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(...
 % 2025_04_25 by Sean Brennan
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
+% 2025_07_17 by Sean Brennan
+% -- standardized Debugging and Input checks area, Inputs area
+% -- made codes use MAX_NARGIN definition at top of code, narginchk
+% -- made plotting flag_do_plots and code consistent across all functions
 
 % TO DO
 % -- none
@@ -58,8 +62,9 @@ function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(...
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 4; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==4 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -81,8 +86,6 @@ if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
     debug_fig_num = 999978; %#ok<NASGU>
-else
-    debug_fig_num = []; %#ok<NASGU>
 end
 
 
@@ -103,24 +106,19 @@ if (0==flag_max_speed)
     if 1 == flag_check_inputs
 
         % Are there the right number of inputs?
-        narginchk(3,4);
+        narginchk(3,MAX_NARGIN);
 
     end
 end
 
 % Does user want to show the plots?
-flag_do_plot = 0; % Default is no plotting
-if  4 == nargin && (0==flag_max_speed) % Only create a figure if NOT maximizing speed
-    temp = varargin{end}; % Last argument is always figure number
-    if ~isempty(temp) % Make sure the user is not giving empty input
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
+    temp = varargin{end};
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
-        flag_do_plot = 1; % Set flag to do plotting
-    end
-else
-    if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
-        fig = figure;
-        fig_for_debug = fig.Number; 
-        flag_do_plot = 1;
+        figure(fig_num);
+        flag_do_plots = 1;
     end
 end
 
@@ -219,11 +217,11 @@ AABBs = [];
 slant_AABBs = [];
 for j=1:length(polytopes)
     poly = polytopes(j);
-    [angles, unit_in_vectors, unit_out_vectors] =...
+    [~, unit_in_vectors, ~] =...
         fcn_MapGen_polytopeFindVertexAngles(...
         poly.vertices);
     side_angles_this_poly = atan2(unit_in_vectors(:,2),unit_in_vectors(:,1));
-    side_angles = [side_angles; side_angles_this_poly];
+    side_angles = [side_angles; side_angles_this_poly]; %#ok<AGROW>
     min_x = min(poly.xv);
     max_x = max(poly.xv);
     min_y = min(poly.yv);
@@ -232,10 +230,10 @@ for j=1:length(polytopes)
     x_75th = prctile(poly.xv,75);
     y_25th = prctile(poly.yv,25);
     y_75th = prctile(poly.yv,75);
-    AABBs = [AABBs; min_x, min_y, max_x, max_y];
-    slant_AABBs = [slant_AABBs; x_25th, y_25th, x_75th, y_75th];
+    AABBs = [AABBs; min_x, min_y, max_x, max_y]; %#ok<AGROW>
+    slant_AABBs = [slant_AABBs; x_25th, y_25th, x_75th, y_75th]; %#ok<AGROW>
 end
-if flag_do_plot
+if flag_do_plots
     figure;
     hold on;
     histogram(side_angles*180/pi,'BinWidth',2,'FaceColor','r','FaceAlpha',0.4)
@@ -248,7 +246,7 @@ end
 side_angles = side_angles(side_angles >= 0);
 % do trig to get gap scaling based on side angle
 effective_gap_scaling = 1/cos(pi-side_angles);
-if flag_do_plot
+if flag_do_plots
     figure;
     hold on;
     histogram(effective_gap_scaling,'FaceColor','g','FaceAlpha',0.4)
@@ -271,8 +269,8 @@ unocc_ests.L_unocc_est_AABB_width = 1-N_int*avg_poly_width;
 unocc_ests.L_unocc_est_slant_AABB_width = 1-N_int*avg_slant_poly_width;
 
 %% r_L,unocc from N_int and statistics on polytope radius
-avg_radii = field_stats.all_average_radius;
-all_radii = field_stats.all_radii;
+% avg_radii = field_stats.all_average_radius;
+% all_radii = field_stats.all_radii;
 min_radius = field_stats.average_min_radius;
 avg_vertex = field_stats.average_vertex_angle;
 min_radius_est = min_radius*sind(avg_vertex/2);
@@ -328,7 +326,7 @@ unocc_ests.L_unocc_est_d_eff4 = 1 - N_int/1000*2*poly_size_stats.d_eff_avg_eval_
 
 
 
-if flag_do_plot
+if flag_do_plots
     figure(fig_num)
     clf;
 

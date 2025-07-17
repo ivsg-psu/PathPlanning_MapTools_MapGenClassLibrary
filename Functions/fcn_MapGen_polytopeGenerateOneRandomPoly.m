@@ -1,21 +1,13 @@
-function isInside = fcn_MapGen_isWithinABBB(AABB, testPoints, varargin)
-% fcn_MapGen_isWithinABBB
-% Checks if the points are within the given axis-aligned bounding box,
-% AABB, returning a vector of 1' or 0's the same length as the nubmer of
-% rows of points. Each point must be strictly within the AABB - e.g. this
-% function returns "false" if a point is on the "wall" of the AABB.
+function onePolytope = fcn_MapGen_polytopeGenerateOneRandomPoly(varargin)
+% fcn_MapGen_polytopeGenerateOneRandomPoly
+% Generates a single random polytope by selecting one randomly from the 
+% Halton Set Voronoi method (HSV) tiling.
 % 
 % FORMAT:
 % 
-%     isInside = fcn_MapGen_isWithinABBB(AABB, testPoints, (fig_num))
+%    onePolytope = fcn_MapGen_polytopeGenerateOneRandomPoly((fig_num))
 % 
 % INPUTS:
-% 
-%     AABB: the Axis-Aligned Bounding Box, defined in form of [xmin ymin 
-%     xmax ymax]
-% 
-%     testPoints: the test points to check, in form of [x y] where x and 
-%     y are scalar or column vectors
 % 
 %     (optional inputs)
 %
@@ -27,45 +19,50 @@ function isInside = fcn_MapGen_isWithinABBB(AABB, testPoints, varargin)
 % 
 % OUTPUTS:
 % 
-%     isInside: a column of 1's or 0's, one for each test point, with 1 
-%     meaning that the test point is within the AABB
+%     onePolytope: one randomly generated polytope
 % 
 % DEPENDENCIES:
 % 
-%     fcn_DebugTools_checkInputsToFunctions
+%     fcn_MapGen_voronoiTiling
+%     fcn_MapGen_polytopeCropEdges
+%     fcn_MapGen_plotPolytopes
 % 
 % 
 % EXAMPLES:
 % 
-% See the script: script_test_fcn_MapGen_isWithinABBB
+% See the script: script_test_fcn_MapGen_polytopeGenerateOneRandomPoly
 % for a full test suite.
 % 
-% This function was written on 2021_07_11 by Sean Brennan
+% This function was written on 2021_06_27 by Sean Brennan
 % Questions or comments? contact sbrennan@psu.edu
 
 % 
 % REVISION HISTORY:
 % 
-% 2021_07_11 by Sean Brennan
+% 2021_06_27 by Sean Brennan
 % -- first write of function
-% 2021_07_17 by Sean Brennan
-% -- clarified strictness of the AABB
 % 2025_04_25 by Sean Brennan
 % -- added global debugging options
-% -- switched input checking to fcn_DebugTools_checkInputsToFunctions 
+% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
+% -- fixed call to fcn_MapGen_polytopesFillFieldsFromVertices
+% 2025_07_15 by Sean Brennan
+% -- cleaned up variable naming one_polytope --> onePolytope
+% 2025_07_17 by Sean Brennan
+% -- standardized Debugging and Input checks area, Inputs area
+% -- made codes use MAX_NARGIN definition at top of code, narginchk
+% -- made plotting flag_do_plots and code consistent across all functions
 
-% 
-% TO DO:
-% 
-% -- fill in to-do items here.
+% TO DO
+% -- none
 
 %% Debugging and Input checks
 
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 1; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==3 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -87,9 +84,8 @@ if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
     debug_fig_num = 999978; %#ok<NASGU>
-else
-    debug_fig_num = []; %#ok<NASGU>
 end
+
 
 %% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -108,36 +104,22 @@ if (0==flag_max_speed)
     if 1 == flag_check_inputs
 
         % Are there the right number of inputs?
-        if nargin < 2 || nargin > 3
-            error('Incorrect number of input arguments')
-        end
-
-        % Check the AABB input, make sure it is '4column_of_numbers' type
-        fcn_DebugTools_checkInputsToFunctions(...
-            AABB, '4column_of_numbers',1);
-
-        % Check the testPoints input, make sure it is '2column_of_numbers' type
-        fcn_DebugTools_checkInputsToFunctions(...
-            testPoints, '2column_of_numbers');
+        narginchk(0,MAX_NARGIN);
 
     end
 end
 
 % Does user want to show the plots?
-flag_do_plot = 0; % Default is no plotting
-if  3 == nargin && (0==flag_max_speed) % Only create a figure if NOT maximizing speed
-    temp = varargin{end}; % Last argument is always figure number
-    if ~isempty(temp) % Make sure the user is not giving empty input
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
+    temp = varargin{end};
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
-        flag_do_plot = 1; % Set flag to do plotting
-    end
-else
-    if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
-        fig = figure;
-        fig_for_debug = fig.Number; %#ok<NASGU>
-        flag_do_plot = 1;
+        figure(fig_num);
+        flag_do_plots = 1;
     end
 end
+
 
 %% Start of main code
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -151,17 +133,31 @@ end
 %See: http://patorjk.com/software/taag/#p=display&f=Big&t=Main
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
+% Set up variables
 
+% Generate Voronoi tiling from Halton points
+seedGeneratorNames = 'haltonset';
+seedGeneratorRanges = [1 100];
+AABBs = [0 0 1 1];
+mapStretchs = [1 1];
+[polytopes] = fcn_MapGen_voronoiTiling(...
+    seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
+    seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
+    (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
+    (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
+    (-1));
 
+% NO NEED TO TRIM USING THE CODE BELOW - polytope field is already AABB
+% bounded with new revisions. Delete below once confirm that everything
+% works.
+% bounding_box = [0,0; 1,1];
+% trim_polytopes = fcn_MapGen_polytopeCropEdges(polytopes,bounding_box, -1);
+trim_polytopes = polytopes;
 
-
-% % See: https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
-% % for details on axis-aligned bounding boxes (AABB)
-
-isInside = (testPoints(:,1)>AABB(1,1))  & ...
-    (testPoints(:,2)>AABB(1,2))  & ...
-    (testPoints(:,1)<AABB(1,3))  & ...
-    (testPoints(:,2)<AABB(1,4));
+% Pick a random polytope
+Npolys = length(trim_polytopes);
+rand_poly = 1+floor(rand*Npolys);
+onePolytope = trim_polytopes(rand_poly);
 
 
 %§
@@ -179,29 +175,17 @@ isInside = (testPoints(:,1)>AABB(1,1))  & ...
 
 
 
-if flag_do_plot
-    figure(fig_num);
-    clf;
-    hold on;
-    
-    % Convert axis-aligned bounding box to wall format
-    walls = [AABB(1,1) AABB(1,2); AABB(1,3) AABB(1,2); AABB(1,3) AABB(1,4); AABB(1,1) AABB(1,4); AABB(1,1) AABB(1,2)];
-    
-    % Plot the walls
-    plot(walls(:,1),walls(:,2),'k-');
-    
-    % Plot the testPoints
-    
-    % plot(...
-    %     [testPoints(:,1); testPoints(1,1)],...
-    %     [testPoints(:,2); testPoints(1,2)],...
-    %     '.-');
-    plot(testPoints(:,1), testPoints(:,2),'k.');
-    
-    % Plot the interior points with green
-    plot(testPoints(isInside,1),testPoints(isInside,2),'go');
-    
-end % Ends the flag_do_plot if statement
+if flag_do_plots
+    % Plot results
+    % fcn_MapGen_OLD_plotPolytopes(onePolytope,fig_num,'-',2,[0.5 0 0])
+    plotFormat.LineWidth = 2;
+    plotFormat.MarkerSize = 10;
+    plotFormat.LineStyle = '-';
+    plotFormat.Color = [0.5 0 0];
+    fillFormat = [];
+    h_plot = fcn_MapGen_plotPolytopes(onePolytope, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+end % Ends the flag_do_plot if statement    
+
 
 if flag_do_debug
     fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
@@ -221,7 +205,4 @@ end % Ends the function
 %                                               
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
-
-
-
 

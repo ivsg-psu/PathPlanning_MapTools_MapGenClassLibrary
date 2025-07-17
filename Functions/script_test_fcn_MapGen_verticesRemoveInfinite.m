@@ -1,10 +1,10 @@
-% script_test_fcn_MapGen_increasePolytopeVertexCount
-% Tests: fcn_MapGen_increasePolytopeVertexCount
+% script_test_fcn_MapGen_verticesRemoveInfinite
+% Tests: fcn_MapGen_verticesRemoveInfinite
 
-%
+% 
 % REVISION HISTORY:
-%
-% 2022_10_21 by Steve Harnett
+% 
+% 2021_07_02 by Sean Brennan
 % -- first write of script
 % 2025_07_11 - S. Brennan, sbrennan@psu.edu
 % -- updated script testing to standard form
@@ -30,43 +30,31 @@ close all
 close all;
 fprintf(1,'Figure: 1XXXXXX: DEMO cases\n');
 
-
-%% DEMO case: basic demo, one polytope set
+%% DEMO case: Remove infinite vertices
 fig_num = 10001;
-titleString = sprintf('DEMO case: basic demo, one polytope set');
+titleString = sprintf('DEMO case: Remove infinite vertices');
 fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
-% Load test data
-polytopes = fcn_INTERNAL_loadExampleData;
+rng(1);
 
-resolution = 0.05;
+[all_vertices, seed_points, AABB, Nvertices_per_poly] = fcn_INTERNAL_loadExampleData;
 
 % Call the function
-interpolatedPolytopes = fcn_MapGen_increasePolytopeVertexCount(polytopes,resolution/2, fig_num);
+boundedVertices = fcn_MapGen_verticesRemoveInfinite(all_vertices, seed_points, AABB, Nvertices_per_poly, (fig_num));
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isstruct(interpolatedPolytopes));
-assert(isfield(interpolatedPolytopes,'vertices'));
-assert(isfield(interpolatedPolytopes,'xv'));
-assert(isfield(interpolatedPolytopes,'yv'));
-assert(isfield(interpolatedPolytopes,'distances'));
-assert(isfield(interpolatedPolytopes,'mean'));
-assert(isfield(interpolatedPolytopes,'area'));
-assert(isfield(interpolatedPolytopes,'max_radius'));
-assert(isfield(interpolatedPolytopes,'min_radius'));
-assert(isfield(interpolatedPolytopes,'mean_radius'));
-assert(isfield(interpolatedPolytopes,'radii'));
-assert(isfield(interpolatedPolytopes,'cost'));
-assert(isfield(interpolatedPolytopes,'parent_poly_id'));
+assert(isnumeric(boundedVertices));
 
 % Check variable sizes
-assert(isequal(length(polytopes),length(interpolatedPolytopes))); 
+Nvertices = length(all_vertices(:,1));
+assert(size(boundedVertices,1)==Nvertices);
+assert(size(boundedVertices,2)==3);
 
 % Check variable values
-% (can't - randomly generated!)
+assert(~any(isinf(boundedVertices),'all'));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -120,34 +108,23 @@ fig_num = 80001;
 fprintf(1,'Figure: %.0f: FAST mode, empty fig_num\n',fig_num);
 figure(fig_num); close(fig_num);
 
-% Load test data
-polytopes = fcn_INTERNAL_loadExampleData;
+rng(1);
 
-resolution = 0.05;
+[all_vertices, seed_points, AABB, Nvertices_per_poly] = fcn_INTERNAL_loadExampleData;
 
 % Call the function
-interpolatedPolytopes = fcn_MapGen_increasePolytopeVertexCount(polytopes,resolution/2, ([]));
+boundedVertices = fcn_MapGen_verticesRemoveInfinite(all_vertices, seed_points, AABB, Nvertices_per_poly, ([]));
 
 % Check variable types
-assert(isstruct(interpolatedPolytopes));
-assert(isfield(interpolatedPolytopes,'vertices'));
-assert(isfield(interpolatedPolytopes,'xv'));
-assert(isfield(interpolatedPolytopes,'yv'));
-assert(isfield(interpolatedPolytopes,'distances'));
-assert(isfield(interpolatedPolytopes,'mean'));
-assert(isfield(interpolatedPolytopes,'area'));
-assert(isfield(interpolatedPolytopes,'max_radius'));
-assert(isfield(interpolatedPolytopes,'min_radius'));
-assert(isfield(interpolatedPolytopes,'mean_radius'));
-assert(isfield(interpolatedPolytopes,'radii'));
-assert(isfield(interpolatedPolytopes,'cost'));
-assert(isfield(interpolatedPolytopes,'parent_poly_id'));
+assert(isnumeric(boundedVertices));
 
 % Check variable sizes
-assert(isequal(length(polytopes),length(interpolatedPolytopes))); 
+Nvertices = length(all_vertices(:,1));
+assert(size(boundedVertices,1)==Nvertices);
+assert(size(boundedVertices,2)==3);
 
 % Check variable values
-% (can't - randomly generated!)
+assert(~any(isinf(boundedVertices),'all'));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -159,35 +136,23 @@ fig_num = 80002;
 fprintf(1,'Figure: %.0f: FAST mode, fig_num=-1\n',fig_num);
 figure(fig_num); close(fig_num);
 
-% Load test data
-polytopes = fcn_INTERNAL_loadExampleData;
+rng(1);
 
-resolution = 0.05;
+[all_vertices, seed_points, AABB, Nvertices_per_poly] = fcn_INTERNAL_loadExampleData;
 
 % Call the function
-interpolatedPolytopes = fcn_MapGen_increasePolytopeVertexCount(polytopes,resolution/2, (-1));
+boundedVertices = fcn_MapGen_verticesRemoveInfinite(all_vertices, seed_points, AABB, Nvertices_per_poly, (-1));
 
 % Check variable types
-assert(isstruct(interpolatedPolytopes));
-assert(isfield(interpolatedPolytopes,'vertices'));
-assert(isfield(interpolatedPolytopes,'xv'));
-assert(isfield(interpolatedPolytopes,'yv'));
-assert(isfield(interpolatedPolytopes,'distances'));
-assert(isfield(interpolatedPolytopes,'mean'));
-assert(isfield(interpolatedPolytopes,'area'));
-assert(isfield(interpolatedPolytopes,'max_radius'));
-assert(isfield(interpolatedPolytopes,'min_radius'));
-assert(isfield(interpolatedPolytopes,'mean_radius'));
-assert(isfield(interpolatedPolytopes,'radii'));
-assert(isfield(interpolatedPolytopes,'cost'));
-assert(isfield(interpolatedPolytopes,'parent_poly_id'));
+assert(isnumeric(boundedVertices));
 
 % Check variable sizes
-assert(isequal(length(polytopes),length(interpolatedPolytopes))); 
+Nvertices = length(all_vertices(:,1));
+assert(size(boundedVertices,1)==Nvertices);
+assert(size(boundedVertices,2)==3);
 
 % Check variable values
-% (can't - randomly generated!)
-
+assert(~any(isinf(boundedVertices),'all'));
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
 assert(~any(figHandles==fig_num));
@@ -199,18 +164,17 @@ fprintf(1,'Figure: %.0f: FAST mode comparisons\n',fig_num);
 figure(fig_num);
 close(fig_num);
 
-% Load test data
-polytopes = fcn_INTERNAL_loadExampleData;
+rng(1);
 
-resolution = 0.05;
+[all_vertices, seed_points, AABB, Nvertices_per_poly] = fcn_INTERNAL_loadExampleData;
 
-Niterations = 10;
+Niterations = 100;
 
 % Do calculation without pre-calculation
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    interpolatedPolytopes = fcn_MapGen_increasePolytopeVertexCount(polytopes,resolution/2, ([]));
+    boundedVertices = fcn_MapGen_verticesRemoveInfinite(all_vertices, seed_points, AABB, Nvertices_per_poly, ([]));
 end
 slow_method = toc;
 
@@ -218,7 +182,7 @@ slow_method = toc;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    interpolatedPolytopes = fcn_MapGen_increasePolytopeVertexCount(polytopes,resolution/2, (-1));
+    boundedVertices = fcn_MapGen_verticesRemoveInfinite(all_vertices, seed_points, AABB, Nvertices_per_poly, (-1));
 end
 fast_method = toc;
 
@@ -282,18 +246,46 @@ end
 
 
 %% fcn_INTERNAL_loadExampleData
-function polytopes = fcn_INTERNAL_loadExampleData
-% axis_box = [0 1 0 1];
+function [all_vertices, seed_points, AABB, Nvertices_per_poly] = fcn_INTERNAL_loadExampleData
 
-seedGeneratorNames = 'haltonset';
-seedGeneratorRanges = [1 100];
-AABBs = [0 0 1 1];
-mapStretchs = [1 1];
-[polytopes] = fcn_MapGen_voronoiTiling(...
-    seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
-    seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
-    (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
-    (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
-    (-1));
+% pull halton set
+halton_points = haltonset(2);
+points_scrambled = scramble(halton_points,'RR2'); % scramble values
+
+% pick values from halton set
+Halton_range = [101        201];
+low_pt = Halton_range(1,1);
+high_pt = Halton_range(1,2);
+seed_points = points_scrambled(low_pt:high_pt,:);
+[V,C] = voronoin(seed_points);
+% V = V.*stretch;
+
+
+AABB = [0 0 1 1];
+% stretch = [1 1];
+
+num_poly = size(seed_points,1);
+clear polytopes
+polytopes(num_poly) = fcn_MapGen_polytopeFillEmptyPoly((-1));
+
+Npolys = length(polytopes);
+Nvertices_per_poly = 20; % Maximum estimate
+Nvertices_per_map = Npolys*Nvertices_per_poly;
+all_vertices = nan(Nvertices_per_map,3);
+% all_neighbors = nan(Nvertices_per_map,1);
+
+% Loop through the polytopes, filling all_vertices matrix
+for ith_poly = 1:Npolys
+    vertices_open = V(C{ith_poly},:); 
+    vertices = [vertices_open; vertices_open(1,:)]; % Close off the vertices
+    Nvertices = length(vertices(:,1));
+    if Nvertices>Nvertices_per_poly
+        error('Need to resize the number of allowable vertices');
+    else
+        row_offset = (ith_poly-1)*Nvertices_per_poly;
+        all_vertices(row_offset+1:row_offset+Nvertices,1) = ith_poly;
+        all_vertices(row_offset+1:row_offset+Nvertices,2:3) = vertices;
+    end       
+end
 
 end % Ends fcn_INTERNAL_loadExampleData

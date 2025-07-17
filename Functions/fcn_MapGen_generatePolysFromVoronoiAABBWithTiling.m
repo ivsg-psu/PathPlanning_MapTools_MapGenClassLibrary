@@ -53,7 +53,7 @@ function [polytopes, allVertices] = fcn_MapGen_generatePolysFromVoronoiAABBWithT
 %     fcn_MapGen_tilePoints
 %     fcn_MapGen_polytopeFillEmptyPoly
 %     fcn_MapGen_plotPolytopes
-%     fcn_MapGen_fillPolytopeFieldsFromVertices
+%     fcn_MapGen_polytopesFillFieldsFromVertices
 %     fcn_MapGen_polytopesShrinkFromEdges
 %
 % EXAMPLES:
@@ -78,6 +78,10 @@ function [polytopes, allVertices] = fcn_MapGen_generatePolysFromVoronoiAABBWithT
 % 2025_07_15 by Sean Brennan
 % -- cleaned variable naming to remove underscores
 % -- turned on fast mode for subfunctions
+% 2025_07_17 by Sean Brennan
+% -- standardized Debugging and Input checks area, Inputs area
+% -- made codes use MAX_NARGIN definition at top of code, narginchk
+% -- made plotting flag_do_plots and code consistent across all functions
 
 % TO DO
 % -- none
@@ -87,8 +91,9 @@ function [polytopes, allVertices] = fcn_MapGen_generatePolysFromVoronoiAABBWithT
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 4; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==4 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -110,9 +115,8 @@ if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
     debug_fig_num = 999978; %#ok<NASGU>
-else
-    debug_fig_num = []; %#ok<NASGU>
 end
+
 
 %% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -131,37 +135,28 @@ if (0==flag_max_speed)
     if 1 == flag_check_inputs
 
         % Are there the right number of inputs?
-        narginchk(3,4);
+        narginchk(3,MAX_NARGIN);
 
-        % Check the seedPoints input, make sure it is '2column_of_numbers' type
-        fcn_DebugTools_checkInputsToFunctions(...
-            seedPoints, '2column_of_numbers');
+        % Check the seedPoints input, make sure it is 2 columns
+        fcn_DebugTools_checkInputsToFunctions(seedPoints, '2column_of_numbers');
 
-        % Check the AABB input, make sure it is '4column_of_numbers' type
-        fcn_DebugTools_checkInputsToFunctions(...
-            AABB, '4column_of_numbers',1);
+        % Check the AABB input, make sure it is 4 columns, 1 row
+        fcn_DebugTools_checkInputsToFunctions(AABB, '4column_of_numbers',1);
 
-        % Check the stretch input, make sure it is '2column_of_numbers' type
-        fcn_DebugTools_checkInputsToFunctions(...
-            stretch, '2column_of_numbers',1);
+        % Check the stretch input, make sure it is 2 columns, 1 row
+        fcn_DebugTools_checkInputsToFunctions(stretch, '2column_of_numbers',1);
 
     end
 end
 
-
 % Does user want to show the plots?
-flag_do_plot = 0; % Default is no plotting
-if  4 == nargin && (0==flag_max_speed) % Only create a figure if NOT maximizing speed
-    temp = varargin{end}; % Last argument is always figure number
-    if ~isempty(temp) % Make sure the user is not giving empty input
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
+    temp = varargin{end};
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
-        flag_do_plot = 1; % Set flag to do plotting
-    end
-else
-    if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
-        fig = figure;
-        fig_for_debug = fig.Number; %#ok<NASGU>
-        flag_do_plot = 1;
+        figure(fig_num);
+        flag_do_plots = 1;
     end
 end
 
@@ -318,7 +313,7 @@ for poly = 1:num_poly % pull each cell from the voronoi diagram
 end % Ends for loop for stretch
 
 %% Fill in all the other fields
-polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes, [], -1);
+polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes, [], -1);
 
 %§
 %% Plot the results (for debugging)?
@@ -335,7 +330,7 @@ polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes, [], -1);
 
 
 
-if flag_do_plot
+if flag_do_plots
 
     figure(fig_num);
     clf;
@@ -369,7 +364,7 @@ if flag_do_plot
     legend('Interpreter','none','location','best');
 
     % number the polytopes at seed points?
-    if 1== flag_do_plot
+    if 1== flag_do_plots
         for ith_poly = 1:length(polytopes)
             text_location = seedPoints(ith_poly,:);
             text(text_location(1,1),text_location(1,2),sprintf('%.0d',ith_poly));

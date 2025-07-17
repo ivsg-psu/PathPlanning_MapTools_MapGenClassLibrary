@@ -68,7 +68,7 @@ error_polytopes = shrunk_polytopes2; % Initialize the structure
 for ii=1:length(shrunk_polytopes2)
     error_polytopes(ii).vertices = [err(ii).circ_x(err(ii).bubble)', err(ii).circ_y(err(ii).bubble)'];
 end
-error_polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(error_polytopes);
+error_polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(error_polytopes);
 
 %verify
 h_fig = figure('name','UGV Positioning Bubbles');

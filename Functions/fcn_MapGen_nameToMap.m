@@ -129,13 +129,16 @@ function [polytopes,fig]=fcn_MapGen_nameToMap(...
 % Comments added on 2021_02_23 by Seth Tau
 % Questions or comments? sat5340@psu.edu 
 
-
 % Revision History:
 % 2021-06-08 - S. Brennan
 % -- revised function to prep for MapGen class 
 % 2025_04_25 by Sean Brennan
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
+% 2025_07_17 by Sean Brennan
+% -- standardized Debugging and Input checks area, Inputs area
+% -- made codes use MAX_NARGIN definition at top of code, narginchk
+% -- made plotting flag_do_plots and code consistent across all functions
 
 % TO DO
 % -- none
@@ -145,6 +148,7 @@ function [polytopes,fig]=fcn_MapGen_nameToMap(...
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 10; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
 if (nargin>=4 && isequal(varargin{1},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
@@ -168,9 +172,8 @@ if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
     debug_fig_num = 999978; %#ok<NASGU>
-else
-    debug_fig_num = []; %#ok<NASGU>
 end
+
 
 %% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -184,8 +187,10 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 if (0==flag_max_speed)
-    if flag_check_inputs
+    if 1 == flag_check_inputs
+
         % Are there the right number of inputs?
         %  not enough   plotting but not enough   too many
         if (nargin<3)||((nargin>3)&&(nargin<6))||(nargin>10)
@@ -201,26 +206,20 @@ if (0==flag_max_speed)
             end
         end
 
-        % Check the plot_flag input
-        fcn_DebugTools_checkInputsToFunctions(...
-            plot_flag, '1column_of_numbers',1);
+        % Check the plot_flag input is a 1x1
+        fcn_DebugTools_checkInputsToFunctions(plot_flag, '1column_of_numbers',1);
 
     end
 end
 
 % Does user want to show the plots?
-flag_do_plot = 0; % Default is no plotting
-if  (4 <= nargin) && (0==flag_max_speed) % Only create a figure if NOT maximizing speed
-    temp = varargin{1}; % Last argument is always figure number
-    if ~isempty(temp) % Make sure the user is not giving empty input
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (nargin>=4) 
+    temp = varargin{1};
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
-        flag_do_plot = 1; % Set flag to do plotting
-    end
-else
-    if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
-        fig = figure;
-        fig_for_debug = fig.Number; %#ok<NASGU>
-        flag_do_plot = 1;
+        figure(fig_num);
+        flag_do_plots = 1;
     end
 end
 
@@ -318,10 +317,10 @@ fig = []; % set value empty to return as default. Value is filled below if plott
 %                           |___/ 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-if flag_do_plot
-    figure(fig_num)
-
+if flag_do_plots
     temp_fig_num = varargin{1};
+    figure(temp_fig_num)
+
     clear plotFormat
 
     plotFormat = fcn_DebugTools_extractPlotFormatFromString(varargin{2}, (-1));

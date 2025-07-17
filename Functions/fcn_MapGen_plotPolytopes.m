@@ -65,16 +65,22 @@ function h_plot = fcn_MapGen_plotPolytopes(polytopes, varargin)
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
 % 2025_07_16 - Sean Brennan
 % -- imported plot structure into format from fcn_plotRoad_plotXY
+% 2025_07_17 by Sean Brennan
+% -- standardized Debugging and Input checks area, Inputs area
+% -- made codes use MAX_NARGIN definition at top of code, narginchk
+% -- made plotting flag_do_plots and code consistent across all functions
+
+% TO DO
+% -- none
 
 %% Debugging and Input checks
-
-% REPLACE!!!!
 
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 4; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==4 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -82,11 +88,11 @@ else
     % Check to see if we are externally setting debug mode to be "on"
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 1; % Flag to perform input checking
-    MATLABFLAG_PLOTROAD_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_PLOTROAD_FLAG_CHECK_INPUTS");
-    MATLABFLAG_PLOTROAD_FLAG_DO_DEBUG = getenv("MATLABFLAG_PLOTROAD_FLAG_DO_DEBUG");
-    if ~isempty(MATLABFLAG_PLOTROAD_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_PLOTROAD_FLAG_DO_DEBUG)
-        flag_do_debug = str2double(MATLABFLAG_PLOTROAD_FLAG_DO_DEBUG); 
-        flag_check_inputs  = str2double(MATLABFLAG_PLOTROAD_FLAG_CHECK_INPUTS);
+    MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS");
+    MATLABFLAG_MAPGEN_FLAG_DO_DEBUG = getenv("MATLABFLAG_MAPGEN_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_MAPGEN_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_MAPGEN_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS);
     end
 end
 
@@ -96,12 +102,10 @@ if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
     debug_fig_num = 999978; %#ok<NASGU>
-else
-    debug_fig_num = []; %#ok<NASGU>
 end
 
 
-%% check input arguments
+%% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   _____                   _
 %  |_   _|                 | |
@@ -114,18 +118,17 @@ end
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-if 0==flag_max_speed
-    if flag_check_inputs == 1
+if (0==flag_max_speed)
+    if 1 == flag_check_inputs
+
         % Are there the right number of inputs?
-        narginchk(1,4);
+        narginchk(1,MAX_NARGIN);
 
         % Check the polytopes input
-        % fcn_DebugTools_checkInputsToFunctions(...
-        %     polytopes, 'polytopes');
+        % fcn_DebugTools_checkInputsToFunctions(polytopes, 'polytopes');
 
     end
 end
-
 
 % Set plotting defaults
 plotFormat = 'k';
@@ -162,14 +165,21 @@ if 2 <= nargin
     end
 end
 
-% Does user want to specify fig_num?
-flag_do_plots = 0;
-if (0==flag_max_speed) &&  (2<=nargin)
+% Does user want to show the plots?
+flag_do_plots = 1; % Default is to show plots
+fig_num = []; % Empty by default
+if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
-    if ~isempty(temp)
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
+        figure(fig_num);
         flag_do_plots = 1;
     end
+end
+
+if isempty(fig_num)
+    temp = gcf;
+    fig_num = temp.Number;
 end
 
 

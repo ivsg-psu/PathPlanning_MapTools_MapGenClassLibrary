@@ -1,5 +1,5 @@
-% script_test_fcn_MapGen_fillPolytopeFieldsFromVerticies
-% Tests: fcn_MapGen_fillPolytopeFieldsFromVerticies
+% script_test_fcn_MapGen_polytopesFillFieldsFromVertices
+% Tests: fcn_MapGen_polytopesFillFieldsFromVertices
 
 %
 % REVISION HISTORY:
@@ -44,7 +44,7 @@ polytopes(1).vertices = [0 0; 4 2; 2 4; 0 0];
 is_nonconvex = 0;
 
 % Call the function
-polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes, (is_nonconvex), (fig_num));
+polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes, (is_nonconvex), (fig_num));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -91,7 +91,7 @@ polytopes(2).vertices = [10 10; 14 21; 12 41; 10 10];
 is_nonconvex = 0;
 
 % Call the function
-polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes, (is_nonconvex), (fig_num));
+polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes, (is_nonconvex), (fig_num));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -180,7 +180,7 @@ polytopes(1).vertices = [0 0; 4 2; 2 4; 0 0];
 is_nonconvex = 0;
 
 % Call the function
-polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes, (is_nonconvex), ([]));
+polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes, (is_nonconvex), ([]));
 
 % Check variable types
 assert(isstruct(polytopes));
@@ -225,7 +225,7 @@ polytopes(1).vertices = [0 0; 4 2; 2 4; 0 0];
 is_nonconvex = 0;
 
 % Call the function
-polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes, (is_nonconvex), (-1));
+polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes, (is_nonconvex), (-1));
 
 % Check variable types
 assert(isstruct(polytopes));
@@ -276,7 +276,7 @@ Niterations = 100;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes, (is_nonconvex), ([]));
+    polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes, (is_nonconvex), ([]));
 end
 slow_method = toc;
 
@@ -284,7 +284,7 @@ slow_method = toc;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes, (is_nonconvex), (-1));
+    polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes, (is_nonconvex), (-1));
 end
 fast_method = toc;
 

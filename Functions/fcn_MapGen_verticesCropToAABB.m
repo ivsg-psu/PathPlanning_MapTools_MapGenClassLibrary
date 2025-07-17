@@ -1,17 +1,17 @@
 function [croppedVertices] = ...
-    fcn_MapGen_cropPolytopeToRange(...
+    fcn_MapGen_verticesCropToAABB(...
     vertices, ...
     interiorPoint,...
     AABB,...
     varargin...
     )
-% fcn_MapGen_cropPolytopeToRange
+% fcn_MapGen_verticesCropToAABB
 % crops the given vertices of a polytope to an axis-aligned bounding box
 %
 % FORMAT:
 %
 %    [croppedVertices] = ...
-%     fcn_MapGen_cropPolytopeToRange(...
+%     fcn_MapGen_verticesCropToAABB(...
 %     vertices, ...
 %     interiorPoint,...
 %     AABB,...
@@ -47,14 +47,14 @@ function [croppedVertices] = ...
 % DEPENDENCIES:
 %
 %     fcn_DebugTools_checkInputsToFunctions
-%     fcn_MapGen_convertAABBtoWalls
+%     fcn_MapGen_AABBConvertToWalls
 %     fcn_MapGen_polytopeProjectVerticesOntoWalls
 %     fcn_MapGen_polytopeRemoveColinearVertices
 %     fcn_Path_findSensorHitOnWall
 %
 % EXAMPLES:
 %
-% See the script: script_test_fcn_MapGen_cropPolytopeToRange
+% See the script: script_test_fcn_MapGen_verticesCropToAABB
 % for a full test suite.
 %
 % This function was written on 2021_07_11 by Sean Brennan
@@ -76,23 +76,30 @@ function [croppedVertices] = ...
 % tested/debugged and regularly updated
 % -- renamed variables for clarity
 % -- improved plotting
+% 2025_07_17 by Sean Brennan
+% -- standardized Debugging and Input checks area, Inputs area
+% -- made codes use MAX_NARGIN definition at top of code, narginchk
+% -- made plotting flag_do_plots and code consistent across all functions
 
 % TO DO:
 %
 % -- allow user to enter the allowable range (hard-coded now to 0 to 1)
 % -- check that interior point is actually inside vertices!
 
+%% Debugging and Input checks
+
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 4; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==4 && isequal(varargin{end},-1))
-    flag_do_debug = 0; %     % Flag to plot the results for debugging
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
 else
     % Check to see if we are externally setting debug mode to be "on"
-    flag_do_debug = 0; %     % Flag to plot the results for debugging
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 1; % Flag to perform input checking
     MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS");
     MATLABFLAG_MAPGEN_FLAG_DO_DEBUG = getenv("MATLABFLAG_MAPGEN_FLAG_DO_DEBUG");
@@ -102,15 +109,14 @@ else
     end
 end
 
-flag_do_debug = 1;
+% flag_do_debug = 1;
 
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
-else
-    debug_fig_num = []; %#ok<NASGU>
+    debug_fig_num = 999978; 
 end
+
 
 %% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -125,45 +131,35 @@ end
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-if 0==flag_max_speed
+if (0==flag_max_speed)
     if 1 == flag_check_inputs
 
         % Are there the right number of inputs?
-        if nargin < 3 || nargin > 4
-            error('Incorrect number of input arguments')
-        end
+        narginchk(3,MAX_NARGIN);
 
-        % Check the vertices input, make sure it is '2column_of_numbers' type
-        fcn_DebugTools_checkInputsToFunctions(...
-            vertices, '2column_of_numbers');
+        % Check the vertices input, only can have 2 columns
+        fcn_DebugTools_checkInputsToFunctions(vertices, '2column_of_numbers');
 
-        % Check the interiorPoint input, make sure it is '2column_of_numbers'
-        % type, with 1 row
-        fcn_DebugTools_checkInputsToFunctions(...
-            interiorPoint, '2column_of_numbers',1);
+        % Check the interiorPoint input, 2 columns with 1 row
+        fcn_DebugTools_checkInputsToFunctions(interiorPoint, '2column_of_numbers',1);
 
-        % Check the AABB input, make sure it is '4column_of_numbers' type, with
-        % 1 row
-        fcn_DebugTools_checkInputsToFunctions(...
-            AABB, '4column_of_numbers',1);
+        % Check the AABB input, 4 columns with 1 row
+        fcn_DebugTools_checkInputsToFunctions(AABB, '4column_of_numbers',1);
 
     end
 end
 
 % Does user want to show the plots?
-flag_do_plot = 0; % Default is no plotting
-if  4 == nargin && (0==flag_max_speed) % Only create a figure if NOT maximizing speed
-    temp = varargin{end}; % Last argument is always figure number
-    if ~isempty(temp) % Make sure the user is not giving empty input
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
+    temp = varargin{end};
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
-        flag_do_plot = 1; % Set flag to do plotting
+        figure(fig_num);
+        flag_do_plots = 1;
     end
 end
 
-if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
-    fig = figure;
-    fig_for_debug = fig.Number;
-end
 
 %% Start of main code
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -177,23 +173,16 @@ end
 %See: http://patorjk.com/software/taag/#p=display&f=Big&t=Main
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
-% % For debugging
-% tolerance = 0.001;
-% location = [0.6128 0.9867];
-% if (...
-%         (interiorPoint(1,1)<location(1)+tolerance) && ...
-%         (interiorPoint(1,1)>location(1)-tolerance) && ...
-%         (interiorPoint(1,2)<location(2)+tolerance) && ...
-%         (interiorPoint(1,2)>location(2)-tolerance))
-%     disp('stop here');
-% end
+% Make sure vertices are not looped around or have any repeats
+vertices = unique(round(vertices,6),'rows','stable');
+NuniqueVertices = length(vertices(:,1));
 
 % Convert axis-aligned bounding box to wall format
-walls = fcn_MapGen_convertAABBtoWalls(AABB, -1);
+walls = fcn_MapGen_AABBConvertToWalls(AABB, -1);
 
 % Open the figure if doing debugging
 if flag_do_debug
-    figure(fig_for_debug);
+    figure(debug_fig_num);
     clf;
     hold on;
 
@@ -202,14 +191,13 @@ if flag_do_debug
     new_axis = [AABB(1)-scale/2 AABB(3)+scale/2 AABB(2)-scale/2 AABB(4)+scale/2];
     axis(new_axis);
 
-    % Plot the original vertices
-    plot(...
-        [vertices(:,1); vertices(1,1)],...
-        [vertices(:,2); vertices(1,2)],...
-        '.-','Linewidth',3);
+    % Plot the original vertices as quiver
+    vertexLoop = [vertices; vertices(1,:)];    
+    arrowMagnitudes = diff(vertexLoop,1,1);
+    quiver(vertices(:,1), vertices(:,2), arrowMagnitudes(:,1), arrowMagnitudes(:,2),1,'-','LineWidth',3);    
 
     % Plot the walls
-    plot(walls(:,1),walls(:,2),'k-');
+    plot(walls(:,1),walls(:,2),'k-','LineWidth',3);
 
     % Plot the interior point
     plot(interiorPoint(:,1),interiorPoint(:,2),'ro');
@@ -222,12 +210,51 @@ interiorPoint = ...
 
 if flag_do_debug
     % Plot the new interior point
-    figure(fig_for_debug);
+    figure(debug_fig_num);
     plot(interiorPoint(:,1),interiorPoint(:,2),'ro');
 
 end
 
-vertices_no_infinite = vertices;
+% Remove any infinite points
+if any(isinf(vertices(:,1)))
+    indicesInfinite = find(isinf(vertices(:,1)));
+    if length(indicesInfinite)>2
+        error('More than 2 infinite vertices found in a polytope. May cause problems!');
+    end
+    indexBefore = mod(indicesInfinite-2,NuniqueVertices)+1;
+    indexAfter  = mod(indicesInfinite,NuniqueVertices)+1;
+
+    % Snap points to nearest wall
+    pointBeforeInf = fcn_MapGen_AABBsnapTo(AABB,vertices(indexBefore,:),1,-1);
+    pointAfterInf  = fcn_MapGen_AABBsnapTo(AABB,vertices(indexAfter,:),1,-1);
+
+    if flag_do_debug
+        % Plot the snap points
+        figure(debug_fig_num);
+        plot(pointBeforeInf(:,1),pointBeforeInf(:,2),'g.','MarkerSize',30);
+        plot(pointAfterInf(:,1),pointAfterInf(:,2),'r.','MarkerSize',30);
+    end
+
+    if indexBefore<indexAfter
+        % Normal case
+        vertices_no_infinite = [vertices(1:indexBefore,:); pointBeforeInf; pointAfterInf; vertices(indexAfter:end,:)];
+    else
+        % This case happens when inf is either at very start or end
+        % this [inf 2a 3 4 5b]  
+        % or   [1a 2 3 4b inf]
+        vertices_no_infinite = [pointBeforeInf; pointAfterInf; vertices(indexAfter:indexBefore,:)];
+    end
+else
+    vertices_no_infinite = vertices;
+end
+
+if flag_do_debug
+    % Plot the vertices_no_infinite as a vertex loop
+    figure(debug_fig_num);
+    verticesLooped = [vertices_no_infinite; vertices_no_infinite(1,:)];
+    plot(verticesLooped(:,1),verticesLooped(:,2),'c.-','MarkerSize',10);
+end
+
 
 % Sometimes the polytopes intersect the box boundaries. We can artificially
 % add these border crossings as extra points so that we can project the
@@ -236,9 +263,9 @@ vertices_no_infinite = vertices;
     fcn_INTERNAL_findAllPoints(vertices_no_infinite, walls);
 
 if flag_do_debug
-    figure(fig_for_debug);
+    figure(debug_fig_num);
     % Plot the all_points locations
-    plot(all_points(:,1),all_points(:,2),'kx');
+    plot(all_points(:,1),all_points(:,2),'r.-','MarkerSize',30);
 end
 
 % Check for the enclosing case where the polytope goes completely around
@@ -251,24 +278,27 @@ if all(flag_vertices_outside) && (flag_was_intersection==0)
     croppedVertices = walls;
 else
 
-    % Remove any infinite points
     % all_points_no_inf = all_points(~isinf(all_points(:,1)),:);
     all_points_no_inf = all_points; 
 
     % From the interior point, project all_points back onto the wall to create
     % a polytope limited by the bounding box.
-    [projected_points] = ...
+    [projected_points_raw] = ...
         fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
         interiorPoint,...
         all_points_no_inf,...
         walls(1:end-1,:),...
         walls(2:end,:), -1);
 
+    % Remove repeat points
+    projected_points = unique(round(projected_points_raw,6),'rows','stable');
+
     if flag_do_debug
-        figure(fig_for_debug);
+        figure(debug_fig_num);
         % Plot the projected_points locations
         plot(projected_points(:,1),projected_points(:,2),'go-');
     end
+
 
     % Use the cross-product to eliminate co-linear points, as sometimes the
     % above process generates multiple points in a line, which is technically
@@ -307,7 +337,7 @@ end % Ends if statement to check if all points are enclosed
 
 
 
-if flag_do_plot
+if flag_do_plots
     figure(fig_num);
     hold on;
 
@@ -318,13 +348,13 @@ if flag_do_plot
     plot(...
         [vertices(:,1); vertices(1,1)],...
         [vertices(:,2); vertices(1,2)],...
-        '.-', 'DisplayName','Input: vertices');
+        '.-', 'LineWidth',5, 'DisplayName','Input: vertices');
 
     % Plot the AABB
-    plot(walls(:,1),walls(:,2),'k.-','DisplayName','Input: AABB');
+    plot(walls(:,1),walls(:,2),'k.-','LineWidth',3,'DisplayName','Input: AABB');
 
     % Plot the croppedVertices locations
-    plot(croppedVertices(:,1),croppedVertices(:,2),'mo-','DisplayName','Output: croppedVertices');
+    plot(croppedVertices(:,1),croppedVertices(:,2),'mo-','LineWidth',1, 'DisplayName','Output: croppedVertices');
 
     legend('Interpreter','none');
 
@@ -370,8 +400,8 @@ vertices = [vertices; vertices(1,:)];
 start_vertices = vertices(1:end-1,:);
 end_vertices = vertices(2:end,:);
 
-
-
+% For each vertex edge, check to see if that edge crosses a wall. If so,
+% save that point to all points along with prior vertices
 flag_was_intersection = 0;
 % Find all intersection points
 for ith_point = 1:length(start_vertices(:,1))
@@ -404,10 +434,11 @@ for ith_point = 1:length(start_vertices(:,1))
     end
 
 end
+% Save last poing
+all_points = [all_points; end_vertices(ith_point,:)]; 
 
 % Get rid of duplicates (occurs when two points are both on edges)
-indices_not_repeated = [~all(abs(diff(all_points))<eps*10,2); 1];
-all_points = all_points(indices_not_repeated>0,:);
+all_points = unique(round(all_points,6),'rows','stable');
 
 end % Ends fcn_INTERNAL_findAllPoints
 

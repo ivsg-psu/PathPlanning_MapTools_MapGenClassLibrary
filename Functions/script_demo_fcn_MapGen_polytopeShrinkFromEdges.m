@@ -15,7 +15,7 @@ vertices = [0 0; 2 0; 1 2; 0 1; 0 0]*5;
 assert(vertices(1,1) == vertices(4,1));
 test_polytope.vertices = vertices;
 % fill in other fields from the vertices field
-test_polytope = fcn_MapGen_fillPolytopeFieldsFromVertices(test_polytope);
+test_polytope = fcn_MapGen_polytopesFillFieldsFromVertices(test_polytope);
 
 
 % perform a small edge shrink
@@ -42,7 +42,7 @@ fig_num = 657;
 vertices = [0 0; 2 0; 1 2; 0 1; 0 0]*5;
 test_polytope.vertices = vertices;
 % fill in other fields from the vertices field
-test_polytope = fcn_MapGen_fillPolytopeFieldsFromVertices(test_polytope);
+test_polytope = fcn_MapGen_polytopesFillFieldsFromVertices(test_polytope);
 % assert that the polytope is convex to start
 [angles, ~, ~] = fcn_MapGen_polytopeFindVertexAngles(test_polytope.vertices);
 interior_angles = 180-angles*180/pi;
@@ -66,7 +66,7 @@ fig_num = 756;
 vertices = [0 0; 2 0; 1 2; 0 1; 0 0]*5;
 test_polytope.vertices = vertices;
 % fill in other fields from the vertices field
-test_polytope = fcn_MapGen_fillPolytopeFieldsFromVertices(test_polytope);
+test_polytope = fcn_MapGen_polytopesFillFieldsFromVertices(test_polytope);
 % assert that the polytope is convex to start
 [angles, ~, ~] = fcn_MapGen_polytopeFindVertexAngles(test_polytope.vertices);
 interior_angles = 180-angles*180/pi;
@@ -94,7 +94,7 @@ vertices = [0 0; 1 0; 1 1; 0 1; 0 0]*5;
 test_polytope.vertices = vertices;
 
 % fill in other fields from the vertices field
-test_polytope = fcn_MapGen_fillPolytopeFieldsFromVertices(test_polytope);
+test_polytope = fcn_MapGen_polytopesFillFieldsFromVertices(test_polytope);
 
 
 edge_cut = 0.1;
@@ -109,7 +109,7 @@ vertices = [0 0; 1 1; 0 1; 0 0]*5;
 test_polytope.vertices = vertices;
 
 % fill in other fields from the vertices field
-test_polytope = fcn_MapGen_fillPolytopeFieldsFromVertices(test_polytope);
+test_polytope = fcn_MapGen_polytopesFillFieldsFromVertices(test_polytope);
 
 edge_cut = 0.1;
 fcn_MapGen_polytopeShrinkFromEdges(...
@@ -121,7 +121,7 @@ vertices = [0 0; 1 1; 0 1; 0 0];
 test_polytope.vertices = vertices;
 
 % fill in other fields from the vertices field
-test_polytope = fcn_MapGen_fillPolytopeFieldsFromVertices(test_polytope);
+test_polytope = fcn_MapGen_polytopesFillFieldsFromVertices(test_polytope);
 
 edge_cut = 2;
 fcn_MapGen_polytopeShrinkFromEdges(...
@@ -136,7 +136,7 @@ vertices = [0 0; 0.4 0.1; 1 1; 0 1; 0 0]*5;
 test_polytope.vertices = vertices;
 
 % fill in other fields from the vertices field
-test_polytope = fcn_MapGen_fillPolytopeFieldsFromVertices(test_polytope);
+test_polytope = fcn_MapGen_polytopesFillFieldsFromVertices(test_polytope);
 
 step =  0.1;
 for edge_cut = step:step:2

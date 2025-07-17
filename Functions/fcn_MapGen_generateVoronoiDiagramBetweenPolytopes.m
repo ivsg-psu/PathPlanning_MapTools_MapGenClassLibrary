@@ -1,5 +1,5 @@
 function [vx,vy,h] = fcn_MapGen_generateVoronoiDiagramBetweenPolytopes(polytopes,is_nonconvex, varargin)
-% fcn_MapGen_increasePolytopeVertexCount
+% fcn_MapGen_generateVoronoiDiagramBetweenPolytopes
 % Wraps the matlab voronoi() function to find the voronoi diagram using
 % the vertices of polytopes as the seed points, in the case of convex obstacles
 % or using densely packed colinear vertices along polytope sides as seed points
@@ -34,7 +34,7 @@ function [vx,vy,h] = fcn_MapGen_generateVoronoiDiagramBetweenPolytopes(polytopes
 %
 % DEPENDENCIES:
 %     Matlab's voronoi function
-%     fcn_MapGen_increasePolytopeVertexCount
+%     fcn_MapGen_polytopesIncreaseVertexCount
 %
 % EXAMPLES:
 %
@@ -51,8 +51,11 @@ function [vx,vy,h] = fcn_MapGen_generateVoronoiDiagramBetweenPolytopes(polytopes
 % 2025_04_25 by Sean Brennan
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-% -- fixed call to fcn_MapGen_fillPolytopeFieldsFromVertices
-
+% -- fixed call to fcn_MapGen_polytopesFillFieldsFromVertices
+% 2025_07_17 by Sean Brennan
+% -- standardized Debugging and Input checks area, Inputs area
+% -- made codes use MAX_NARGIN definition at top of code, narginchk
+% -- made plotting flag_do_plots and code consistent across all functions
 
 % TO DO
 % -- none
@@ -62,8 +65,9 @@ function [vx,vy,h] = fcn_MapGen_generateVoronoiDiagramBetweenPolytopes(polytopes
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 3; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==3 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -85,8 +89,6 @@ if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
     debug_fig_num = 999978; %#ok<NASGU>
-else
-    debug_fig_num = []; %#ok<NASGU>
 end
 
 
@@ -107,38 +109,21 @@ if (0==flag_max_speed)
     if 1 == flag_check_inputs
 
         % Are there the right number of inputs?
-        if nargin < 2 || nargin > 3
-            error('Incorrect number of input arguments')
-        end
-
-        % % Check the polytopes input, make sure it is 'polytopes' type
-        % fcn_DebugTools_checkInputsToFunctions(...
-        %     polytopes, 'polytopes');
-        %
-        %
-        % % Check the exp_dist input, make sure it is 'positive_column_of_numbers' type
-        % fcn_DebugTools_checkInputsToFunctions(...
-        %     exp_dist, 'positive_1column_of_numbers',1);
+        narginchk(2,MAX_NARGIN);
 
     end
 end
 
 % Does user want to show the plots?
-flag_do_plot = 0; % Default is no plotting
-if  3 == nargin && (0==flag_max_speed) % Only create a figure if NOT maximizing speed
-    temp = varargin{end}; % Last argument is always figure number
-    if ~isempty(temp) % Make sure the user is not giving empty input
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
+    temp = varargin{end};
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
-        flag_do_plot = 1; % Set flag to do plotting
-    end
-else
-    if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
-        fig = figure;
-        fig_for_debug = fig.Number; %#ok<NASGU>
-        flag_do_plot = 1;
+        figure(fig_num);
+        flag_do_plots = 1;
     end
 end
-
 
 %% Start of main code
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -163,7 +148,7 @@ else
     % % want to ensure that a side with length of 2 std dev below mean is still interpolated at least in half
     % resolution = (poly_map_stats.average_side_length - 2*poly_map_stats.std_side_length)/2;
     resolution = min_distance_between_verts/2;
-    interpolated_polytopes = fcn_MapGen_increasePolytopeVertexCount(polytopes, resolution);
+    interpolated_polytopes = fcn_MapGen_polytopesIncreaseVertexCount(polytopes, resolution);
     [vx,vy] = voronoi([interpolated_polytopes.xv], [interpolated_polytopes.yv]);
     h = voronoi([interpolated_polytopes.xv], [interpolated_polytopes.yv]);
 end
@@ -182,7 +167,7 @@ end
 
 
 
-if flag_do_plot
+if flag_do_plots
     figure(fig_num)
     clf;
 

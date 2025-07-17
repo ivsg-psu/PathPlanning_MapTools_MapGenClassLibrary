@@ -30,7 +30,7 @@ function shrunkPolytope = fcn_MapGen_polytopeShrinkToRadius(shrinker, newRadius,
 % DEPENDENCIES:
 % 
 %     fcn_DebugTools_checkInputsToFunctions
-%     fcn_MapGen_fillPolytopeFieldsFromVertices
+%     fcn_MapGen_polytopesFillFieldsFromVertices
 %     fcn_MapGen_plotPolytopes
 % 
 % EXAMPLES:
@@ -49,24 +49,29 @@ function shrunkPolytope = fcn_MapGen_polytopeShrinkToRadius(shrinker, newRadius,
 % 2025_04_25 by Sean Brennan
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-% -- fixed call to fcn_MapGen_fillPolytopeFieldsFromVertices
+% -- fixed call to fcn_MapGen_polytopesFillFieldsFromVertices
 % 2025_07_16 by Sean Brennan
 % -- cleaned up documentation and typos
 % -- removed tolerance input as it wasn't being used
 % -- turned on fast mode for all internal calls to external functions
+% 2025_07_17 by Sean Brennan
+% -- standardized Debugging and Input checks area, Inputs area
+% -- made codes use MAX_NARGIN definition at top of code, narginchk
+% -- made plotting flag_do_plots and code consistent across all functions
 
 % TO DO
 % -- Vectorize the for loop if possible
 % -- check inputs are positive numbers where appropriate (e.g. make a
-% "positive number" check
+%    % "positive number" chec
 
 %% Debugging and Input checks
 
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 3; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==3 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -88,8 +93,6 @@ if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
     debug_fig_num = 999978; %#ok<NASGU>
-else
-    debug_fig_num = []; %#ok<NASGU>
 end
 
 
@@ -105,38 +108,32 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
-if flag_check_inputs
-    % Are there the right number of inputs?
-    narginchk(2,3);
-    
-    % Check the shrinker input
-    fcn_DebugTools_checkInputsToFunctions(...
-        shrinker, 'polytopes');
-    
-    % Check the newRadius input
-    fcn_DebugTools_checkInputsToFunctions(...
-        newRadius, 'positive_1column_of_numbers',1);
-    
+
+if (0==flag_max_speed)
+    if 1 == flag_check_inputs
+
+        % Are there the right number of inputs?
+        narginchk(2,MAX_NARGIN);
+
+        % Check the shrinker input
+        fcn_DebugTools_checkInputsToFunctions(shrinker, 'polytopes');
+
+        % Check the newRadius input
+        fcn_DebugTools_checkInputsToFunctions(newRadius, 'positive_1column_of_numbers',1);
+
+    end
 end
-    
 
 % Does user want to show the plots?
-flag_do_plot = 0; % Default is no plotting
-if  3 == nargin && (0==flag_max_speed) % Only create a figure if NOT maximizing speed
-    temp = varargin{end}; % Last argument is always figure number
-    if ~isempty(temp) % Make sure the user is not giving empty input
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
+    temp = varargin{end};
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
-        flag_do_plot = 1; % Set flag to do plotting
-    end
-else
-    if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
-        fig = figure;
-        fig_for_debug = fig.Number; %#ok<NASGU>
-        flag_do_plot = 1;
+        figure(fig_num);
+        flag_do_plots = 1;
     end
 end
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   __  __       _
@@ -168,7 +165,7 @@ if scale < 1
 end
 
 % fill in other fields from the vertices field
-shrunkPolytope = fcn_MapGen_fillPolytopeFieldsFromVertices(shrunkPolytope, [], -1);
+shrunkPolytope = fcn_MapGen_polytopesFillFieldsFromVertices(shrunkPolytope, [], -1);
 
 
 %% Plot results?
@@ -183,7 +180,7 @@ shrunkPolytope = fcn_MapGen_fillPolytopeFieldsFromVertices(shrunkPolytope, [], -
 %                           |___/ 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-if flag_do_plot
+if flag_do_plots
     figure(fig_num);
     hold on
     

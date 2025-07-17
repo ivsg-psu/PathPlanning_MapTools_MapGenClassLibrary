@@ -1,5 +1,5 @@
-% script_test_fcn_MapGen_convertAABBtoWalls
-% Tests: fcn_MapGen_convertAABBtoWalls
+% script_test_fcn_MapGen_AABBConvertToWalls
+% Tests: fcn_MapGen_AABBConvertToWalls
 
 %
 % REVISION HISTORY:
@@ -39,7 +39,7 @@ figure(fig_num); clf;
 AABB = [0 0 1 1];
 
 % Call the function
-walls = fcn_MapGen_convertAABBtoWalls(AABB, (fig_num));
+walls = fcn_MapGen_AABBConvertToWalls(AABB, (fig_num));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -107,7 +107,7 @@ figure(fig_num); close(fig_num);
 AABB = [0 0 1 1];
 
 % Call the function
-walls = fcn_MapGen_convertAABBtoWalls(AABB, ([]));
+walls = fcn_MapGen_AABBConvertToWalls(AABB, ([]));
 
 % Check variable types
 assert(isnumeric(walls));
@@ -131,7 +131,7 @@ figure(fig_num); close(fig_num);
 AABB = [0 0 1 1];
 
 % Call the function
-walls = fcn_MapGen_convertAABBtoWalls(AABB, (-1));
+walls = fcn_MapGen_AABBConvertToWalls(AABB, (-1));
 
 % Check variable types
 assert(isnumeric(walls));
@@ -161,7 +161,7 @@ Niterations = 100;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    walls = fcn_MapGen_convertAABBtoWalls(AABB, ([]));
+    walls = fcn_MapGen_AABBConvertToWalls(AABB, ([]));
 end
 slow_method = toc;
 
@@ -169,7 +169,7 @@ slow_method = toc;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    walls = fcn_MapGen_convertAABBtoWalls(AABB, (-1));
+    walls = fcn_MapGen_AABBConvertToWalls(AABB, (-1));
 end
 fast_method = toc;
 

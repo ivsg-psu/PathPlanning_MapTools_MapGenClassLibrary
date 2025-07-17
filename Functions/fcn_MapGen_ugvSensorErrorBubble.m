@@ -70,7 +70,6 @@ varargin...
 % 
 %     err: Error result
 % 
-% 
 % DEPENDENCIES:
 % 
 %     fcn_DebugTools_checkInputsToFunctions
@@ -107,6 +106,10 @@ varargin...
 % 2025_04_25 by Sean Brennan
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
+% 2025_07_17 by Sean Brennan
+% -- standardized Debugging and Input checks area, Inputs area
+% -- made codes use MAX_NARGIN definition at top of code, narginchk
+% -- made plotting flag_do_plots and code consistent across all functions
 
 % TO DO
 % -- none
@@ -116,8 +119,9 @@ varargin...
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 4; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==4 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -139,9 +143,8 @@ if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
     debug_fig_num = 999978; %#ok<NASGU>
-else
-    debug_fig_num = []; %#ok<NASGU>
 end
+
 
 %% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -160,38 +163,31 @@ if (0==flag_max_speed)
     if 1 == flag_check_inputs
 
         % Are there the right number of inputs?
-        narginchk(3,4);
+        narginchk(3,MAX_NARGIN);
 
         % Check the Polytopes input, make sure it is 'polytopes' type
-        fcn_DebugTools_checkInputsToFunctions(...
-            Polytopes, 'polytopes');
+        fcn_DebugTools_checkInputsToFunctions(Polytopes, 'polytopes');
 
-        % Check the Heading_Angle input, make sure it is '1column_of_numbers' type
-        fcn_DebugTools_checkInputsToFunctions(...
-            Heading_Angle, '1column_of_numbers',[1]);
+        % Check the Heading_Angle input, make sure it is 1x1
+        fcn_DebugTools_checkInputsToFunctions(Heading_Angle, '1column_of_numbers',1);
 
-        % Check the Bubble_Resolution input, make sure it is '1column_of_numbers' type
-        fcn_DebugTools_checkInputsToFunctions(...
-            Bubble_Resolution, '1column_of_numbers',[1]);
+        % Check the Bubble_Resolution input, make sure it is 1x1
+        fcn_DebugTools_checkInputsToFunctions(Bubble_Resolution, '1column_of_numbers',1);
 
     end
 end
 
 % Does user want to show the plots?
-flag_do_plot = 0; % Default is no plotting
-if  (4 == nargin) && (0==flag_max_speed) % Only create a figure if NOT maximizing speed
-    temp = varargin{end}; % Last argument is always figure number
-    if ~isempty(temp) % Make sure the user is not giving empty input
+flag_do_plot = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
+    temp = varargin{end};
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
-        flag_do_plot = 1; % Set flag to do plotting
-    end
-else
-    if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
-        fig = figure;
-        fig_for_debug = fig.Number; %#ok<NASGU>
+        figure(fig_num);
         flag_do_plot = 1;
     end
 end
+
 
 %% Start of main code
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -263,12 +259,12 @@ for ii=1:length(Polytopes)
 
     % Sensor error values from Baltsavias paper
     [err(ii).x , err(ii).y ] = fcn_MapGen_ugvSensorError({R, beta, kappa}, ... 
-        {0.08, 0.08, 0.08}, {0.03, 0.03, 0.04}, {0.02, -0.05});
+        {0.08, 0.08, 0.08}, {0.03, 0.03, 0.04}, {0.02, -0.05}); %#ok<AGROW>
     
     %initialization for nested loop
     R_len = length(R);
-    err(ii).circ_x = zeros(1,R_len*N);
-    err(ii).circ_y = zeros(1,R_len*N);
+    err(ii).circ_x = zeros(1,R_len*N); %#ok<AGROW>
+    err(ii).circ_y = zeros(1,R_len*N); %#ok<AGROW>
     %kk is a pre-allocating the points along a circle where the bubble
     %points will be generated
     kk=linspace(2*pi/N,2*pi,N);
@@ -285,7 +281,7 @@ for ii=1:length(Polytopes)
 
     end
 
-    err(ii).bubble = convhull(err(ii).circ_x, err(ii).circ_y);
+    err(ii).bubble = convhull(err(ii).circ_x, err(ii).circ_y); %#ok<AGROW>
 
 end % Ends for loop
 

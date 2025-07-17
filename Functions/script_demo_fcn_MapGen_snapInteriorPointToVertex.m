@@ -19,7 +19,7 @@ flag_do_plot = 1;
 % convex polytope
 convex_polytope(1).vertices = [0 0; 1 1; -1 2; -2 1; -1 0; 0 0];
 convex_polytope(2).vertices = [convex_polytope(1).vertices(:,1) + 4, convex_polytope(1).vertices(:,2) - 2];
-polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(convex_polytope);
+polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(convex_polytope);
 pts_to_test = [0 0.5; -1 -1; 4 -1; 4.1 -1];
 output_pts = fcn_MapGen_snapInteriorPointToVertex(polytopes, pts_to_test);
 

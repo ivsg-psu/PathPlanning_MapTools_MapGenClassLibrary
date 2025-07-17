@@ -1,10 +1,10 @@
-% script_test_fcn_MapGen_removeInfiniteVertices
-% Tests: fcn_MapGen_removeInfiniteVertices
+% script_test_fcn_MapGen_AABBisWithin
+% Tests: fcn_MapGen_AABBisWithin
 
-% 
+%
 % REVISION HISTORY:
-% 
-% 2021_07_02 by Sean Brennan
+%
+% 2021_07_11 by Sean Brennan
 % -- first write of script
 % 2025_07_11 - S. Brennan, sbrennan@psu.edu
 % -- updated script testing to standard form
@@ -30,31 +30,30 @@ close all
 close all;
 fprintf(1,'Figure: 1XXXXXX: DEMO cases\n');
 
-%% DEMO case: Remove infinite vertices
+%% DEMO case: basic demo
 fig_num = 10001;
-titleString = sprintf('DEMO case: Remove infinite vertices');
+titleString = sprintf('DEMO case: self-intersection');
 fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
-rng(1);
-
-[all_vertices, seed_points, AABB, Nvertices_per_poly] = fcn_INTERNAL_loadExampleData;
+AABB = [0 0 1 1];
+testPoints = randn(100,2);
 
 % Call the function
-boundedVertices = fcn_MapGen_removeInfiniteVertices(all_vertices, seed_points, AABB, Nvertices_per_poly, (fig_num));
+isInside = fcn_MapGen_AABBisWithin( AABB, testPoints, (fig_num));
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(boundedVertices));
+assert(islogical(isInside));
 
 % Check variable sizes
-Nvertices = length(all_vertices(:,1));
-assert(size(boundedVertices,1)==Nvertices);
-assert(size(boundedVertices,2)==3);
+Nvertices = length(testPoints(:,1));
+assert(size(isInside,1)==Nvertices);
+assert(size(isInside,2)==1);
 
 % Check variable values
-assert(~any(isinf(boundedVertices),'all'));
+% Cannot check as they are randomly generated
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -108,23 +107,22 @@ fig_num = 80001;
 fprintf(1,'Figure: %.0f: FAST mode, empty fig_num\n',fig_num);
 figure(fig_num); close(fig_num);
 
-rng(1);
-
-[all_vertices, seed_points, AABB, Nvertices_per_poly] = fcn_INTERNAL_loadExampleData;
+AABB = [0 0 1 1];
+testPoints = randn(100,2);
 
 % Call the function
-boundedVertices = fcn_MapGen_removeInfiniteVertices(all_vertices, seed_points, AABB, Nvertices_per_poly, ([]));
+isInside = fcn_MapGen_AABBisWithin( AABB, testPoints, ([]));
 
 % Check variable types
-assert(isnumeric(boundedVertices));
+assert(islogical(isInside));
 
 % Check variable sizes
-Nvertices = length(all_vertices(:,1));
-assert(size(boundedVertices,1)==Nvertices);
-assert(size(boundedVertices,2)==3);
+Nvertices = length(testPoints(:,1));
+assert(size(isInside,1)==Nvertices);
+assert(size(isInside,2)==1);
 
 % Check variable values
-assert(~any(isinf(boundedVertices),'all'));
+% Cannot check as they are randomly generated
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -136,23 +134,23 @@ fig_num = 80002;
 fprintf(1,'Figure: %.0f: FAST mode, fig_num=-1\n',fig_num);
 figure(fig_num); close(fig_num);
 
-rng(1);
-
-[all_vertices, seed_points, AABB, Nvertices_per_poly] = fcn_INTERNAL_loadExampleData;
+AABB = [0 0 1 1];
+testPoints = randn(100,2);
 
 % Call the function
-boundedVertices = fcn_MapGen_removeInfiniteVertices(all_vertices, seed_points, AABB, Nvertices_per_poly, (-1));
+isInside = fcn_MapGen_AABBisWithin( AABB, testPoints, (-1));
 
 % Check variable types
-assert(isnumeric(boundedVertices));
+assert(islogical(isInside));
 
 % Check variable sizes
-Nvertices = length(all_vertices(:,1));
-assert(size(boundedVertices,1)==Nvertices);
-assert(size(boundedVertices,2)==3);
+Nvertices = length(testPoints(:,1));
+assert(size(isInside,1)==Nvertices);
+assert(size(isInside,2)==1);
 
 % Check variable values
-assert(~any(isinf(boundedVertices),'all'));
+% Cannot check as they are randomly generated
+
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
 assert(~any(figHandles==fig_num));
@@ -164,9 +162,8 @@ fprintf(1,'Figure: %.0f: FAST mode comparisons\n',fig_num);
 figure(fig_num);
 close(fig_num);
 
-rng(1);
-
-[all_vertices, seed_points, AABB, Nvertices_per_poly] = fcn_INTERNAL_loadExampleData;
+AABB = [0 0 1 1];
+testPoints = randn(100,2);
 
 Niterations = 100;
 
@@ -174,7 +171,7 @@ Niterations = 100;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    boundedVertices = fcn_MapGen_removeInfiniteVertices(all_vertices, seed_points, AABB, Nvertices_per_poly, ([]));
+    isInside = fcn_MapGen_AABBisWithin( AABB, testPoints, ([]));
 end
 slow_method = toc;
 
@@ -182,7 +179,7 @@ slow_method = toc;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    boundedVertices = fcn_MapGen_removeInfiniteVertices(all_vertices, seed_points, AABB, Nvertices_per_poly, (-1));
+    isInside = fcn_MapGen_AABBisWithin( AABB, testPoints, (-1));
 end
 fast_method = toc;
 
@@ -245,47 +242,19 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
 
-%% fcn_INTERNAL_loadExampleData
-function [all_vertices, seed_points, AABB, Nvertices_per_poly] = fcn_INTERNAL_loadExampleData
-
-% pull halton set
-halton_points = haltonset(2);
-points_scrambled = scramble(halton_points,'RR2'); % scramble values
-
-% pick values from halton set
-Halton_range = [101        201];
-low_pt = Halton_range(1,1);
-high_pt = Halton_range(1,2);
-seed_points = points_scrambled(low_pt:high_pt,:);
-[V,C] = voronoin(seed_points);
-% V = V.*stretch;
-
-
-AABB = [0 0 1 1];
-% stretch = [1 1];
-
-num_poly = size(seed_points,1);
-clear polytopes
-polytopes(num_poly) = fcn_MapGen_polytopeFillEmptyPoly((-1));
-
-Npolys = length(polytopes);
-Nvertices_per_poly = 20; % Maximum estimate
-Nvertices_per_map = Npolys*Nvertices_per_poly;
-all_vertices = nan(Nvertices_per_map,3);
-% all_neighbors = nan(Nvertices_per_map,1);
-
-% Loop through the polytopes, filling all_vertices matrix
-for ith_poly = 1:Npolys
-    vertices_open = V(C{ith_poly},:); 
-    vertices = [vertices_open; vertices_open(1,:)]; % Close off the vertices
-    Nvertices = length(vertices(:,1));
-    if Nvertices>Nvertices_per_poly
-        error('Need to resize the number of allowable vertices');
-    else
-        row_offset = (ith_poly-1)*Nvertices_per_poly;
-        all_vertices(row_offset+1:row_offset+Nvertices,1) = ith_poly;
-        all_vertices(row_offset+1:row_offset+Nvertices,2:3) = vertices;
-    end       
-end
-
-end % Ends fcn_INTERNAL_loadExampleData
+% %% fcn_INTERNAL_loadExampleData
+% function [seed_points, V, C] = fcn_INTERNAL_loadExampleData
+%
+%
+% % pull halton set
+% halton_points = haltonset(2);
+% points_scrambled = scramble(halton_points,'RR2'); % scramble values
+%
+% % pick values from halton set
+% Halton_range = [1801 1901];
+% low_pt = Halton_range(1,1);
+% high_pt = Halton_range(1,2);
+% seed_points = points_scrambled(low_pt:high_pt,:);
+% [V,C] = voronoin(seed_points);
+% % V = V.*stretch;
+% end % Ends fcn_INTERNAL_loadExampleData

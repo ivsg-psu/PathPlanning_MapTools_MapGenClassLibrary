@@ -7,10 +7,8 @@ function flattened_polytopes = fcn_MapGen_flattenPolytopeMap(polytopes, varargin
 % additionally all polytopes will be broken up into triangles to enforce
 % convexity
 %
-%
-%
 % FORMAT:
-% flattened_polytopes = fcn_MapGen_flattenPolytopeMap(polytopes)
+% flattened_polytopes = fcn_MapGen_flattenPolytopeMap(polytopes, (fig_num))
 %
 % INPUTS:
 %     polytopes - the initial polytope field, potentially containing concave
@@ -18,11 +16,11 @@ function flattened_polytopes = fcn_MapGen_flattenPolytopeMap(polytopes, varargin
 %
 %     (optional inputs)
 %
-%      fig_num: a figure number to plot results. If set to -1, skips any
-%      input checking or debugging, no figures will be generated, and sets
-%      up code to maximize speed. As well, if given, this forces the
-%      variable types to be displayed as output and as well makes the input
-%      check process verbose.
+%     fig_num: a figure number to plot results. If set to -1, skips any
+%     input checking or debugging, no figures will be generated, and sets
+%     up code to maximize speed. As well, if given, this forces the
+%     variable types to be displayed as output and as well makes the input
+%     check process verbose.
 %
 % OUTPUTS:
 %
@@ -33,7 +31,7 @@ function flattened_polytopes = fcn_MapGen_flattenPolytopeMap(polytopes, varargin
 % DEPENDENCIES:
 %
 %     fcn_MapGen_plotPolytopes
-%     fcn_MapGen_fillPolytopeFieldsFromVertices
+%     fcn_MapGen_polytopesFillFieldsFromVertices
 %
 % EXAMPLES:
 %
@@ -49,8 +47,11 @@ function flattened_polytopes = fcn_MapGen_flattenPolytopeMap(polytopes, varargin
 % -- typo fixes in test script name
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-% -- fixed call to fcn_MapGen_fillPolytopeFieldsFromVertices
-
+% -- fixed call to fcn_MapGen_polytopesFillFieldsFromVertices
+% 2025_07_17 by Sean Brennan
+% -- standardized Debugging and Input checks area, Inputs area
+% -- made codes use MAX_NARGIN definition at top of code, narginchk
+% -- made plotting flag_do_plots and code consistent across all functions
 
 % TO DO
 % -- none
@@ -60,8 +61,9 @@ function flattened_polytopes = fcn_MapGen_flattenPolytopeMap(polytopes, varargin
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 2; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==2 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -83,8 +85,6 @@ if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
     debug_fig_num = 999978; %#ok<NASGU>
-else
-    debug_fig_num = []; %#ok<NASGU>
 end
 
 
@@ -105,36 +105,19 @@ if (0==flag_max_speed)
     if 1 == flag_check_inputs
 
         % Are there the right number of inputs?
-        if nargin < 1 || nargin > 2
-            error('Incorrect number of input arguments')
-        end
-         
-        % % Check the polytopes input, make sure it is 'polytopes' type
-        % fcn_DebugTools_checkInputsToFunctions(...
-        %     polytopes, 'polytopes');
-        % 
-        % 
-        % % Check the exp_dist input, make sure it is 'positive_column_of_numbers' type
-        % fcn_DebugTools_checkInputsToFunctions(...
-        %     exp_dist, 'positive_1column_of_numbers',1);
+        narginchk(1,MAX_NARGIN);
 
     end
 end
 
 % Does user want to show the plots?
-flag_do_plot = 0; % Default is no plotting
-fig_num = [];
-if  2 == nargin && (0==flag_max_speed) % Only create a figure if NOT maximizing speed
-    temp = varargin{end}; % Last argument is always figure number
-    if ~isempty(temp) % Make sure the user is not giving empty input
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
+    temp = varargin{end};
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
-        flag_do_plot = 1; % Set flag to do plotting
-    end
-else
-    if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
-        fig = figure;
-        fig_for_debug = fig.Number; %#ok<NASGU>
-        flag_do_plot = 1;
+        figure(fig_num);
+        flag_do_plots = 1;
     end
 end
 
@@ -154,7 +137,7 @@ if ~isempty(fig_num)
 end
 
 % convert polytopes to polyshapes
-if flag_do_plot
+if flag_do_plots
     %fcn_MapGen_OLD_plotPolytopes(polytopes,1000,'-',2,[0 0 0],[],'square',[1 0 0 0 0.5]);
     plotFormat.LineWidth = 2;
     plotFormat.MarkerSize = 10;
@@ -165,13 +148,13 @@ if flag_do_plot
 
 end
 polyshapes = [];
-if flag_do_plot
+if flag_do_plots
     figure(1)
     clf
 end
 for i = 1:length(polytopes)
     polyshapes = [polyshapes, polyshape(polytopes(i).xv,polytopes(i).yv)]; %#ok<AGROW>
-    if flag_do_plot
+    if flag_do_plots
         figure(1)
         hold on
         title('Polyshapes before subtraction')
@@ -204,7 +187,7 @@ if ~isempty(r) && ~isempty(c)
     p2_new = rmslivers(p2_new,0.001);
     p3 = simplify(p3);
     p3 = rmslivers(p3,0.001);
-    if flag_do_plot
+    if flag_do_plots
         figure(2)
         clf
         hold on
@@ -216,12 +199,12 @@ if ~isempty(r) && ~isempty(c)
     % make the polygonal polyshapes into series of triangular polyshapes
     % and triangular polytopes
     if p1_new.area > eps
-        [~, p1_new_tris] = INTERNAL_fcn_triangulatePolyshape(p1_new,flag_do_plot);
+        [~, p1_new_tris] = INTERNAL_fcn_triangulatePolyshape(p1_new,flag_do_plots);
     end
     if p2_new.area > eps
-        [~, p2_new_tris] = INTERNAL_fcn_triangulatePolyshape(p2_new,flag_do_plot);
+        [~, p2_new_tris] = INTERNAL_fcn_triangulatePolyshape(p2_new,flag_do_plots);
     end
-    [~, p3_new_tris] = INTERNAL_fcn_triangulatePolyshape(p3,flag_do_plot);
+    [~, p3_new_tris] = INTERNAL_fcn_triangulatePolyshape(p3,flag_do_plots);
 
     % TODO when making them triangles, set an ID field that the planner can use,
     % to know that when planning between two tris from the same parent poly,
@@ -247,7 +230,7 @@ if ~isempty(r) && ~isempty(c)
         polytopes = [polytopes, p2_new_tris];
     end
     polytopes = [polytopes, p3_new_tris];
-    if flag_do_plot
+    if flag_do_plots
         % fcn_MapGen_P:D_plotPolytopes(polytopes,1000,'-',2,[0 0 0],[],'square',[1 0 0 0 0.5]);
         plotFormat.LineWidth = 2;
         plotFormat.MarkerSize = 10;
@@ -358,7 +341,7 @@ for i=1:size(p_tri.ConnectivityList,1)
     p_tri_polytopes(i).vertices = [x1 y1; x2 y2; x3 y3; x1 y1]; %#ok<AGROW>
 end
 % fill out all polytope fields from vertices
-p_tri_polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(p_tri_polytopes);
+p_tri_polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(p_tri_polytopes);
 end
 
 % example code doing different things

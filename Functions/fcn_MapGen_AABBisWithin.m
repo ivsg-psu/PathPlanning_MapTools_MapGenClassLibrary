@@ -1,37 +1,34 @@
-function [walls] = ...
-    fcn_MapGen_convertAABBtoWalls(...
-    AABB,varargin)
-
-% fcn_MapGen_convertAABBtoWalls
-% converts axis-aligned bounding boxes into equivalent enclosing walls
+function isInside = fcn_MapGen_AABBisWithin(AABB, testPoints, varargin)
+% fcn_MapGen_AABBisWithin
+% Checks if the points are within the given axis-aligned bounding box,
+% AABB, returning a vector of 1' or 0's the same length as the nubmer of
+% rows of points. Each point must be strictly within the AABB - e.g. this
+% function returns "false" if a point is on the "wall" of the AABB.
 % 
 % FORMAT:
 % 
-%    [walls] = ...
-%    fcn_MapGen_convertAABBtoWalls(...
-%    AABB,(fig_num))
+%     isInside = fcn_MapGen_AABBisWithin(AABB, testPoints, (fig_num))
 % 
 % INPUTS:
 % 
-%     AABB: the axis-aligned bounding box, in format of 
-%     [xmin ymin xmax ymax], wherein the resulting polytopes must be
-%     bounded.
-%
+%     AABB: the Axis-Aligned Bounding Box, defined in form of [xmin ymin 
+%     xmax ymax]
+% 
+%     testPoints: the test points to check, in form of [x y] where x and 
+%     y are scalar or column vectors
+% 
 %     (optional inputs)
 %
-%      fig_num: a figure number to plot results. If set to -1, skips any
-%      input checking or debugging, no figures will be generated, and sets
-%      up code to maximize speed. As well, if given, this forces the
-%      variable types to be displayed as output and as well makes the input
-%      check process verbose.
-% 
+%     fig_num: a figure number to plot results. If set to -1, skips any
+%     input checking or debugging, no figures will be generated, and sets
+%     up code to maximize speed. As well, if given, this forces the
+%     variable types to be displayed as output and as well makes the input
+%     check process verbose.
 % 
 % OUTPUTS:
 % 
-%     walls: the resulting vertices of the walls in [x y] format. Note that
-%     the walls enclose, so the last vertices will be the same as the
-%     first.
-% 
+%     isInside: a column of 1's or 0's, one for each test point, with 1 
+%     meaning that the test point is within the AABB
 % 
 % DEPENDENCIES:
 % 
@@ -39,7 +36,7 @@ function [walls] = ...
 % 
 % EXAMPLES:
 % 
-% See the script: script_test_fcn_MapGen_convertAABBtoWalls
+% See the script: script_test_fcn_MapGen_AABBisWithin
 % for a full test suite.
 % 
 % This function was written on 2021_07_11 by Sean Brennan
@@ -48,12 +45,17 @@ function [walls] = ...
 % 
 % REVISION HISTORY:
 % 
-% 2021_07_17 by Sean Brennan
+% 2021_07_11 by Sean Brennan
 % -- first write of function
+% 2021_07_17 by Sean Brennan
+% -- clarified strictness of the AABB
 % 2025_04_25 by Sean Brennan
 % -- added global debugging options
-% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-
+% -- switched input checking to fcn_DebugTools_checkInputsToFunctions 
+% 2025_07_17 by Sean Brennan
+% -- standardized Debugging and Input checks area, Inputs area
+% -- made codes use MAX_NARGIN definition at top of code, narginchk
+% -- made plotting flag_do_plots and code consistent across all functions
 
 % TO DO
 % -- none
@@ -63,8 +65,9 @@ function [walls] = ...
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 3; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==2 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -86,8 +89,6 @@ if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
     debug_fig_num = 999978; %#ok<NASGU>
-else
-    debug_fig_num = []; %#ok<NASGU>
 end
 
 
@@ -108,35 +109,27 @@ if (0==flag_max_speed)
     if 1 == flag_check_inputs
 
         % Are there the right number of inputs?
-        if nargin < 1 || nargin > 2
-            error('Incorrect number of input arguments')
-        end
+        narginchk(2,MAX_NARGIN);
 
-        % Check the AABB input, make sure it is '4column_of_numbers' type, with
-        % 1 row
-        fcn_DebugTools_checkInputsToFunctions(...
-            AABB, '4column_of_numbers',1);
+        % Check the AABB input, make sure it is 4 columns, 1 row
+        fcn_DebugTools_checkInputsToFunctions(AABB, '4column_of_numbers',1);
+
+        % Check the testPoints input, make sure it is 2 coluns
+        fcn_DebugTools_checkInputsToFunctions(testPoints, '2column_of_numbers');
 
     end
 end
 
 % Does user want to show the plots?
-flag_do_plot = 0; % Default is no plotting
-if  2 == nargin && (0==flag_max_speed) % Only create a figure if NOT maximizing speed
-    temp = varargin{end}; % Last argument is always figure number
-    if ~isempty(temp) % Make sure the user is not giving empty input
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
+    temp = varargin{end};
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
-        flag_do_plot = 1; % Set flag to do plotting
-    end
-else
-    if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
-        fig = figure;
-        fig_for_debug = fig.Number; %#ok<NASGU>
-        flag_do_plot = 1;
+        figure(fig_num);
+        flag_do_plots = 1;
     end
 end
-
-
 
 %% Start of main code
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -149,15 +142,14 @@ end
 %
 %See: http://patorjk.com/software/taag/#p=display&f=Big&t=Main
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
-% Goes through the vertices and removes infinite values by inserting
-% points prior, and after the infinite one that "close" the polytope.
-% Convert axis-aligned bounding box to wall format
-walls = [...
-    AABB(1,1) AABB(1,2); ...
-    AABB(1,3) AABB(1,2); ...
-    AABB(1,3) AABB(1,4); ...
-    AABB(1,1) AABB(1,4); ...
-    AABB(1,1) AABB(1,2)];
+
+% % See: https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
+% % for details on axis-aligned bounding boxes (AABB)
+
+isInside = (testPoints(:,1)>AABB(1,1))  & ...
+    (testPoints(:,2)>AABB(1,2))  & ...
+    (testPoints(:,1)<AABB(1,3))  & ...
+    (testPoints(:,2)<AABB(1,4));
 
 %§
 %% Plot the results (for debugging)?
@@ -172,22 +164,28 @@ walls = [...
 %                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-
-if flag_do_plot    
+if flag_do_plots
     figure(fig_num);
     clf;
     hold on;
-    grid on;
-    grid minor;
     
-    scale = max(AABB,[],'all') - min(AABB,[],'all');
-    new_axis = [AABB(1)-scale/2 AABB(3)+scale/2 AABB(2)-scale/2 AABB(4)+scale/2];
-    axis(new_axis);
+    % Convert axis-aligned bounding box to wall format
+    walls = [AABB(1,1) AABB(1,2); AABB(1,3) AABB(1,2); AABB(1,3) AABB(1,4); AABB(1,1) AABB(1,4); AABB(1,1) AABB(1,2)];
     
     % Plot the walls
-    plot(walls(:,1),walls(:,2),'b-');
-        
+    plot(walls(:,1),walls(:,2),'k-');
+    
+    % Plot the testPoints
+    
+    % plot(...
+    %     [testPoints(:,1); testPoints(1,1)],...
+    %     [testPoints(:,2); testPoints(1,2)],...
+    %     '.-');
+    plot(testPoints(:,1), testPoints(:,2),'k.');
+    
+    % Plot the interior points with green
+    plot(testPoints(isInside,1),testPoints(isInside,2),'go');
+    
 end % Ends the flag_do_plot if statement
 
 if flag_do_debug
@@ -196,11 +194,6 @@ end
 
 
 end % Ends the function
-
-
-
-
-
 
 %% Functions follow
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -213,6 +206,7 @@ end % Ends the function
 %                                               
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
+
 
 
 

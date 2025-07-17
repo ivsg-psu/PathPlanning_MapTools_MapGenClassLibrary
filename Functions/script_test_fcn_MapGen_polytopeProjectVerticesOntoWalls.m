@@ -294,7 +294,9 @@ assert(~any(figHandles==fig_num));
 
 % close all;
 
-%% BUG
+%% BUG cases go here
+
+
 
 %% Fail conditions
 if 1==0

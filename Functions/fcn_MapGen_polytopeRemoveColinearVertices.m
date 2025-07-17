@@ -44,7 +44,10 @@ function cleanedVertices = fcn_MapGen_polytopeRemoveColinearVertices(inputVertic
 % 2025_04_25 by Sean Brennan
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-
+% 2025_07_17 by Sean Brennan
+% -- standardized Debugging and Input checks area, Inputs area
+% -- made codes use MAX_NARGIN definition at top of code, narginchk
+% -- made plotting flag_do_plots and code consistent across all functions
 
 % TO DO
 % -- none
@@ -54,8 +57,9 @@ function cleanedVertices = fcn_MapGen_polytopeRemoveColinearVertices(inputVertic
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 2; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==2 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -77,9 +81,8 @@ if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
     debug_fig_num = 999978; %#ok<NASGU>
-else
-    debug_fig_num = []; %#ok<NASGU>
 end
+
 
 %% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -93,35 +96,29 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if (0==flag_max_speed)
-    if flag_check_inputs
-        % Are there the right number of inputs?
-        narginchk(1,2);
 
-        % Check the vertices input
-        fcn_DebugTools_checkInputsToFunctions(...
-            inputVertices, '2column_of_numbers');
+if (0==flag_max_speed)
+    if 1 == flag_check_inputs
+
+        % Are there the right number of inputs?
+        narginchk(1,MAX_NARGIN);
+
+        % Check the vertices input, 2 columns
+        fcn_DebugTools_checkInputsToFunctions(inputVertices, '2column_of_numbers');
 
     end
 end
-    
 
 % Does user want to show the plots?
-flag_do_plot = 0; % Default is no plotting
-if  2 == nargin && (0==flag_max_speed) % Only create a figure if NOT maximizing speed
-    temp = varargin{end}; % Last argument is always figure number
-    if ~isempty(temp) % Make sure the user is not giving empty input
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
+    temp = varargin{end};
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
-        flag_do_plot = 1; % Set flag to do plotting
-    end
-else
-    if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
-        fig = figure;
-        fig_for_debug = fig.Number; %#ok<NASGU>
-        flag_do_plot = 1;
+        figure(fig_num);
+        flag_do_plots = 1;
     end
 end
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   __  __       _
@@ -135,37 +132,36 @@ end
 
 
 % Remove repeats
-[cleanedVertices,~,~] = unique(round(inputVertices,7),'rows','stable');
+[uniqueVertices,~,~] = unique(round(inputVertices,7),'rows','stable');
 
 % Use the cross-product to eliminate co-linear points
-Npoints = length(cleanedVertices(:,1));
-good_indices = zeros(Npoints,1);
-
+Npoints = length(uniqueVertices(:,1));
+crossResults = nan(Npoints,1);
 for ith_point = 1:Npoints
     
     if ith_point>1
-        previous_vector = [cleanedVertices(ith_point,:)-cleanedVertices(ith_point-1,:), 0];
+        previous_vector = [uniqueVertices(ith_point,:)-uniqueVertices(ith_point-1,:), 0];
     else % must wrap around
-        previous_vector = [cleanedVertices(end,:)-cleanedVertices(1,:), 0];
+        previous_vector = [uniqueVertices(end,:)-uniqueVertices(1,:), 0];
     end
     
     if ith_point<Npoints
-        subsequent_vector = [cleanedVertices(ith_point+1,:)-cleanedVertices(ith_point,:), 0];
+        subsequent_vector = [uniqueVertices(ith_point+1,:)-uniqueVertices(ith_point,:), 0];
     else % must wrap around
-        subsequent_vector = [cleanedVertices(1,:)-cleanedVertices(Npoints,:), 0];
+        subsequent_vector = [uniqueVertices(1,:)-uniqueVertices(Npoints,:), 0];
     end
     
     cross_result = cross(previous_vector,subsequent_vector);
+    crossResults(ith_point,1) = cross_result(1,3);
     
-    % Keep only points that "bend", e.g. have a non-zero cross-product
-    tolerance = 1000*eps;
-    if abs(cross_result(1,3))>tolerance
-        good_indices(ith_point,:) = 1;
-    end
 end
 
+% Keep only points that "bend", e.g. have a non-zero cross-product
+tolerance = 1E-7; % Roughly floating point error
+keepIndices = abs(crossResults)>tolerance;
+
 % Final polytope
-cleanedVertices = cleanedVertices(good_indices>0,:);
+cleanedVertices = uniqueVertices(keepIndices,:);
 
 
 
@@ -181,7 +177,7 @@ cleanedVertices = cleanedVertices(good_indices>0,:);
 %                           |___/ 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-if flag_do_plot
+if flag_do_plots
     figure(fig_num);
 
     hold on

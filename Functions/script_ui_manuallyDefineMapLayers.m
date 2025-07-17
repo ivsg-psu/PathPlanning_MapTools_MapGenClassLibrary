@@ -66,7 +66,7 @@ polytopes_flattened = [];
 for i = 1:length(polytopes)
     prompt_polytope_cost = sprintf("What traversal cost would you like for polytopes in layer %i?\n",i);
     des_polytope_cost = input(prompt_polytope_cost)
-    polytopes{i} = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes{i});
+    polytopes{i} = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes{i});
     polytopes{i} = fcn_polytope_editing_set_all_costs(polytopes{i},des_polytope_cost);
     % flatten cell array into regular polytope struct array after setting costs
     polytopes_flattened = [polytopes_flattened,polytopes{i}]

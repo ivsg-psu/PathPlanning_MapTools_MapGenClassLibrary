@@ -544,7 +544,7 @@ rng(1234);
 % seedGeneratorRanges = cell(Nsets,1);
 % AABBs               = cell(Nsets,1);
 % mapStretchs        = cell(Nsets,1);
-
+Nsets = 1;
 mapStretch = [1 1];
 set_range = [1 100];
 seedGeneratorNames = 'haltonset';

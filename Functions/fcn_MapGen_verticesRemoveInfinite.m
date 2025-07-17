@@ -1,15 +1,15 @@
 function [bounded_vertices] = ...
-    fcn_MapGen_removeInfiniteVertices(...
-    all_vertices,seed_points,AABB,Nvertices_per_poly, varargin)
+    fcn_MapGen_verticesRemoveInfinite(...
+    all_vertices, seed_points, AABB, Nvertices_per_poly, varargin)
 
-% fcn_MapGen_removeInfiniteVertices
+% fcn_MapGen_verticesRemoveInfinite
 % removes infinite vertices created by Voronoi tiling steps
 %
 % FORMAT:
 %
 %    [bounded_vertices] = ...
-%    fcn_MapGen_removeInfiniteVertices(...
-%    all_vertices,seed_points,AABB,Nvertices_per_poly, (fig_num))
+%    fcn_MapGen_verticesRemoveInfinite(...
+%    all_vertices, seed_points, AABB, Nvertices_per_poly, (fig_num))
 %
 % INPUTS:
 %
@@ -44,13 +44,13 @@ function [bounded_vertices] = ...
 % DEPENDENCIES:
 %
 %     fcn_DebugTools_checkInputsToFunctions
-%     fcn_MapGen_convertAABBtoWalls
-%     fcn_MapGen_isWithinABBB
-%     fcn_MapGen_snapToAABB
+%     fcn_MapGen_AABBConvertToWalls
+%     fcn_MapGen_AABBisWithin
+%     fcn_MapGen_AABBsnapTo
 %
 % EXAMPLES:
 %
-% See the script: script_test_fcn_MapGen_removeInfiniteVertices
+% See the script: script_test_fcn_MapGen_verticesRemoveInfinite
 % for a full test suite.
 %
 % This function was written on 2021_07_17 by Sean Brennan
@@ -70,6 +70,10 @@ function [bounded_vertices] = ...
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
 % 2025_07_13 by Sean Brennan
 % -- added error catching for single vertex triangles
+% 2025_07_17 by Sean Brennan
+% -- standardized Debugging and Input checks area, Inputs area
+% -- made codes use MAX_NARGIN definition at top of code, narginchk
+% -- made plotting flag_do_plots and code consistent across all functions
 
 % TO DO
 % -- none
@@ -79,8 +83,9 @@ function [bounded_vertices] = ...
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 5; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==5 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -102,9 +107,8 @@ if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
     debug_fig_num = 999978; %#ok<NASGU>
-else
-    debug_fig_num = []; %#ok<NASGU>
 end
+
 
 %% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -123,44 +127,34 @@ if (0==flag_max_speed)
     if 1 == flag_check_inputs
 
         % Are there the right number of inputs?
-        narginchk(4,5);
+        narginchk(4,MAX_NARGIN);
 
         % Check the all_vertices input, make sure it has 3 columns, and can be
         % mixed NaN with numeric values
-        fcn_DebugTools_checkInputsToFunctions(...
-            all_vertices, '3column_of_mixed');
+        fcn_DebugTools_checkInputsToFunctions(all_vertices, '3column_of_mixed');
 
-        % Check the Nvertices_per_poly input, make sure it has 1 column, 1 row
-        fcn_DebugTools_checkInputsToFunctions(...
-            Nvertices_per_poly, '1column_of_numbers',1);
+        % Check the Nvertices_per_poly input, make sure it is 1x1
+        fcn_DebugTools_checkInputsToFunctions(Nvertices_per_poly, '1column_of_numbers',1);
 
-        % Check the seed_points input, make sure it is '2column_of_numbers'
+        % Check the seed_points input, make sure it is Nx2
         % type, with correct number of rows
-        fcn_DebugTools_checkInputsToFunctions(...
-            seed_points, '2column_of_numbers',...
+        fcn_DebugTools_checkInputsToFunctions(seed_points, '2column_of_numbers',...
             round(length(all_vertices(:,1))/Nvertices_per_poly));
 
-        % Check the AABB input, make sure it is '4column_of_numbers' type, with
-        % 1 row
-        fcn_DebugTools_checkInputsToFunctions(...
-            AABB, '4column_of_numbers',1);
+        % Check the AABB input, make sure it is 1x4
+        fcn_DebugTools_checkInputsToFunctions(AABB, '4column_of_numbers',1);
 
     end
 end
 
 % Does user want to show the plots?
-flag_do_plot = 0; % Default is no plotting
-if  (5 == nargin) && (0==flag_max_speed) % Only create a figure if NOT maximizing speed
-    temp = varargin{end}; % Last argument is always figure number
-    if ~isempty(temp) % Make sure the user is not giving empty input
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
+    temp = varargin{end};
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
-        flag_do_plot = 1; % Set flag to do plotting
-    end
-else
-    if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
-        fig = figure;
-        fig_for_debug = fig.Number; 
-        flag_do_plot = 1;
+        figure(fig_num);
+        flag_do_plots = 1;
     end
 end
 
@@ -179,7 +173,7 @@ end
 % points prior, and after the infinite one that "close" the polytope.
 
 % Convert axis-aligned bounding box to wall format
-walls = fcn_MapGen_convertAABBtoWalls(AABB, -1);
+walls = fcn_MapGen_AABBConvertToWalls(AABB, -1);
 
 
 if flag_do_debug
@@ -287,7 +281,7 @@ if any(isinf(all_vertices),'all') % Are there any infinite vertices
             [vertices_no_repeats(bad_index+1:end,:); ...
             vertices_no_repeats(1:bad_index-1,:)];
 
-        if length(vertex_string(:,1))==1 %#ok<ISCL>
+        if length(vertex_string(:,1))==1 
             warning('on','backtrace');
             warning('A single vertex polytope was encountered. Unable to continue');
             error('single vertex "triangle" encountered');
@@ -314,7 +308,7 @@ if any(isinf(all_vertices),'all') % Are there any infinite vertices
         % out to the boundaries. This is a bit challenging since these
         % represent cases where the Vornoi boundary is missing, so
         % basically it means we have to calculate the boundary ourselves.
-        isInside = fcn_MapGen_isWithinABBB(AABB, [prior_point; next_point], -1);        
+        isInside = fcn_MapGen_AABBisWithin(AABB, [prior_point; next_point], -1);        
         if isInside(1)
             new_prior = fcn_INTERNAL_MapGen_findMissingBoundaryPoint(...
                 prior_point,prior_point_lead_in, bad_poly,AABB,sorted_all_vertices,seed_points);
@@ -420,7 +414,7 @@ end
 
 
 
-if flag_do_plot
+if flag_do_plots
     figure(fig_num);
     clf;
     hold on;
@@ -560,7 +554,7 @@ end
 % Check which is closer - midpoint or the current point? - to where the
 % snap point would have been:
 points_for_vector = [midpoint;test_point];
-nominal_new_boundary_point = fcn_MapGen_snapToAABB(AABB,test_point,[],-1);
+nominal_new_boundary_point = fcn_MapGen_AABBsnapTo(AABB,test_point,[],-1);
 distances_squared = ...
     sum((points_for_vector-nominal_new_boundary_point).^2,2);
 [~,sort_index] = sort(distances_squared,'descend');
@@ -585,7 +579,7 @@ end
 
 
 snap_type = 2;
-new_point = fcn_MapGen_snapToAABB(AABB, sorted_points_for_vector, snap_type,-1);
+new_point = fcn_MapGen_AABBsnapTo(AABB, sorted_points_for_vector, snap_type,-1);
 
 
 if flag_do_debug

@@ -1,10 +1,10 @@
-% script_test_fcn_MapGen_generateOneRandomPolytope
-% Tests: fcn_MapGen_generateOneRandomPolytope
+% script_test_fcn_MapGen_polytopesIncreaseVertexCount
+% Tests: fcn_MapGen_polytopesIncreaseVertexCount
 
-% 
+%
 % REVISION HISTORY:
-% 
-% 2021_06_27 by Sean Brennan
+%
+% 2022_10_21 by Steve Harnett
 % -- first write of script
 % 2025_07_11 - S. Brennan, sbrennan@psu.edu
 % -- updated script testing to standard form
@@ -30,34 +30,40 @@ close all
 close all;
 fprintf(1,'Figure: 1XXXXXX: DEMO cases\n');
 
-%% DEMO case: basic demo
+
+%% DEMO case: basic demo, one polytope set
 fig_num = 10001;
-titleString = sprintf('DEMO case: basic demo');
+titleString = sprintf('DEMO case: basic demo, one polytope set');
 fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
+% Load test data
+polytopes = fcn_INTERNAL_loadExampleData;
+
+resolution = 0.05;
+
 % Call the function
-onePolytope = fcn_MapGen_generateOneRandomPolytope((fig_num));
+interpolatedPolytopes = fcn_MapGen_polytopesIncreaseVertexCount(polytopes,resolution/2, fig_num);
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isstruct(onePolytope));
-assert(isfield(onePolytope,'vertices'));
-assert(isfield(onePolytope,'xv'));
-assert(isfield(onePolytope,'yv'));
-assert(isfield(onePolytope,'distances'));
-assert(isfield(onePolytope,'mean'));
-assert(isfield(onePolytope,'area'));
-assert(isfield(onePolytope,'max_radius'));
-assert(isfield(onePolytope,'min_radius'));
-assert(isfield(onePolytope,'mean_radius'));
-assert(isfield(onePolytope,'radii'));
-assert(isfield(onePolytope,'cost'));
-assert(isfield(onePolytope,'parent_poly_id'));
+assert(isstruct(interpolatedPolytopes));
+assert(isfield(interpolatedPolytopes,'vertices'));
+assert(isfield(interpolatedPolytopes,'xv'));
+assert(isfield(interpolatedPolytopes,'yv'));
+assert(isfield(interpolatedPolytopes,'distances'));
+assert(isfield(interpolatedPolytopes,'mean'));
+assert(isfield(interpolatedPolytopes,'area'));
+assert(isfield(interpolatedPolytopes,'max_radius'));
+assert(isfield(interpolatedPolytopes,'min_radius'));
+assert(isfield(interpolatedPolytopes,'mean_radius'));
+assert(isfield(interpolatedPolytopes,'radii'));
+assert(isfield(interpolatedPolytopes,'cost'));
+assert(isfield(interpolatedPolytopes,'parent_poly_id'));
 
 % Check variable sizes
-assert(isequal(1,length(onePolytope))); 
+assert(isequal(length(polytopes),length(interpolatedPolytopes))); 
 
 % Check variable values
 % (can't - randomly generated!)
@@ -114,26 +120,31 @@ fig_num = 80001;
 fprintf(1,'Figure: %.0f: FAST mode, empty fig_num\n',fig_num);
 figure(fig_num); close(fig_num);
 
+% Load test data
+polytopes = fcn_INTERNAL_loadExampleData;
+
+resolution = 0.05;
+
 % Call the function
-onePolytope = fcn_MapGen_generateOneRandomPolytope(([]));
+interpolatedPolytopes = fcn_MapGen_polytopesIncreaseVertexCount(polytopes,resolution/2, ([]));
 
 % Check variable types
-assert(isstruct(onePolytope));
-assert(isfield(onePolytope,'vertices'));
-assert(isfield(onePolytope,'xv'));
-assert(isfield(onePolytope,'yv'));
-assert(isfield(onePolytope,'distances'));
-assert(isfield(onePolytope,'mean'));
-assert(isfield(onePolytope,'area'));
-assert(isfield(onePolytope,'max_radius'));
-assert(isfield(onePolytope,'min_radius'));
-assert(isfield(onePolytope,'mean_radius'));
-assert(isfield(onePolytope,'radii'));
-assert(isfield(onePolytope,'cost'));
-assert(isfield(onePolytope,'parent_poly_id'));
+assert(isstruct(interpolatedPolytopes));
+assert(isfield(interpolatedPolytopes,'vertices'));
+assert(isfield(interpolatedPolytopes,'xv'));
+assert(isfield(interpolatedPolytopes,'yv'));
+assert(isfield(interpolatedPolytopes,'distances'));
+assert(isfield(interpolatedPolytopes,'mean'));
+assert(isfield(interpolatedPolytopes,'area'));
+assert(isfield(interpolatedPolytopes,'max_radius'));
+assert(isfield(interpolatedPolytopes,'min_radius'));
+assert(isfield(interpolatedPolytopes,'mean_radius'));
+assert(isfield(interpolatedPolytopes,'radii'));
+assert(isfield(interpolatedPolytopes,'cost'));
+assert(isfield(interpolatedPolytopes,'parent_poly_id'));
 
 % Check variable sizes
-assert(isequal(1,length(onePolytope))); 
+assert(isequal(length(polytopes),length(interpolatedPolytopes))); 
 
 % Check variable values
 % (can't - randomly generated!)
@@ -148,26 +159,31 @@ fig_num = 80002;
 fprintf(1,'Figure: %.0f: FAST mode, fig_num=-1\n',fig_num);
 figure(fig_num); close(fig_num);
 
+% Load test data
+polytopes = fcn_INTERNAL_loadExampleData;
+
+resolution = 0.05;
+
 % Call the function
-onePolytope = fcn_MapGen_generateOneRandomPolytope((-1));
+interpolatedPolytopes = fcn_MapGen_polytopesIncreaseVertexCount(polytopes,resolution/2, (-1));
 
 % Check variable types
-assert(isstruct(onePolytope));
-assert(isfield(onePolytope,'vertices'));
-assert(isfield(onePolytope,'xv'));
-assert(isfield(onePolytope,'yv'));
-assert(isfield(onePolytope,'distances'));
-assert(isfield(onePolytope,'mean'));
-assert(isfield(onePolytope,'area'));
-assert(isfield(onePolytope,'max_radius'));
-assert(isfield(onePolytope,'min_radius'));
-assert(isfield(onePolytope,'mean_radius'));
-assert(isfield(onePolytope,'radii'));
-assert(isfield(onePolytope,'cost'));
-assert(isfield(onePolytope,'parent_poly_id'));
+assert(isstruct(interpolatedPolytopes));
+assert(isfield(interpolatedPolytopes,'vertices'));
+assert(isfield(interpolatedPolytopes,'xv'));
+assert(isfield(interpolatedPolytopes,'yv'));
+assert(isfield(interpolatedPolytopes,'distances'));
+assert(isfield(interpolatedPolytopes,'mean'));
+assert(isfield(interpolatedPolytopes,'area'));
+assert(isfield(interpolatedPolytopes,'max_radius'));
+assert(isfield(interpolatedPolytopes,'min_radius'));
+assert(isfield(interpolatedPolytopes,'mean_radius'));
+assert(isfield(interpolatedPolytopes,'radii'));
+assert(isfield(interpolatedPolytopes,'cost'));
+assert(isfield(interpolatedPolytopes,'parent_poly_id'));
 
 % Check variable sizes
-assert(isequal(1,length(onePolytope))); 
+assert(isequal(length(polytopes),length(interpolatedPolytopes))); 
 
 % Check variable values
 % (can't - randomly generated!)
@@ -183,13 +199,18 @@ fprintf(1,'Figure: %.0f: FAST mode comparisons\n',fig_num);
 figure(fig_num);
 close(fig_num);
 
-Niterations = 20;
+% Load test data
+polytopes = fcn_INTERNAL_loadExampleData;
+
+resolution = 0.05;
+
+Niterations = 10;
 
 % Do calculation without pre-calculation
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    onePolytope = fcn_MapGen_generateOneRandomPolytope(([]));
+    interpolatedPolytopes = fcn_MapGen_polytopesIncreaseVertexCount(polytopes,resolution/2, ([]));
 end
 slow_method = toc;
 
@@ -197,7 +218,7 @@ slow_method = toc;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    onePolytope = fcn_MapGen_generateOneRandomPolytope((-1));
+    interpolatedPolytopes = fcn_MapGen_polytopesIncreaseVertexCount(polytopes,resolution/2, (-1));
 end
 fast_method = toc;
 
@@ -260,19 +281,19 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
 
-% %% fcn_INTERNAL_loadExampleData
-% function [seed_points, V, C] = fcn_INTERNAL_loadExampleData
-%
-%
-% % pull halton set
-% halton_points = haltonset(2);
-% points_scrambled = scramble(halton_points,'RR2'); % scramble values
-%
-% % pick values from halton set
-% Halton_range = [1801 1901];
-% low_pt = Halton_range(1,1);
-% high_pt = Halton_range(1,2);
-% seed_points = points_scrambled(low_pt:high_pt,:);
-% [V,C] = voronoin(seed_points);
-% % V = V.*stretch;
-% end % Ends fcn_INTERNAL_loadExampleData
+%% fcn_INTERNAL_loadExampleData
+function polytopes = fcn_INTERNAL_loadExampleData
+% axis_box = [0 1 0 1];
+
+seedGeneratorNames = 'haltonset';
+seedGeneratorRanges = [1 100];
+AABBs = [0 0 1 1];
+mapStretchs = [1 1];
+[polytopes] = fcn_MapGen_voronoiTiling(...
+    seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
+    seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
+    (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
+    (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
+    (-1));
+
+end % Ends fcn_INTERNAL_loadExampleData

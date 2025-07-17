@@ -1,5 +1,5 @@
-function interpolatedPolytopes = fcn_MapGen_increasePolytopeVertexCount(polytopes, resolution, varargin)
-% fcn_MapGen_increasePolytopeVertexCount
+function interpolatedPolytopes = fcn_MapGen_polytopesIncreaseVertexCount(polytopes, resolution, varargin)
+% fcn_MapGen_polytopesIncreaseVertexCount
 % Given polytope field and a desired resolution distance, n, returns an equivalent
 % polytope field with colinear vertices added to each polytope side such that
 % there is a vertex every n units
@@ -10,7 +10,7 @@ function interpolatedPolytopes = fcn_MapGen_increasePolytopeVertexCount(polytope
 % rather than on just the vertices.
 %
 % FORMAT:
-%     interpolatedPolytopes = fcn_MapGen_increasePolytopeVertexCount(polytopes,resolution, (fig_num))
+%     interpolatedPolytopes = fcn_MapGen_polytopesIncreaseVertexCount(polytopes,resolution, (fig_num))
 %
 % INPUTS:
 %
@@ -35,7 +35,7 @@ function interpolatedPolytopes = fcn_MapGen_increasePolytopeVertexCount(polytope
 %
 % EXAMPLES:
 %
-% See the script: script_test_fcn_MapGen_increasePolytopeVertexCount.m
+% See the script: script_test_fcn_MapGen_polytopesIncreaseVertexCount.m
 % for a full test suite.
 %
 % Questions or comments? contact sjh6473@psu.edu or Sean Brennan,
@@ -50,6 +50,10 @@ function interpolatedPolytopes = fcn_MapGen_increasePolytopeVertexCount(polytope
 % 2025_07_15 by Sean Brennan
 % -- improved docstrings to clarify fig_num input
 % -- cleaned up variable names to avoid underscores.
+% 2025_07_17 by Sean Brennan
+% -- standardized Debugging and Input checks area, Inputs area
+% -- made codes use MAX_NARGIN definition at top of code, narginchk
+% -- made plotting flag_do_plots and code consistent across all functions
 
 % TO DO
 % -- none
@@ -59,8 +63,9 @@ function interpolatedPolytopes = fcn_MapGen_increasePolytopeVertexCount(polytope
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 3; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==3 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -82,8 +87,6 @@ if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
     debug_fig_num = 999978; %#ok<NASGU>
-else
-    debug_fig_num = []; %#ok<NASGU>
 end
 
 
@@ -99,10 +102,12 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 if (0==flag_max_speed)
-    if flag_check_inputs
+    if 1 == flag_check_inputs
+
         % Are there the right number of inputs?
-        narginchk(2,3);
+        narginchk(2,MAX_NARGIN);
 
         % Check the polytopes input
         fcn_DebugTools_checkInputsToFunctions(polytopes, 'polytopes');
@@ -110,23 +115,17 @@ if (0==flag_max_speed)
         % Check the resolution input, make sure it is [1 1]
         fcn_DebugTools_checkInputsToFunctions(resolution, '1column_of_numbers',[1 1]);
 
-        
     end
 end
 
 % Does user want to show the plots?
-flag_do_plot = 0; % Default is no plotting
-if  3 == nargin && (0==flag_max_speed) % Only create a figure if NOT maximizing speed
-    temp = varargin{end}; % Last argument is always figure number
-    if ~isempty(temp) % Make sure the user is not giving empty input
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
+    temp = varargin{end};
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
-        flag_do_plot = 1; % Set flag to do plotting
-    end
-else
-    if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
-        fig = figure;
-        fig_for_debug = fig.Number; %#ok<NASGU>
-        flag_do_plot = 1;
+        figure(fig_num);
+        flag_do_plots = 1;
     end
 end
 
@@ -150,7 +149,7 @@ plotting_updated_vertices = [];
 for i = 1:length(polytopes)
     new_verts = [];
 
-    if flag_do_plot
+    if flag_do_plots
         plotting_vertices = [plotting_vertices; polytopes(i).vertices; nan nan]; %#ok<AGROW>
     end
 
@@ -213,7 +212,7 @@ for i = 1:length(polytopes)
     polytopes(i).yv = new_verts(:,2)';
 
     % plot the new vertices in a different color for comparison
-    if flag_do_plot
+    if flag_do_plots
         plotting_updated_vertices = [plotting_updated_vertices; polytopes(i).vertices; nan nan]; %#ok<AGROW>
     end
 end
@@ -232,7 +231,7 @@ interpolatedPolytopes = polytopes;
 
 
 
-if flag_do_plot
+if flag_do_plots
     figure(fig_num);
     clf;
     hold on;

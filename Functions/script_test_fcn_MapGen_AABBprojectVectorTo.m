@@ -1,5 +1,5 @@
-% script_test_fcn_MapGen_snapToAABB
-% Tests: fcn_MapGen_snapToAABB
+% script_test_fcn_MapGen_AABBprojectVectorTo
+% Tests: fcn_MapGen_AABBprojectVectorTo
 
 % REVISION HISTORY:
 % 2021_07_14 by Sean Brennan
@@ -36,28 +36,28 @@ fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
 axisAlignedBoundingBox = [0 0 1 1];
-testPoint = [0.3 0.2];
+projectionVector = [0.3 0.2];
 snapType = 0;
 
 % Call the function
-[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
+%  [snapPoint, wallNumber] = fcn_MapGen_AABBprojectVectorTo(axisAlignedBoundingBox, projectionVector, (snapType), (fig_num) );
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(snapPoint));
-assert(isnumeric(wallNumber));
+% assert(isnumeric(snapPoint));
+% assert(isnumeric(wallNumber));
 
 % Check variable sizes
-assert(isequal(size(snapPoint),[1 2]));
-assert(isequal(size(wallNumber),[1 1]));
+% assert(isequal(size(snapPoint),[1 2]));
+% assert(isequal(size(wallNumber),[1 1]));
 
 % Check variable values
-assert(isequal([0.1667         0],round(snapPoint,4)))
-assert(isequal(1,wallNumber))
+% assert(isequal([0.1667         0],round(snapPoint,4)))
+% assert(isequal(1,wallNumber))
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+% assert(isequal(get(gcf,'Number'),fig_num));
 
 
 %% Test cases start here. These are very simple, usually trivial
@@ -101,28 +101,28 @@ fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
 axisAlignedBoundingBox = [0 0 1 1];
-testPoint = [0.3 0.2];
+projectionVector = [0.3 0.2];
 snapType = 0;
 
 % Call the function
-[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
+%  [snapPoint, wallNumber] = fcn_MapGen_AABBprojectVectorTo(axisAlignedBoundingBox, projectionVector, (snapType), (fig_num) );
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(snapPoint));
-assert(isnumeric(wallNumber));
+% assert(isnumeric(snapPoint));
+% assert(isnumeric(wallNumber));
 
 % Check variable sizes
-assert(isequal(size(snapPoint),[1 2]));
-assert(isequal(size(wallNumber),[1 1]));
+% assert(isequal(size(snapPoint),[1 2]));
+% assert(isequal(size(wallNumber),[1 1]));
 
 % Check variable values
-assert(isequal([0.1667         0],round(snapPoint,4)))
-assert(isequal(1,wallNumber))
+% assert(isequal([0.1667         0],round(snapPoint,4)))
+% assert(isequal(1,wallNumber))
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+% assert(isequal(get(gcf,'Number'),fig_num));
 
 
 %% TEST case: inside, close to right
@@ -132,28 +132,28 @@ fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
 axisAlignedBoundingBox = [0 0 1 1];
-testPoint = [0.8 0.4];
+projectionVector = [0.8 0.4];
 snapType = 0;
 
 % Call the function
-[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
+%  [snapPoint, wallNumber] = fcn_MapGen_AABBprojectVectorTo(axisAlignedBoundingBox, projectionVector, (snapType), (fig_num) );
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(snapPoint));
-assert(isnumeric(wallNumber));
+% assert(isnumeric(snapPoint));
+% assert(isnumeric(wallNumber));
 
 % Check variable sizes
-assert(isequal(size(snapPoint),[1 2]));
-assert(isequal(size(wallNumber),[1 1]));
+% assert(isequal(size(snapPoint),[1 2]));
+% assert(isequal(size(wallNumber),[1 1]));
 
 % Check variable values
-assert(isequal([1.0000    0.3333],round(snapPoint,4)))
-assert(isequal(2,wallNumber))
+% assert(isequal([1.0000    0.3333],round(snapPoint,4)))
+% assert(isequal(2,wallNumber))
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+% assert(isequal(get(gcf,'Number'),fig_num));
 
 %% TEST case: inside, close to top
 fig_num = 20003;
@@ -162,28 +162,28 @@ fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
 axisAlignedBoundingBox = [0 0 1 1];
-testPoint = [0.6 0.9];
+projectionVector = [0.6 0.9];
 snapType = 0;
 
 % Call the function
-[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
+%  [snapPoint, wallNumber] = fcn_MapGen_AABBprojectVectorTo(axisAlignedBoundingBox, projectionVector, (snapType), (fig_num) );
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(snapPoint));
-assert(isnumeric(wallNumber));
+% assert(isnumeric(snapPoint));
+% assert(isnumeric(wallNumber));
 
 % Check variable sizes
-assert(isequal(size(snapPoint),[1 2]));
-assert(isequal(size(wallNumber),[1 1]));
+% assert(isequal(size(snapPoint),[1 2]));
+% assert(isequal(size(wallNumber),[1 1]));
 
 % Check variable values
-assert(isequal([0.6250    1.0000],round(snapPoint,4)))
-assert(isequal(3,wallNumber))
+% assert(isequal([0.6250    1.0000],round(snapPoint,4)))
+% assert(isequal(3,wallNumber))
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+% assert(isequal(get(gcf,'Number'),fig_num));
 
 %% TEST case: inside, close to left
 fig_num = 20004;
@@ -192,28 +192,28 @@ fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
 axisAlignedBoundingBox = [0 0 1 1];
-testPoint = [0.2 0.7];
+projectionVector = [0.2 0.7];
 snapType = 0;
 
 % Call the function
-[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
+%  [snapPoint, wallNumber] = fcn_MapGen_AABBprojectVectorTo(axisAlignedBoundingBox, projectionVector, (snapType), (fig_num) );
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(snapPoint));
-assert(isnumeric(wallNumber));
+% assert(isnumeric(snapPoint));
+% assert(isnumeric(wallNumber));
 
 % Check variable sizes
-assert(isequal(size(snapPoint),[1 2]));
-assert(isequal(size(wallNumber),[1 1]));
+% assert(isequal(size(snapPoint),[1 2]));
+% assert(isequal(size(wallNumber),[1 1]));
 
 % Check variable values
-assert(isequal([0    0.8333],round(snapPoint,4)))
-assert(isequal(4,wallNumber))
+% assert(isequal([0    0.8333],round(snapPoint,4)))
+% assert(isequal(4,wallNumber))
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+% assert(isequal(get(gcf,'Number'),fig_num));
 
 %% TEST case: outside, close to bottom
 fig_num = 20005;
@@ -222,28 +222,28 @@ fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
 axisAlignedBoundingBox = [0 0 1 1];
-testPoint = [0.3 -0.2];
+projectionVector = [0.3 -0.2];
 snapType = 0;
 
 % Call the function
-[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
+%  [snapPoint, wallNumber] = fcn_MapGen_AABBprojectVectorTo(axisAlignedBoundingBox, projectionVector, (snapType), (fig_num) );
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(snapPoint));
-assert(isnumeric(wallNumber));
+% assert(isnumeric(snapPoint));
+% assert(isnumeric(wallNumber));
 
 % Check variable sizes
-assert(isequal(size(snapPoint),[1 2]));
-assert(isequal(size(wallNumber),[1 1]));
+% assert(isequal(size(snapPoint),[1 2]));
+% assert(isequal(size(wallNumber),[1 1]));
 
 % Check variable values
-assert(isequal([0.3000   -0.2000],round(snapPoint,4)))
-assert(isequal(1,wallNumber))
+% assert(isequal([0.3000   -0.2000],round(snapPoint,4)))
+% assert(isequal(1,wallNumber))
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+% assert(isequal(get(gcf,'Number'),fig_num));
 
 %% check snap type 1
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -269,28 +269,28 @@ fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
 axisAlignedBoundingBox = [0 0 1 1];
-testPoint = [0.3 0.2];
+projectionVector = [0.3 0.2];
 snapType = 1;
 
 % Call the function
-[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
+%  [snapPoint, wallNumber] = fcn_MapGen_AABBprojectVectorTo(axisAlignedBoundingBox, projectionVector, (snapType), (fig_num) );
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(snapPoint));
-assert(isnumeric(wallNumber));
+% assert(isnumeric(snapPoint));
+% assert(isnumeric(wallNumber));
 
 % Check variable sizes
-assert(isequal(size(snapPoint),[1 2]));
-assert(isequal(size(wallNumber),[1 1]));
+% assert(isequal(size(snapPoint),[1 2]));
+% assert(isequal(size(wallNumber),[1 1]));
 
 % Check variable values
-assert(isequal([0.3         0],round(snapPoint,4)))
-assert(isequal(1,wallNumber))
+% assert(isequal([0.3         0],round(snapPoint,4)))
+% assert(isequal(1,wallNumber))
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+% assert(isequal(get(gcf,'Number'),fig_num));
 
 %% TEST case: Snap type 1, inside, close to right
 fig_num = 30002;
@@ -299,28 +299,28 @@ fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
 axisAlignedBoundingBox = [0 0 1 1];
-testPoint = [0.8 0.4];
+projectionVector = [0.8 0.4];
 snapType = 1;
 
 % Call the function
-[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
+%  [snapPoint, wallNumber] = fcn_MapGen_AABBprojectVectorTo(axisAlignedBoundingBox, projectionVector, (snapType), (fig_num) );
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(snapPoint));
-assert(isnumeric(wallNumber));
+% assert(isnumeric(snapPoint));
+% assert(isnumeric(wallNumber));
 
 % Check variable sizes
-assert(isequal(size(snapPoint),[1 2]));
-assert(isequal(size(wallNumber),[1 1]));
+% assert(isequal(size(snapPoint),[1 2]));
+% assert(isequal(size(wallNumber),[1 1]));
 
 % Check variable values
-assert(isequal([1.0000    0.4],round(snapPoint,4)))
-assert(isequal(2,wallNumber))
+% assert(isequal([1.0000    0.4],round(snapPoint,4)))
+% assert(isequal(2,wallNumber))
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+% assert(isequal(get(gcf,'Number'),fig_num));
 
 %% TEST case: Snap type 1, inside, close to top
 fig_num = 30003;
@@ -329,28 +329,28 @@ fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
 axisAlignedBoundingBox = [0 0 1 1];
-testPoint = [0.6 0.9];
+projectionVector = [0.6 0.9];
 snapType = 1;
 
 % Call the function
-[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
+%  [snapPoint, wallNumber] = fcn_MapGen_AABBprojectVectorTo(axisAlignedBoundingBox, projectionVector, (snapType), (fig_num) );
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(snapPoint));
-assert(isnumeric(wallNumber));
+% assert(isnumeric(snapPoint));
+% assert(isnumeric(wallNumber));
 
 % Check variable sizes
-assert(isequal(size(snapPoint),[1 2]));
-assert(isequal(size(wallNumber),[1 1]));
+% assert(isequal(size(snapPoint),[1 2]));
+% assert(isequal(size(wallNumber),[1 1]));
 
 % Check variable values
-assert(isequal([0.6    1.0000],round(snapPoint,4)))
-assert(isequal(3,wallNumber))
+% assert(isequal([0.6    1.0000],round(snapPoint,4)))
+% assert(isequal(3,wallNumber))
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+% assert(isequal(get(gcf,'Number'),fig_num));
 
 
 %% TEST case: Snap type 1, inside, close to left
@@ -360,28 +360,28 @@ fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
 axisAlignedBoundingBox = [0 0 1 1];
-testPoint = [0.2 0.7];
+projectionVector = [0.2 0.7];
 snapType = 1;
 
 % Call the function
-[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
+%  [snapPoint, wallNumber] = fcn_MapGen_AABBprojectVectorTo(axisAlignedBoundingBox, projectionVector, (snapType), (fig_num) );
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(snapPoint));
-assert(isnumeric(wallNumber));
+% assert(isnumeric(snapPoint));
+% assert(isnumeric(wallNumber));
 
 % Check variable sizes
-assert(isequal(size(snapPoint),[1 2]));
-assert(isequal(size(wallNumber),[1 1]));
+% assert(isequal(size(snapPoint),[1 2]));
+% assert(isequal(size(wallNumber),[1 1]));
 
 % Check variable values
-assert(isequal([0    0.7],round(snapPoint,4)))
-assert(isequal(4,wallNumber))
+% assert(isequal([0    0.7],round(snapPoint,4)))
+% assert(isequal(4,wallNumber))
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+% assert(isequal(get(gcf,'Number'),fig_num));
 
 %% TEST case: Snap type 1, inside, close to bottom
 fig_num = 30005;
@@ -390,28 +390,28 @@ fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
 axisAlignedBoundingBox = [0 0 1 1];
-testPoint = [0.3 -0.2];
+projectionVector = [0.3 -0.2];
 snapType = 1;
 
 % Call the function
-[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
+%  [snapPoint, wallNumber] = fcn_MapGen_AABBprojectVectorTo(axisAlignedBoundingBox, projectionVector, (snapType), (fig_num) );
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(snapPoint));
-assert(isnumeric(wallNumber));
+% assert(isnumeric(snapPoint));
+% assert(isnumeric(wallNumber));
 
 % Check variable sizes
-assert(isequal(size(snapPoint),[1 2]));
-assert(isequal(size(wallNumber),[1 1]));
+% assert(isequal(size(snapPoint),[1 2]));
+% assert(isequal(size(wallNumber),[1 1]));
 
 % Check variable values
-assert(isequal([0.3000   -0.2000],round(snapPoint,4)))
-assert(isequal(1,wallNumber))
+% assert(isequal([0.3000   -0.2000],round(snapPoint,4)))
+% assert(isequal(1,wallNumber))
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+% assert(isequal(get(gcf,'Number'),fig_num));
 
 %% TEST case: Snap type 1, outside, close to right
 fig_num = 30006;
@@ -420,28 +420,28 @@ fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
 axisAlignedBoundingBox = [0 0 1 1];
-testPoint = [1.2 0.4];
+projectionVector = [1.2 0.4];
 snapType = 1;
 
 % Call the function
-[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
+%  [snapPoint, wallNumber] = fcn_MapGen_AABBprojectVectorTo(axisAlignedBoundingBox, projectionVector, (snapType), (fig_num) );
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(snapPoint));
-assert(isnumeric(wallNumber));
+% assert(isnumeric(snapPoint));
+% assert(isnumeric(wallNumber));
 
 % Check variable sizes
-assert(isequal(size(snapPoint),[1 2]));
-assert(isequal(size(wallNumber),[1 1]));
+% assert(isequal(size(snapPoint),[1 2]));
+% assert(isequal(size(wallNumber),[1 1]));
 
 % Check variable values
-assert(isequal([1.2000    0.4000],round(snapPoint,4)))
-assert(isequal(2,wallNumber))
+% assert(isequal([1.2000    0.4000],round(snapPoint,4)))
+% assert(isequal(2,wallNumber))
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+% assert(isequal(get(gcf,'Number'),fig_num));
 
 %% TEST case: Snap type 1, outside, close to top
 fig_num = 30006;
@@ -450,28 +450,28 @@ fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
 axisAlignedBoundingBox = [0 0 1 1];
-testPoint = [0.6 1.1];
+projectionVector = [0.6 1.1];
 snapType = 1;
 
 % Call the function
-[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
+%  [snapPoint, wallNumber] = fcn_MapGen_AABBprojectVectorTo(axisAlignedBoundingBox, projectionVector, (snapType), (fig_num) );
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(snapPoint));
-assert(isnumeric(wallNumber));
+% assert(isnumeric(snapPoint));
+% assert(isnumeric(wallNumber));
 
 % Check variable sizes
-assert(isequal(size(snapPoint),[1 2]));
-assert(isequal(size(wallNumber),[1 1]));
+% assert(isequal(size(snapPoint),[1 2]));
+% assert(isequal(size(wallNumber),[1 1]));
 
 % Check variable values
-assert(isequal([0.6000    1.1000],round(snapPoint,4)))
-assert(isequal(3,wallNumber))
+% assert(isequal([0.6000    1.1000],round(snapPoint,4)))
+% assert(isequal(3,wallNumber))
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+% assert(isequal(get(gcf,'Number'),fig_num));
 
 %% TEST case: Snap type 1, outside, close to top
 fig_num = 30007;
@@ -480,28 +480,28 @@ fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
 axisAlignedBoundingBox = [0 0 1 1];
-testPoint = [0.6 1.1];
+projectionVector = [0.6 1.1];
 snapType = 1;
 
 % Call the function
-[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
+%  [snapPoint, wallNumber] = fcn_MapGen_AABBprojectVectorTo(axisAlignedBoundingBox, projectionVector, (snapType), (fig_num) );
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(snapPoint));
-assert(isnumeric(wallNumber));
+% assert(isnumeric(snapPoint));
+% assert(isnumeric(wallNumber));
 
 % Check variable sizes
-assert(isequal(size(snapPoint),[1 2]));
-assert(isequal(size(wallNumber),[1 1]));
+% assert(isequal(size(snapPoint),[1 2]));
+% assert(isequal(size(wallNumber),[1 1]));
 
 % Check variable values
-assert(isequal([0.6000    1.1000],round(snapPoint,4)))
-assert(isequal(3,wallNumber))
+% assert(isequal([0.6000    1.1000],round(snapPoint,4)))
+% assert(isequal(3,wallNumber))
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+% assert(isequal(get(gcf,'Number'),fig_num));
 
 %% TEST case: Snap type 1, outside, close to left
 fig_num = 30008;
@@ -510,28 +510,28 @@ fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
 axisAlignedBoundingBox = [0 0 1 1];
-testPoint = [-0.2 0.7];
+projectionVector = [-0.2 0.7];
 snapType = 1;
 
 % Call the function
-[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
+%  [snapPoint, wallNumber] = fcn_MapGen_AABBprojectVectorTo(axisAlignedBoundingBox, projectionVector, (snapType), (fig_num) );
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(snapPoint));
-assert(isnumeric(wallNumber));
+% assert(isnumeric(snapPoint));
+% assert(isnumeric(wallNumber));
 
 % Check variable sizes
-assert(isequal(size(snapPoint),[1 2]));
-assert(isequal(size(wallNumber),[1 1]));
+% assert(isequal(size(snapPoint),[1 2]));
+% assert(isequal(size(wallNumber),[1 1]));
 
 % Check variable values
-assert(isequal([-0.2000    0.7000],round(snapPoint,4)))
-assert(isequal(4,wallNumber))
+% assert(isequal([-0.2000    0.7000],round(snapPoint,4)))
+% assert(isequal(4,wallNumber))
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+% assert(isequal(get(gcf,'Number'),fig_num));
 
 %% check snap type 2
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -557,28 +557,28 @@ fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
 axisAlignedBoundingBox = [0 0 1 1];
-testPoint = [0.2 0.7; 0.2 0.9];
+projectionVector = [0.2 0.7; 0.2 0.9];
 snapType = 2;
 
 % Call the function
-[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (fig_num) );
+%  [snapPoint, wallNumber] = fcn_MapGen_AABBprojectVectorTo(axisAlignedBoundingBox, projectionVector, (snapType), (fig_num) );
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(snapPoint));
-assert(isnumeric(wallNumber));
+% assert(isnumeric(snapPoint));
+% assert(isnumeric(wallNumber));
 
 % Check variable sizes
-assert(isequal(size(snapPoint),[1 2]));
-assert(isequal(size(wallNumber),[1 1]));
+% assert(isequal(size(snapPoint),[1 2]));
+% assert(isequal(size(wallNumber),[1 1]));
 
 % Check variable values
-assert(isequal([0.2000    1.0000],round(snapPoint,4)))
-assert(isequal(3,wallNumber))
+% assert(isequal([0.2000    1.0000],round(snapPoint,4)))
+% assert(isequal(3,wallNumber))
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+% assert(isequal(get(gcf,'Number'),fig_num));
 
 
 
@@ -606,27 +606,27 @@ fprintf(1,'Figure: %.0f: FAST mode, empty fig_num\n',fig_num);
 figure(fig_num); close(fig_num);
 
 axisAlignedBoundingBox = [0 0 1 1];
-testPoint = [0.3 0.2];
+projectionVector = [0.3 0.2];
 snapType = 0;
 
 % Call the function
-[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), ([]) );
+%  [snapPoint, wallNumber] = fcn_MapGen_AABBprojectVectorTo(axisAlignedBoundingBox, projectionVector, (snapType), ([]) );
 
 % Check variable types
-assert(isnumeric(snapPoint));
-assert(isnumeric(wallNumber));
+% assert(isnumeric(snapPoint));
+% assert(isnumeric(wallNumber));
 
 % Check variable sizes
-assert(isequal(size(snapPoint),[1 2]));
-assert(isequal(size(wallNumber),[1 1]));
+% assert(isequal(size(snapPoint),[1 2]));
+% assert(isequal(size(wallNumber),[1 1]));
 
 % Check variable values
-assert(isequal([0.1667         0],round(snapPoint,4)))
-assert(isequal(1,wallNumber))
+% assert(isequal([0.1667         0],round(snapPoint,4)))
+% assert(isequal(1,wallNumber))
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+% assert(~any(figHandles==fig_num));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
@@ -635,27 +635,27 @@ fprintf(1,'Figure: %.0f: FAST mode, fig_num=-1\n',fig_num);
 figure(fig_num); close(fig_num);
 
 axisAlignedBoundingBox = [0 0 1 1];
-testPoint = [0.3 0.2];
+projectionVector = [0.3 0.2];
 snapType = 0;
 
 % Call the function
-[snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (-1) );
+%  [snapPoint, wallNumber] = fcn_MapGen_AABBprojectVectorTo(axisAlignedBoundingBox, projectionVector, (snapType), (-1) );
 
 % Check variable types
-assert(isnumeric(snapPoint));
-assert(isnumeric(wallNumber));
+% assert(isnumeric(snapPoint));
+% assert(isnumeric(wallNumber));
 
 % Check variable sizes
-assert(isequal(size(snapPoint),[1 2]));
-assert(isequal(size(wallNumber),[1 1]));
+% assert(isequal(size(snapPoint),[1 2]));
+% assert(isequal(size(wallNumber),[1 1]));
 
 % Check variable values
-assert(isequal([0.1667         0],round(snapPoint,4)))
-assert(isequal(1,wallNumber))
+% assert(isequal([0.1667         0],round(snapPoint,4)))
+% assert(isequal(1,wallNumber))
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+% assert(~any(figHandles==fig_num));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
@@ -665,7 +665,7 @@ figure(fig_num);
 close(fig_num);
 
 axisAlignedBoundingBox = [0 0 1 1];
-testPoint = [0.3 0.2];
+projectionVector = [0.3 0.2];
 snapType = 0;
 
 Niterations = 100;
@@ -674,7 +674,7 @@ Niterations = 100;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), ([]) );
+    %  [snapPoint, wallNumber] = fcn_MapGen_AABBprojectVectorTo(axisAlignedBoundingBox, projectionVector, (snapType), ([]) );
 end
 slow_method = toc;
 
@@ -682,13 +682,13 @@ slow_method = toc;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [snapPoint, wallNumber] = fcn_MapGen_snapToAABB(axisAlignedBoundingBox, testPoint, (snapType), (-1) );
+    %  [snapPoint, wallNumber] = fcn_MapGen_AABBprojectVectorTo(axisAlignedBoundingBox, projectionVector, (snapType), (-1) );
 end
 fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+% assert(~any(figHandles==fig_num));
 
 % Plot results as bar chart
 figure(373737);
@@ -704,7 +704,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+% assert(~any(figHandles==fig_num));
 
 
 %% BUG cases

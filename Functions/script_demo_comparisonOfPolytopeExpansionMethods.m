@@ -18,7 +18,7 @@ fig_num = 1;
 
 if 1==1
     rng(1);
-    polytopes = fcn_MapGen_generateOneRandomPolytope(fig_num);
+    polytopes = fcn_MapGen_polytopeGenerateOneRandomPoly(fig_num);
 
 else
     % concave polytope
@@ -33,7 +33,7 @@ else
         1.0000    0.5217
         ];
 
-    polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes,fig_num);
+    polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes,fig_num);
 end
 % fcn_MapGen_plotPolytopes(polytopes,1,'r',2);
 % Set parameters
@@ -64,7 +64,7 @@ for ith_poly = 1:size(polytopes,2) % check each obstacle
     exp_polytopes(ith_poly).vertices = centroid + my_scale*(vertices-centroid);
 
     % fill in other fields from the vertices field
-    exp_polytopes(ith_poly) = fcn_MapGen_fillPolytopeFieldsFromVertices(exp_polytopes(ith_poly),1,fig_num);
+    exp_polytopes(ith_poly) = fcn_MapGen_polytopesFillFieldsFromVertices(exp_polytopes(ith_poly),1,fig_num);
 
 end
 hold on; box on;

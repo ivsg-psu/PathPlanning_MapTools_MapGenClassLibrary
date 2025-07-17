@@ -68,16 +68,15 @@ varargin...
 %
 %     polytopes: the resulting polytopes after converting to polytope form.
 %
-%
 % DEPENDENCIES:
 %
 %     fcn_DebugTools_checkInputsToFunctions
-%     fcn_MapGen_removeInfiniteVertices
-%     fcn_MapGen_isWithinABBB
-%     fcn_MapGen_cropPolytopeToRange
-%     fcn_MapGen_fillPolytopeFieldsFromVertices
+%     fcn_MapGen_verticesRemoveInfinite
+%     fcn_MapGen_AABBisWithin
+%     fcn_MapGen_verticesCropToAABB
+%     fcn_MapGen_polytopesFillFieldsFromVertices
 %     fcn_MapGen_plotPolytopes
-%     fcn_MapGen_convertAABBtoWalls
+%     fcn_MapGen_AABBConvertToWalls
 %     fcn_Path_findSensorHitOnWall
 %
 % EXAMPLES:
@@ -97,7 +96,7 @@ varargin...
 % 2025_04_25 by Sean Brennan
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-% -- fixed call to fcn_MapGen_fillPolytopeFieldsFromVertices
+% -- fixed call to fcn_MapGen_polytopesFillFieldsFromVertices
 % 2025_07_07 by Sean Brennan
 % -- added flag_removeEdgePolytopes option to be compatible with Bounded
 %    Astar library usage of old codes
@@ -112,23 +111,28 @@ varargin...
 % -- clean-up of comments
 % 2025_07_10 by Sean Brennan
 % -- updated header debugging and input area to fix global flags
+% 2025_07_17 by Sean Brennan
+% -- standardized Debugging and Input checks area, Inputs area
+% -- made codes use MAX_NARGIN definition at top of code, narginchk
+% -- made plotting flag_do_plots and code consistent across all functions
 
-% TO-DO
-% (none)
+% TO DO
+% -- none
 
 %% Debugging and Input checks
+
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 7; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
 if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
-    flag_do_debug = 0; %     % Flag to plot the results for debugging
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
 else
     % Check to see if we are externally setting debug mode to be "on"
-    flag_do_debug = 0; %     % Flag to plot the results for debugging
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 1; % Flag to perform input checking
     MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS");
     MATLABFLAG_MAPGEN_FLAG_DO_DEBUG = getenv("MATLABFLAG_MAPGEN_FLAG_DO_DEBUG");
@@ -144,9 +148,8 @@ if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
     debug_fig_num = 999978; %#ok<NASGU>
-else
-    debug_fig_num = []; %#ok<NASGU>
 end
+
 
 %% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -160,21 +163,21 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if 0==flag_max_speed
-    if flag_check_inputs
+
+if (0==flag_max_speed)
+    if 1 == flag_check_inputs
+
         % Are there the right number of inputs?
         narginchk(5,MAX_NARGIN);
 
-        % Check the seedPoints input, make sure it is '2column_of_numbers' type
-        fcn_DebugTools_checkInputsToFunctions(...
-            seedPoints, '2column_of_numbers');
+        % Check the seedPoints input, make sure it is 2 columns
+        fcn_DebugTools_checkInputsToFunctions(seedPoints, '2column_of_numbers');
 
-        % Check the stretch input, make sure it is '2column_of_numbers' type
-        fcn_DebugTools_checkInputsToFunctions(...
-            stretch, '2column_of_numbers',1);
+        % Check the stretch input, make sure it has 2 columns, 1 row
+        fcn_DebugTools_checkInputsToFunctions(stretch, '2column_of_numbers',1);
+
     end
 end
-
 
 % Does user want to specify the flag_removeEdgePolytopes input?
 flag_removeEdgePolytopes = 0; % Default is to NOT remove the edges
@@ -207,8 +210,6 @@ end
 %
 %See: http://patorjk.com/software/taag/#p=display&f=Big&t=Main
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
-
-
 
 %% Initiate data structures
 num_poly = size(seedPoints,1);
@@ -252,15 +253,11 @@ for ith_poly = 1:Npolys
         polytopeVertices(row_offset+1:row_offset+Nvertices,1) = ith_poly;
         polytopeVertices(row_offset+1:row_offset+Nvertices,2:3) = vertices;
     end
-
-
-
 end
-
 
 %% Remove infinite vertices
 [bounded_vertices] = ...
-    fcn_MapGen_removeInfiniteVertices(...
+    fcn_MapGen_verticesRemoveInfinite(...
     polytopeVertices,seedPoints,AABB,Nvertices_per_poly, -1);
 
 %% Crop vertices
@@ -290,12 +287,11 @@ for ith_poly = 1:num_poly % pull each cell from the voronoi diagram
     %         disp('stop here');
     %     end
 
-
     % Are any vertices outside the AABB? If so, must crop them
-    if ~all(fcn_MapGen_isWithinABBB(AABB,vertices,-1)==1)
+    if ~all(fcn_MapGen_AABBisWithin(AABB,vertices,-1)==1)
         % Crop vertices to allowable range
         [cropped_vertices] = ...
-            fcn_MapGen_cropPolytopeToRange(vertices, interior_point, AABB, -1);
+            fcn_MapGen_verticesCropToAABB(vertices, interior_point, AABB, -1);
 
         if 1==flag_removeEdgePolytopes
             % don't keep polytopes with any vertices outside the bounding box
@@ -326,8 +322,6 @@ for ith_poly = 1:num_poly % pull each cell from the voronoi diagram
     end
 end
 
-
-
 % remove extra empty polytopes
 polytopes = polytopes(find(goodIndices)); %#ok<FNDSB>
 
@@ -344,7 +338,7 @@ end % Ends for loop for stretch
 
 % Fill in all the other fields
 is_nonconvex = 1;
-polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes, (is_nonconvex), (-1));
+polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes, (is_nonconvex), (-1));
 
 %§
 %% Plot the results (for debugging)?
@@ -358,8 +352,6 @@ polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes, (is_nonconvex),
 %                            __/ |
 %                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
 
 if flag_do_plots
 
@@ -474,7 +466,7 @@ if 1==flag_do_debug
 end
 
 % Check that all the wall corners are inside polytopes
-walls = fcn_MapGen_convertAABBtoWalls(AABB, -1);
+walls = fcn_MapGen_AABBConvertToWalls(AABB, -1);
 test_points = walls(1:4,:);
 
 
@@ -556,7 +548,7 @@ for ith_missing = 1:length(missing_vertices(:,1))
 
     % Crop vertices to allowable range
     [cropped_vertices] = ...
-        fcn_MapGen_cropPolytopeToRange(shoved_vertices, interior_point, AABB, -1);
+        fcn_MapGen_verticesCropToAABB(shoved_vertices, interior_point, AABB, -1);
 
     % make sure cw
     vec1 = [cropped_vertices(2,:)-cropped_vertices(1,:),0]; % vector leading into point

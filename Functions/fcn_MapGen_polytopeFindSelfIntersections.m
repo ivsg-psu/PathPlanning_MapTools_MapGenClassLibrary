@@ -57,9 +57,13 @@ function [verticesIncludingSelfIntersections, flag_wasIntersection] = ...
 % 2025_07_10 by Sean Brennan
 % -- updated variable names for clarity
 % -- changed fcn_MapGen_findIntersectionOfSegments to use
-% fcn_Path_findSensorHitOnWall instead, as the Path function is much more
-% tested/debugged and regularly updated
+%    % fcn_Path_findSensorHitOnWall instead, as the Path function is far more
+%    % tested/debugged and regularly updated
 % -- fixed bug with flag_wasIntersection
+% 2025_07_17 by Sean Brennan
+% -- standardized Debugging and Input checks area, Inputs area
+% -- made codes use MAX_NARGIN definition at top of code, narginchk
+% -- made plotting flag_do_plots and code consistent across all functions
 
 % TO DO
 % -- none
@@ -69,8 +73,9 @@ function [verticesIncludingSelfIntersections, flag_wasIntersection] = ...
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 2; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==2 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -92,8 +97,6 @@ if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
     debug_fig_num = 999978; %#ok<NASGU>
-else
-    debug_fig_num = []; %#ok<NASGU>
 end
 
 
@@ -109,31 +112,27 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if (0==flag_max_speed)
-    if flag_check_inputs
-        % Are there the right number of inputs?
-        narginchk(1,2);
 
-        % Check the vertices input
-        fcn_DebugTools_checkInputsToFunctions(...
-            vertices, '2column_of_numbers');
+if (0==flag_max_speed)
+    if 1 == flag_check_inputs
+
+        % Are there the right number of inputs?
+        narginchk(1,MAX_NARGIN);
+
+        % Check the vertices input, should have 2 columns
+        fcn_DebugTools_checkInputsToFunctions(vertices, '2column_of_numbers');
 
     end
 end
 
 % Does user want to show the plots?
-flag_do_plot = 0; % Default is no plotting
-if  2 == nargin && (0==flag_max_speed) % Only create a figure if NOT maximizing speed
-    temp = varargin{end}; % Last argument is always figure number
-    if ~isempty(temp) % Make sure the user is not giving empty input
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
+    temp = varargin{end};
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
-        flag_do_plot = 1; % Set flag to do plotting
-    end
-else
-    if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
-        fig = figure;
-        fig_for_debug = fig.Number; 
-        flag_do_plot = 1;
+        figure(fig_num);
+        flag_do_plots = 1;
     end
 end
 
@@ -252,7 +251,7 @@ end
 %                           |___/ 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-if flag_do_plot
+if flag_do_plots
     figure(fig_num);
     grid on
     grid minor

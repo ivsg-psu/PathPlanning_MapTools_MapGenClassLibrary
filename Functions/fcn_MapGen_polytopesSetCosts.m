@@ -52,9 +52,13 @@ function polytopesWithNewCost = fcn_MapGen_polytopesSetCosts(polytopes, desiredC
 % 2025_07_16 by Sean Brennan 
 % -- changed function name to
 %    % fcn_MapGen_polytopesSetCosts from fcn_polytope_editing_set_all_costs
+% 2025_07_17 by Sean Brennan
+% -- standardized Debugging and Input checks area, Inputs area
+% -- made codes use MAX_NARGIN definition at top of code, narginchk
+% -- made plotting flag_do_plots and code consistent across all functions
 
 % TO DO
-% -- it may be possibel to speed this up with setfield() or extract field instead of a loop
+% -- it may be possible to speed this up with setfield() or extract field instead of a loop
 % -- a good feature to add would be to allow for specification of a mean and standard deviation
 %    of costs so that a cost distribution can be applied instead of a fixed uniform cost
 
@@ -63,14 +67,15 @@ function polytopesWithNewCost = fcn_MapGen_polytopesSetCosts(polytopes, desiredC
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 3; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==3 && isequal(varargin{end},-1))
-    flag_do_debug = 0; %      % Flag to plot the results for debugging
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
 else
     % Check to see if we are externally setting debug mode to be "on"
-    flag_do_debug = 0; %      % Flag to plot the results for debugging
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 1; % Flag to perform input checking
     MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS");
     MATLABFLAG_MAPGEN_FLAG_DO_DEBUG = getenv("MATLABFLAG_MAPGEN_FLAG_DO_DEBUG");
@@ -86,9 +91,9 @@ if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
     debug_fig_num = 999978; %#ok<NASGU>
-else
-    debug_fig_num = []; %#ok<NASGU>
 end
+
+
 %% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   _____                   _
@@ -106,33 +111,25 @@ if (0==flag_max_speed)
     if 1 == flag_check_inputs
 
         % Are there the right number of inputs?
-        narginchk(2,3);
+        narginchk(2,MAX_NARGIN);
 
         % Check the polytopes input, make sure it is 'polytopes' type
-        fcn_DebugTools_checkInputsToFunctions(...
-            polytopes, 'polytopes');
-
+        fcn_DebugTools_checkInputsToFunctions(polytopes, 'polytopes');
 
         % Check the exp_dist input, make sure it is 'positive_column_of_numbers' type
-        fcn_DebugTools_checkInputsToFunctions(...
-            desiredCost, 'positive_1column_of_numbers',1);
+        fcn_DebugTools_checkInputsToFunctions(desiredCost, 'positive_1column_of_numbers',1);
 
     end
 end
 
 % Does user want to show the plots?
-flag_do_plot = 0; % Default is no plotting
-if  (3 == nargin) && (0==flag_max_speed) % Only create a figure if NOT maximizing speed
-    temp = varargin{end}; % Last argument is always figure number
-    if ~isempty(temp) % Make sure the user is not giving empty input
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
+    temp = varargin{end};
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
-        flag_do_plot = 1; % Set flag to do plotting
-    end
-else
-    if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
-        fig = figure;
-        fig_for_debug = fig.Number; %#ok<NASGU>
-        flag_do_plot = 1;
+        figure(fig_num);
+        flag_do_plots = 1;
     end
 end
 
@@ -165,7 +162,7 @@ polytopesWithNewCost = polytopes;
 %                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-if flag_do_plot
+if flag_do_plots
     figure(fig_num)
     clf;
 

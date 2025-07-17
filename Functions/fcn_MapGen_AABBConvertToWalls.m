@@ -1,24 +1,22 @@
-function [ ...
-onePolytope ...
-] = ...
-fcn_MapGen_generateOneRandomPolytope( ...
-varargin...
-)
-% fcn_MapGen_generateOneRandomPolytope
-% Generates a single random polytope by selecting one randomly from the 
-% Halton Set Voronoi method (HSV) tiling.
+function [walls] = ...
+    fcn_MapGen_AABBConvertToWalls(...
+    AABB,varargin)
+
+% fcn_MapGen_AABBConvertToWalls
+% converts axis-aligned bounding boxes into equivalent enclosing walls
 % 
 % FORMAT:
 % 
-%    [ ...
-%    onePolytope ...
-%    ] = ...
-%    fcn_MapGen_generateOneRandomPolytope( ...
-%    (fig_num) ...
-%    )
+%    [walls] = ...
+%    fcn_MapGen_AABBConvertToWalls(...
+%    AABB,(fig_num))
 % 
 % INPUTS:
 % 
+%     AABB: the axis-aligned bounding box, in format of 
+%     [xmin ymin xmax ymax], wherein the resulting polytopes must be
+%     bounded.
+%
 %     (optional inputs)
 %
 %      fig_num: a figure number to plot results. If set to -1, skips any
@@ -27,37 +25,37 @@ varargin...
 %      variable types to be displayed as output and as well makes the input
 %      check process verbose.
 % 
+% 
 % OUTPUTS:
 % 
-%     onePolytope: one randomly generated polytope
-% 
+%     walls: the resulting vertices of the walls in [x y] format. Note that
+%     the walls enclose, so the last vertices will be the same as the
+%     first.
 % 
 % DEPENDENCIES:
 % 
-%     fcn_MapGen_voronoiTiling
-%     fcn_MapGen_polytopeCropEdges
-%     fcn_MapGen_plotPolytopes
-% 
+%     fcn_DebugTools_checkInputsToFunctions
 % 
 % EXAMPLES:
 % 
-% See the script: script_test_fcn_MapGen_generateOneRandomPolytope
+% See the script: script_test_fcn_MapGen_AABBConvertToWalls
 % for a full test suite.
 % 
-% This function was written on 2021_06_27 by Sean Brennan
+% This function was written on 2021_07_11 by Sean Brennan
 % Questions or comments? contact sbrennan@psu.edu
 
 % 
 % REVISION HISTORY:
 % 
-% 2021_06_27 by Sean Brennan
+% 2021_07_17 by Sean Brennan
 % -- first write of function
 % 2025_04_25 by Sean Brennan
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-% -- fixed call to fcn_MapGen_fillPolytopeFieldsFromVertices
-% 2025_07_15 by Sean Brennan
-% -- cleaned up variable naming one_polytope --> onePolytope
+% 2025_07_17 by Sean Brennan
+% -- standardized Debugging and Input checks area, Inputs area
+% -- made codes use MAX_NARGIN definition at top of code, narginchk
+% -- made plotting flag_do_plots and code consistent across all functions
 
 % TO DO
 % -- none
@@ -67,8 +65,9 @@ varargin...
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 2; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==1 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -90,8 +89,6 @@ if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
     debug_fig_num = 999978; %#ok<NASGU>
-else
-    debug_fig_num = []; %#ok<NASGU>
 end
 
 
@@ -108,28 +105,26 @@ end
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-if 1 == flag_check_inputs
+if (0==flag_max_speed)
+    if 1 == flag_check_inputs
 
-    % Are there the right number of inputs?
-    if nargin < 0 || nargin > 1
-        error('Incorrect number of input arguments')
+        % Are there the right number of inputs?
+        narginchk(1,MAX_NARGIN);
+
+        % Check the AABB input, vector 4 columns with 1 row
+        fcn_DebugTools_checkInputsToFunctions(AABB, '4column_of_numbers',1);
+
     end
-
 end
 
 % Does user want to show the plots?
-flag_do_plot = 0; % Default is no plotting
-if  1 == nargin && (0==flag_max_speed) % Only create a figure if NOT maximizing speed
-    temp = varargin{end}; % Last argument is always figure number
-    if ~isempty(temp) % Make sure the user is not giving empty input
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
+    temp = varargin{end};
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
-        flag_do_plot = 1; % Set flag to do plotting
-    end
-else
-    if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
-        fig = figure;
-        fig_for_debug = fig.Number; %#ok<NASGU>
-        flag_do_plot = 1;
+        figure(fig_num);
+        flag_do_plots = 1;
     end
 end
 
@@ -145,33 +140,15 @@ end
 %
 %See: http://patorjk.com/software/taag/#p=display&f=Big&t=Main
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
-
-% Set up variables
-
-% Generate Voronoi tiling from Halton points
-seedGeneratorNames = 'haltonset';
-seedGeneratorRanges = [1 100];
-AABBs = [0 0 1 1];
-mapStretchs = [1 1];
-[polytopes] = fcn_MapGen_voronoiTiling(...
-    seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
-    seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
-    (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
-    (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
-    (-1));
-
-% NO NEED TO TRIM USING THE CODE BELOW - polytope field is already AABB
-% bounded with new revisions. Delete below once confirm that everything
-% works.
-% bounding_box = [0,0; 1,1];
-% trim_polytopes = fcn_MapGen_polytopeCropEdges(polytopes,bounding_box, -1);
-trim_polytopes = polytopes;
-
-% Pick a random polytope
-Npolys = length(trim_polytopes);
-rand_poly = 1+floor(rand*Npolys);
-onePolytope = trim_polytopes(rand_poly);
-
+% Goes through the vertices and removes infinite values by inserting
+% points prior, and after the infinite one that "close" the polytope.
+% Convert axis-aligned bounding box to wall format
+walls = [...
+    AABB(1,1) AABB(1,2); ...
+    AABB(1,3) AABB(1,2); ...
+    AABB(1,3) AABB(1,4); ...
+    AABB(1,1) AABB(1,4); ...
+    AABB(1,1) AABB(1,2)];
 
 %§
 %% Plot the results (for debugging)?
@@ -188,17 +165,21 @@ onePolytope = trim_polytopes(rand_poly);
 
 
 
-if flag_do_plot
-    % Plot results
-    % fcn_MapGen_OLD_plotPolytopes(onePolytope,fig_num,'-',2,[0.5 0 0])
-    plotFormat.LineWidth = 2;
-    plotFormat.MarkerSize = 10;
-    plotFormat.LineStyle = '-';
-    plotFormat.Color = [0.5 0 0];
-    fillFormat = [];
-    h_plot = fcn_MapGen_plotPolytopes(onePolytope, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
-end % Ends the flag_do_plot if statement    
-
+if flag_do_plots    
+    figure(fig_num);
+    clf;
+    hold on;
+    grid on;
+    grid minor;
+    
+    scale = max(AABB,[],'all') - min(AABB,[],'all');
+    new_axis = [AABB(1)-scale/2 AABB(3)+scale/2 AABB(2)-scale/2 AABB(4)+scale/2];
+    axis(new_axis);
+    
+    % Plot the walls
+    plot(walls(:,1),walls(:,2),'b-');
+        
+end % Ends the flag_do_plot if statement
 
 if flag_do_debug
     fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
@@ -206,6 +187,11 @@ end
 
 
 end % Ends the function
+
+
+
+
+
 
 %% Functions follow
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -218,4 +204,6 @@ end % Ends the function
 %                                               
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
+
+
 

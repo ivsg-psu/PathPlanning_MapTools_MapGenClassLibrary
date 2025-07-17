@@ -47,6 +47,10 @@ function poly_size_stats = fcn_MapGen_polytopesRadiusDistributions(polytopes, va
 % 2025_04_25 by Sean Brennan
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
+% 2025_07_17 by Sean Brennan
+% -- standardized Debugging and Input checks area, Inputs area
+% -- made codes use MAX_NARGIN definition at top of code, narginchk
+% -- made plotting flag_do_plots and code consistent across all functions
 
 % TO DO
 % -- plotting needs to be consolodated to one part of the function
@@ -56,8 +60,9 @@ function poly_size_stats = fcn_MapGen_polytopesRadiusDistributions(polytopes, va
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 2; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==2 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -79,9 +84,8 @@ if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
     debug_fig_num = 999978; %#ok<NASGU>
-else
-    debug_fig_num = []; %#ok<NASGU>
 end
+
 
 %% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -100,33 +104,19 @@ if (0==flag_max_speed)
     if 1 == flag_check_inputs
 
         % Are there the right number of inputs?
-        narginchk(1,2);
-
-        % % Check the polytopes input, make sure it is 'polytopes' type
-        % fcn_DebugTools_checkInputsToFunctions(...
-        %     polytopes, 'polytopes');
-        %
-        %
-        % % Check the exp_dist input, make sure it is 'positive_column_of_numbers' type
-        % fcn_DebugTools_checkInputsToFunctions(...
-        %     exp_dist, 'positive_1column_of_numbers',1);
+        narginchk(1,MAX_NARGIN);
 
     end
 end
 
 % Does user want to show the plots?
-flag_do_plot = 0; % Default is no plotting
-if  (2 == nargin) && (0==flag_max_speed) % Only create a figure if NOT maximizing speed
-    temp = varargin{end}; % Last argument is always figure number
-    if ~isempty(temp) % Make sure the user is not giving empty input
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
+    temp = varargin{end};
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
-        flag_do_plot = 1; % Set flag to do plotting
-    end
-else
-    if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
-        fig = figure;
-        fig_for_debug = fig.Number; %#ok<NASGU>
-        flag_do_plot = 1;
+        figure(fig_num);
+        flag_do_plots = 1;
     end
 end
 
@@ -183,7 +173,7 @@ for ith_poly = 1:length(polytopes)
     delta_theta = 1;
     % translate polytope so centroid is at (0,0)
     vertices_recentered = [poly.vertices(:,1)-centroid(1),poly.vertices(:,2)-centroid(2)];
-    if flag_do_plot
+    if flag_do_plots
         % plot original polytope
         figure(12345321)
         clf;
@@ -236,7 +226,7 @@ for ith_poly = 1:length(polytopes)
         % add the r(theta) data for this side to the vector for the whole shape
         r_of_theta_all_sides = [r_of_theta_all_sides, r_of_theta];
         theta_range_ordered = [theta_range_ordered, theta_range];
-        if flag_do_plot
+        if flag_do_plots
             figure(12345322)
             % plot vertices of interest
             plot(1000*x1,1000*y1,'ro')
@@ -250,7 +240,7 @@ for ith_poly = 1:length(polytopes)
             legend('Cartesian','centroid','','','polar')
         end
     end
-    if flag_do_plot
+    if flag_do_plots
         figure(12345323)
         clf;
         % plot r(theta) for whole polytope on rectangular axes
@@ -268,7 +258,7 @@ for ith_poly = 1:length(polytopes)
     % now we can store the r-curve for this all polys, knowing they all are ordered
     % from 0 degrees to 359 with 1 degree increments
 %     poly_size_stats.r_of_theta_all_polys = [poly_size_stats.r_of_theta_all_polys; r_and_theta_all_sides(2,:)];
-    if flag_do_plot
+    if flag_do_plots
         figure(12345324)
         clf;
         % plot histogram of single polytope
@@ -311,7 +301,7 @@ for ith_poly = 1:length(polytopes)
     bin_center = (edges(1:end-1)+edges(2:end))/2;
     poly_size_stats.N_all_polys = [poly_size_stats.N_all_polys; 1-N];
     poly_size_stats.bin_edges_all_polys = [poly_size_stats.bin_edges_all_polys; bin_center];
-    if flag_do_plot
+    if flag_do_plots
         % plot 1-CDF of a single polytope - this is probability of occupation
         figure(123453256)
         clf;
@@ -334,7 +324,7 @@ for ith_poly = 1:length(polytopes)
             (1-N(i))*delta_R;
     end
     poly_size_stats.expected_radii = [poly_size_stats.expected_radii, expected_radius];
-    if flag_do_plot
+    if flag_do_plots
         % show expected radius on probability of occupation plot
         figure(123453256)
         hold on;
@@ -397,7 +387,7 @@ for ith_poly = 1:length(polytopes)
     poly_size_stats.offsets = [poly_size_stats.offsets; o];
     poly_size_stats.effective_depths = [poly_size_stats.effective_depths;effective_depths];
     poly_size_stats.effective_depth_scalars = [poly_size_stats.effective_depth_scalars,mean(effective_depths(effective_depths>0.0001))];
-    if flag_do_plot
+    if flag_do_plots
         figure(12345327)
         hold on
         box on
@@ -416,7 +406,7 @@ poly_size_stats.mean_d_eff = mean_d_eff;
 d_eff_avg_eval_at_o_avg = mean_d_eff(closest_index);
 poly_size_stats.d_eff_avg_eval_at_o_avg = d_eff_avg_eval_at_o_avg;
 
-if flag_do_plot
+if flag_do_plots
     plot(o,mean_d_eff,'LineWidth',3,'Color','k')
     mean(poly_size_stats.effective_depths(5,:),1);
     num_curves = [1,5,20,50,100,500];
@@ -426,7 +416,7 @@ if flag_do_plot
         hold on
         box on
         avg_curve = mean(poly_size_stats.effective_depths(1:num_curves(i),:),1);
-        if flag_do_plot
+        if flag_do_plots
             plot(o,avg_curve,'LineWidth',3,'Color','k')
             xlabel('offset from centroid, o [m]')
             ylabel('effective depth, d_{eff} [m]')
@@ -440,7 +430,7 @@ poly_size_stats.mean_d_eff_scalar = mean(mean_d_eff(mean_d_eff>0.0001));
 % middle_o_avg_curve = o(floor(length(mean_d_eff(mean_d_eff>0.0001))/2));
 % [~,closest_index] = min(abs(o-middle_o_avg_curve));
 % poly_size_stats.mean_d_eff_at_middle_o = mean_d_eff(closest_index);
-if flag_do_plot
+if flag_do_plots
     figure(12345327)
     hold on
     plot([0,max(o)],[poly_size_stats.mean_d_eff_scalar,poly_size_stats.mean_d_eff_scalar],'k-')
@@ -460,7 +450,7 @@ end
 
 
 
-if flag_do_plot
+if flag_do_plots
     figure(fig_num)
     clf;
 

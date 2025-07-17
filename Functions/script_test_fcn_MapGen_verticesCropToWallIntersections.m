@@ -1,9 +1,12 @@
-% script_test_fcn_MapGen_cropPolytopeToRange
-% Tests function: fcn_MapGen_cropPolytopeToRange
+% script_test_fcn_MapGen_verticesCropToWallIntersections
+% Tests: fcn_MapGen_verticesCropToWallIntersections
 
+% 
 % REVISION HISTORY:
-% 2021_08_03
-% -- first written by S. Brennan
+% 
+% 2021_07_15 by Sean Brennan
+% -- first write of script
+% -- remove dependence on test fixture
 % 2025_07_11 - S. Brennan, sbrennan@psu.edu
 % -- updated script testing to standard form
 
@@ -28,31 +31,40 @@ close all
 close all;
 fprintf(1,'Figure: 1XXXXXX: DEMO cases\n');
 
-%% TEST case: simple square
+%% DEMO case: basic example with 2 intersections
 fig_num = 10001;
-titleString = sprintf('DEMO case: simple square');
+titleString = sprintf('DEMO case: basic example with 2 intersections');
 fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
-verticies = [1 1; 1 -1; -1 -1; -1 1; 1 1]*0.5;
-interiorPoint = [0.25 0.25];
-AABB = [0 0 1 1];
+walls = [0 0; 2 0; 1 3; 0 0];
+inputVertices = [1 -1; 1 1; 2 2; 2 2.5; -1 2.5; -1 -1; 1 -1];
 
 % Call the function
-[croppedVertices] = fcn_MapGen_cropPolytopeToRange(verticies, interiorPoint, AABB, (fig_num));
+[croppedVertices, NwallsHit] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, (fig_num));
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
 assert(isnumeric(croppedVertices));
+assert(isnumeric(NwallsHit));
 
 % Check variable sizes
-Nvertices = length(verticies(:,1));
-assert(size(croppedVertices,1)<=Nvertices);
-assert(size(croppedVertices,2)==2);
+Nvertices = 5;
+assert(isequal(size(croppedVertices),[Nvertices 2]));
+assert(isequal(size(NwallsHit),[1 1]));
 
 % Check variable values
-assert(isequal(round(croppedVertices,4),[0,0;0.5000,0;0.5000,0.5000;0,0.5000;0,0]));
+assert(isequal(round(croppedVertices,4),round(...
+    [...
+    1.0000         0
+    1.0000    1.0000
+    1.5000    1.5000
+    1.1667    2.5000
+    0.8333    2.5000
+    ]...
+    ,4)));
+assert(isequal(NwallsHit,3));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -76,240 +88,249 @@ assert(isequal(get(gcf,'Number'),fig_num));
 close all;
 fprintf(1,'Figure: 2XXXXXX: TEST mode cases\n');
 
-%% TEST case: simple square, interiorPoint on top of AABB
+%% TEST case: Going from out to in
 fig_num = 20001;
-titleString = sprintf('TEST case: simple square, query point on top of AABB');
+titleString = sprintf('TEST case: Going from out to in');
 fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
-verticies = [1 1; 1 -1; -1 -1; -1 1; 1 1]*0.5;
-interiorPoint = [0 0];
-AABB = [0 0 1 1];
+walls = [0 0; 1 0; 1 1; 0 1; 0 0];
+inputVertices = [-0.3 0.2; 0.3 0.2];
 
 % Call the function
-[croppedVertices] = fcn_MapGen_cropPolytopeToRange(verticies, interiorPoint, AABB, (fig_num));
+[croppedVertices, NwallsHit] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, (fig_num));
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
 assert(isnumeric(croppedVertices));
+assert(isnumeric(NwallsHit));
 
 % Check variable sizes
-Nvertices = length(verticies(:,1));
-assert(size(croppedVertices,1)<=Nvertices);
-assert(size(croppedVertices,2)==2);
+Nvertices = 2;
+assert(isequal(size(croppedVertices),[Nvertices 2]));
+assert(isequal(size(NwallsHit),[1 1]));
 
 % Check variable values
-assert(isequal(round(croppedVertices,4),[0,0;0.5000,0;0.5000,0.5000;0,0.5000;0,0]));
+assert(all(([0 0.2; 0.3 0.2]-eps*[1 1; 1 1])<croppedVertices,'all') && all([0 0.2; 0.3 0.2]+eps*[1 1; 1 1]>croppedVertices,'all'));
+assert(isequal(NwallsHit,1))
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
 
-
-%% TEST case: simple triangle, interiorPoint on AABB
+%% TEST case: Going from in to out
 fig_num = 20002;
-titleString = sprintf('TEST case: simple triangle, interiorPoint on AABB');
+titleString = sprintf('TEST case: Going from in to out');
 fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
-verticies = [1 -0.5; -1 -1; -0.5 1; 1 -0.5];
-interiorPoint = [0 0];
-AABB = [0 0 1 1];
-
+walls = [0 0; 1 0; 1 1; 0 1; 0 0];
+inputVertices = [0.3 0.2; 1.3 0.2];
 
 % Call the function
-[croppedVertices] = fcn_MapGen_cropPolytopeToRange(verticies, interiorPoint, AABB, (fig_num));
+[croppedVertices, NwallsHit] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, (fig_num));
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
 assert(isnumeric(croppedVertices));
+assert(isnumeric(NwallsHit));
 
 % Check variable sizes
-Nvertices = length(verticies(:,1));
-assert(size(croppedVertices,1)<=Nvertices);
-assert(size(croppedVertices,2)==2);
+Nvertices = 2;
+assert(isequal(size(croppedVertices),[Nvertices 2]));
+assert(isequal(size(NwallsHit),[1 1]));
 
 % Check variable values
-assert(isequal(round(croppedVertices,4),[         0         0;     0.5000         0;          0    0.5000;          0         0]));
+assert(all(([0.3 0.2; 1 0.2]-eps*[1 1; 1 1])<croppedVertices,'all') && all([0.3 0.2; 1 0.2]+eps*[1 1; 1 1]>croppedVertices,'all'));
+assert(isequal(NwallsHit,1))
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
 
-
-%% TEST case: vertices enclosing region
+%% TEST case: all inside, nothing to crop
 fig_num = 20003;
-titleString = sprintf('TEST case: vertices enclosing region');
+titleString = sprintf('TEST case: all inside, nothing to crop');
 fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
-verticies = [1 1; 1 -1; -1 -1; -1 1; 1 1]*2;
-interiorPoint = [0 0];
-AABB = [0 0 1 1];
+walls = [0 0; 1 0; 1 1; 0 1; 0 0];
+inputVertices = [0.3 0.2; 0.4 0.2];
 
 % Call the function
-[croppedVertices] = fcn_MapGen_cropPolytopeToRange(verticies, interiorPoint, AABB, (fig_num));
+[croppedVertices, NwallsHit] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, (fig_num));
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
 assert(isnumeric(croppedVertices));
+assert(isnumeric(NwallsHit));
 
 % Check variable sizes
-Nvertices = length(verticies(:,1));
-assert(size(croppedVertices,1)<=Nvertices);
-assert(size(croppedVertices,2)==2);
+Nvertices = 2;
+assert(isequal(size(croppedVertices),[Nvertices 2]));
+assert(isequal(size(NwallsHit),[1 1]));
 
 % Check variable values
-assert(isequal(round(croppedVertices,4),[     0     0;      1     0;      1     1;      0     1;      0     0]));
+assert(all(([0.3 0.2; 0.4 0.2]-eps*[1 1; 1 1])<croppedVertices,'all') && all([0.3 0.2; 0.4 0.2]+eps*[1 1; 1 1]>croppedVertices,'all'));
+assert(isequal(NwallsHit,0))
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
 
-%% TEST case: vertices all within region
+%% TEST case: all outside, returns empty
 fig_num = 20004;
-titleString = sprintf('TEST case: vertices all within region');
+titleString = sprintf('TEST case: all outside, returns empty');
 fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
-verticies = [ 0.25 0.25; 0.25 0.75; 0.75 0.75; 0.75 0.25; 0.25 0.25;];
-interiorPoint = [0.5 0.5];
-AABB = [0 0 1 1];
+walls = [0 0; 1 0; 1 1; 0 1; 0 0];
+inputVertices = [-0.3 0.2; -0.4 0.2];
 
 % Call the function
-[croppedVertices] = fcn_MapGen_cropPolytopeToRange(verticies, interiorPoint, AABB, (fig_num));
+[croppedVertices, NwallsHit] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, (fig_num));
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
 assert(isnumeric(croppedVertices));
+assert(isnumeric(NwallsHit));
 
 % Check variable sizes
-Nvertices = length(verticies(:,1));
-assert(size(croppedVertices,1)<=Nvertices);
-assert(size(croppedVertices,2)==2);
+assert(isempty(croppedVertices));
+assert(isequal(size(NwallsHit),[1 1]));
 
 % Check variable values
-assert(isequal(round(croppedVertices,4),[    0.2500    0.2500;     0.7500    0.2500;     0.7500    0.7500;     0.2500    0.7500;    0.2500    0.2500]));
+assert(isequal([],croppedVertices));
+assert(isequal(NwallsHit,0))
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
 
-
-%% TEST case: infinity in the numbers (returns infinities back)
+%% TEST case: crossing over, crops both sides keeping inside
 fig_num = 20005;
-titleString = sprintf('TEST case: infinity in the numbers (returns infinities back)');
+titleString = sprintf('TEST case: crossing over, crops both sides keeping inside');
 fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
-verticies = [...
-   -0.0457    0.0471
-   -0.4075    0.0851
-   -2.7148    0.1857
-  -11.3670    0.2644
-       Inf       Inf
-    0.3841  -53.6209
-    0.2255   -6.8725
-    0.1203   -1.0609
-    0.0352   -0.0163
-   -0.0081    0.0368
-   -0.0457    0.0471];
-
-interiorPoint = [0 0];
-AABB = [0 0 1 1];
+walls = [0 0; 1 0; 1 1; 0 1; 0 0];
+inputVertices = [-0.3 0.2; 1.4 0.2];
 
 % Call the function
-[croppedVertices] = fcn_MapGen_cropPolytopeToRange(verticies, interiorPoint, AABB, (fig_num));
+[croppedVertices, NwallsHit] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, (fig_num));
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
 assert(isnumeric(croppedVertices));
+assert(isnumeric(NwallsHit));
 
 % Check variable sizes
-Nvertices = length(verticies(:,1));
-assert(size(croppedVertices,1)<=Nvertices);
-assert(size(croppedVertices,2)==2);
+Nvertices = 2;
+assert(isequal(size(croppedVertices),[Nvertices 2]));
+assert(isequal(size(NwallsHit),[1 1]));
 
 % Check variable values
-assert(isequal(round(croppedVertices,4),[    0.0000         0;     1.0000         0;        Inf       Inf;          0    1.0000;          0    0.0000;    0.0000         0]));
+true_answer = [1 0.2; 0 0.2];
+assert(all((true_answer-eps*[1 1; 1 1])<croppedVertices,'all') && all(true_answer+eps*[1 1; 1 1]>croppedVertices,'all'));
+assert(isequal(NwallsHit,2))
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
 
-
-
-%% TEST case: Points on edges
+%% TEST case: aligned with edge, across, crops both sides keeping inside
 fig_num = 20006;
-titleString = sprintf('TEST case: Points on edges');
+titleString = sprintf('TEST case: aligned with edge, across, crops both sides keeping inside');
 fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
-verticies = [
-   0.951225451552411   0.038481963258910
-   0.951225451552411                   0
-   1.000000000000000   0.055571820180916
-   0.972711461970130   0.055571820180916
-   0.967138332311524   0.053930059059772
-   0.951225451552411   0.038481963258910];
-interiorPoint = [0.978515625000000   0.035665294924554];
-AABB = [0 0 1 1];
+walls = [0 0; 1 0; 1 1; 0 1; 0 0];
+inputVertices = [-0.3 0; 1.4 0];
 
 % Call the function
-[croppedVertices] = fcn_MapGen_cropPolytopeToRange(verticies, interiorPoint, AABB, (fig_num));
+[croppedVertices, NwallsHit] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, (fig_num));
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
 assert(isnumeric(croppedVertices));
+assert(isnumeric(NwallsHit));
 
 % Check variable sizes
-Nvertices = length(verticies(:,1));
-assert(size(croppedVertices,1)<=Nvertices);
-assert(size(croppedVertices,2)==2);
+Nvertices = 2;
+assert(isequal(size(croppedVertices),[Nvertices 2]));
+assert(isequal(size(NwallsHit),[1 1]));
 
 % Check variable values
-assert(isequal(round(croppedVertices,4),[     0.9512         0;    1.0000    0.0556;    0.9727    0.0556;    0.9671    0.0539;    0.9512    0.0385;    0.9512         0]));
+true_answer = [0 0; 1 0];
+assert(all((true_answer-eps*[1 1; 1 1])<croppedVertices,'all') && all(true_answer+eps*[1 1; 1 1]>croppedVertices,'all'));
+assert(isequal(NwallsHit,3))
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
 
-
-%% TEST case: Points valid except infinity
+%% TEST case: aligned with edge, inside to outside, crops outside but keeps edge
 fig_num = 20007;
-titleString = sprintf('TEST case: Points valid except infinity');
+titleString = sprintf('TEST case: aligned with edge, inside to outside, crops outside but keeps edge');
 fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
-interiorPoint = [0.9404    0.0133];
-
-verticies = [
-    0.9512    0.0385
-       Inf       Inf
-    0.9275    0.0315
-    0.9318    0.0417
-    0.9512    0.0385];
-
-AABB = [0 0 1 1];
+walls = [0 0; 1 0; 1 1; 0 1; 0 0];
+inputVertices = [0.5 0; 1.4 0];
 
 % Call the function
-[croppedVertices] = fcn_MapGen_cropPolytopeToRange(verticies, interiorPoint, AABB, (fig_num));
+[croppedVertices, NwallsHit] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, (fig_num));
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
 assert(isnumeric(croppedVertices));
+assert(isnumeric(NwallsHit));
 
 % Check variable sizes
-Nvertices = length(verticies(:,1));
-assert(size(croppedVertices,1)<=Nvertices);
-assert(size(croppedVertices,2)==2);
+Nvertices = 2;
+assert(isequal(size(croppedVertices),[Nvertices 2]));
+assert(isequal(size(NwallsHit),[1 1]));
 
 % Check variable values
-assert(isequal(round(croppedVertices,4),[       Inf       Inf;     0.9512    0.0385;     0.9318    0.0417;     0.9275    0.0315;       Inf       Inf]));
+true_answer = [0.5 0; 1 0];
+assert(all((true_answer-eps*[1 1; 1 1])<croppedVertices,'all') && all(true_answer+eps*[1 1; 1 1]>croppedVertices,'all'));
+assert(isequal(NwallsHit,2))
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
+
+%% TEST case: aligned with edge, on corner to outside, keeps only corner
+fig_num = 20008;
+titleString = sprintf('TEST case: aligned with edge, on corner to outside, keeps only corner');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+walls = [0 0; 1 0; 1 1; 0 1; 0 0];
+inputVertices = [1 0; 1.4 0];
+
+% Call the function
+[croppedVertices, NwallsHit] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, (fig_num));
+
+sgtitle(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(isnumeric(croppedVertices));
+assert(isnumeric(NwallsHit));
+
+% Check variable sizes
+Nvertices = 1;
+assert(isequal(size(croppedVertices),[Nvertices 2]));
+assert(isequal(size(NwallsHit),[1 1]));
+
+% Check variable values
+true_answer = [1 0];
+assert(all((true_answer-eps*[1 1; 1 1])<croppedVertices,'all') && all(true_answer+eps*[1 1; 1 1]>croppedVertices,'all'));
+assert(isequal(NwallsHit,2))
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
 
 
 %% Fast Mode Tests
@@ -335,23 +356,32 @@ fig_num = 80001;
 fprintf(1,'Figure: %.0f: FAST mode, empty fig_num\n',fig_num);
 figure(fig_num); close(fig_num);
 
-verticies = [1 1; 1 -1; -1 -1; -1 1; 1 1]*0.5;
-interiorPoint = [0.25 0.25];
-AABB = [0 0 1 1];
+walls = [0 0; 2 0; 1 3; 0 0];
+inputVertices = [1 -1; 1 1; 2 2; 2 2.5; -1 2.5; -1 -1; 1 -1];
 
 % Call the function
-[croppedVertices] = fcn_MapGen_cropPolytopeToRange(verticies, interiorPoint, AABB, ([]));
+[croppedVertices, NwallsHit] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, ([]));
 
 % Check variable types
 assert(isnumeric(croppedVertices));
+assert(isnumeric(NwallsHit));
 
 % Check variable sizes
-Nvertices = length(verticies(:,1));
-assert(size(croppedVertices,1)<=Nvertices);
-assert(size(croppedVertices,2)==2);
+Nvertices = 5;
+assert(isequal(size(croppedVertices),[Nvertices 2]));
+assert(isequal(size(NwallsHit),[1 1]));
 
 % Check variable values
-assert(isequal(round(croppedVertices,4),[0,0;0.5000,0;0.5000,0.5000;0,0.5000;0,0]));
+assert(isequal(round(croppedVertices,4),round(...
+    [...
+    1.0000         0
+    1.0000    1.0000
+    1.5000    1.5000
+    1.1667    2.5000
+    0.8333    2.5000
+    ]...
+    ,4)));
+assert(isequal(NwallsHit,3));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -363,25 +393,32 @@ fig_num = 80002;
 fprintf(1,'Figure: %.0f: FAST mode, fig_num=-1\n',fig_num);
 figure(fig_num); close(fig_num);
 
-verticies = [1 1; 1 -1; -1 -1; -1 1; 1 1]*0.5;
-interiorPoint = [0.25 0.25];
-AABB = [0 0 1 1];
+walls = [0 0; 2 0; 1 3; 0 0];
+inputVertices = [1 -1; 1 1; 2 2; 2 2.5; -1 2.5; -1 -1; 1 -1];
 
 % Call the function
-[croppedVertices] = fcn_MapGen_cropPolytopeToRange(verticies, interiorPoint, AABB, (-1));
+[croppedVertices, NwallsHit] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, (-1));
 
 % Check variable types
 assert(isnumeric(croppedVertices));
+assert(isnumeric(NwallsHit));
 
 % Check variable sizes
-Nvertices = length(verticies(:,1));
-assert(size(croppedVertices,1)<=Nvertices);
-assert(size(croppedVertices,2)==2);
+Nvertices = 5;
+assert(isequal(size(croppedVertices),[Nvertices 2]));
+assert(isequal(size(NwallsHit),[1 1]));
 
 % Check variable values
-assert(isequal(round(croppedVertices,4),[0,0;0.5000,0;0.5000,0.5000;0,0.5000;0,0]));
-
-
+assert(isequal(round(croppedVertices,4),round(...
+    [...
+    1.0000         0
+    1.0000    1.0000
+    1.5000    1.5000
+    1.1667    2.5000
+    0.8333    2.5000
+    ]...
+    ,4)));
+assert(isequal(NwallsHit,3));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -394,9 +431,8 @@ fprintf(1,'Figure: %.0f: FAST mode comparisons\n',fig_num);
 figure(fig_num);
 close(fig_num);
 
-verticies = [1 1; 1 -1; -1 -1; -1 1; 1 1]*0.5;
-interiorPoint = [0.25 0.25];
-AABB = [0 0 1 1];
+walls = [0 0; 2 0; 1 3; 0 0];
+inputVertices = [1 -1; 1 1; 2 2; 2 2.5; -1 2.5; -1 -1; 1 -1];
 
 Niterations = 100;
 
@@ -404,8 +440,7 @@ Niterations = 100;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [croppedVertices] = fcn_MapGen_cropPolytopeToRange(verticies, interiorPoint, AABB, ([]));
-
+    [croppedVertices, NwallsHit] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, ([]));
 end
 slow_method = toc;
 
@@ -413,7 +448,7 @@ slow_method = toc;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [croppedVertices] = fcn_MapGen_cropPolytopeToRange(verticies, interiorPoint, AABB, (-1));
+    [croppedVertices, NwallsHit] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, (-1));
 end
 fast_method = toc;
 

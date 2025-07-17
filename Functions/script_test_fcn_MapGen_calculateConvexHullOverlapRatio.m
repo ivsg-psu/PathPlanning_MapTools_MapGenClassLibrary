@@ -41,7 +41,7 @@ figure(fig_num); clf;
 polytopes(1).vertices = [0 0; 10 0; 10 1; 0 1; 0 0];
 polytopes(2).vertices = polytopes(1).vertices+[8,0];
 is_nonconvex = 0;
-polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes,(is_nonconvex),(-1));
+polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes,(is_nonconvex),(-1));
 
 % Call the function
 [convexHullOverlapRatio, areaOverlap, areaOccupied] = ...
@@ -76,7 +76,7 @@ figure(fig_num); clf;
 polytopes(1).vertices = [0 0; 5 0; 7, 0.5; 5 1; 0 1; 0 0];
 polytopes(2).vertices = [6 0; 10 0; 10 1; 6 1; 8 0.5; 6 0];
 is_nonconvex = 1;
-polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes,(is_nonconvex),(-1));
+polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes,(is_nonconvex),(-1));
 
 % Call the function
 [convexHullOverlapRatio, areaOverlap, areaOccupied] = ...
@@ -154,7 +154,7 @@ figure(fig_num); close(fig_num);
 polytopes(1).vertices = [0 0; 5 0; 7, 0.5; 5 1; 0 1; 0 0];
 polytopes(2).vertices = [6 0; 10 0; 10 1; 6 1; 8 0.5; 6 0];
 is_nonconvex = 1;
-polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes,(is_nonconvex),(-1));
+polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes,(is_nonconvex),(-1));
 
 % Call the function
 [convexHullOverlapRatio, areaOverlap, areaOccupied] = ...
@@ -188,7 +188,7 @@ figure(fig_num); close(fig_num);
 polytopes(1).vertices = [0 0; 5 0; 7, 0.5; 5 1; 0 1; 0 0];
 polytopes(2).vertices = [6 0; 10 0; 10 1; 6 1; 8 0.5; 6 0];
 is_nonconvex = 1;
-polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes,(is_nonconvex),(-1));
+polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes,(is_nonconvex),(-1));
 
 % Call the function
 [convexHullOverlapRatio, areaOverlap, areaOccupied] = ...

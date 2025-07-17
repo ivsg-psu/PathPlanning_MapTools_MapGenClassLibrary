@@ -1,10 +1,10 @@
-% script_test_fcn_MapGen_isWithinABBB
-% Tests: fcn_MapGen_isWithinABBB
+% script_test_fcn_MapGen_polytopeGenerateOneRandomPoly
+% Tests: fcn_MapGen_polytopeGenerateOneRandomPoly
 
-%
+% 
 % REVISION HISTORY:
-%
-% 2021_07_11 by Sean Brennan
+% 
+% 2021_06_27 by Sean Brennan
 % -- first write of script
 % 2025_07_11 - S. Brennan, sbrennan@psu.edu
 % -- updated script testing to standard form
@@ -32,28 +32,35 @@ fprintf(1,'Figure: 1XXXXXX: DEMO cases\n');
 
 %% DEMO case: basic demo
 fig_num = 10001;
-titleString = sprintf('DEMO case: self-intersection');
+titleString = sprintf('DEMO case: basic demo');
 fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
-AABB = [0 0 1 1];
-testPoints = randn(100,2);
-
 % Call the function
-isInside = fcn_MapGen_isWithinABBB( AABB, testPoints, (fig_num));
+onePolytope = fcn_MapGen_polytopeGenerateOneRandomPoly((fig_num));
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(islogical(isInside));
+assert(isstruct(onePolytope));
+assert(isfield(onePolytope,'vertices'));
+assert(isfield(onePolytope,'xv'));
+assert(isfield(onePolytope,'yv'));
+assert(isfield(onePolytope,'distances'));
+assert(isfield(onePolytope,'mean'));
+assert(isfield(onePolytope,'area'));
+assert(isfield(onePolytope,'max_radius'));
+assert(isfield(onePolytope,'min_radius'));
+assert(isfield(onePolytope,'mean_radius'));
+assert(isfield(onePolytope,'radii'));
+assert(isfield(onePolytope,'cost'));
+assert(isfield(onePolytope,'parent_poly_id'));
 
 % Check variable sizes
-Nvertices = length(testPoints(:,1));
-assert(size(isInside,1)==Nvertices);
-assert(size(isInside,2)==1);
+assert(isequal(1,length(onePolytope))); 
 
 % Check variable values
-% Cannot check as they are randomly generated
+% (can't - randomly generated!)
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -107,22 +114,29 @@ fig_num = 80001;
 fprintf(1,'Figure: %.0f: FAST mode, empty fig_num\n',fig_num);
 figure(fig_num); close(fig_num);
 
-AABB = [0 0 1 1];
-testPoints = randn(100,2);
-
 % Call the function
-isInside = fcn_MapGen_isWithinABBB( AABB, testPoints, ([]));
+onePolytope = fcn_MapGen_polytopeGenerateOneRandomPoly(([]));
 
 % Check variable types
-assert(islogical(isInside));
+assert(isstruct(onePolytope));
+assert(isfield(onePolytope,'vertices'));
+assert(isfield(onePolytope,'xv'));
+assert(isfield(onePolytope,'yv'));
+assert(isfield(onePolytope,'distances'));
+assert(isfield(onePolytope,'mean'));
+assert(isfield(onePolytope,'area'));
+assert(isfield(onePolytope,'max_radius'));
+assert(isfield(onePolytope,'min_radius'));
+assert(isfield(onePolytope,'mean_radius'));
+assert(isfield(onePolytope,'radii'));
+assert(isfield(onePolytope,'cost'));
+assert(isfield(onePolytope,'parent_poly_id'));
 
 % Check variable sizes
-Nvertices = length(testPoints(:,1));
-assert(size(isInside,1)==Nvertices);
-assert(size(isInside,2)==1);
+assert(isequal(1,length(onePolytope))); 
 
 % Check variable values
-% Cannot check as they are randomly generated
+% (can't - randomly generated!)
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -134,22 +148,29 @@ fig_num = 80002;
 fprintf(1,'Figure: %.0f: FAST mode, fig_num=-1\n',fig_num);
 figure(fig_num); close(fig_num);
 
-AABB = [0 0 1 1];
-testPoints = randn(100,2);
-
 % Call the function
-isInside = fcn_MapGen_isWithinABBB( AABB, testPoints, (-1));
+onePolytope = fcn_MapGen_polytopeGenerateOneRandomPoly((-1));
 
 % Check variable types
-assert(islogical(isInside));
+assert(isstruct(onePolytope));
+assert(isfield(onePolytope,'vertices'));
+assert(isfield(onePolytope,'xv'));
+assert(isfield(onePolytope,'yv'));
+assert(isfield(onePolytope,'distances'));
+assert(isfield(onePolytope,'mean'));
+assert(isfield(onePolytope,'area'));
+assert(isfield(onePolytope,'max_radius'));
+assert(isfield(onePolytope,'min_radius'));
+assert(isfield(onePolytope,'mean_radius'));
+assert(isfield(onePolytope,'radii'));
+assert(isfield(onePolytope,'cost'));
+assert(isfield(onePolytope,'parent_poly_id'));
 
 % Check variable sizes
-Nvertices = length(testPoints(:,1));
-assert(size(isInside,1)==Nvertices);
-assert(size(isInside,2)==1);
+assert(isequal(1,length(onePolytope))); 
 
 % Check variable values
-% Cannot check as they are randomly generated
+% (can't - randomly generated!)
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -162,16 +183,13 @@ fprintf(1,'Figure: %.0f: FAST mode comparisons\n',fig_num);
 figure(fig_num);
 close(fig_num);
 
-AABB = [0 0 1 1];
-testPoints = randn(100,2);
-
-Niterations = 100;
+Niterations = 20;
 
 % Do calculation without pre-calculation
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    isInside = fcn_MapGen_isWithinABBB( AABB, testPoints, ([]));
+    onePolytope = fcn_MapGen_polytopeGenerateOneRandomPoly(([]));
 end
 slow_method = toc;
 
@@ -179,7 +197,7 @@ slow_method = toc;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    isInside = fcn_MapGen_isWithinABBB( AABB, testPoints, (-1));
+    onePolytope = fcn_MapGen_polytopeGenerateOneRandomPoly((-1));
 end
 fast_method = toc;
 

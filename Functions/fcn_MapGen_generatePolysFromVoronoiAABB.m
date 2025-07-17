@@ -58,12 +58,12 @@ varargin...
 %
 %     fcn_DebugTools_checkInputsToFunctions
 %     fcn_MapGen_polytopeFillEmptyPoly
-%     fcn_MapGen_removeInfiniteVertices
-%     fcn_MapGen_isWithinABBB
-%     fcn_MapGen_fillPolytopeFieldsFromVertices
-%     fcn_MapGen_convertAABBtoWalls
+%     fcn_MapGen_verticesRemoveInfinite
+%     fcn_MapGen_AABBisWithin
+%     fcn_MapGen_polytopesFillFieldsFromVertices
+%     fcn_MapGen_AABBConvertToWalls
 %     fcn_Path_findSensorHitOnWall
-%     fcn_MapGen_cropPolytopeToRange
+%     fcn_MapGen_verticesCropToAABB
 %     fcn_MapGen_plotPolytopes
 %
 % EXAMPLES:
@@ -91,6 +91,10 @@ varargin...
 % 2025_07_15 by Sean Brennan
 % -- cleaned variable naming to remove underscores
 % -- turned on fast mode for subfunctions
+% 2025_07_17 by Sean Brennan
+% -- standardized Debugging and Input checks area, Inputs area
+% -- made codes use MAX_NARGIN definition at top of code, narginchk
+% -- made plotting flag_do_plots and code consistent across all functions
 
 % TO DO
 % -- none
@@ -100,14 +104,15 @@ varargin...
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 6; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==6 && isequal(varargin{end},-1))
-    flag_do_debug = 0; %     % Flag to plot the results for debugging
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
 else
     % Check to see if we are externally setting debug mode to be "on"
-    flag_do_debug = 0; %     % Flag to plot the results for debugging
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 1; % Flag to perform input checking
     MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS");
     MATLABFLAG_MAPGEN_FLAG_DO_DEBUG = getenv("MATLABFLAG_MAPGEN_FLAG_DO_DEBUG");
@@ -123,9 +128,8 @@ if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
     debug_fig_num = 999978; %#ok<NASGU>
-else
-    debug_fig_num = []; %#ok<NASGU>
 end
+
 
 %% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -144,36 +148,27 @@ if (0==flag_max_speed)
     if 1 == flag_check_inputs
 
         % Are there the right number of inputs?
-        narginchk(5,6);
+        narginchk(5,MAX_NARGIN);
 
-        % Check the seedPoints input, make sure it is '2column_of_numbers' type
-        fcn_DebugTools_checkInputsToFunctions(...
-            seedPoints, '2column_of_numbers');
+        % Check the seedPoints input, make sure it is 2 columns
+        fcn_DebugTools_checkInputsToFunctions(seedPoints, '2column_of_numbers');
 
-        % Check the stretch input, make sure it is '2column_of_numbers' type
-        fcn_DebugTools_checkInputsToFunctions(...
-            stretch, '2column_of_numbers',1);
+        % Check the stretch input, make sure it is 2 columns, 1 row
+        fcn_DebugTools_checkInputsToFunctions(stretch, '2column_of_numbers',1);
 
     end
 end
-
 
 % Does user want to show the plots?
-flag_do_plot = 0; % Default is no plotting
-if  6 == nargin && (0==flag_max_speed) % Only create a figure if NOT maximizing speed
-    temp = varargin{end}; % Last argument is always figure number
-    if ~isempty(temp) % Make sure the user is not giving empty input
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
+    temp = varargin{end};
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
-        flag_do_plot = 1; % Set flag to do plotting
-    end
-else
-    if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
-        fig = figure;
-        fig_for_debug = fig.Number; %#ok<NASGU>
-        flag_do_plot = 1;
+        figure(fig_num);
+        flag_do_plots = 1;
     end
 end
-
 
 %% Start of main code
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -237,7 +232,7 @@ end
 
 %% Remove infinite vertices
 [bounded_vertices] = ...
-    fcn_MapGen_removeInfiniteVertices(...
+    fcn_MapGen_verticesRemoveInfinite(...
     polytopeVertices,seedPoints,AABB,Nvertices_per_poly, -1);
 
 %% Crop vertices
@@ -267,11 +262,11 @@ for poly = 1:num_poly % pull each cell from the voronoi diagram
     %     end
 
     % Are any vertices outside the AABB? If so, must crop them
-    if ~all(fcn_MapGen_isWithinABBB(AABB,vertices,-1)==1)
+    if ~all(fcn_MapGen_AABBisWithin(AABB,vertices,-1)==1)
 
       % Crop vertices to allowable range
         [cropped_vertices] = ...
-            fcn_MapGen_cropPolytopeToRange(vertices, interior_point, AABB,-1);
+            fcn_MapGen_verticesCropToAABB(vertices, interior_point, AABB,-1);
     else
         cropped_vertices = vertices;
     end
@@ -312,7 +307,7 @@ for poly = 1:num_poly % pull each cell from the voronoi diagram
 end % Ends for loop for stretch
 
 % Fill in all the other fields
-polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes,[], -1);
+polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes,[], -1);
 
 %§
 %% Plot the results (for debugging)?
@@ -327,7 +322,7 @@ polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes,[], -1);
 %                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-if flag_do_plot
+if flag_do_plots
 
     figure(fig_num);
     clf;
@@ -456,7 +451,7 @@ function polytopes_with_corners = fcn_INTERNAL_addCorners(polytopes,seedPoints,A
 % trims that polytope down to appropriate size with the corner included.
 
 % Check that all the wall corners are inside polytopes
-walls = fcn_MapGen_convertAABBtoWalls(AABB, -1);
+walls = fcn_MapGen_AABBConvertToWalls(AABB, -1);
 test_points = walls(1:4,:);
 all_found = zeros(length(test_points(:,1)),1); % keep track of which vertices are hit
 for poly = 1:length(polytopes)
@@ -500,7 +495,7 @@ for ith_missing = 1:length(missing_vertices(:,1))
 
     % Crop vertices to allowable range
     [cropped_vertices] = ...
-        fcn_MapGen_cropPolytopeToRange(shoved_vertices, interior_point, AABB, -1);
+        fcn_MapGen_verticesCropToAABB(shoved_vertices, interior_point, AABB, -1);
 
     % make sure cw
     vec1 = [cropped_vertices(2,:)-cropped_vertices(1,:),0]; % vector leading into point

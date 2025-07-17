@@ -43,9 +43,12 @@
 % -- started updating headers and test scripts. Only have 
 % fcn_MapGen_generatePolysFromTiling done so far.
 % 2025_07_11 - Sean Brennan
-% -- updated DebugTools library
-% -- added PathClass library to use this function (better) rather than
+% -- updated DebugTools library to DebugTools_v2025_07_15
+% -- added PathClass library to use fcn_Path_findSensorHitOnWall function
+%    % rather than
 %    % fcn_MapGen_findIntersectionOfSegments
+%    % the Path library version is FAR better in speed, debugged, support,
+%    % etc. Deprecated fcn_MapGen_findIntersectionOfSegments
 % -- for all the tiling variants, deprecated the following
 %    % fcn_MapGen_sobolVoronoiTiling
 %    % fcn_MapGen_latinVoronoiTiling
@@ -61,11 +64,37 @@
 %    % above
 % -- Deprecated fcn_MapGen_checkIfPointInsideConvexPolytope, using
 %    % inpolytope instead
-
+% -- rewrote plotPolytopes using variable input arguments (see plotRoad
+%    % library) to allow arbitrary formatting. Deprecated old version.
+% -- added option in fcn_MapGen_voronoiTiling to plot both all Voronoi
+%    cells and then all each individual Voronoi cell for each generator,
+%    with colors matched. 
+% -- fixed bugs in fcn_MapGen_verticesCropToAABB where infinite vertices
+%    % not treated correctly
+% -- fully used DebugTools library utility for input checking
+% -- make sure all function calls internal to functions have -1 speed set
+%    % for figure number
+% -- renamed fcn_MapGen_generateOneRandomPolytope to be:
+%    % fcn_MapGen_polytopeGenerateOneRandomPoly
+% -- renamed polytopes function:
+%    % fcn_MapGen_fillPolytopeFieldsFromVertices to fcn_MapGen_polytopesFillFieldsFromVertices
+%    % fcn_MapGen_increasePolytopeVertexCount to fcn_MapGen_polytopesIncreaseVertexCount
+% -- renamed AABB functions:
+%    % fcn_MapGen_convertAABBtoWalls to fcn_MapGen_AABBConvertToWalls
+%    % fcn_MapGen_snapToAABB to fcn_MapGen_AABBsnapTo
+%    % fcn_MapGen_isWithinABBB to fcn_MapGen_AABBisWithin
+%    % fcn_MapGen_projectVectorToAABB to fcn_MapGen_AABBprojectVectorTo
+% -- renamed vertices functions:
+%    % fcn_MapGen_cropPolytopeToRange to fcn_MapGen_verticesCropToAABB
+%    % fcn_MapGen_cropVerticesByWallIntersections to fcn_MapGen_verticesCropToWallIntersections
+%    % fcn_MapGen_removeInfiniteVertices to fcn_MapGen_verticesRemoveInfinite
 
 % TO-DO:
-% -- add debug library utility, and switch functions to this. Done?
-% -- add functions that, given a map, give core statistics (look out limit, linear density, etc - basically make functions to calculate all the pi-values and interpretations we might need)
+% -- add functions that, given a map, give core statistics including:
+%    % look out limit, 
+%    % linear density, etc
+%    % basically make function to calculate all the pi-values and 
+%    % interpretations we might need for publication
 % -- add prior work on grid-based map generation
 % 2025_07_03 - Sean Brennan
 % -- need codes to generate non-convex obstacles randomly
@@ -74,30 +103,20 @@
 % -- need codes to generate 3D obstacles randomly via Halton set
 % 2025_07_09 - S. Brennan and K. Hayes
 % --  need a tool to check if polytope is convex in 
-%     % fcn_MapGen_fillPolytopeFieldsFromVertices. This is causing some of
+%     % fcn_MapGen_polytopesFillFieldsFromVertices. This is causing some of
 %     % the codes in Bounded_AStar to break
 % 2025_07_11 - Sean Brennan
 % -- in fcn_MapGen_generatePolysFromTiling, seems all arguments are
 %    optional. Need to fix this
-% -- make sure all function calls internal to functions have -1 speed set
-%    % for figure number
-% -- rewrote plotPolytopes using variable input arguments (see plotRoad
-%    % library?). 
-%    % Then, fix call in fcn_MapGen_voronoiTiling to plot both all Voronoi
-%    cells and then all each individual Voronoi cell for each generator,
-%    with colors matched. Be sure to pass out plot handle (not figure
-%    handle) from plotting function. Also be sure to label DisplayName of
-%    plot to allow legends
-% -- rename fcn_MapGen_fillPolytopeFieldsFromVertices to be:
-%    % fcn_MapGen_polytopesFillFromVertices
-% -- rename fcn_MapGen_generateOneRandomPolytope to be:
-%    % fcn_MapGen_polytopeGenerateOneRandomPoly
 % -- copy example script out of
-%    % fcn_MapGen_generatePolysFromVoronoiAABBWithTiling into here!
-% -- rewrite fcn_MapGen_increasePolytopeVertexCount to use linspace between
+%    % fcn_MapGen_generatePolysFromVoronoiAABBWithTiling into this main
+%    % demo
+% -- rewrite fcn_MapGen_polytopesIncreaseVertexCount to use linspace between
 %    % X and Y vertices rather than interpolation. MUCH simpler.
 % -- rework fcn_MapGen_polytopesPredictLengthCostRatio - code is very messy
-% FIX case 20005 in fcn_MapGen_cropPolytopeToRange
+% -- need to finish script_test_fcn_MapGen_AABBprojectVectorTo
+% -- figure out difference between fcn_MapGen_generatePolysFromTiling and
+%    % fcn_MapGen_generatePolysFromVoronoiAABB - they look the same
 
 clear library_name library_folders library_url
 
@@ -195,12 +214,14 @@ disp('Welcome to the MapGen library!')
 %                   __/ |                       __/ |        | |               | |                                         
 %                  |___/                       |___/         |_|               |_|                                         
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Single polytope operations are functions that usually start with
+% "polytope"
 
 %% Show how to check if points are within an Axis-Aligned Bounding Box
 AABB = [0 0 1 1]; % Define the axis-aligned bounding box
 test_points = randn(100,2);
 fig_num = 1;
-isInside = fcn_MapGen_isWithinABBB(AABB,test_points,fig_num);
+isInside = fcn_MapGen_AABBisWithin(AABB,test_points,fig_num);
 
 %% Show how to plot a polytope
 clear polytopes
@@ -240,7 +261,7 @@ plot(Centroid(:,1),Centroid(:,2),'kx','linewidth',1);
 fig_num = 3;
 clear polytopes
 polytopes(1).vertices = [0 0; 4 2; 2 4; 0 0];
-polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes,fig_num);
+polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes,fig_num);
 assert(isequal(round(polytopes(1).max_radius,4),2.8284));
 
 
@@ -1070,7 +1091,7 @@ fig_num = 7;
 %% Show how to expand one polytope
 fig_num = 8;
 
-one_polytope = fcn_MapGen_generateOneRandomPolytope;
+one_polytope = fcn_MapGen_polytopeGenerateOneRandomPoly;
 exp_polytopes=fcn_MapGen_polytopesExpandEvenly(one_polytope,exp_dist,fig_num); %#ok<NASGU>
 
 %% Show how to expand many polytopes
@@ -1143,7 +1164,7 @@ error_polytopes = shrunk_polytopes2; % Initialize the structure
 for ii=1:length(shrunk_polytopes2)
     error_polytopes(ii).vertices = [err(ii).circ_x(err(ii).bubble)', err(ii).circ_y(err(ii).bubble)'];
 end
-error_polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(error_polytopes);
+error_polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(error_polytopes);
 
 %verify
 h_fig = figure('name','UGV Positioning Bubbles');

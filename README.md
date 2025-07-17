@@ -47,10 +47,10 @@ The class library for functions to generate new maps, started from Seth Tau's or
             <ul>
                 <li><a href="#single-polytope-functions">Single Polytope Functions</li>
                 <ul>
-                    <li><a href="#fcn_mapgen_iswithinaabb">fcn_MapGen_isWithinABBB - a method to test if points are within an AABB</li>
+                    <li><a href="#fcn_mapgen_aabbiswithin">fcn_MapGen_AABBisWithin - a method to test if points are within an AABB</li>
                     <li><a href="#fcn_mapgen_plotpolytopes">fcn_MapGen_plotPolytopes - a method to plot polytope arrays</li>
                     <li><a href="#fcn_mapgen_polytopecentroidandarea">fcn_MapGen_polytopeCentroidAndArea - calculates polytope centroid and area from vertices</li>
-                    <li><a href="#fcn_mapgen_fillpolytopefieldsfromvertices">fcn_MapGen_fillPolytopeFieldsFromVertices - calculates polytope properties from vertices</li>
+                    <li><a href="#fcn_MapGen_polytopefillfieldsfromvertices">fcn_MapGen_polytopesFillFieldsFromVertices - calculates polytope properties from vertices</li>
                 </ul>
                 <li><a href="#polytope-field-generation-functions">Polytope Field Generation Functions</li>
                 <ul>
@@ -209,9 +209,9 @@ will give the following figure
 <a href="#pathplanning_maptools_mapgenclasslibrary">Back to top</a>
 ***
 
-#### fcn_MapGen_fillPolytopeFieldsFromVertices
+#### fcn_MapGen_polytopesFillFieldsFromVertices
 
-The function  **fcn_MapGen_fillPolytopeFieldsFromVertices** fills in all fields of a polytope given the vertices.
+The function  **fcn_MapGen_polytopesFillFieldsFromVertices** fills in all fields of a polytope given the vertices.
 
 For example:
 
@@ -220,7 +220,7 @@ fig_num = 3; % Define the figure number
 clear polytopes % Clear the variable
 polytopes(1).vertices = [0 0; 4 2; 2 4; 0 0]; % Fill in the verticies
 % Call the function to fill in all other fields
-polytopes = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes,fig_num);
+polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes,fig_num);
 % Show that a new field now exists
 assert(isequal(round(polytopes(1).max_radius,4),2.8284));
 ```
@@ -434,9 +434,9 @@ Or many polytopes:
 #### Basic Support Functions
 
 
-`fcn_MapGen_increasePolytopeVertexCount.m` : Some path planners may be restricted to navigating to points that are polytope vertices.  To provide a field that gives these planners higher resolution paths, it may be desirable to have colinear vertices on polytope sides.  This function accomplishes that.
+`fcn_MapGen_polytopesIncreaseVertexCount.m` : Some path planners may be restricted to navigating to points that are polytope vertices.  To provide a field that gives these planners higher resolution paths, it may be desirable to have colinear vertices on polytope sides.  This function accomplishes that.
 
-<img src=".\Images\fcn_MapGen_increasePolytopeVertexCount.png " alt="vertex interpolation example">
+<img src=".\Images\fcn_MapGen_polytopesIncreaseVertexCount.png " alt="vertex interpolation example">
 
 `fcn_MapGen_polytopesPredictLengthCostRatio.m` : This is an example of a map analysis tool.  Given a field of polytopes, without planning a path, this will approximate the typical distance cost-to-go for that field.  As expected, this increases with denser fields and larger obstacles.
 
@@ -497,7 +497,7 @@ Example non-convex and non-overlapping triangular polytopes:
 
 #### Core Functions
 
-`fcn_MapGen_fillPolytopeFieldsFromVertices.m` : This is the core function for this repo that creates a polytope struct from an input set of vertices.  An example of the fields in this struct is shown below:
+`fcn_MapGen_polytopesFillFieldsFromVertices.m` : This is the core function for this repo that creates a polytope struct from an input set of vertices.  An example of the fields in this struct is shown below:
 
 ```matlab
        vertices: [4×2 double]

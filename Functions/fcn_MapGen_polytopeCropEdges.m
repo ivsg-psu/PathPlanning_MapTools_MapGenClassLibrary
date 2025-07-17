@@ -1,12 +1,10 @@
-function [trimmedPolytopes] = ...
-    fcn_MapGen_polytopeCropEdges(polytopes,boundingBox,varargin)
+function trimmedPolytopes = fcn_MapGen_polytopeCropEdges(polytopes, boundingBox, varargin)
 % fcn_MapGen_polytopeCropEdges removes polytopes that extend
 % beyond the boundaries specified
 %
 % FORMAT:
 %
-% [trimmedPolytopes] = ...
-%     fcn_MapGen_polytopeCropEdges(polytopes,boundingBox,(fig_num))
+% trimmedPolytopes = fcn_MapGen_polytopeCropEdges( polytopes, boundingBox, (fig_num))
 %
 % INPUTS:
 %
@@ -18,10 +16,9 @@ function [trimmedPolytopes] = ...
 %
 %    (OPTIONAL INPUTS)
 %
-%      fig_num: a figure number to plot results. If set to -1, skips any
-%      input checking or debugging, no figures will be generated, and sets
-%      up code to maximize speed.
-%
+%     fig_num: a figure number to plot results. If set to -1, skips any
+%     input checking or debugging, no figures will be generated, and sets
+%     up code to maximize speed.
 %
 % OUTPUTS:
 %
@@ -42,25 +39,7 @@ function [trimmedPolytopes] = ...
 %
 % EXAMPLES:
 %
-%   % generate Voronoi tiling from Halton points
-%     seedGeneratorNames = 'haltonset';
-%     seedGeneratorRanges = [1 1000];
-%     AABBs = [0 0 1 1];
-%     mapStretchs = [1 1];
-%     [polytopes] = fcn_MapGen_voronoiTiling(...
-%         seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
-%         seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
-%         (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
-%         (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
-%         (-1));
-%     
-%   fig = fcn_plot_polytopes(polytopes,[],'b',2,[0 1 0 1]);
-%
-%   boundingBox = [0,1; 0,1];
-%   trimmedPolytopes = fcn_MapGen_polytopeCropEdges(polytopes,boundingBox);
-%   fcn_plot_polytopes(trimmedPolytopes,fig,'g',2,[0 1 0 1]);
-%
-% For additional examples, see: script_test_fcn_MapGen_polytopeCropEdges
+% For examples, see: script_test_fcn_MapGen_polytopeCropEdges
 %
 % This function was written on 2019_06_13 by Seth Tau
 % Questions or comments? sat5340@psu.edu
@@ -75,24 +54,28 @@ function [trimmedPolytopes] = ...
 % 2025_04_25 by Sean Brennan
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-
+% 2025_07_17 by Sean Brennan
+% -- standardized Debugging and Input checks area, Inputs area
+% -- made codes use MAX_NARGIN definition at top of code, narginchk
+% -- made plotting flag_do_plots and code consistent across all functions
 
 % TO DO
-% -- Vectorize the for loop if possible
+% -- vectorize the for loop if possible
 
 %% Debugging and Input checks
 
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 3; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==3 && isequal(varargin{end},-1))
-    flag_do_debug = 0;     %    Flag to plot the results for debugging
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
 else
     % Check to see if we are externally setting debug mode to be "on"
-    flag_do_debug = 0;     %    Flag to plot the results for debugging
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 1; % Flag to perform input checking
     MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_MAPGEN_FLAG_CHECK_INPUTS");
     MATLABFLAG_MAPGEN_FLAG_DO_DEBUG = getenv("MATLABFLAG_MAPGEN_FLAG_DO_DEBUG");
@@ -108,9 +91,8 @@ if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
     debug_fig_num = 999978; %#ok<NASGU>
-else
-    debug_fig_num = []; %#ok<NASGU>
 end
+
 
 %% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -124,40 +106,32 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 if (0==flag_max_speed)
-    if flag_check_inputs
+    if 1 == flag_check_inputs
+
         % Are there the right number of inputs?
-        if nargin < 2 || nargin > 3
-            error('Incorrect number of input arguments')
-        end
+        narginchk(2,MAX_NARGIN);
 
         % Check the polytopes input
-        fcn_DebugTools_checkInputsToFunctions(...
-            polytopes, 'polytopes');
+        fcn_DebugTools_checkInputsToFunctions(polytopes, 'polytopes');
 
-        % Check the boundingBox input
-        fcn_DebugTools_checkInputsToFunctions(...
-            boundingBox, '2column_of_numbers',2);
+        % Check the boundingBox input, is it 2x2?
+        fcn_DebugTools_checkInputsToFunctions(boundingBox, '2column_of_numbers',2);
 
     end
 end
 
 % Does user want to show the plots?
-flag_do_plot = 0; % Default is no plotting
-if  3 == nargin && (0==flag_max_speed) % Only create a figure if NOT maximizing speed
-    temp = varargin{end}; % Last argument is always figure number
-    if ~isempty(temp) % Make sure the user is not giving empty input
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
+    temp = varargin{end};
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
-        flag_do_plot = 1; % Set flag to do plotting
-    end
-else
-    if flag_do_debug % If in debug mode, do plotting but to an arbitrary figure number
-        fig = figure;
-        fig_for_debug = fig.Number; %#ok<NASGU>
-        flag_do_plot = 1;
+        figure(fig_num);
+        flag_do_plots = 1;
     end
 end
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   __  __       _
@@ -210,7 +184,7 @@ trimmedPolytopes = trimmedPolytopes(1:keep); % Save only the ones that were fill
 %                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-if flag_do_plot
+if flag_do_plots
     figure(fig_num);
     hold on
 
