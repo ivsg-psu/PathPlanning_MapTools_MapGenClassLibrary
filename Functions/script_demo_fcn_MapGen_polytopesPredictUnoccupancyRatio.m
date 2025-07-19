@@ -28,7 +28,7 @@ seedGeneratorNames = 'haltonset';
 seedGeneratorRanges = [1 4000];
 AABBs = [0 0 1 1];
 mapStretchs = [1 1];
-[polytopes] = fcn_MapGen_voronoiTiling(...
+[polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
@@ -39,7 +39,7 @@ mapStretchs = [1 1];
 fig_num = 1;
 bounding_box = [0,0; 1,1];
 trim_polytopes = fcn_MapGen_polytopeCropEdges(polytopes,bounding_box,fig_num);
-pre_shrink_stats = fcn_MapGen_polytopesStatistics(trim_polytopes);
+pre_shrink_stats = fcn_MapGen_statsPolytopes(trim_polytopes, -1);
 R_bar_initial = pre_shrink_stats.average_max_radius;
 des_gap_size_all = [];
 r_occ_meas_all = [];
@@ -63,9 +63,9 @@ for i = linspace(0.001,0.08,2)
     shrunk_polytopes=...
         fcn_MapGen_polytopesShrinkFromEdges(...
         trim_polytopes,des_gap_size);
-    field_stats = fcn_MapGen_polytopesStatistics(shrunk_polytopes);
+    field_stats = fcn_MapGen_statsPolytopes(shrunk_polytopes, -1);
     lambda = field_stats.linear_density_mean;
-    unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(trim_polytopes,shrunk_polytopes,des_gap_size);
+    unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(trim_polytopes,shrunk_polytopes,des_gap_size, -1);
     r_unocc_meas = unocc_ests.A_unocc_meas;
     r_occ_meas = 1-r_unocc_meas; % calculated occupancy ratio
     des_gap_size_all = [des_gap_size_all; des_gap_size];

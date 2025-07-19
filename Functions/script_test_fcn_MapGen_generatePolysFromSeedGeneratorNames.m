@@ -1,5 +1,5 @@
-% script_test_fcn_MapGen_voronoiTiling
-% Tests function: fcn_MapGen_voronoiTiling
+% script_test_fcn_MapGen_generatePolysFromSeedGeneratorNames
+% Tests function: fcn_MapGen_generatePolysFromSeedGeneratorNames
 
 % REVISION HISTORY:
 % 2021_06_06
@@ -65,7 +65,7 @@ seedGeneratorRanges{ith_set,1} = set_range;
 AABBs{ith_set,1} = [1 1 2 2];
 mapStretchs{ith_set,1} = mapStretch;
 
-[polytopes] = fcn_MapGen_voronoiTiling(...
+[polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
@@ -144,7 +144,7 @@ seedGeneratorRanges{ith_set,1} = set_range;
 AABBs{ith_set,1} = [0.5 0 0.75 1];
 mapStretchs{ith_set,1} = mapStretch;
 
-[polytopes] = fcn_MapGen_voronoiTiling(...
+[polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
@@ -223,7 +223,7 @@ for ith_generator = 1:Nsets
     mapStretchs{ith_set,1} = mapStretch;
 end
 
-[polytopes] = fcn_MapGen_voronoiTiling(...
+[polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
@@ -338,7 +338,7 @@ seedGeneratorRanges{ith_set,1} = set_range;
 AABBs{ith_set,1} = [1 1 2 2];
 mapStretchs{ith_set,1} = mapStretch;
 
-[polytopes] = fcn_MapGen_voronoiTiling(...
+[polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
@@ -410,7 +410,7 @@ seedGeneratorRanges{ith_set,1} = set_range;
 AABBs{ith_set,1} = [0 0 1 1];
 mapStretchs{ith_set,1} = mapStretch;
 
-[polytopes] = fcn_MapGen_voronoiTiling(...
+[polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
@@ -482,7 +482,7 @@ seedGeneratorRanges{ith_set,1} = set_range;
 AABBs{ith_set,1} = [0 0 1 1];
 mapStretchs{ith_set,1} = mapStretch;
 
-[polytopes] = fcn_MapGen_voronoiTiling(...
+[polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
@@ -552,7 +552,7 @@ seedGeneratorRanges = set_range;
 AABBs = [0 0 1 1];
 mapStretchs = mapStretch;
 
-[polytopes] = fcn_MapGen_voronoiTiling(...
+[polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
@@ -632,7 +632,7 @@ for ith_set = 1:length(allGeneratorTypes)
     figure(fig_num);
     nexttile;
 
-    [polytopes] = fcn_MapGen_voronoiTiling(...
+    [polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
         seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
         seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
         (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
@@ -738,7 +738,7 @@ seedGeneratorRanges{ith_set,1} = set_range;
 AABBs{ith_set,1} = [1 1 2 2];
 mapStretchs{ith_set,1} = mapStretch;
 
-[polytopes] = fcn_MapGen_voronoiTiling(...
+[polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
@@ -821,7 +821,7 @@ seedGeneratorRanges{ith_set,1} = set_range;
 AABBs{ith_set,1} = [1 1 2 2];
 mapStretchs{ith_set,1} = mapStretch;
 
-[polytopes] = fcn_MapGen_voronoiTiling(...
+[polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
@@ -913,7 +913,7 @@ for ith_test = 1:Niterations
     rng(1234);
 
     % Call the function
-    [polytopes] = fcn_MapGen_voronoiTiling(...
+    [polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
         seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
         seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
         (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
@@ -928,7 +928,7 @@ for ith_test = 1:Niterations
     rng(1234);
 
     % Call the function
-    [polytopes] = fcn_MapGen_voronoiTiling(...
+    [polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
         seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
         seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
         (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use

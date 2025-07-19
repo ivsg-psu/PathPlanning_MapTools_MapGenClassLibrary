@@ -1,14 +1,15 @@
 function [convexHullOverlapRatio, areaOverlap, areaOccupied] = ...
-    fcn_MapGen_calculateConvexHullOverlapRatio(polytopes, varargin)
+    fcn_MapGen_statsConvexHullOverlapRatio(polytopes, varargin)
 
-% fcn_MapGen_calculateConvexHullOverlapRatio
-% calculates the convex hull of every obstacle.  The area of the overlap between
-% these hulls relative to the total occupied area
+% fcn_MapGen_statsConvexHullOverlapRatio
+% calculates the convex hull of every obstacle, then uses this to find the
+% area of the overlap between these hulls relative to the total occupied
+% area.
 %
 % FORMAT:
 %
 %     [convexHullOverlapRatio, areaOverlap, areaOccupied] = ...
-%     fcn_MapGen_calculateConvexHullOverlapRatio( polytopes, (fig_num))
+%     fcn_MapGen_statsConvexHullOverlapRatio( polytopes, (fig_num))
 %
 % INPUTS:
 %
@@ -38,7 +39,7 @@ function [convexHullOverlapRatio, areaOverlap, areaOccupied] = ...
 %
 % EXAMPLES:
 %
-% See the script: script_test_fcn_MapGen_calculateConvexHullOverlapRatio
+% See the script: script_test_fcn_MapGen_statsConvexHullOverlapRatio
 % for a full test suite.
 %
 % This function was written 2024_02_23 by Steve Harnett

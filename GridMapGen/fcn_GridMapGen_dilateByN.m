@@ -1,13 +1,21 @@
-function onePolytope = fcn_MapGen_polytopeGenerateOneRandomPoly(varargin)
-% fcn_MapGen_polytopeGenerateOneRandomPoly
-% Generates a single random polytope by selecting one randomly from the 
-% Halton Set Voronoi method (HSV) tiling.
+function dilatedMatrix = fcn_GridMapGen_dilateByN(occupancyMatrix, dilationLevel, varargin)
+% fcn_GridMapGen_dilateByN  dilates a matrix by N cells
+% 
+% given an N-by-M occupancyMatrix, returns an N-by-M dilatedMatrix which is
+% occupancyMatrix dialated by n pixels. 
+% 
+% NOTE: this is NOT true dilation. For true dilation, see the image
+% processing toolbox.
 % 
 % FORMAT:
 % 
-%    onePolytope = fcn_MapGen_polytopeGenerateOneRandomPoly((fig_num))
+%     dilatedMatrix = fcn_GridMapGen_dilateByN(occupancyMatrix, n, (fig_num))
 % 
 % INPUTS:
+% 
+%     occupancyMatrix: N-by-M matrix
+%   
+%     dilationLevel: number of cells (or pixels) to dilate by
 % 
 %     (optional inputs)
 %
@@ -19,38 +27,35 @@ function onePolytope = fcn_MapGen_polytopeGenerateOneRandomPoly(varargin)
 % 
 % OUTPUTS:
 % 
-%     onePolytope: one randomly generated polytope
+%     dilatedMatrix: a matrix where all elements of occupancyMatrix>=1 have
+%     been dilated outward by n pixels
 % 
 % DEPENDENCIES:
 % 
-%     fcn_MapGen_generatePolysFromSeedGeneratorNames
-%     fcn_MapGen_polytopeCropEdges
-%     fcn_MapGen_plotPolytopes
-% 
+%     fcn_DebugTools_checkInputsToFunctions
 % 
 % EXAMPLES:
-% 
-% See the script: script_test_fcn_MapGen_polytopeGenerateOneRandomPoly
+%
+%     occupancyMatrix = rand(100,100)<0.1; % about 10 percent occupied
+%     percentOccupied = fcn_GridMapGen_dilateOccupancyStats(occupancyMatrix*1.0, (28282));
+%     dilationLevel = 1;
+%     
+%     % Call the function
+%     dilatedMatrix = fcn_GridMapGen_dilateByN(occupancyMatrix, dilationLevel, (fig_num));
+%
+% See the script: script_test_fcn_GridMapGen_dilateByN
 % for a full test suite.
 % 
-% This function was written on 2021_06_27 by Sean Brennan
+% This function was written on 2008_10_18 by Sean Brennan
 % Questions or comments? contact sbrennan@psu.edu
 
 % 
 % REVISION HISTORY:
 % 
-% 2021_06_27 by Sean Brennan
+% 2008_10_18 by Sean Brennan
 % -- first write of function
-% 2025_04_25 by Sean Brennan
-% -- added global debugging options
-% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-% -- fixed call to fcn_MapGen_polytopesFillFieldsFromVertices
-% 2025_07_15 by Sean Brennan
-% -- cleaned up variable naming one_polytope --> onePolytope
 % 2025_07_17 by Sean Brennan
-% -- standardized Debugging and Input checks area, Inputs area
-% -- made codes use MAX_NARGIN definition at top of code, narginchk
-% -- made plotting flag_do_plots and code consistent across all functions
+% -- imported into MapGen library with updates to formatting
 
 % TO DO
 % -- none
@@ -60,7 +65,7 @@ function onePolytope = fcn_MapGen_polytopeGenerateOneRandomPoly(varargin)
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
-MAX_NARGIN = 1; % The largest Number of argument inputs to the function
+MAX_NARGIN = 3; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
 if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
@@ -104,8 +109,14 @@ if (0==flag_max_speed)
     if 1 == flag_check_inputs
 
         % Are there the right number of inputs?
-        narginchk(0,MAX_NARGIN);
+        narginchk(2,MAX_NARGIN);
 
+        % Check the occupancyMatrix input, must be [2+ 2+] in size
+        fcn_DebugTools_checkInputsToFunctions(occupancyMatrix*1.0, 'positive_2orMorecolumn_of_numbers',[2 3]);
+
+        % Check the dilationLevel input, must be [1 1] integer
+        fcn_DebugTools_checkInputsToFunctions(dilationLevel, 'positive_1column_of_integers',[1 1]);
+        
     end
 end
 
@@ -120,7 +131,6 @@ if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     end
 end
 
-
 %% Start of main code
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   __  __       _
@@ -132,33 +142,24 @@ end
 %
 %See: http://patorjk.com/software/taag/#p=display&f=Big&t=Main
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
+[n,m] = size(occupancyMatrix);
+dilatedMatrix = occupancyMatrix;
 
-% Set up variables
+multiplier1 = diag(ones(n,1),0) + diag(ones(n-1,1),1) + diag(ones(n-1,1),-1);
+multiplier2 = diag(ones(m,1),0) + diag(ones(m-1,1),1) + diag(ones(m-1,1),-1);
 
-% Generate Voronoi tiling from Halton points
-seedGeneratorNames = 'haltonset';
-seedGeneratorRanges = [1 100];
-AABBs = [0 0 1 1];
-mapStretchs = [1 1];
-[polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
-    seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
-    seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
-    (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
-    (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
-    (-1));
+for i=1:dilationLevel
+    dilatedMatrix = multiplier1*dilatedMatrix*multiplier2;
 
-% NO NEED TO TRIM USING THE CODE BELOW - polytope field is already AABB
-% bounded with new revisions. Delete below once confirm that everything
-% works.
-% bounding_box = [0,0; 1,1];
-% trim_polytopes = fcn_MapGen_polytopeCropEdges(polytopes,bounding_box, -1);
-trim_polytopes = polytopes;
-
-% Pick a random polytope
-Npolys = length(trim_polytopes);
-rand_poly = 1+floor(rand*Npolys);
-onePolytope = trim_polytopes(rand_poly);
-
+    % The following code makes the uppper/lower/right/left walls all
+    % "occupied"
+    if 1==0
+        dilatedMatrix(:,1) = max(max(dilatedMatrix));
+        dilatedMatrix(:,end) = max(max(dilatedMatrix));
+        dilatedMatrix(1,:) = max(max(dilatedMatrix));
+        dilatedMatrix(end,:) = max(max(dilatedMatrix));
+    end
+end
 
 %§
 %% Plot the results (for debugging)?
@@ -173,19 +174,17 @@ onePolytope = trim_polytopes(rand_poly);
 %                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-
 if flag_do_plots
-    % Plot results
-    % fcn_MapGen_OLD_plotPolytopes(onePolytope,fig_num,'-',2,[0.5 0 0])
-    plotFormat.LineWidth = 2;
-    plotFormat.MarkerSize = 10;
-    plotFormat.LineStyle = '-';
-    plotFormat.Color = [0.5 0 0];
-    fillFormat = [];
-    h_plot = fcn_MapGen_plotPolytopes(onePolytope, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
-end % Ends the flag_do_plot if statement    
+    figure(fig_num);
 
+    % Display dialated on top of original by making testOccupancy
+    % pixels have value of 3, dilated have values of 2, 1 otherwise
+    % Then use a colormap to map 3 values to white, 2 to grey, 1 to
+    % white
+    image(2*(occupancyMatrix>0) + 1.0*(dilatedMatrix>0) + 1);
+    colormap([1 1 1;0.5 0.5 0.5;0 0 0])
+    
+end % Ends the flag_do_plot if statement
 
 if flag_do_debug
     fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
@@ -205,4 +204,7 @@ end % Ends the function
 %                                               
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
+
+
+
 

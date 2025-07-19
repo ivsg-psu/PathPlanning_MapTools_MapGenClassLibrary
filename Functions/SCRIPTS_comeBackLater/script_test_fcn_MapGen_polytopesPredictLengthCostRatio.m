@@ -11,7 +11,7 @@ seedGeneratorNames = 'haltonset';
 seedGeneratorRanges = [1 10];
 AABBs = [0 0 1 1];
 mapStretchs = [1 1];
-[tiled_polytopes] = fcn_MapGen_voronoiTiling(...
+[tiled_polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use

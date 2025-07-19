@@ -144,7 +144,7 @@ else
     % min of diff between all points /2 so at least every side is cut in half
     distances = diff([[polytopes.xv]',[polytopes.yv]']);
     min_distance_between_verts = min(sqrt(sum(distances.*distances,2)));
-    % poly_map_stats = fcn_MapGen_polytopesStatistics(polytopes);
+    % poly_map_stats = fcn_MapGen_statsPolytopes(polytopes);
     % % want to ensure that a side with length of 2 std dev below mean is still interpolated at least in half
     % resolution = (poly_map_stats.average_side_length - 2*poly_map_stats.std_side_length)/2;
     resolution = min_distance_between_verts/2;

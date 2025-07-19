@@ -1,15 +1,15 @@
-function [polytopes,fig]=fcn_MapGen_nameToMap(...
+function [polytopes,fig]=fcn_MapGen_generatePolysFromName(...
     map_name,...
     plot_flag,...
     disp_name,...
     varargin)
-% fcn_MapGen_nameToMap generates a map based on 
+% fcn_MapGen_generatePolysFromName generates a map based on 
 % map_name which specifies the map characteristics in a way that allows map
 % to be recreated exactly from the name alone.
 %
 % FORMAT:
 %
-% [polytopes,fig]=fcn_MapGen_nameToMap(...
+% [polytopes,fig]=fcn_MapGen_generatePolysFromName(...
 %     map_name,...
 %     plot_flag,...
 %     disp_name,...
@@ -100,7 +100,7 @@ function [polytopes,fig]=fcn_MapGen_nameToMap(...
 % DEPENDENCIES:
 %
 %      fcn_DebugTools_checkInputsToFunctions
-%      fcn_MapGen_voronoiTiling
+%      fcn_MapGen_generatePolysFromSeedGeneratorNames
 %      fcn_MapGen_polytopeCropEdges
 %      fcn_MapGen_polytopesShrinkToRadius
 %      fcn_MapGen_plotPolytopes
@@ -111,7 +111,7 @@ function [polytopes,fig]=fcn_MapGen_nameToMap(...
 %   map_name = "HST 1 100 SQT 0 1 0 1 SMV 0.01 0.001 1e-6 1111"; 
 %   plot_flag = 1; disp_name = 0; fig_num = []; line_style = 'r-'; 
 %   line_width = 2;
-%   [polytopes,fig]=fcn_MapGen_nameToMap(map_name,plot_flag,disp_name,fig_num,line_style,line_width);
+%   [polytopes,fig]=fcn_MapGen_generatePolysFromName(map_name,plot_flag,disp_name,fig_num,line_style,line_width);
 %   
 % Advanced Example
 %   map_name = "HST 30 450 SQT 0 1 0 1 SMV 0.02 0.005 1e-6 1234";
@@ -119,10 +119,10 @@ function [polytopes,fig]=fcn_MapGen_nameToMap(...
 %   fig_num = 999; line_style = '-'; line_width = 2; color = [0 0 1]; 
 %   axis_limits = [0 1 -0.1 1]; axis_style = 'square'; 
 %   fill_info = [1 1 0 1 0.5];
-%   [polytopes,fig]=fcn_MapGen_nameToMap(map_name,plot_flag,disp_name,fig_num,line_style,line_width,color,axis_limits,axis_style,fill_info);
+%   [polytopes,fig]=fcn_MapGen_generatePolysFromName(map_name,plot_flag,disp_name,fig_num,line_style,line_width,color,axis_limits,axis_style,fill_info);
 % 
 % 
-% See the script: script_test_fcn_MapGen_nameToMap
+% See the script: script_test_fcn_MapGen_generatePolysFromName
 % for a full test suite.
 %
 % This function was written on 2020_07_02 by Seth Tau
@@ -250,7 +250,7 @@ if sum(split_name=="HST")>0 % Check for Halton Set Tiling (HST)
     seedGeneratorRanges = halton_range;
     AABBs = [0 0 1 1];
     mapStretchs = [1 1];
-    [base_polytopes] = fcn_MapGen_voronoiTiling(...
+    [base_polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
         seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
         seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
         (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use

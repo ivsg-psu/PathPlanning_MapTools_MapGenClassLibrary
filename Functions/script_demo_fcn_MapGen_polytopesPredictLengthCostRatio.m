@@ -83,7 +83,7 @@ for tiles=100 % a range can be input here to do fields with different numbers of
                 seedGeneratorRanges = Halton_range;
                 AABBs = [0 0 1 1];
                 mapStretchs = [1 1];
-                [tiled_polytopes] = fcn_MapGen_voronoiTiling(...
+                [tiled_polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
                     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
                     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
                     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
@@ -95,13 +95,14 @@ for tiles=100 % a range can be input here to do fields with different numbers of
                 % TODO switch this to side shrinking to get gap distance as an output so it can be given to predictor as input
                 % shrinking may fail but should just result in a discarded data point
                 try
-                    [shrunk_field,mu_final,sigma_final] = fcn_MapGen_polytopesShrinkToRadius(tiled_polytopes,des_rad,sigma_radius,min_rad);%,fig_num);
+                    [shrunk_field,mu_final,sigma_final] = fcn_MapGen_polytopesShrinkToRadius(tiled_polytopes,des_rad,sigma_radius,min_rad, -1);
                 catch
                     fprintf("point for radii goals:%f didn't work",radii_goals);
+                    error
                 end
-                field_stats = fcn_MapGen_polytopesStatistics(shrunk_field);
+                field_stats = fcn_MapGen_statsPolytopes(shrunk_field, -1);
                 field_avg_r_D = field_stats.avg_r_D;
-                field_stats_pre_shrink = fcn_MapGen_polytopesStatistics(tiled_polytopes);
+                field_stats_pre_shrink = fcn_MapGen_statsPolytopes(tiled_polytopes, -1);
                 field_avg_r_D_pre_shrink = field_stats_pre_shrink.avg_r_D;
                 R_bar_initial = field_stats_pre_shrink.average_max_radius;
                 avg_max_rad = field_stats.average_max_radius;
@@ -114,10 +115,11 @@ for tiles=100 % a range can be input here to do fields with different numbers of
                 % prediction may fail but should just result in a discarded data point
                 try
                     [field_small_choice_angles,field_big_choice_angles,r_lc_estimates] = ...
-                        fcn_MapGen_polytopesPredictLengthCostRatio(tiled_polytopes,shrunk_field,gap_size,travel_direction,L_E)
+                        fcn_MapGen_polytopesPredictLengthCostRatio(tiled_polytopes,shrunk_field,gap_size,travel_direction,L_E, -1);
                 catch
                     radii_goals_failed = [radii_goals_failed, radii_goals];
                     fprintf("point for radii goals:%f didn't work",radii_goals);
+                    error;
                 end
                 % store outputs for this particular map
                 r_lc_sparse_worst_this_map = [r_lc_sparse_worst_this_map, r_lc_estimates.r_lc_sparse_worst];

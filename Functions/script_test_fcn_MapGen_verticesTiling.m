@@ -1,5 +1,5 @@
-% script_test_fcn_MapGen_tilePoints
-% Tests function: fcn_MapGen_tilePoints
+% script_test_fcn_MapGen_verticesTiling
+% Tests function: fcn_MapGen_verticesTiling
 
 % REVISION HISTORY:
 % 2023_02_24
@@ -40,7 +40,7 @@ AABB = [0 0 2 2];
 inputPoints = 2*rand(Npoints,2);
 
 % Call the function
-[tiledPoints] = fcn_MapGen_tilePoints(inputPoints, tileDepth, AABB, (fig_num));
+[tiledPoints] = fcn_MapGen_verticesTiling(inputPoints, tileDepth, AABB, (fig_num));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -70,7 +70,7 @@ AABB = [0 0 2 2];
 inputPoints = 0.5*randn(Npoints,2)+[7,0] + 1;
 
 % Call the function
-[tiledPoints] = fcn_MapGen_tilePoints(inputPoints, tileDepth, AABB, (fig_num));
+[tiledPoints] = fcn_MapGen_verticesTiling(inputPoints, tileDepth, AABB, (fig_num));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -100,7 +100,7 @@ AABB = [0 0 5 5];
 inputPoints = 0.5*randn(Npoints,2)+1;
 
 % Call the function
-[tiledPoints] = fcn_MapGen_tilePoints(inputPoints, tileDepth, AABB, (fig_num));
+[tiledPoints] = fcn_MapGen_verticesTiling(inputPoints, tileDepth, AABB, (fig_num));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -130,7 +130,7 @@ AABB = [0 0 2 2]- 7;
 inputPoints = 0.5*randn(Npoints,2) + 1;
 
 % Call the function
-[tiledPoints] = fcn_MapGen_tilePoints(inputPoints, tileDepth, AABB, (fig_num));
+[tiledPoints] = fcn_MapGen_verticesTiling(inputPoints, tileDepth, AABB, (fig_num));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -160,7 +160,7 @@ AABB = [0 0 2 2];
 inputPoints = 2*rand(Npoints,2);
 
 % Call the function
-[tiledPoints] = fcn_MapGen_tilePoints(inputPoints, tileDepth, AABB, (fig_num));
+[tiledPoints] = fcn_MapGen_verticesTiling(inputPoints, tileDepth, AABB, (fig_num));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -191,7 +191,7 @@ AABB = [0 0 2 2];
 inputPoints = 2*rand(Npoints,2);
 
 % Call the function
-[tiledPoints] = fcn_MapGen_tilePoints(inputPoints, tileDepth, AABB, (fig_num));
+[tiledPoints] = fcn_MapGen_verticesTiling(inputPoints, tileDepth, AABB, (fig_num));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -265,7 +265,7 @@ AABB = [0 0 2 2];
 inputPoints = 2*rand(Npoints,2);
 
 % Call the function
-[tiledPoints] = fcn_MapGen_tilePoints(inputPoints, tileDepth, AABB, ([]));
+[tiledPoints] = fcn_MapGen_verticesTiling(inputPoints, tileDepth, AABB, ([]));
 
 % Check variable types
 assert(isnumeric(tiledPoints));
@@ -294,7 +294,7 @@ AABB = [0 0 2 2];
 inputPoints = 2*rand(Npoints,2);
 
 % Call the function
-[tiledPoints] = fcn_MapGen_tilePoints(inputPoints, tileDepth, AABB, (-1));
+[tiledPoints] = fcn_MapGen_verticesTiling(inputPoints, tileDepth, AABB, (-1));
 
 % Check variable types
 assert(isnumeric(tiledPoints));
@@ -329,7 +329,7 @@ Niterations = 10;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [tiledPoints] = fcn_MapGen_tilePoints(inputPoints, tileDepth, AABB, ([]));
+    [tiledPoints] = fcn_MapGen_verticesTiling(inputPoints, tileDepth, AABB, ([]));
 end
 slow_method = toc;
 
@@ -337,7 +337,7 @@ slow_method = toc;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [tiledPoints] = fcn_MapGen_tilePoints(inputPoints, tileDepth, AABB, (-1));
+    [tiledPoints] = fcn_MapGen_verticesTiling(inputPoints, tileDepth, AABB, (-1));
 end
 fast_method = toc;
 
@@ -386,57 +386,57 @@ if 1==0 % Fail cases
     %% Input incorrect, wrong number of argument
     inputPoints = rand(10,1);
     tileDepth = 2;
-    fcn_MapGen_tilePoints(inputPoints,tileDepth);
+    fcn_MapGen_verticesTiling(inputPoints,tileDepth);
 
     %% Input incorrect, wrong number of arguments
     
     inputPoints = rand(10,1);
     tileDepth = 2;
     AABB = [0 0 1 1];
-    fcn_MapGen_tilePoints(inputPoints,tileDepth,AABB,3,4);
+    fcn_MapGen_verticesTiling(inputPoints,tileDepth,AABB,3,4);
 
     %% Input incorrect for inputPoints, only 1 column
     
     inputPoints = rand(10,1);
     tileDepth = 2;
     AABB = [0 0 1 1];
-    fcn_MapGen_tilePoints(inputPoints,tileDepth,AABB);
+    fcn_MapGen_verticesTiling(inputPoints,tileDepth,AABB);
     %% Input incorrect for inputPoints, 3 column
     
     inputPoints = rand(10,1);
     tileDepth = 2;
     AABB = [0 0 1 1];
-    fcn_MapGen_tilePoints(inputPoints,tileDepth,AABB);
+    fcn_MapGen_verticesTiling(inputPoints,tileDepth,AABB);
     %% Input incorrect for tileDepth, not strictly positive
     
     inputPoints = rand(10,2);
     tileDepth = 0;
     AABB = [0 0 1 1];
-    fcn_MapGen_tilePoints(inputPoints,tileDepth,AABB);
+    fcn_MapGen_verticesTiling(inputPoints,tileDepth,AABB);
     %% Input incorrect for tileDepth, not an integer
     
     inputPoints = rand(10,2);
     tileDepth = 1.2;
     AABB = [0 0 1 1];
-    fcn_MapGen_tilePoints(inputPoints,tileDepth,AABB);
+    fcn_MapGen_verticesTiling(inputPoints,tileDepth,AABB);
     %% Input incorrect for AABB, not an 4x1
     
     inputPoints = rand(10,2);
     tileDepth = 1;
     AABB = [0 0 1];
-    fcn_MapGen_tilePoints(inputPoints,tileDepth,AABB);
+    fcn_MapGen_verticesTiling(inputPoints,tileDepth,AABB);
     %% Input incorrect for AABB, not an 4x1
     
     inputPoints = rand(10,2);
     tileDepth = 1;
     AABB = [0 0 1 1 1];
-    fcn_MapGen_tilePoints(inputPoints,tileDepth,AABB);
+    fcn_MapGen_verticesTiling(inputPoints,tileDepth,AABB);
     %% Input incorrect for AABB, not an 4x1
     
     inputPoints = rand(10,2);
     tileDepth = 1;
     AABB = [0 0 1 1; 0 0 0 0];
-    fcn_MapGen_tilePoints(inputPoints,tileDepth,AABB);
+    fcn_MapGen_verticesTiling(inputPoints,tileDepth,AABB);
 end
 
 

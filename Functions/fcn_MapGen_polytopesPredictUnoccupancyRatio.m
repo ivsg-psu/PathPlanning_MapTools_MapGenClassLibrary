@@ -29,7 +29,7 @@ function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(...
 % DEPENDENCIES:
 %
 %     fcn_MapGen_polytopeFindVertexAngles
-%     fcn_MapGen_polytopesStatistics
+%     fcn_MapGen_statsPolytopes
 %     fcn_MapGen_polytopesRadiusDistributions
 %
 % EXAMPLES:
@@ -135,10 +135,10 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
 %% extract necessary stats from polytopes
-pre_shrink_stats = fcn_MapGen_polytopesStatistics(pre_shrink_polytopes);
+pre_shrink_stats = fcn_MapGen_statsPolytopes(pre_shrink_polytopes, -1);
 total_area = pre_shrink_stats.total_area;
 R_bar_initial = pre_shrink_stats.average_max_radius;
-field_stats = fcn_MapGen_polytopesStatistics(polytopes);
+field_stats = fcn_MapGen_statsPolytopes(polytopes, -1);
 field_avg_r_D = field_stats.avg_r_D;
 occ_area = field_stats.occupied_area;
 r_occ_meas = occ_area/total_area; % calculated occupancy ratio

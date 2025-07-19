@@ -15,7 +15,7 @@
 % the function: fcn_MapGen_mixedSetVoronoiTiling
 % 2021_07_12
 % -- Added ability to determine generic map statistics via the function:
-% fcn_MapGen_polytopesStatistics
+% fcn_MapGen_statsPolytopes
 % 2023_01_15
 % -- Added demo of edge-based shrinking
 % 2023_02_20
@@ -54,7 +54,7 @@
 %    % fcn_MapGen_latinVoronoiTiling
 %    % (etc)
 %    % Merged these to use fcn_MapGen_mixedSetVoronoiTiling and renamed
-%    % this to fcn_MapGen_voronoiTiling. Created output from voronoiTiling
+%    % this to fcn_MapGen_generatePolysFromSeedGeneratorNames. Created output from voronoiTiling
 %    % that preserves the polytopes and seedPoints for each generator
 %    % function
 % -- Fixed a bug where corners of AABBs are not being tiled in voronoiTiling
@@ -66,7 +66,7 @@
 %    % inpolytope instead
 % -- rewrote plotPolytopes using variable input arguments (see plotRoad
 %    % library) to allow arbitrary formatting. Deprecated old version.
-% -- added option in fcn_MapGen_voronoiTiling to plot both all Voronoi
+% -- added option in fcn_MapGen_generatePolysFromSeedGeneratorNames to plot both all Voronoi
 %    cells and then all each individual Voronoi cell for each generator,
 %    with colors matched. 
 % -- fixed bugs in fcn_MapGen_verticesCropToAABB where infinite vertices
@@ -88,9 +88,20 @@
 %    % fcn_MapGen_cropPolytopeToRange to fcn_MapGen_verticesCropToAABB
 %    % fcn_MapGen_cropVerticesByWallIntersections to fcn_MapGen_verticesCropToWallIntersections
 %    % fcn_MapGen_removeInfiniteVertices to fcn_MapGen_verticesRemoveInfinite
+% 2025_07_17 by Sean Brennan
+% -- renamed more vertices functions:
+%    % fcn_MapGen_tilePoints to fcn_MapGen_verticesTiling
+% -- renamed stats functions:
+%    % fcn_MapGen_calculateConvexHullOverlapRatio to fcn_MapGen_statsConvexHullOverlapRatio
+%    % fcn_MapGen_polytopesStatistics to fcn_MapGen_statsPolytopes
+% -- renamed polytopes function:
+%    % fcn_MapGen_flattenPolytopeMap to fcn_MapGen_polytopesFlattenMap
+% -- renamed generator functions:
+%    % fcn_MapGen_voronoiTiling to fcn_MapGen_generatePolysFromSeedGeneratorNames
+%    % fcn_MapGen_nameToMap to fcn_MapGen_generatePolysFromName
 
 % TO-DO:
-% -- add functions that, given a map, give core statistics including:
+% -- Modify statPoly code to give core statistics including:
 %    % look out limit, 
 %    % linear density, etc
 %    % basically make function to calculate all the pi-values and 
@@ -108,15 +119,18 @@
 % 2025_07_11 - Sean Brennan
 % -- in fcn_MapGen_generatePolysFromTiling, seems all arguments are
 %    optional. Need to fix this
-% -- copy example script out of
-%    % fcn_MapGen_generatePolysFromVoronoiAABBWithTiling into this main
-%    % demo
+% -- compare example script out of
+%    % fcn_MapGen_generatePolysFromVoronoiAABBWithTiling to code in this main
+%    % demo. remove the code if not being used anymore.
 % -- rewrite fcn_MapGen_polytopesIncreaseVertexCount to use linspace between
 %    % X and Y vertices rather than interpolation. MUCH simpler.
 % -- rework fcn_MapGen_polytopesPredictLengthCostRatio - code is very messy
 % -- need to finish script_test_fcn_MapGen_AABBprojectVectorTo
 % -- figure out difference between fcn_MapGen_generatePolysFromTiling and
 %    % fcn_MapGen_generatePolysFromVoronoiAABB - they look the same
+% 2025_07_18 - S. Brennan
+% -- Added GridMapGen tools including:
+%    % --- fcn_GridMapGen_dilationOccupancyStats: calcs occupancy stats
 
 clear library_name library_folders library_url
 
@@ -155,7 +169,7 @@ end
 
 %% Do we need to set up the work space?
 if ~exist('flag_MapGen_Folders_Initialized','var')
-    this_project_folders = {'Functions','testFixtures','Data'}; % {'Functions','Data'};
+    this_project_folders = {'Functions','testFixtures','Data', 'GridMapGen'}; % {'Functions','Data'};
     fcn_INTERNAL_initializeUtilities(library_name,library_folders,library_url,this_project_folders);  
     flag_MapGen_Folders_Initialized = 1;
 end
@@ -825,7 +839,7 @@ seedGeneratorNames = 'sobolset';
 seedGeneratorRanges = [1 Numpoints];
 AABBs = [0 0 1 1];
 mapStretchs = [1 1];
-[~] = fcn_MapGen_voronoiTiling(...
+[~] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
@@ -841,7 +855,7 @@ seedGeneratorNames = 'haltonset';
 seedGeneratorRanges = [1 Numpoints];
 AABBs = [0 0 1 1];
 mapStretchs = [1 1];
-[~] = fcn_MapGen_voronoiTiling(...
+[~] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
@@ -858,7 +872,7 @@ seedGeneratorNames = 'latin';
 seedGeneratorRanges = [1 Numpoints];
 AABBs = [0 0 1 1];
 mapStretchs = [1 1];
-[~] = fcn_MapGen_voronoiTiling(...
+[~] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
@@ -874,7 +888,7 @@ seedGeneratorNames = 'randn';
 seedGeneratorRanges = [1 Numpoints];
 AABBs = [0 0 1 1];
 mapStretchs = [1 1];
-[~] = fcn_MapGen_voronoiTiling(...
+[~] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
@@ -890,7 +904,7 @@ seedGeneratorNames = 'rand';
 seedGeneratorRanges = [1 Numpoints];
 AABBs = [0 0 1 1];
 mapStretchs = [1 1];
-[~] = fcn_MapGen_voronoiTiling(...
+[~] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
@@ -930,7 +944,7 @@ for i=1:100:500
     seedGeneratorRanges = [i i+100];
     AABBs = [0 0 1 1];
     mapStretchs = [1 1];
-    [~] = fcn_MapGen_voronoiTiling(...
+    [~] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
         seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
         seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
         (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
@@ -940,7 +954,7 @@ for i=1:100:500
     % Do statistics, checking that the area is always fully filled and we
     % get 101 polytopes each time
 
-    % temp = fcn_MapGen_polytopesStatistics(...
+    % temp = fcn_MapGen_statsPolytopes(...
     % polytopes);
     % title(sprintf('Halton range is: [%.0d %.0d]',i,i+100));
     % assert(abs(temp.unoccupancy_ratio)<(1000*eps));
@@ -957,7 +971,7 @@ seedGeneratorNames = 'haltonset';
 seedGeneratorRanges = [5401 5501];
 AABBs = [0 0 1 1];
 mapStretchs = [1 1];
-[tiled_polytopes] = fcn_MapGen_voronoiTiling(...
+[tiled_polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
@@ -966,7 +980,7 @@ mapStretchs = [1 1];
 
 
 fig_num = 32;
-fcn_MapGen_polytopesStatistics(...
+fcn_MapGen_statsPolytopes(...
     tiled_polytopes,...
     fig_num);
 
@@ -999,7 +1013,7 @@ seedGeneratorNames = 'haltonset';
 seedGeneratorRanges = [5401 5501];
 AABBs = [0 0 1 1];
 mapStretchs = [1 1];
-[tiled_polytopes] = fcn_MapGen_voronoiTiling(...
+[tiled_polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
@@ -1008,7 +1022,7 @@ mapStretchs = [1 1];
 
     
 % Grab statistics on original map
-fcn_MapGen_polytopesStatistics(...
+fcn_MapGen_statsPolytopes(...
     tiled_polytopes,...
     fig_num+1);
 
@@ -1075,7 +1089,7 @@ axis_limits = [0 1 -0.1 1]; axis_style = 'square';
 fill_info = [1 1 0 1 0.5];
 fig_num = 7; 
 
-[polytopes,fig]=fcn_MapGen_nameToMap(...
+[polytopes,fig]=fcn_MapGen_generatePolysFromName(...
     map_name,...
     plot_flag,...
     disp_name,...
@@ -1101,7 +1115,7 @@ exp_polytopes=fcn_MapGen_polytopesExpandEvenly(polytopes,exp_dist,fig_num);
 
 %% Show calculation of map statistics
 fig_num = 9;
-fcn_MapGen_polytopesStatistics(...
+fcn_MapGen_statsPolytopes(...
     polytopes,...
     fig_num);
 
@@ -1114,7 +1128,7 @@ for ith_poly = 1:length(polytopes)
 end
 
 fig_num = 20;
-fcn_MapGen_polytopesStatistics(...
+fcn_MapGen_statsPolytopes(...
     cleaned_polytopes,...
     fig_num);
 
@@ -1126,7 +1140,7 @@ seedGeneratorNames = 'haltonset';
 seedGeneratorRanges = [1 1000]; % range of Halton points to use to generate the tiling
 AABBs = [0 0 1 1];
 mapStretchs = [200 200]; % stretch in the x and y directions
-[polytopes] = fcn_MapGen_voronoiTiling(...
+[polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use

@@ -1,5 +1,5 @@
-% script_test_fcn_MapGen_nameToMap
-% Tests function: fcn_MapGen_nameToMap
+% script_test_fcn_MapGen_generatePolysFromName
+% Tests function: fcn_MapGen_generatePolysFromName
 
 % REVISION HISTORY:
 % 2021_06_06
@@ -42,7 +42,7 @@ line_style = 'r-';
 line_width = 2;
 
 % Call the function
-[polytopes, h_fig] = fcn_MapGen_nameToMap(map_name, plot_flag, disp_name, (fig_num), (line_style), (line_width));
+[polytopes, h_fig] = fcn_MapGen_generatePolysFromName(map_name, plot_flag, disp_name, (fig_num), (line_style), (line_width));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -91,7 +91,7 @@ axis_style = 'square';
 fill_info = [1 1 0 1 0.5];
 
 % Call the function
-[polytopes, h_fig] = fcn_MapGen_nameToMap(map_name, plot_flag, disp_name,...
+[polytopes, h_fig] = fcn_MapGen_generatePolysFromName(map_name, plot_flag, disp_name,...
     (fig_num), (line_style), (line_width), (color), (axis_limits), (axis_style), (fill_info));
 
 sgtitle(titleString, 'Interpreter','none');
@@ -180,7 +180,7 @@ line_style = 'r-';
 line_width = 2;
 
 % Call the function
-[polytopes, h_fig] = fcn_MapGen_nameToMap(map_name, plot_flag, disp_name, ([]), (line_style), (line_width));
+[polytopes, h_fig] = fcn_MapGen_generatePolysFromName(map_name, plot_flag, disp_name, ([]), (line_style), (line_width));
 
 % Check variable types
 assert(isstruct(polytopes));
@@ -224,7 +224,7 @@ line_style = 'r-';
 line_width = 2;
 
 % Call the function
-[polytopes, h_fig] = fcn_MapGen_nameToMap(map_name, plot_flag, disp_name, (-1), (line_style), (line_width));
+[polytopes, h_fig] = fcn_MapGen_generatePolysFromName(map_name, plot_flag, disp_name, (-1), (line_style), (line_width));
 
 % Check variable types
 assert(isstruct(polytopes));
@@ -274,7 +274,7 @@ Niterations = 10;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [polytopes, h_fig] = fcn_MapGen_nameToMap(map_name, plot_flag, disp_name, ([]), (line_style), (line_width));
+    [polytopes, h_fig] = fcn_MapGen_generatePolysFromName(map_name, plot_flag, disp_name, ([]), (line_style), (line_width));
 end
 slow_method = toc;
 
@@ -282,7 +282,7 @@ slow_method = toc;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [polytopes, h_fig] = fcn_MapGen_nameToMap(map_name, plot_flag, disp_name, (-1), (line_style), (line_width));
+    [polytopes, h_fig] = fcn_MapGen_generatePolysFromName(map_name, plot_flag, disp_name, (-1), (line_style), (line_width));
 end
 fast_method = toc;
 

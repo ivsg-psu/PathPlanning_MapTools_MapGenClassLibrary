@@ -1,8 +1,8 @@
 function [tiledPoints] = ...
-   fcn_MapGen_tilePoints(...
+   fcn_MapGen_verticesTiling(...
    inputPoints, tileDepth, AABB, varargin)
 
-% fcn_MapGen_tilePoints - creates a tiling of points. 
+% fcn_MapGen_verticesTiling - creates a tiling of points. 
 %
 % Given an input set of Nx2 vector of points that specify a points in an
 % area "X", this returns a tiling of the points by repeating them but with
@@ -42,7 +42,7 @@ function [tiledPoints] = ...
 % FORMAT:
 %
 %    [tiledPoints] = ...
-%    fcn_MapGen_tilePoints(...
+%    fcn_MapGen_verticesTiling(...
 %    inputPoints, tileDepth, AABB, (fig_num))
 %
 % INPUTS:
@@ -60,12 +60,11 @@ function [tiledPoints] = ...
 %
 %     (optional inputs)
 %
-%      fig_num: a figure number to plot results. If set to -1, skips any
-%      input checking or debugging, no figures will be generated, and sets
-%      up code to maximize speed. As well, if given, this forces the
-%      variable types to be displayed as output and as well makes the input
-%      check process verbose.
-%
+%     fig_num: a figure number to plot results. If set to -1, skips any
+%     input checking or debugging, no figures will be generated, and sets
+%     up code to maximize speed. As well, if given, this forces the
+%     variable types to be displayed as output and as well makes the input
+%     check process verbose.
 %
 % OUTPUTS:
 %
@@ -80,7 +79,7 @@ function [tiledPoints] = ...
 %
 % EXAMPLES:
 %
-% See the script: script_test_fcn_MapGen_tilePoints
+% See the script: script_test_fcn_MapGen_verticesTiling
 % for a full test suite.
 %
 % This function was written on 2021_07_17 by Sean Brennan

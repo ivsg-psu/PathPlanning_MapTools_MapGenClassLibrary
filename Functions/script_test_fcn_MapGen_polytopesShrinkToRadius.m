@@ -40,7 +40,7 @@ seedGeneratorNames = 'haltonset';
 seedGeneratorRanges = [1 100];
 AABBs = [0 0 1 1];
 mapStretchs = [1 1];
-[polytopes] = fcn_MapGen_voronoiTiling(...
+[polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
@@ -87,7 +87,7 @@ assert(isequal(size(muFinal),[1 1]));
 assert(isequal(size(sigmaFinal),[1 1]));
 
 % Check variable values
-field_stats = fcn_MapGen_polytopesStatistics(shrunkPolytopes);
+field_stats = fcn_MapGen_statsPolytopes(shrunkPolytopes, -1);
 assert(isequal(round(field_stats.average_max_radius,4),round(desiredRadius,4)));
 
 % Make sure plot opened up
@@ -104,7 +104,7 @@ seedGeneratorNames = 'haltonset';
 seedGeneratorRanges = [1 100];
 AABBs = [0 0 1 1];
 mapStretchs = [1 1];
-[polytopes] = fcn_MapGen_voronoiTiling(...
+[polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
@@ -150,7 +150,7 @@ assert(isequal(size(muFinal),[1 1]));
 assert(isequal(size(sigmaFinal),[1 1]));
 
 % Check variable values
-% field_stats = fcn_MapGen_polytopesStatistics(shrunkPolytopes);
+% field_stats = fcn_MapGen_statsPolytopes(shrunkPolytopes, -1);
 % assert(isequal(round(field_stats.average_max_radius,4),round(desiredRadius,4)));
 
 % Make sure plot opened up
@@ -169,7 +169,7 @@ seedGeneratorNames = 'haltonset';
 seedGeneratorRanges = [1 100];
 AABBs = [0 0 1 1];
 mapStretchs = [1 1];
-[polytopes] = fcn_MapGen_voronoiTiling(...
+[polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
@@ -215,7 +215,7 @@ assert(isequal(size(muFinal),[1 1]));
 assert(isequal(size(sigmaFinal),[1 1]));
 
 % Check variable values
-% field_stats = fcn_MapGen_polytopesStatistics(shrunkPolytopes);
+% field_stats = fcn_MapGen_statsPolytopes(shrunkPolytopes, -1);
 % assert(isequal(round(field_stats.average_max_radius,4),round(desiredRadius,4)));
 
 % Make sure plot opened up
@@ -275,7 +275,7 @@ seedGeneratorNames = 'haltonset';
 seedGeneratorRanges = [1 100];
 AABBs = [0 0 1 1];
 mapStretchs = [1 1];
-[polytopes] = fcn_MapGen_voronoiTiling(...
+[polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
@@ -320,7 +320,7 @@ assert(isequal(size(muFinal),[1 1]));
 assert(isequal(size(sigmaFinal),[1 1]));
 
 % Check variable values
-field_stats = fcn_MapGen_polytopesStatistics(shrunkPolytopes);
+field_stats = fcn_MapGen_statsPolytopes(shrunkPolytopes, -1);
 assert(isequal(round(field_stats.average_max_radius,4),round(desiredRadius,4)));
 
 % Make sure plot did NOT open up
@@ -338,7 +338,7 @@ seedGeneratorNames = 'haltonset';
 seedGeneratorRanges = [1 100];
 AABBs = [0 0 1 1];
 mapStretchs = [1 1];
-[polytopes] = fcn_MapGen_voronoiTiling(...
+[polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
@@ -383,7 +383,7 @@ assert(isequal(size(muFinal),[1 1]));
 assert(isequal(size(sigmaFinal),[1 1]));
 
 % Check variable values
-field_stats = fcn_MapGen_polytopesStatistics(shrunkPolytopes, -1);
+field_stats = fcn_MapGen_statsPolytopes(shrunkPolytopes, -1);
 assert(isequal(round(field_stats.average_max_radius,4),round(desiredRadius,4)));
 
 % Make sure plot did NOT open up
@@ -402,7 +402,7 @@ seedGeneratorNames = 'haltonset';
 seedGeneratorRanges = [1 100];
 AABBs = [0 0 1 1];
 mapStretchs = [1 1];
-[polytopes] = fcn_MapGen_voronoiTiling(...
+[polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use

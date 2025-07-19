@@ -50,7 +50,7 @@ function [polytopes, allVertices] = fcn_MapGen_generatePolysFromVoronoiAABBWithT
 % DEPENDENCIES:
 %
 %     fcn_DebugTools_checkInputsToFunctions
-%     fcn_MapGen_tilePoints
+%     fcn_MapGen_verticesTiling
 %     fcn_MapGen_polytopeFillEmptyPoly
 %     fcn_MapGen_plotPolytopes
 %     fcn_MapGen_polytopesFillFieldsFromVertices
@@ -177,7 +177,7 @@ end
  % the AABB
 tile_depth = 1;
 Nseedpoints = length(seedPoints);
-[tiled_original_seedPoints] = fcn_MapGen_tilePoints(seedPoints,tile_depth,AABB, -1);
+[tiled_original_seedPoints] = fcn_MapGen_verticesTiling(seedPoints,tile_depth,AABB, -1);
 
 % Calculate the resulting Voronoi diagram
 [V,C] = voronoin(tiled_original_seedPoints);

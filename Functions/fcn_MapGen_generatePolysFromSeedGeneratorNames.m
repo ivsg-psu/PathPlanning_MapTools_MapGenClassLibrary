@@ -1,5 +1,5 @@
-function [polytopes, eachGeneratorPolytopes] = fcn_MapGen_voronoiTiling(seedGeneratorNames, seedGeneratorRanges, varargin)
-% fcn_MapGen_voronoiTiling generates a map fully covered by polytope
+function [polytopes, eachGeneratorPolytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(seedGeneratorNames, seedGeneratorRanges, varargin)
+% fcn_MapGen_generatePolysFromSeedGeneratorNames generates a map fully covered by polytope
 % obstacles that are tiled via Voronoi tilings. The tilings are specified
 % by one or more sets of seed points. Each seed point set can be specified
 % independently in type, settings, and AABB range for each set. A mapStretch
@@ -7,7 +7,7 @@ function [polytopes, eachGeneratorPolytopes] = fcn_MapGen_voronoiTiling(seedGene
 %
 %     FORMAT:
 %
-%     [polytopes] = fcn_MapGen_voronoiTiling(...
+%     [polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
 %       seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
 %       seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
 %       (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
@@ -72,7 +72,7 @@ function [polytopes, eachGeneratorPolytopes] = fcn_MapGen_voronoiTiling(seedGene
 %
 % EXAMPLES:
 %
-% See the script: script_test_fcn_MapGen_voronoiTiling
+% See the script: script_test_fcn_MapGen_generatePolysFromSeedGeneratorNames
 % for a full test suite.
 %
 % This function was written on 2021_07_08 by S. Brennan
@@ -420,7 +420,7 @@ switch lower(name)
 
     otherwise
         warning('on','backtrace');
-        warning('fcn_MapGen_voronoiTiling was given an unrecognized geenrator type: %s. An error will be thrown.', lower(name));
+        warning('fcn_MapGen_generatePolysFromSeedGeneratorNames was given an unrecognized geenrator type: %s. An error will be thrown.', lower(name));
         error('Unknown method given');
 end
 

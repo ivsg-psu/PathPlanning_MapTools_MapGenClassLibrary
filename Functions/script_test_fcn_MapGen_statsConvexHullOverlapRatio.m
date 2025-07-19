@@ -1,98 +1,13 @@
-% script_test_fcn_MapGen_polytopesStatistics
-% Tests: fcn_MapGen_polytopesStatistics
+% script_test_fcn_MapGen_statsConvexHullOverlapRatio
+% Tests: fcn_MapGen_statsConvexHullOverlapRatio
 
 %
 % REVISION HISTORY:
 %
-% 2021_07_12 by Sean Brennan
+% 2024_02_28 by Steve Harnett
 % -- first write of script
-%%%%%%%%%%%%%%§
-
-close all;
-
-%% Generate a set of polytopes from the Halton set
-fig_num = 12;
-figure(fig_num);
-clf;
-
-seedGeneratorNames = 'haltonset';
-seedGeneratorRanges = [200 220];
-AABBs = [0 0 1 1];
-mapStretchs = [1 1];
-[polytopes] = fcn_MapGen_voronoiTiling(...
-    seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
-    seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
-    (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
-    (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
-    (fig_num));
-
-pre_shrink_stats = fcn_MapGen_polytopesStatistics(...
-    polytopes,...
-    fig_num);
-
-%% Extra test cases follow showing shrinkage
-if 1==0
-    shrinkage = 0.001;
-    % Shrink all polytopes by a gap using radial shrinking
-    shrunk_polytopes_radial = polytopes;
-    for ith_poly = 1:length(polytopes)
-        orig_radius = polytopes(ith_poly).max_radius;
-        des_rad = orig_radius - shrinkage;
-
-        shrunk_polytopes_radial(ith_poly) =...
-            fcn_MapGen_polytopeShrinkToRadius(...
-            polytopes(ith_poly),des_rad, -1);
-    end
-
-    % Check the statistics on these
-    fig_num = 13;
-    fcn_MapGen_polytopesStatistics(...
-        shrunk_polytopes_radial,...
-        fig_num);
-end
-if 1==0
-    % Shrink all polytopes by a gap using edge shrinking
-    fig_num = 14;
-    figure(fig_num);
-    clf;
-
-    seedGeneratorNames = 'haltonset';
-    seedGeneratorRanges = [200 301];
-    AABBs = [0 0 1 1];
-    mapStretchs = [1 1];
-    [polytopes] = fcn_MapGen_voronoiTiling(...
-        seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
-        seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
-        (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
-        (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
-        (fig_num));
-
-    shrinkage = 0.001;
-    shrunk_polytopes_edge = polytopes;
-    for ith_poly = 1:length(polytopes)
-        shrunk_polytopes_edge(ith_poly) = ...
-            fcn_MapGen_polytopeShrinkFromEdges(...
-            polytopes(ith_poly),shrinkage);
-    end
-
-    % Check the statistics on these
-    fcn_MapGen_polytopesStatistics(...
-        shrunk_polytopes_edge,...
-        fig_num);
-
-    % Show the original polytopes
-    h_plot = subplot(2,3,1);
-    hold on;
-    line_width = 2;
-    % fcn_MapGen_plotPolytopes(polytopes,h_plot,'r',line_width);
-end
-
-% script_test_fcn_MapGen_polytopeFindSelfIntersections
-% Tests function: fcn_MapGen_polytopeFindSelfIntersections
-
-% REVISION HISTORY:
-% 2021_08_03
-% -- first written by S. Brennan
+% 2025_04_16 by Steve Harnett
+% -- remove dependence on test fixture
 % 2025_07_11 - S. Brennan, sbrennan@psu.edu
 % -- updated script testing to standard form
 
@@ -117,50 +32,72 @@ close all
 close all;
 fprintf(1,'Figure: 1XXXXXX: DEMO cases\n');
 
-%% DEMO case: self-intersection
+%% DEMO case: basic polytope case, convex obstacles
 fig_num = 10001;
-titleString = sprintf('DEMO case: self-intersection');
+titleString = sprintf('DEMO case: basic polytope case, convex obstacles');
 fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
-
-interiorPoint = [0.5 0.5];
+polytopes(1).vertices = [0 0; 10 0; 10 1; 0 1; 0 0];
+polytopes(2).vertices = polytopes(1).vertices+[8,0];
+is_nonconvex = 0;
+polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes,(is_nonconvex),(-1));
 
 % Call the function
-[projectedPoints] = ...
-    fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-    interiorPoint,...
-    verticesIncludingSelfIntersections,...
-    verticesIncludingSelfIntersections(1:end-1,:),...
-    verticesIncludingSelfIntersections(2:end,:),...
-    (fig_num));
+[convexHullOverlapRatio, areaOverlap, areaOccupied] = ...
+    fcn_MapGen_statsConvexHullOverlapRatio( polytopes, (fig_num));
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(projectedPoints));
+assert(isnumeric(convexHullOverlapRatio));
+assert(isnumeric(areaOverlap));
+assert(isnumeric(areaOccupied));
 
 % Check variable sizes
-Nvertices = length(verticesIncludingSelfIntersections(:,1));
-assert(size(projectedPoints,1)==Nvertices);
-assert(size(projectedPoints,2)==2);
+assert(isequal(size(convexHullOverlapRatio),[1 1]));
+assert(isequal(size(areaOverlap),[1 1]));
+assert(isequal(size(areaOccupied),[1 1]));
 
 % Check variable values
-assert(isequal(round(projectedPoints,4),round(...
-    [...
-    0         0
-    0         0
-    1.0000         0
-    0.7500    0.7500
-    0.6667    1.0000
-    0.6667    1.0000
-    0.5000    1.0000
-    0    1.0000
-    ]...
-    ,4)));
+assert(isequal(0.1000            ,round(convexHullOverlapRatio,4)))
+assert(isequal(2                 ,round(areaOverlap,4)))
+assert(isequal(20                ,round(areaOccupied,4)))
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+%% DEMO case: more complicated demo, non-convex obstacles
+fig_num = 10002;
+titleString = sprintf('DEMO case: more complicated demo, non-convex obstacles');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+polytopes(1).vertices = [0 0; 5 0; 7, 0.5; 5 1; 0 1; 0 0];
+polytopes(2).vertices = [6 0; 10 0; 10 1; 6 1; 8 0.5; 6 0];
+is_nonconvex = 1;
+polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes,(is_nonconvex),(-1));
+
+% Call the function
+[convexHullOverlapRatio, areaOverlap, areaOccupied] = ...
+    fcn_MapGen_statsConvexHullOverlapRatio( polytopes, (fig_num));
+
+sgtitle(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(isnumeric(convexHullOverlapRatio));
+assert(isnumeric(areaOverlap));
+assert(isnumeric(areaOccupied));
+
+% Check variable sizes
+assert(isequal(size(convexHullOverlapRatio),[1 1]));
+assert(isequal(size(areaOverlap),[1 1]));
+assert(isequal(size(areaOccupied),[1 1]));
+
+% Check variable values
+assert(isequal(0.0278            ,round(convexHullOverlapRatio,4)))
+assert(isequal(0.25              ,round(areaOverlap,4)))
+assert(isequal(9                 ,round(areaOccupied,4)))
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -214,42 +151,29 @@ fig_num = 80001;
 fprintf(1,'Figure: %.0f: FAST mode, empty fig_num\n',fig_num);
 figure(fig_num); close(fig_num);
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
-
-interiorPoint = [0.5 0.5];
+polytopes(1).vertices = [0 0; 5 0; 7, 0.5; 5 1; 0 1; 0 0];
+polytopes(2).vertices = [6 0; 10 0; 10 1; 6 1; 8 0.5; 6 0];
+is_nonconvex = 1;
+polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes,(is_nonconvex),(-1));
 
 % Call the function
-[projectedPoints] = ...
-    fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-    interiorPoint,...
-    verticesIncludingSelfIntersections,...
-    verticesIncludingSelfIntersections(1:end-1,:),...
-    verticesIncludingSelfIntersections(2:end,:),...
-    ([]));
+[convexHullOverlapRatio, areaOverlap, areaOccupied] = ...
+    fcn_MapGen_statsConvexHullOverlapRatio( polytopes, ([]));
 
 % Check variable types
-assert(isnumeric(projectedPoints));
+assert(isnumeric(convexHullOverlapRatio));
+assert(isnumeric(areaOverlap));
+assert(isnumeric(areaOccupied));
 
 % Check variable sizes
-Nvertices = length(verticesIncludingSelfIntersections(:,1));
-assert(size(projectedPoints,1)==Nvertices);
-assert(size(projectedPoints,2)==2);
+assert(isequal(size(convexHullOverlapRatio),[1 1]));
+assert(isequal(size(areaOverlap),[1 1]));
+assert(isequal(size(areaOccupied),[1 1]));
 
 % Check variable values
-assert(isequal(round(projectedPoints,4),round(...
-    [...
-    0         0
-    0         0
-    1.0000         0
-    0.7500    0.7500
-    0.6667    1.0000
-    0.6667    1.0000
-    0.5000    1.0000
-    0    1.0000
-    ]...
-    ,4)));
+assert(isequal(0.0278            ,round(convexHullOverlapRatio,4)))
+assert(isequal(0.25              ,round(areaOverlap,4)))
+assert(isequal(9                 ,round(areaOccupied,4)))
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -261,43 +185,29 @@ fig_num = 80002;
 fprintf(1,'Figure: %.0f: FAST mode, fig_num=-1\n',fig_num);
 figure(fig_num); close(fig_num);
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
-
-interiorPoint = [0.5 0.5];
+polytopes(1).vertices = [0 0; 5 0; 7, 0.5; 5 1; 0 1; 0 0];
+polytopes(2).vertices = [6 0; 10 0; 10 1; 6 1; 8 0.5; 6 0];
+is_nonconvex = 1;
+polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes,(is_nonconvex),(-1));
 
 % Call the function
-[projectedPoints] = ...
-    fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-    interiorPoint,...
-    verticesIncludingSelfIntersections,...
-    verticesIncludingSelfIntersections(1:end-1,:),...
-    verticesIncludingSelfIntersections(2:end,:),...
-    (-1));
+[convexHullOverlapRatio, areaOverlap, areaOccupied] = ...
+    fcn_MapGen_statsConvexHullOverlapRatio( polytopes, (-1));
 
 % Check variable types
-assert(isnumeric(projectedPoints));
+assert(isnumeric(convexHullOverlapRatio));
+assert(isnumeric(areaOverlap));
+assert(isnumeric(areaOccupied));
 
 % Check variable sizes
-Nvertices = length(verticesIncludingSelfIntersections(:,1));
-assert(size(projectedPoints,1)==Nvertices);
-assert(size(projectedPoints,2)==2);
+assert(isequal(size(convexHullOverlapRatio),[1 1]));
+assert(isequal(size(areaOverlap),[1 1]));
+assert(isequal(size(areaOccupied),[1 1]));
 
 % Check variable values
-assert(isequal(round(projectedPoints,4),round(...
-    [...
-    0         0
-    0         0
-    1.0000         0
-    0.7500    0.7500
-    0.6667    1.0000
-    0.6667    1.0000
-    0.5000    1.0000
-    0    1.0000
-    ]...
-    ,4)));
-
+assert(isequal(0.0278            ,round(convexHullOverlapRatio,4)))
+assert(isequal(0.25              ,round(areaOverlap,4)))
+assert(isequal(9                 ,round(areaOccupied,4)))
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');

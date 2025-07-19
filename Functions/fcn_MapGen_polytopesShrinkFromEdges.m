@@ -161,10 +161,11 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-initial_stats = fcn_MapGen_polytopesStatistics(polytopes);
-initial_average_max_rad = initial_stats.average_max_radius;
 
 if flag_do_debug
+    initial_stats = fcn_MapGen_statsPolytopes(polytopes, -1);
+    initial_average_max_rad = initial_stats.average_max_radius;
+
     fprintf(1,'Target statistics:\n');
     fprintf(1,'\tGap size: %.4f\n',des_gap_size);
 
@@ -191,9 +192,7 @@ end
 % distance between vertices, below which vertices are merged into one.
 clear shrunkPolytopes
 shrinker = polytopes(1); % obstacle to be shrunk
-temp = ...
-    fcn_MapGen_polytopeShrinkFromEdges(...
-    shrinker,des_gap_size/2);
+temp = fcn_MapGen_polytopeShrinkFromEdges(shrinker,des_gap_size/2, [], [], [], -1);
 shrunkPolytopes(length(polytopes)) = temp;
 
 % Loop through each polytope, shrinking it to the reference size
@@ -205,16 +204,14 @@ for ith_poly = 1:length(polytopes)
     else
         % assign to shrunkPolytopes
         % gap_size over 2 is the normal distance to pull edges in
-        shrunkPolytopes(ith_poly) = ...
-            fcn_MapGen_polytopeShrinkFromEdges(...
-            shrinker,des_gap_size/2);
+        shrunkPolytopes(ith_poly) = fcn_MapGen_polytopeShrinkFromEdges(shrinker,des_gap_size/2, [], [], [], -1);
     end
 end
 
 
 
 if flag_do_debug
-    final_stats = fcn_MapGen_polytopesStatistics(shrunkPolytopes);
+    final_stats = fcn_MapGen_statsPolytopes(shrunkPolytopes, -1);
     final_average_max_rad = final_stats.average_max_radius;
     fprintf(1,'Final distrubution statistics:\n');
     fprintf(1,'\tAvg mag rad: %.4f\n',final_average_max_rad);

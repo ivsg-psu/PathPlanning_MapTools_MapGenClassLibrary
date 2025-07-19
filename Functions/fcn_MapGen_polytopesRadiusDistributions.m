@@ -34,7 +34,7 @@ function poly_size_stats = fcn_MapGen_polytopesRadiusDistributions(polytopes, va
 %
 % DEPENDENCIES:
 %
-%     fcn_MapGen_polytopesStatistics
+%     fcn_MapGen_statsPolytopes
 %
 % EXAMPLES:
 %
@@ -150,7 +150,7 @@ poly_size_stats.a_d_eff_i_eval_at_o_avg = [];
 
 % max radius of all polys in the field
 max_radius_field = max(extractfield(polytopes,'max_radius'));
-field_stats = fcn_MapGen_polytopesStatistics(polytopes);
+field_stats = fcn_MapGen_statsPolytopes(polytopes, -1);
 field_avg_r_D = field_stats.avg_r_D;
 N_int = field_stats.linear_density_mean;
 D_L = field_avg_r_D;

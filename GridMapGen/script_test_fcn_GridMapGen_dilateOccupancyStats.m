@@ -1,11 +1,13 @@
-% script_test_fcn_MapGen_polytopeFindVertexAngles
-% Tests function: fcn_MapGen_polytopeFindVertexAngles
+% script_test_fcn_GridMapGen_dilateOccupancyStats
+% Tests: fcn_GridMapGen_dilateOccupancyStats
 
+%
 % REVISION HISTORY:
-% 2021_08_01
-% -- first written by S. Brennan 
-% 2025_07_11 - S. Brennan, sbrennan@psu.edu
-% -- updated script testing to standard form
+%
+% 2008_10_18 by Sean Brennan
+% -- first write of function
+% 2025_07_17 by Sean Brennan
+% -- imported into MapGen library with updates to formatting
 
 %% Set up the workspace
 close all
@@ -23,117 +25,32 @@ close all
 %
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Demos%20Of%20Code
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Figures start with 1
+% DEMO figures start with 1
 
 close all;
 fprintf(1,'Figure: 1XXXXXX: DEMO cases\n');
 
-%% DEMO case: Basic example of vertex calculation - a square
+%% DEMO case: random 100x100 matrix
 fig_num = 10001;
-titleString = sprintf('DEMO case: Basic example of vertex calculation - a square');
+titleString = sprintf('DEMO case: random 100x100 matrix');
 fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
-vertices = [0 0; 1 0; 1 1; 0 1; 0 0];
-
+occupancyMatrix = rand(100,100)*2;
+     
 % Call the function
-[angles, unitInVectors, unitOutVectors] = fcn_MapGen_polytopeFindVertexAngles(vertices, (fig_num));
+percentOccupied = fcn_GridMapGen_dilateOccupancyStats(occupancyMatrix,(fig_num));
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(angles));
-assert(isnumeric(unitInVectors));
-assert(isnumeric(unitOutVectors));
+assert(isnumeric(percentOccupied));
 
 % Check variable sizes
-Nvertices = length(vertices(:,1));
-assert(isequal(size(angles),[Nvertices-1 1]));
-assert(isequal(size(unitInVectors),[Nvertices-1 2]));
-assert(isequal(size(unitInVectors),[Nvertices-1 2]));
+assert(isequal(size(percentOccupied),[1 1]));
 
 % Check variable values
-assert(1000*eps>abs(360-sum(angles)*180/pi));
-
-% Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
-
-
-%% DEMO case: Basic example of vertex calculation - a triange
-fig_num = 10002;
-titleString = sprintf('DEMO case: Basic example of vertex calculation - a triangle');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
-
-vertices = [0 0; 1 1; 0 1; 0 0];
-
-% Call the function
-[angles, unitInVectors, unitOutVectors] = fcn_MapGen_polytopeFindVertexAngles(vertices, (fig_num));
-
-sgtitle(titleString, 'Interpreter','none');
-
-% Check variable types
-assert(isnumeric(angles));
-assert(isnumeric(unitInVectors));
-assert(isnumeric(unitOutVectors));
-
-% Check variable sizes
-Nvertices = length(vertices(:,1));
-assert(isequal(size(angles),[Nvertices-1 1]));
-assert(isequal(size(unitInVectors),[Nvertices-1 2]));
-assert(isequal(size(unitInVectors),[Nvertices-1 2]));
-
-% Check variable values
-assert(1000*eps>abs(360-sum(angles)*180/pi));
-
-% Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
-
-%% DEMO case: Random polytope
-fig_num = 10003;
-titleString = sprintf('DEMO case: Random polytope');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
-
-% Set up polytopes
-seedGeneratorNames = 'haltonset';
-seedGeneratorRanges = [1 100];
-AABBs = [0 0 1 1];
-mapStretchs = [1 1];
-[polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
-    seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
-    seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
-    (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
-    (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
-    (-1));
-
-
-bounding_box = [0,0; 1,1];
-trim_polytopes = fcn_MapGen_polytopeCropEdges(polytopes,bounding_box,-1);
-
-% Pick a random polytope
-Npolys = length(trim_polytopes);
-rand_poly = 1+floor(rand*Npolys);
-shrinker = trim_polytopes(rand_poly);
-
-% Call the function
-[angles, unitInVectors, unitOutVectors] = fcn_MapGen_polytopeFindVertexAngles(shrinker.vertices, (fig_num));
-
-sgtitle(titleString, 'Interpreter','none');
-
-% Check variable types
-assert(isnumeric(angles));
-assert(isnumeric(unitInVectors));
-assert(isnumeric(unitOutVectors));
-
-% Check variable sizes
-Nvertices = length(shrinker.vertices(:,1));
-assert(isequal(size(angles),[Nvertices-1 1]));
-assert(isequal(size(unitInVectors),[Nvertices-1 2]));
-assert(isequal(size(unitInVectors),[Nvertices-1 2]));
-
-% Check variable values
-assert(1000*eps>abs(360-sum(angles)*180/pi));
+assert(percentOccupied>=0 && percentOccupied<=1);
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -152,16 +69,60 @@ assert(isequal(get(gcf,'Number'),fig_num));
 %
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=TESTS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Figures start with 2
+% TEST figures start with 2
 
 close all;
 fprintf(1,'Figure: 2XXXXXX: TEST mode cases\n');
-% 
-% %% TEST case: simple crossing at origin
-% fig_num = 20001;
-% titleString = sprintf('TEST case: simple crossing at origin');
-% fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-% figure(fig_num); clf;
+
+%% TEST case: 10x10 matrix, exactly 50% occupied
+fig_num = 20001;
+titleString = sprintf('TEST case: 10x10 matrix, exactly 50%% occupied');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+occupancyMatrix = [zeros(10,5) ones(10,5)];
+
+% Call the function
+percentOccupied = fcn_GridMapGen_dilateOccupancyStats(occupancyMatrix,(fig_num));
+
+sgtitle(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(isnumeric(percentOccupied));
+
+% Check variable sizes
+assert(isequal(size(percentOccupied),[1 1]));
+
+% Check variable values
+assert(isequal(round(percentOccupied,6),0.5));
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+%% TEST case: 10x20 matrix, exactly 10% occupied
+fig_num = 20002;
+titleString = sprintf('TEST case: 10x20 matrix, exactly 10%% occupied');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+occupancyMatrix = [zeros(10,18) ones(10,2)];
+
+% Call the function
+percentOccupied = fcn_GridMapGen_dilateOccupancyStats(occupancyMatrix,(fig_num));
+
+sgtitle(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(isnumeric(percentOccupied));
+
+% Check variable sizes
+assert(isequal(size(percentOccupied),[1 1]));
+
+% Check variable values
+assert(isequal(round(percentOccupied,6),0.1));
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
 
 
 %% Fast Mode Tests
@@ -187,24 +148,19 @@ fig_num = 80001;
 fprintf(1,'Figure: %.0f: FAST mode, empty fig_num\n',fig_num);
 figure(fig_num); close(fig_num);
 
-vertices = [0 0; 1 0; 1 1; 0 1; 0 0];
-
+occupancyMatrix = rand(100,100)*2;
+     
 % Call the function
-[angles, unitInVectors, unitOutVectors] = fcn_MapGen_polytopeFindVertexAngles(vertices, ([]));
+percentOccupied = fcn_GridMapGen_dilateOccupancyStats(occupancyMatrix,([]));
 
 % Check variable types
-assert(isnumeric(angles));
-assert(isnumeric(unitInVectors));
-assert(isnumeric(unitOutVectors));
+assert(isnumeric(percentOccupied));
 
 % Check variable sizes
-Nvertices = length(vertices(:,1));
-assert(isequal(size(angles),[Nvertices-1 1]));
-assert(isequal(size(unitInVectors),[Nvertices-1 2]));
-assert(isequal(size(unitInVectors),[Nvertices-1 2]));
+assert(isequal(size(percentOccupied),[1 1]));
 
 % Check variable values
-assert(1000*eps>abs(360-sum(angles)*180/pi));
+assert(percentOccupied>=0 && percentOccupied<=1);
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -216,24 +172,19 @@ fig_num = 80002;
 fprintf(1,'Figure: %.0f: FAST mode, fig_num=-1\n',fig_num);
 figure(fig_num); close(fig_num);
 
-vertices = [0 0; 1 0; 1 1; 0 1; 0 0];
-
+occupancyMatrix = rand(100,100)*2;
+     
 % Call the function
-[angles, unitInVectors, unitOutVectors] = fcn_MapGen_polytopeFindVertexAngles(vertices, (-1));
+percentOccupied = fcn_GridMapGen_dilateOccupancyStats(occupancyMatrix,(-1));
 
 % Check variable types
-assert(isnumeric(angles));
-assert(isnumeric(unitInVectors));
-assert(isnumeric(unitOutVectors));
+assert(isnumeric(percentOccupied));
 
 % Check variable sizes
-Nvertices = length(vertices(:,1));
-assert(isequal(size(angles),[Nvertices-1 1]));
-assert(isequal(size(unitInVectors),[Nvertices-1 2]));
-assert(isequal(size(unitInVectors),[Nvertices-1 2]));
+assert(isequal(size(percentOccupied),[1 1]));
 
 % Check variable values
-assert(1000*eps>abs(360-sum(angles)*180/pi));
+assert(percentOccupied>=0 && percentOccupied<=1);
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -246,15 +197,15 @@ fprintf(1,'Figure: %.0f: FAST mode comparisons\n',fig_num);
 figure(fig_num);
 close(fig_num);
 
-vertices = [0 0; 1 0; 1 1; 0 1; 0 0];
-
+occupancyMatrix = rand(100,100)*2;
+     
 Niterations = 100;
 
 % Do calculation without pre-calculation
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [angles, unitInVectors, unitOutVectors] = fcn_MapGen_polytopeFindVertexAngles(vertices, ([]));
+    percentOccupied = fcn_GridMapGen_dilateOccupancyStats(occupancyMatrix,([]));
 end
 slow_method = toc;
 
@@ -262,7 +213,7 @@ slow_method = toc;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [angles, unitInVectors, unitOutVectors] = fcn_MapGen_polytopeFindVertexAngles(vertices, (-1));
+    percentOccupied = fcn_GridMapGen_dilateOccupancyStats(occupancyMatrix,(-1));
 end
 fast_method = toc;
 
@@ -341,4 +292,3 @@ end
 % [V,C] = voronoin(seed_points);
 % % V = V.*stretch;
 % end % Ends fcn_INTERNAL_loadExampleData
-  

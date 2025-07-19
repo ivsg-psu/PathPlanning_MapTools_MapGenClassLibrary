@@ -133,8 +133,8 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
 % find area unoccupancy ratio
-unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(pre_shrink_polytopes,polytopes,des_gap_size);
-map_stats = fcn_MapGen_polytopesStatistics(polytopes);
+unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(pre_shrink_polytopes,polytopes,des_gap_size, -1);
+map_stats = fcn_MapGen_statsPolytopes(polytopes, -1);
 r_D = map_stats.avg_r_D; %#ok<NASGU>
 L_unocc = unocc_ests.L_unocc_est_avg_circle_min_rad_est_1;
 % convert to occupancy ratio

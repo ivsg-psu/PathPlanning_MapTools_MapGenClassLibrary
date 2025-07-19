@@ -62,7 +62,7 @@ function [map_polytopes,all_pts,mu_rad_final,sigma_rad_final] = ...
 % DEPENDENCIES:
 %
 %      fcn_DebugTools_checkInputsToFunctions
-%      fcn_MapGen_voronoiTiling
+%      fcn_MapGen_generatePolysFromSeedGeneratorNames
 %      fcn_MapGen_polytopeCropEdges
 %      fcn_MapGen_polytopesShrinkToRadius
 %      fcn_MapGen_plotPolytopes
@@ -177,7 +177,7 @@ seedGeneratorRanges = halton_range;
 AABBs = [0 0 1 1];
 mapStretchs = [1 1];
 
-[tiled_polytopes] = fcn_MapGen_voronoiTiling(...
+[tiled_polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
     seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use

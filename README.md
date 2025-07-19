@@ -55,7 +55,7 @@ The class library for functions to generate new maps, started from Seth Tau's or
                 <li><a href="#polytope-field-generation-functions">Polytope Field Generation Functions</li>
                 <ul>
                     <li><a href="#fcn_mapgen_generatepolysfromvoronoiaabb">fcn_MapGen_generatePolysFromVoronoiAABB - a method to generate polytope fields by "manaully" bounding the Voronoi diagram</li>
-                    <li><a href="#fcn_mapgen_tilepoints">fcn_MapGen_tilePoints - a method to tile points</li>
+                    <li><a href="#fcn_mapgen_verticestiling">fcn_MapGen_verticesTiling - a method to tile points</li>
                 </ul>
             </ul>
         <li><a href="#usage">Usage</a></li>
@@ -309,9 +309,9 @@ And it produces the following plot:
 <a href="#pathplanning_maptools_mapgenclasslibrary">Back to top</a>
 ***
 
-#### fcn_MapGen_tilePoints
+#### fcn_MapGen_verticesTiling
 
-The function  **fcn_MapGen_tilePoints** takes as an input set of Nx2 vector of points that specify a points in an area "X". The function returns a tiling of the points by repeating them but with coordinate displacements along the Axis-aligned Bounding Box (AABB), a certain tile "depth". For example, if a region "X" is specified and a tiling depth of 1 is used, this returns tiling points that make a 1-unit boundary around X, as:
+The function  **fcn_MapGen_verticesTiling** takes as an input set of Nx2 vector of points that specify a points in an area "X". The function returns a tiling of the points by repeating them but with coordinate displacements along the Axis-aligned Bounding Box (AABB), a certain tile "depth". For example, if a region "X" is specified and a tiling depth of 1 is used, this returns tiling points that make a 1-unit boundary around X, as:
 
 ```sh
     Y Y Y
@@ -343,24 +343,24 @@ Thus, S1 contains the points on rows (1..N), S2 is ((N+1)...(2N)), S3 is ((2N+1)
 Below is an example output illustrating how the center original points are tiled:
 
 <pre align="center">
-<img src=".\Images\fcn_MapGen_tilePoints_BasicCall.png " alt="Tiling points example" width="420" height="315">
-<figcaption>fcn_MapGen_tilePoints - the basic call.</figcaption>
+<img src=".\Images\fcn_MapGen_verticesTiling_BasicCall.png " alt="Tiling points example" width="420" height="315">
+<figcaption>fcn_MapGen_verticesTiling - the basic call.</figcaption>
 <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
 </pre>
 
 Note that the tiling does not require the points to be inside the AABB. If, for example, the center points are offset from the AABB, then the points are still tiled, resulting in points that are offset from the tiling pattern:
 
 <pre align="center">
-<img src=".\Images\fcn_MapGen_tilePoints_OffsetPoints.png " alt="Tiling points example with offsets" width="420" height="315">
-<figcaption>fcn_MapGen_tilePoints - showing point offsets.</figcaption>
+<img src=".\Images\fcn_MapGen_verticesTiling_OffsetPoints.png " alt="Tiling points example with offsets" width="420" height="315">
+<figcaption>fcn_MapGen_verticesTiling - showing point offsets.</figcaption>
 <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
 </pre>
 
 Here's an example with a tiling depth of 2, e.g. the number of cells that will "fence" the original points.
 
 <pre align="center">
-<img src=".\Images\fcn_MapGen_tilePoints_DepthOf2.png " alt="Tiling points example, depth of 2" width="420" height="315">
-<figcaption>fcn_MapGen_tilePoints - a depth of 2.</figcaption>
+<img src=".\Images\fcn_MapGen_verticesTiling_DepthOf2.png " alt="Tiling points example, depth of 2" width="420" height="315">
+<figcaption>fcn_MapGen_verticesTiling - a depth of 2.</figcaption>
 <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
 </pre>
 
@@ -466,24 +466,24 @@ Example path planned through this:
 
 <img src=".\Images\script_ui_manuallyDefineMapLayers_path.png " alt="polytopes manually drawn and used for path planning">
 
-`fcn_MapGen_flattenPolytopeMap.m` : This takes a potentially overlapping set of polytopes and breaks them into non-overlapping triangles to enforce convexity.  Note, polytope traversal costs will be linearlly combined.
+`fcn_MapGen_polytopesFlattenMap.m` : This takes a potentially overlapping set of polytopes and breaks them into non-overlapping triangles to enforce convexity.  Note, polytope traversal costs will be linearlly combined.
 Example overlapping polytopes:
 
-<img src=".\Images\fcn_MapGen_flattenPolytopeMap.png " alt="overlapping polytopes on a satellite map">
+<img src=".\Images\fcn_MapGen_polytopesFlattenMap.png " alt="overlapping polytopes on a satellite map">
 
 Example non-overlapping but potentially convex polytopes:
 
-<img src=".\Images\fcn_MapGen_flattenPolytopeMap_2.png " alt="non-overlapping flattened polytopes">
+<img src=".\Images\fcn_MapGen_polytopesFlattenMap_2.png " alt="non-overlapping flattened polytopes">
 
 Example non-convex and non-overlapping triangular polytopes:
 
-<img src=".\Images\fcn_MapGen_flattenPolytopeMap_3.png " alt="triangulated flattened polytopes">
+<img src=".\Images\fcn_MapGen_polytopesFlattenMap_3.png " alt="triangulated flattened polytopes">
 
 `fcn_MapGen_polytopesExpandEvenlyForConcave.m`: can be used as an alternative to `fcn_MapGen_polytopesExpandEvenly`.  The existing function works well for convex polytopes but unexpected behavior can occur with concave polytopes.  The new function uses Matlab's polyshape object and polybuffer method to create a buffer around the polytope that is robust to concave input polytopes.
 
 ![image](https://github.com/ivsg-psu/PathPlanning_MapTools_MapGenClassLibrary/assets/82562987/501b21a1-d26e-45c0-b6ce-5d08b0839f35)
 
-`fcn_MapGen_calculateConvexHullOverlapRatio.m`: can be used to calculate the area of obstacle convex hulls that overlap relative to the total area covered by obstacles.  This is useful for assessing how much obstacles protrude into concavities of other obstacles.
+`fcn_MapGen_statsConvexHullOverlapRatio.m`: can be used to calculate the area of obstacle convex hulls that overlap relative to the total area covered by obstacles.  This is useful for assessing how much obstacles protrude into concavities of other obstacles.
 
 ![image](https://github.com/user-attachments/assets/f5cefffa-9149-472b-8990-cafb9c6ee310)
 

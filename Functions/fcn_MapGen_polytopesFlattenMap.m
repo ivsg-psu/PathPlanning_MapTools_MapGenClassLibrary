@@ -1,5 +1,5 @@
-function flattened_polytopes = fcn_MapGen_flattenPolytopeMap(polytopes, varargin)
-% fcn_MapGen_flattenPolytopeMap
+function flattened_polytopes = fcn_MapGen_polytopesFlattenMap(polytopes, varargin)
+% fcn_MapGen_polytopesFlattenMap
 % Given a structure array of polytopes that may overlap and/or be concave,
 % return a structure array of equivalent polytopes with overlapping regions
 % broken into new polytopes with traversal cost equal to the sum of the
@@ -8,7 +8,7 @@ function flattened_polytopes = fcn_MapGen_flattenPolytopeMap(polytopes, varargin
 % convexity
 %
 % FORMAT:
-% flattened_polytopes = fcn_MapGen_flattenPolytopeMap(polytopes, (fig_num))
+% flattened_polytopes = fcn_MapGen_polytopesFlattenMap(polytopes, (fig_num))
 %
 % INPUTS:
 %     polytopes - the initial polytope field, potentially containing concave
@@ -35,7 +35,7 @@ function flattened_polytopes = fcn_MapGen_flattenPolytopeMap(polytopes, varargin
 %
 % EXAMPLES:
 %
-% See the script: script_test_fcn_MapGen_flattenPolytopeMap.m
+% See the script: script_test_fcn_MapGen_polytopesFlattenMap.m
 % for a full test suite.
 %
 % Questions or comments? contact sjh6473@psu.edu
@@ -277,7 +277,7 @@ if ~isempty(r) && ~isempty(c)
 
     % recursively call this function again becaus the initial polytope list is
     % effectively different now
-    polytopes = fcn_MapGen_flattenPolytopeMap(polytopes);
+    polytopes = fcn_MapGen_polytopesFlattenMap(polytopes);
 end
 % if there are no intersections the loop will exit
 flattened_polytopes = polytopes;

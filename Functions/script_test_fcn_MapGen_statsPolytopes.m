@@ -1,13 +1,11 @@
-% script_test_fcn_MapGen_calculateConvexHullOverlapRatio
-% Tests: fcn_MapGen_calculateConvexHullOverlapRatio
+% script_test_fcn_MapGen_statsPolytopes
+% Tests: fcn_MapGen_statsPolytopes
 
 %
 % REVISION HISTORY:
 %
-% 2024_02_28 by Steve Harnett
+% 2021_07_12 by Sean Brennan
 % -- first write of script
-% 2025_04_16 by Steve Harnett
-% -- remove dependence on test fixture
 % 2025_07_11 - S. Brennan, sbrennan@psu.edu
 % -- updated script testing to standard form
 
@@ -32,75 +30,104 @@ close all
 close all;
 fprintf(1,'Figure: 1XXXXXX: DEMO cases\n');
 
-%% DEMO case: basic polytope case, convex obstacles
+%% DEMO case: statistics on Halton set [200 220]
 fig_num = 10001;
-titleString = sprintf('DEMO case: basic polytope case, convex obstacles');
+titleString = sprintf('DEMO case: statistics on Halton set [200 220]');
 fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
-polytopes(1).vertices = [0 0; 10 0; 10 1; 0 1; 0 0];
-polytopes(2).vertices = polytopes(1).vertices+[8,0];
-is_nonconvex = 0;
-polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes,(is_nonconvex),(-1));
+polytopes = fcn_INTERNAL_loadExampleData([200 220]);
 
 % Call the function
-[convexHullOverlapRatio, areaOverlap, areaOccupied] = ...
-    fcn_MapGen_calculateConvexHullOverlapRatio( polytopes, (fig_num));
+polyMapStats = fcn_MapGen_statsPolytopes(polytopes, (fig_num));
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(convexHullOverlapRatio));
-assert(isnumeric(areaOverlap));
-assert(isnumeric(areaOccupied));
+assert(isstruct(polyMapStats));
 
 % Check variable sizes
-assert(isequal(size(convexHullOverlapRatio),[1 1]));
-assert(isequal(size(areaOverlap),[1 1]));
-assert(isequal(size(areaOccupied),[1 1]));
+% Too many
 
 % Check variable values
-assert(isequal(0.1000            ,round(convexHullOverlapRatio,4)))
-assert(isequal(2                 ,round(areaOverlap,4)))
-assert(isequal(20                ,round(areaOccupied,4)))
+% Too many
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
 
-%% DEMO case: more complicated demo, non-convex obstacles
+
+%% DEMO case: statistics on Halton set [200 220] with radial shrinkage
 fig_num = 10002;
-titleString = sprintf('DEMO case: more complicated demo, non-convex obstacles');
+titleString = sprintf('DEMO case: statistics on Halton set [200 220] with shrinkage');
 fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
-polytopes(1).vertices = [0 0; 5 0; 7, 0.5; 5 1; 0 1; 0 0];
-polytopes(2).vertices = [6 0; 10 0; 10 1; 6 1; 8 0.5; 6 0];
-is_nonconvex = 1;
-polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes,(is_nonconvex),(-1));
+polytopes = fcn_INTERNAL_loadExampleData([200 220]);
+
+shrinkage = 0.1;
+% Shrink all polytopes by a gap using radial shrinking
+shrunkPolytopes = polytopes;
+for ith_poly = 1:length(polytopes)
+    orig_radius = polytopes(ith_poly).max_radius;
+    des_rad = orig_radius - shrinkage;
+
+    shrunkPolytopes(ith_poly) =...
+        fcn_MapGen_polytopeShrinkToRadius(...
+        polytopes(ith_poly),des_rad, -1);
+end
 
 % Call the function
-[convexHullOverlapRatio, areaOverlap, areaOccupied] = ...
-    fcn_MapGen_calculateConvexHullOverlapRatio( polytopes, (fig_num));
+polyMapStats = fcn_MapGen_statsPolytopes(shrunkPolytopes, (fig_num));
 
 sgtitle(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(convexHullOverlapRatio));
-assert(isnumeric(areaOverlap));
-assert(isnumeric(areaOccupied));
+assert(isstruct(polyMapStats));
 
 % Check variable sizes
-assert(isequal(size(convexHullOverlapRatio),[1 1]));
-assert(isequal(size(areaOverlap),[1 1]));
-assert(isequal(size(areaOccupied),[1 1]));
+% Too many
 
 % Check variable values
-assert(isequal(0.0278            ,round(convexHullOverlapRatio,4)))
-assert(isequal(0.25              ,round(areaOverlap,4)))
-assert(isequal(9                 ,round(areaOccupied,4)))
+% Too many
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
+
+%% DEMO case: statistics on Halton set [200 301] with shrinkage from edge
+fig_num = 10003;
+titleString = sprintf('DEMO case: statistics on Halton set [200 220] with shrinkage');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+% Commented out b/c Vskel is being deprecated (temporarily)
+if 1==0
+    polytopes = fcn_INTERNAL_loadExampleData([200 301]);
+
+    shrinkage = 0.001;
+    shrunkPolytopes = polytopes;
+    for ith_poly = 1:length(polytopes)
+        shrunkPolytopes(ith_poly) = ...
+            fcn_MapGen_polytopeShrinkFromEdges(...
+            polytopes(ith_poly),shrinkage, [], [], [], -1);
+    end
+
+    % Call the function
+    polyMapStats = fcn_MapGen_statsPolytopes(shrunkPolytopes, (fig_num));
+
+    sgtitle(titleString, 'Interpreter','none');
+
+    % Check variable types
+    assert(isstruct(polyMapStats));
+
+    % Check variable sizes
+    % Too many
+
+    % Check variable values
+    % Too many
+
+    % Make sure plot opened up
+    assert(isequal(get(gcf,'Number'),fig_num));
+end
 
 %% Test cases start here. These are very simple, usually trivial
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -151,29 +178,19 @@ fig_num = 80001;
 fprintf(1,'Figure: %.0f: FAST mode, empty fig_num\n',fig_num);
 figure(fig_num); close(fig_num);
 
-polytopes(1).vertices = [0 0; 5 0; 7, 0.5; 5 1; 0 1; 0 0];
-polytopes(2).vertices = [6 0; 10 0; 10 1; 6 1; 8 0.5; 6 0];
-is_nonconvex = 1;
-polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes,(is_nonconvex),(-1));
+polytopes = fcn_INTERNAL_loadExampleData([200 220]);
 
 % Call the function
-[convexHullOverlapRatio, areaOverlap, areaOccupied] = ...
-    fcn_MapGen_calculateConvexHullOverlapRatio( polytopes, ([]));
+polyMapStats = fcn_MapGen_statsPolytopes(polytopes, ([]));
 
 % Check variable types
-assert(isnumeric(convexHullOverlapRatio));
-assert(isnumeric(areaOverlap));
-assert(isnumeric(areaOccupied));
+assert(isstruct(polyMapStats));
 
 % Check variable sizes
-assert(isequal(size(convexHullOverlapRatio),[1 1]));
-assert(isequal(size(areaOverlap),[1 1]));
-assert(isequal(size(areaOccupied),[1 1]));
+% Too many
 
 % Check variable values
-assert(isequal(0.0278            ,round(convexHullOverlapRatio,4)))
-assert(isequal(0.25              ,round(areaOverlap,4)))
-assert(isequal(9                 ,round(areaOccupied,4)))
+% Too many
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -185,29 +202,19 @@ fig_num = 80002;
 fprintf(1,'Figure: %.0f: FAST mode, fig_num=-1\n',fig_num);
 figure(fig_num); close(fig_num);
 
-polytopes(1).vertices = [0 0; 5 0; 7, 0.5; 5 1; 0 1; 0 0];
-polytopes(2).vertices = [6 0; 10 0; 10 1; 6 1; 8 0.5; 6 0];
-is_nonconvex = 1;
-polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes,(is_nonconvex),(-1));
+polytopes = fcn_INTERNAL_loadExampleData([200 220]);
 
 % Call the function
-[convexHullOverlapRatio, areaOverlap, areaOccupied] = ...
-    fcn_MapGen_calculateConvexHullOverlapRatio( polytopes, (-1));
+polyMapStats = fcn_MapGen_statsPolytopes(polytopes, (-1));
 
 % Check variable types
-assert(isnumeric(convexHullOverlapRatio));
-assert(isnumeric(areaOverlap));
-assert(isnumeric(areaOccupied));
+assert(isstruct(polyMapStats));
 
 % Check variable sizes
-assert(isequal(size(convexHullOverlapRatio),[1 1]));
-assert(isequal(size(areaOverlap),[1 1]));
-assert(isequal(size(areaOccupied),[1 1]));
+% Too many
 
 % Check variable values
-assert(isequal(0.0278            ,round(convexHullOverlapRatio,4)))
-assert(isequal(0.25              ,round(areaOverlap,4)))
-assert(isequal(9                 ,round(areaOccupied,4)))
+% Too many
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -220,25 +227,15 @@ fprintf(1,'Figure: %.0f: FAST mode comparisons\n',fig_num);
 figure(fig_num);
 close(fig_num);
 
-vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
-verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
-    vertices, -1);
+polytopes = fcn_INTERNAL_loadExampleData([200 220]);
 
-interiorPoint = [0.5 0.5];
-
-Niterations = 100;
+Niterations = 10;
 
 % Do calculation without pre-calculation
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [projectedPoints] = ...
-        fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-        interiorPoint,...
-        verticesIncludingSelfIntersections,...
-        verticesIncludingSelfIntersections(1:end-1,:),...
-        verticesIncludingSelfIntersections(2:end,:),...
-        ([]));
+    polyMapStats = fcn_MapGen_statsPolytopes(polytopes, ([]));
 end
 slow_method = toc;
 
@@ -246,13 +243,7 @@ slow_method = toc;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [projectedPoints] = ...
-        fcn_MapGen_polytopeProjectVerticesOntoWalls(...,
-        interiorPoint,...
-        verticesIncludingSelfIntersections,...
-        verticesIncludingSelfIntersections(1:end-1,:),...
-        verticesIncludingSelfIntersections(2:end,:),...
-        (-1));
+    polyMapStats = fcn_MapGen_statsPolytopes(polytopes, (-1));
 end
 fast_method = toc;
 
@@ -315,19 +306,16 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
 
-% %% fcn_INTERNAL_loadExampleData
-% function [seed_points, V, C] = fcn_INTERNAL_loadExampleData
-%
-%
-% % pull halton set
-% halton_points = haltonset(2);
-% points_scrambled = scramble(halton_points,'RR2'); % scramble values
-%
-% % pick values from halton set
-% Halton_range = [1801 1901];
-% low_pt = Halton_range(1,1);
-% high_pt = Halton_range(1,2);
-% seed_points = points_scrambled(low_pt:high_pt,:);
-% [V,C] = voronoin(seed_points);
-% % V = V.*stretch;
-% end % Ends fcn_INTERNAL_loadExampleData
+%% fcn_INTERNAL_loadExampleData
+function polytopes = fcn_INTERNAL_loadExampleData(range)
+seedGeneratorNames = 'haltonset';
+seedGeneratorRanges = range;
+AABBs = [0 0 1 1];
+mapStretchs = [1 1];
+[polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
+    seedGeneratorNames,...  % string or cellArrayOf_strings with the name of the seed generator to use
+    seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
+    (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
+    (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
+    (-1));
+end % Ends fcn_INTERNAL_loadExampleData

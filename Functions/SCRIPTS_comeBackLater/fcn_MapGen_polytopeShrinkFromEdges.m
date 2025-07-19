@@ -17,7 +17,6 @@ function [shrunkPolytope, new_vertices, new_projection_vectors, cut_distance] = 
 %
 % 3. Convert the resulting verticies into the standard polytope form.
 %
-%
 % FORMAT:
 %
 % [shrunkPolytope, (new_vertices, new_projection_vectors, cut_distance)]= ...
@@ -75,7 +74,6 @@ function [shrunkPolytope, new_vertices, new_projection_vectors, cut_distance] = 
 %    or outputs from previous calls, used to speed up code since this
 %    skeleton calculation is by far the slowest part.
 %
-%
 % DEPENDENCIES:
 %
 %     fcn_DebugTools_checkInputsToFunctions
@@ -83,7 +81,6 @@ function [shrunkPolytope, new_vertices, new_projection_vectors, cut_distance] = 
 %     fcn_MapGen_fillPolytopeFieldsFromVertices
 %
 % % EXAMPLES:
-%
 %
 % For additional examples, see: script_test_fcn_MapGen_polytopeShrinkFromEdges
 %
@@ -172,16 +169,18 @@ if  3 < nargin % Only way this happens is if user specifies skeleton
     if nargin<5
         error('Incorrect number of input arguments');
     end
+    temp = varargin{1};
+    if ~isempty(temp)
+        new_vertices = varargin{1};
+        new_projection_vectors = varargin{2};
+        cut_distance = varargin{3};
 
-    new_vertices = varargin{1};
-    new_projection_vectors = varargin{2};
-    cut_distance = varargin{3};
+        % Check the cut_distance input
+        % fcn_DebugTools_checkInputsToFunctions(...
+        %     new_vertices, '1column_of_numbers');
 
-    % Check the cut_distance input
-    % fcn_DebugTools_checkInputsToFunctions(...
-    %     new_vertices, '1column_of_numbers');
-
-    flag_use_user_skeleton = 1;
+        flag_use_user_skeleton = 1;
+    end
 
 end
 
@@ -224,7 +223,7 @@ if 0 == flag_use_user_skeleton
             fcn_MapGen_polytopeFindVertexSkeleton(vertices,fig_num);
     else
         [new_vertices, new_projection_vectors, cut_distance] = ...
-            fcn_MapGen_polytopeFindVertexSkeleton(vertices);
+            fcn_MapGen_polytopeFindVertexSkeleton(vertices, -1);
     end
 end
 
@@ -252,8 +251,7 @@ final_vertices = template_vertices + new_projection_vectors{shape_index}*additio
 shrunkPolytope.vertices = final_vertices;
 
 % fill in other fields from the vertices field
-shrunkPolytope = fcn_MapGen_fillPolytopeFieldsFromVertices(shrunkPolytope);
-
+shrunkPolytope = fcn_MapGen_polytopesFillFieldsFromVertices(shrunkPolytope, [], -1);
 
 
 %% Plot results?
