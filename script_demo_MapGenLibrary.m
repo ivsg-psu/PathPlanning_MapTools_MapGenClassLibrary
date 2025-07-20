@@ -134,7 +134,11 @@
 %    % --- fcn_GridMapGen_dilateByN: dilates a matrix by N cells
 %    % --- fcn_GridMapGen_dilateOccupancyByN: dilates occupancy by N cells 
 %    % --- fcn_GridMapGen_generateRandomOccupancyMap: generates a random occupancy map
-
+% -- Added GridMapGen demos including:
+%    % --- script_demo_dilateCompareDilateByNSpeeds - shows the dilation
+%    %     toolsets
+%    % --- script_demo_dilateCompareDilateByNSpeeds - shows the dilation
+%    %     toolsets
 
 clear library_name library_folders library_url
 

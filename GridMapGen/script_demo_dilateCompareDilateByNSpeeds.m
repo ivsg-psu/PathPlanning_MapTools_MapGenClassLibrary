@@ -26,6 +26,16 @@ map = fcn_GridMapGen_generateRandomOccupancyMap(...
     (seedMap), ...
     (3737));
 
+
+% Call the function
+fig_num = 1000;
+figure(fig_num); clf;
+fcn_GridMapGen_dilateByN(map, dilationLevel, [], [], (fig_num));
+
+fig_num = 2000;
+figure(fig_num); clf;
+fcn_GridMapGen_dilateOccupancyByN(map, dilationLevel, ([]), (fig_num));
+
 %% FAST mode comparisons with regular vs precalculated modes
 fig_num = 80001;
 fprintf(1,'Figure: %.0f: FAST mode comparisons with regular vs precalculated modes\n',fig_num);

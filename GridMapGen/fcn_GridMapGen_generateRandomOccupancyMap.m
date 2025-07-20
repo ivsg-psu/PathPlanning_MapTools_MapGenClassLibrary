@@ -293,6 +293,7 @@ end
 indexMatchingDesiredRatio = find(percentages<=occupancyRatio,1);
 goodThresholdToUse = levels(indexMatchingDesiredRatio);
 
+fprintf(1,'Current threshold: %.2f\n', goodThresholdToUse);
 
 %% Save final result
 occupancyMatrix = randomMap_dilated>goodThresholdToUse;
@@ -326,7 +327,7 @@ end
 
 if flag_do_plots
     h_fig = figure(fig_num);
-    set(h_fig,'Name','occupancyMatrix','NumberTitle','off', 'Position',[684 85 592 317]);
+    set(h_fig,'Name','occupancyMatrix','NumberTitle','off'); %, 'Position',[684 85 592 317]);
 
     image(occupancyMatrix+1);
     colormap([1 1 1;0 0 0])
