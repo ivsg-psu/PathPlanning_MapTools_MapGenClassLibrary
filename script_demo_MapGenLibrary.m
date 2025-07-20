@@ -131,6 +131,10 @@
 % 2025_07_18 - S. Brennan
 % -- Added GridMapGen tools including:
 %    % --- fcn_GridMapGen_dilationOccupancyStats: calcs occupancy stats
+%    % --- fcn_GridMapGen_dilateByN: dilates a matrix by N cells
+%    % --- fcn_GridMapGen_dilateOccupancyByN: dilates occupancy by N cells 
+%    % --- fcn_GridMapGen_generateRandomOccupancyMap: generates a random occupancy map
+
 
 clear library_name library_folders library_url
 

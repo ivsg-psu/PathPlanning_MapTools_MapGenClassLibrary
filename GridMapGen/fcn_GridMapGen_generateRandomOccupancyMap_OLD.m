@@ -1,22 +1,22 @@
-function occupancy_map = fcn_generate_random_occupancy(n,m,varargin)
-% FCN_GENERATE_RANDOM_OCCUPANCY  generates a random occupancy map
+function occupancy_map = fcn_GridMapGen_generateRandomOccupancyMap_OLD(n,m,varargin)
+% fcn_GridMapGen_generateRandomOccupancyMap_OLD  generates a random occupancy map
 %
-% OCCUPANCY_MAP = FCN_GENERATE_RANDOM_OCCUPANCY(N,M) returns an N-by-M
+% OCCUPANCY_MAP = fcn_GridMapGen_generateRandomOccupancyMap_OLD(N,M) returns an N-by-M
 % matrix containing 1's and 0's, with 1 being occupied and 0 clear. Default
 % values are used where 20% of the map is occupied, dilation is level 3.
 %
-% OCCUPANCY_MAP = FCN_GENERATE_RANDOM_OCCUPANCY(N,M,R) allows the user to
+% OCCUPANCY_MAP = fcn_GridMapGen_generateRandomOccupancyMap_OLD(N,M,R) allows the user to
 % specify the ratio of occupied elements to total elements. For example, if
 % R = 0.5, then 50% of the elements will be occupied. The default value is
 % 20%.
 %
-% OCCUPANCY_MAP = FCN_GENERATE_RANDOM_OCCUPANCY(N,M,R,D) allows the user to
+% OCCUPANCY_MAP = fcn_GridMapGen_generateRandomOccupancyMap_OLD(N,M,R,D) allows the user to
 % specify the dilation level (integer), which in turn affects the
 % smoothness. Dilation levels of 0 are the same as the random plot. A value
 % of 1, 2, or 3 usually gives good maps, though larger values can be used.
 % The default is 2.
 % 
-% OCCUPANCY_MAP = FCN_GENERATE_RANDOM_OCCUPANCY(N,M,R,D,SEED_MAP) allows
+% OCCUPANCY_MAP = fcn_GridMapGen_generateRandomOccupancyMap_OLD(N,M,R,D,SEED_MAP) allows
 % the user to specify a seed map as an N-by-M matrix. This is especially
 % useful to compare the same map data at different resolutions or levels of
 % smoothing. Note: the size of the seed map overwrites the values of N and
@@ -25,7 +25,7 @@ function occupancy_map = fcn_generate_random_occupancy(n,m,varargin)
 % Examples:
 %      
 %      % BASIC example
-%      occupancy_map = fcn_generate_random_occupancy(100,100);
+%      occupancy_map = fcn_GridMapGen_generateRandomOccupancyMap_OLD(100,100);
 %      image(occupancy_map+1);
 %      colormap([1 1 1;0 0 0])
 %
@@ -36,7 +36,7 @@ function occupancy_map = fcn_generate_random_occupancy(n,m,varargin)
 %      total_maps = seed_map<r+1;
 %      levels = 20;
 %      for D = 1:levels
-%          occupancy_map = fcn_generate_random_occupancy(100,100,r,D,seed_map);
+%          occupancy_map = fcn_GridMapGen_generateRandomOccupancyMap_OLD(100,100,r,D,seed_map);
 %          total_maps = total_maps + occupancy_map;
 %          maps{D} = occupancy_map; %#ok<AGROW>
 %      end
@@ -76,7 +76,6 @@ end
 % Check if user has specified the initial random map
 if nargin==5
     rand_map = varargin{3};
-    [n,m] = size(rand_map); %#ok<NASGU>
 else
     % Generate inital occupancy map
     rand_map = rand(n,m);
@@ -94,7 +93,7 @@ end
 % title(sprintf('Percent occupied at dialation %d, r of %.2f: %.4f\n',1,r,percent_occupied));
 
 %% Dilate on original random image with bad dialation function
-rand_map_d1 = fcn_GridMapGen_dilateByN(rand_map,dilation);
+rand_map_d1 = fcn_GridMapGen_dilateByN(rand_map,dilation,18181);
 
 %% Iterate to find the right value of r that preserves ratio
 low = min(min(rand_map_d1));
@@ -104,7 +103,7 @@ levels = low:(high-low)/100:high;
 percentages = zeros(length(levels),1);
 for i=1:length(levels)
     temp_occupancy = rand_map_d1<levels(i);
-    percentages(i) = fcn_GridMapGen_dilationOccupancyStats(temp_occupancy);
+    percentages(i) = fcn_GridMapGen_dilateOccupancyStats(temp_occupancy);
 end
 indices = find(percentages>r);
 r_d = levels(indices(1));

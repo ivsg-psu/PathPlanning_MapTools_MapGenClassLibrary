@@ -1,5 +1,5 @@
-% script_test_fcn_GridMapGen_dilateByN
-% Tests: fcn_GridMapGen_dilateByN
+% script_test_fcn_GridMapGen_dilateOccupancyByN
+% Tests: fcn_GridMapGen_dilateOccupancyByN
 
 %
 % REVISION HISTORY:
@@ -39,32 +39,32 @@ figure(fig_num); clf;
 occupancyMatrix = rand(100,100)<0.1; % about 10 percent occupied
 % percentOccupied = fcn_GridMapGen_dilateOccupancyStats(occupancyMatrix, (28282));
 dilationLevel = 1;
-leftDilationMultiplier = [];
-rightDilationMultiplier = [];
+dilationIndexShift = [];
 
 % Call the function
-[dilatedMatrix, leftDilationMultiplier, rightDilationMultiplier] = ...
-    fcn_GridMapGen_dilateByN(occupancyMatrix, dilationLevel, ...
-    (leftDilationMultiplier), (rightDilationMultiplier), (fig_num));
+[dilatedMatrix, dilationIndexShift] = ...
+    fcn_GridMapGen_dilateOccupancyByN(occupancyMatrix, dilationLevel, ...
+    (dilationIndexShift), (fig_num));
 
 sgtitle(titleString, 'Interpreter','none','FontSize',12)
 
 % Check variable types
-assert(isnumeric(dilatedMatrix));
-assert(isnumeric(leftDilationMultiplier));
-assert(isnumeric(leftDilationMultiplier));
+if islogical(occupancyMatrix)
+    assert(islogical(dilatedMatrix));
+else
+    assert(isnumeric(dilatedMatrix));
+end
+assert(isnumeric(dilationIndexShift));
 
 % Check variable sizes
 nRows = size(occupancyMatrix,1);
 mCols = size(occupancyMatrix,2);
 assert(isequal(size(dilatedMatrix),[nRows mCols]));
-assert(isequal(size(leftDilationMultiplier),[nRows nRows]));
-assert(isequal(size(rightDilationMultiplier),[mCols mCols]));
+assert(isequal(size(dilationIndexShift,2),nRows*mCols));
 
 % Check variable values
 assert(all(all(dilatedMatrix>=occupancyMatrix)));
-assert(all(all(leftDilationMultiplier>=0)));
-assert(all(all(rightDilationMultiplier>=0)));
+assert(all(all(dilationIndexShift>=0)));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -80,28 +80,29 @@ occupancyMatrix = rand(100,100)<0.02; % about 2 percent occupied
 dilationLevel = 2;
 
 % Call the function
-[dilatedMatrix, leftDilationMultiplier, rightDilationMultiplier] = ...
-    fcn_GridMapGen_dilateByN(occupancyMatrix, dilationLevel, ...
-    (leftDilationMultiplier), (rightDilationMultiplier), (fig_num));
+[dilatedMatrix, dilationIndexShift] = ...
+    fcn_GridMapGen_dilateOccupancyByN(occupancyMatrix, dilationLevel, ...
+    (dilationIndexShift), (fig_num));
 
 sgtitle(titleString, 'Interpreter','none','FontSize',12)
 
 % Check variable types
-assert(isnumeric(dilatedMatrix));
-assert(isnumeric(leftDilationMultiplier));
-assert(isnumeric(leftDilationMultiplier));
+if islogical(occupancyMatrix)
+    assert(islogical(dilatedMatrix));
+else
+    assert(isnumeric(dilatedMatrix));
+end
+assert(isnumeric(dilationIndexShift));
 
 % Check variable sizes
 nRows = size(occupancyMatrix,1);
 mCols = size(occupancyMatrix,2);
 assert(isequal(size(dilatedMatrix),[nRows mCols]));
-assert(isequal(size(leftDilationMultiplier),[nRows nRows]));
-assert(isequal(size(rightDilationMultiplier),[mCols mCols]));
+assert(isequal(size(dilationIndexShift,2),nRows*mCols));
 
 % Check variable values
 assert(all(all(dilatedMatrix>=occupancyMatrix)));
-assert(all(all(leftDilationMultiplier>=0)));
-assert(all(all(rightDilationMultiplier>=0)));
+assert(all(all(dilationIndexShift>=0)));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -134,33 +135,33 @@ figure(fig_num); clf;
 
 occupancyMatrix = [zeros(10,5) ones(10,5)];
 dilationLevel = 1;
-leftDilationMultiplier = [];
-rightDilationMultiplier = [];
+dilationIndexShift = [];
 
 % Call the function
-[dilatedMatrix, leftDilationMultiplier, rightDilationMultiplier] = ...
-    fcn_GridMapGen_dilateByN(occupancyMatrix, dilationLevel, ...
-    (leftDilationMultiplier), (rightDilationMultiplier), (fig_num));
-
+[dilatedMatrix, dilationIndexShift] = ...
+    fcn_GridMapGen_dilateOccupancyByN(occupancyMatrix, dilationLevel, ...
+    (dilationIndexShift), (fig_num));
 
 sgtitle(titleString, 'Interpreter','none','FontSize',12)
 
 % Check variable types
-assert(isnumeric(dilatedMatrix));
-assert(isnumeric(leftDilationMultiplier));
-assert(isnumeric(leftDilationMultiplier));
+if islogical(occupancyMatrix)
+    assert(islogical(dilatedMatrix)); %#ok<UNRCH>
+else
+    assert(isnumeric(dilatedMatrix));
+end
+assert(isnumeric(dilationIndexShift));
 
 % Check variable sizes
 nRows = size(occupancyMatrix,1);
 mCols = size(occupancyMatrix,2);
 assert(isequal(size(dilatedMatrix),[nRows mCols]));
-assert(isequal(size(leftDilationMultiplier),[nRows nRows]));
-assert(isequal(size(rightDilationMultiplier),[mCols mCols]));
+assert(isequal(size(dilationIndexShift,2),nRows*mCols));
 
 % Check variable values
 assert(all(all(dilatedMatrix>=occupancyMatrix)));
-assert(all(all(leftDilationMultiplier>=0)));
-assert(all(all(rightDilationMultiplier>=0)));
+assert(all(all(dilationIndexShift>=0)));
+
 percentOccupied = fcn_GridMapGen_dilateOccupancyStats(dilatedMatrix,-1);
 assert(isequal(round(percentOccupied,6),0.6));
 
@@ -175,32 +176,33 @@ figure(fig_num); clf;
 
 occupancyMatrix = [zeros(10,5) ones(10,5)];
 dilationLevel = 2;
-leftDilationMultiplier = [];
-rightDilationMultiplier = [];
+dilationIndexShift = [];
 
 % Call the function
-[dilatedMatrix, leftDilationMultiplier, rightDilationMultiplier] = ...
-    fcn_GridMapGen_dilateByN(occupancyMatrix, dilationLevel, ...
-    (leftDilationMultiplier), (rightDilationMultiplier), (fig_num));
+[dilatedMatrix, dilationIndexShift] = ...
+    fcn_GridMapGen_dilateOccupancyByN(occupancyMatrix, dilationLevel, ...
+    (dilationIndexShift), (fig_num));
 
 sgtitle(titleString, 'Interpreter','none','FontSize',12)
 
 % Check variable types
-assert(isnumeric(dilatedMatrix));
-assert(isnumeric(leftDilationMultiplier));
-assert(isnumeric(leftDilationMultiplier));
+if islogical(occupancyMatrix)
+    assert(islogical(dilatedMatrix)); %#ok<UNRCH>
+else
+    assert(isnumeric(dilatedMatrix));
+end
+assert(isnumeric(dilationIndexShift));
 
 % Check variable sizes
 nRows = size(occupancyMatrix,1);
 mCols = size(occupancyMatrix,2);
 assert(isequal(size(dilatedMatrix),[nRows mCols]));
-assert(isequal(size(leftDilationMultiplier),[nRows nRows]));
-assert(isequal(size(rightDilationMultiplier),[mCols mCols]));
+assert(isequal(size(dilationIndexShift,2),nRows*mCols));
 
 % Check variable values
 assert(all(all(dilatedMatrix>=occupancyMatrix)));
-assert(all(all(leftDilationMultiplier>=0)));
-assert(all(all(rightDilationMultiplier>=0)));
+assert(all(all(dilationIndexShift>=0)));
+
 percentOccupied = fcn_GridMapGen_dilateOccupancyStats(dilatedMatrix,-1);
 assert(isequal(round(percentOccupied,6),0.7));
 
@@ -216,34 +218,124 @@ figure(fig_num); clf;
 
 occupancyMatrix = [zeros(5,10); ones(5,10)];
 dilationLevel = 2;
-leftDilationMultiplier = [];
-rightDilationMultiplier = [];
+dilationIndexShift = [];
 
 % Call the function
-[dilatedMatrix, leftDilationMultiplier, rightDilationMultiplier] = ...
-    fcn_GridMapGen_dilateByN(occupancyMatrix, dilationLevel, ...
-    (leftDilationMultiplier), (rightDilationMultiplier), (fig_num));
+[dilatedMatrix, dilationIndexShift] = ...
+    fcn_GridMapGen_dilateOccupancyByN(occupancyMatrix, dilationLevel, ...
+    (dilationIndexShift), (fig_num));
 
 sgtitle(titleString, 'Interpreter','none','FontSize',12)
 
 % Check variable types
-assert(isnumeric(dilatedMatrix));
-assert(isnumeric(leftDilationMultiplier));
-assert(isnumeric(leftDilationMultiplier));
+if islogical(occupancyMatrix)
+    assert(islogical(dilatedMatrix)); %#ok<UNRCH>
+else
+    assert(isnumeric(dilatedMatrix));
+end
+assert(isnumeric(dilationIndexShift));
 
 % Check variable sizes
 nRows = size(occupancyMatrix,1);
 mCols = size(occupancyMatrix,2);
 assert(isequal(size(dilatedMatrix),[nRows mCols]));
-assert(isequal(size(leftDilationMultiplier),[nRows nRows]));
-assert(isequal(size(rightDilationMultiplier),[mCols mCols]));
+assert(isequal(size(dilationIndexShift,2),nRows*mCols));
 
 % Check variable values
 assert(all(all(dilatedMatrix>=occupancyMatrix)));
-assert(all(all(leftDilationMultiplier>=0)));
-assert(all(all(rightDilationMultiplier>=0)));
+assert(all(all(dilationIndexShift>=0)));
+
 percentOccupied = fcn_GridMapGen_dilateOccupancyStats(dilatedMatrix,-1);
 assert(isequal(round(percentOccupied,6),0.7));
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+%% TEST case: 5x5 matrix, exactly 20% occupied by row, converted to exactly 60% by 2-step dilation
+% Useful for debugging the index operations, as matrix is small
+fig_num = 20004;
+titleString = sprintf('TEST case: 5x5 matrix, exactly 20%% occupied by row, converted to exactly 60%% by 2-step dilation');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+occupancyMatrix = [zeros(4,5); ones(1,5)];
+dilationLevel = 2;
+dilationIndexShift = [];
+
+% Call the function
+[dilatedMatrix, dilationIndexShift] = ...
+    fcn_GridMapGen_dilateOccupancyByN(occupancyMatrix, dilationLevel, ...
+    (dilationIndexShift), (fig_num));
+
+sgtitle(titleString, 'Interpreter','none','FontSize',12)
+
+% Check variable types
+if islogical(occupancyMatrix)
+    assert(islogical(dilatedMatrix)); %#ok<UNRCH>
+else
+    assert(isnumeric(dilatedMatrix));
+end
+assert(isnumeric(dilationIndexShift));
+
+% Check variable sizes
+nRows = size(occupancyMatrix,1);
+mCols = size(occupancyMatrix,2);
+assert(isequal(size(dilatedMatrix),[nRows mCols]));
+assert(isequal(size(dilationIndexShift,2),nRows*mCols));
+
+% Check variable values
+assert(all(all(dilatedMatrix>=occupancyMatrix)));
+assert(all(all(dilationIndexShift>=0)));
+
+percentOccupied = fcn_GridMapGen_dilateOccupancyStats(dilatedMatrix,-1);
+assert(isequal(round(percentOccupied,6),0.6));
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+%% TEST case: 10x10 matrix, exactly 50% occupied by row, converted to exactly 70% by 2-step dilation, precalculated shift
+fig_num = 20005;
+titleString = sprintf('TEST case: 10x10 matrix, exactly 50%% occupied by row, converted to exactly 70%% by 2-step dilation, precalculated shift');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+occupancyMatrix = [zeros(5,10); ones(5,10)];
+dilationLevel = 2;
+dilationIndexShift = [];
+
+% Call the function once
+[dilatedMatrix, dilationIndexShift] = ...
+    fcn_GridMapGen_dilateOccupancyByN(occupancyMatrix, dilationLevel, ...
+    (dilationIndexShift), (fig_num));
+
+% Call the function again
+[dilatedMatrix2, dilationIndexShift] = ...
+    fcn_GridMapGen_dilateOccupancyByN(occupancyMatrix, dilationLevel, ...
+    (dilationIndexShift), (fig_num));
+
+sgtitle(titleString, 'Interpreter','none','FontSize',12)
+
+% Check variable types
+if islogical(occupancyMatrix)
+    assert(islogical(dilatedMatrix)); %#ok<UNRCH>
+else
+    assert(isnumeric(dilatedMatrix));
+end
+assert(isnumeric(dilationIndexShift));
+
+% Check variable sizes
+nRows = size(occupancyMatrix,1);
+mCols = size(occupancyMatrix,2);
+assert(isequal(size(dilatedMatrix),[nRows mCols]));
+assert(isequal(size(dilationIndexShift,2),nRows*mCols));
+
+% Check variable values
+assert(all(all(dilatedMatrix>=occupancyMatrix)));
+assert(all(all(dilationIndexShift>=0)));
+
+percentOccupied = fcn_GridMapGen_dilateOccupancyStats(dilatedMatrix,-1);
+assert(isequal(round(percentOccupied,6),0.7));
+assert(isequal(dilatedMatrix,dilatedMatrix2));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -274,30 +366,32 @@ figure(fig_num); close(fig_num);
 occupancyMatrix = rand(100,100)<0.1; % about 10 percent occupied
 % percentOccupied = fcn_GridMapGen_dilateOccupancyStats(occupancyMatrix, (28282));
 dilationLevel = 1;
-leftDilationMultiplier = [];
-rightDilationMultiplier = [];
+dilationIndexShift = [];
+
 
 % Call the function
-[dilatedMatrix, leftDilationMultiplier, rightDilationMultiplier] = ...
-    fcn_GridMapGen_dilateByN(occupancyMatrix, dilationLevel, ...
-    (leftDilationMultiplier), (rightDilationMultiplier), ([]));
+[dilatedMatrix, dilationIndexShift] = ...
+    fcn_GridMapGen_dilateOccupancyByN(occupancyMatrix, dilationLevel, ...
+    (dilationIndexShift), ([]));
 
 % Check variable types
-assert(isnumeric(dilatedMatrix));
-assert(isnumeric(leftDilationMultiplier));
-assert(isnumeric(leftDilationMultiplier));
+if islogical(occupancyMatrix)
+    assert(islogical(dilatedMatrix));
+else
+    assert(isnumeric(dilatedMatrix));
+end
+assert(isnumeric(dilationIndexShift));
 
 % Check variable sizes
 nRows = size(occupancyMatrix,1);
 mCols = size(occupancyMatrix,2);
 assert(isequal(size(dilatedMatrix),[nRows mCols]));
-assert(isequal(size(leftDilationMultiplier),[nRows nRows]));
-assert(isequal(size(rightDilationMultiplier),[mCols mCols]));
+assert(isequal(size(dilationIndexShift,2),nRows*mCols));
 
 % Check variable values
 assert(all(all(dilatedMatrix>=occupancyMatrix)));
-assert(all(all(leftDilationMultiplier>=0)));
-assert(all(all(rightDilationMultiplier>=0)));
+assert(all(all(dilationIndexShift>=0)));
+
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -311,30 +405,31 @@ figure(fig_num); close(fig_num);
 occupancyMatrix = rand(100,100)<0.1; % about 10 percent occupied
 % percentOccupied = fcn_GridMapGen_dilateOccupancyStats(occupancyMatrix, (28282));
 dilationLevel = 1;
-leftDilationMultiplier = [];
-rightDilationMultiplier = [];
+dilationIndexShift = [];
 
 % Call the function
-[dilatedMatrix, leftDilationMultiplier, rightDilationMultiplier] = ...
-    fcn_GridMapGen_dilateByN(occupancyMatrix, dilationLevel, ...
-    (leftDilationMultiplier), (rightDilationMultiplier), (-1));
+[dilatedMatrix, dilationIndexShift] = ...
+    fcn_GridMapGen_dilateOccupancyByN(occupancyMatrix, dilationLevel, ...
+    (dilationIndexShift), (-1));
 
 % Check variable types
-assert(isnumeric(dilatedMatrix));
-assert(isnumeric(leftDilationMultiplier));
-assert(isnumeric(leftDilationMultiplier));
+if islogical(occupancyMatrix)
+    assert(islogical(dilatedMatrix));
+else
+    assert(isnumeric(dilatedMatrix));
+end
+assert(isnumeric(dilationIndexShift));
 
 % Check variable sizes
 nRows = size(occupancyMatrix,1);
 mCols = size(occupancyMatrix,2);
 assert(isequal(size(dilatedMatrix),[nRows mCols]));
-assert(isequal(size(leftDilationMultiplier),[nRows nRows]));
-assert(isequal(size(rightDilationMultiplier),[mCols mCols]));
+assert(isequal(size(dilationIndexShift,2),nRows*mCols));
 
 % Check variable values
 assert(all(all(dilatedMatrix>=occupancyMatrix)));
-assert(all(all(leftDilationMultiplier>=0)));
-assert(all(all(rightDilationMultiplier>=0)));
+assert(all(all(dilationIndexShift>=0)));
+
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -357,9 +452,9 @@ Niterations = 100;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [dilatedMatrix, leftDilationMultiplier, rightDilationMultiplier] = ...
-    fcn_GridMapGen_dilateByN(occupancyMatrix, dilationLevel, ...
-    ([]), ([]), ([]));
+    [dilatedMatrix, dilationIndexShift] = ...
+    fcn_GridMapGen_dilateOccupancyByN(occupancyMatrix, dilationLevel, ...
+    ([]), ([]));
 end
 slow_method = toc;
 
@@ -367,9 +462,9 @@ slow_method = toc;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [dilatedMatrix, leftDilationMultiplier, rightDilationMultiplier] = ...
-        fcn_GridMapGen_dilateByN(occupancyMatrix, dilationLevel, ...
-        ([]), ([]), (-1));
+    [dilatedMatrix, dilationIndexShift] = ...
+        fcn_GridMapGen_dilateOccupancyByN(occupancyMatrix, dilationLevel, ...
+        ([]), (-1));
 end
 fast_method = toc;
 
@@ -409,9 +504,9 @@ Niterations = 100;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [dilatedMatrix, leftDilationMultiplier, rightDilationMultiplier] = ...
-    fcn_GridMapGen_dilateByN(occupancyMatrix, dilationLevel, ...
-    ([]), ([]), ([]));
+    [dilatedMatrix, dilationIndexShift] = ...
+    fcn_GridMapGen_dilateOccupancyByN(occupancyMatrix, dilationLevel, ...
+    ([]), ([]));
 end
 slow_method = toc;
 
@@ -419,9 +514,9 @@ slow_method = toc;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [dilatedMatrix, leftDilationMultiplier, rightDilationMultiplier] = ...
-        fcn_GridMapGen_dilateByN(occupancyMatrix, dilationLevel, ...
-        ([]), ([]), (-1));
+    [dilatedMatrix, dilationIndexShift] = ...
+        fcn_GridMapGen_dilateOccupancyByN(occupancyMatrix, dilationLevel, ...
+        ([]), (-1));
 end
 fast_method = toc;
 
@@ -429,9 +524,9 @@ fast_method = toc;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [dilatedMatrix, leftDilationMultiplier, rightDilationMultiplier] = ...
-        fcn_GridMapGen_dilateByN(occupancyMatrix, dilationLevel, ...
-        (leftDilationMultiplier), (rightDilationMultiplier), (-1));
+    [dilatedMatrix, dilationIndexShift] = ...
+        fcn_GridMapGen_dilateOccupancyByN(occupancyMatrix, dilationLevel, ...
+        (dilationIndexShift), (-1));
 end
 very_fast_method = toc;
 
@@ -472,6 +567,59 @@ assert(~any(figHandles==fig_num));
 % close all;
 
 %% BUG
+
+%% BUG case: small 5x5 matrix, walking through pixels
+% Useful for debugging the index operations, as matrix is small
+fig_num = 90001;
+titleString = sprintf('BUG case: small 5x5 matrix, walking through pixels');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num);  clf;
+
+for ith_row = 1:6
+    for jth_col = 1:6
+        occupancyMatrix = zeros(6,6);
+        occupancyMatrix(ith_row,jth_col) = 1;
+
+        dilationLevel = 4;
+        dilationIndexShift = [];
+
+        % Call the function
+        % figure(fig_num); clf;
+
+        [dilatedMatrix, dilationIndexShift] = ...
+            fcn_GridMapGen_dilateOccupancyByN(occupancyMatrix, dilationLevel, ...
+            (dilationIndexShift), (fig_num));
+        sgtitle(sprintf('Row: %.0d, Col: %.0d',ith_row, jth_col));
+        pause(0.1);
+    end
+end
+
+sgtitle(titleString, 'Interpreter','none','FontSize',12)
+
+% Check variable types
+if islogical(occupancyMatrix)
+    assert(islogical(dilatedMatrix)); 
+else
+    assert(isnumeric(dilatedMatrix));
+end
+assert(isnumeric(dilationIndexShift));
+
+% Check variable sizes
+nRows = size(occupancyMatrix,1);
+mCols = size(occupancyMatrix,2);
+assert(isequal(size(dilatedMatrix),[nRows mCols]));
+assert(isequal(size(dilationIndexShift,2),nRows*mCols));
+
+% Check variable values
+assert(all(all(dilatedMatrix>=occupancyMatrix)));
+assert(all(all(dilationIndexShift>=0)));
+
+percentOccupied = fcn_GridMapGen_dilateOccupancyStats(dilatedMatrix,-1);
+% assert(isequal(round(percentOccupied,6),0.7));
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
 
 %% Fail conditions
 if 1==0

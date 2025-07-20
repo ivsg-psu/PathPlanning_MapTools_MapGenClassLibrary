@@ -30,9 +30,9 @@ close all
 close all;
 fprintf(1,'Figure: 1XXXXXX: DEMO cases\n');
 
-%% DEMO case: occupancyMap using all defaults
+%% DEMO case: occupancyMap using all defaults blank
 fig_num = 10001;
-titleString = sprintf('DEMO case: random 100x100 matrix, 10%% occupied, dilation of 1');
+titleString = sprintf('DEMO case: occupancyMap using all defaults blank');
 fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
@@ -52,43 +52,159 @@ occupancyMatrix = fcn_GridMapGen_generateRandomOccupancyMap(...
     (seedMap), ...
     (fig_num));
 
-sgtitle(titleString, 'Interpreter','none');
+sgtitle(titleString, 'Interpreter','none','Fontsize',10);
 
 % Check variable types
-assert(isnumeric(occupancyMatrix));
+assert(islogical(occupancyMatrix));
 
 % Check variable sizes
-assert(isequal(size(occupancyMatrix),[100 100]));
+if ~exist('nRows','var') || isempty(nRows)
+    assert(isequal(size(occupancyMatrix,1),100));
+else
+    assert(isequal(size(occupancyMatrix,1),nRows));
+end
+if ~exist('mColumns','var') || isempty(mColumns)
+    % Defaults to number of rows
+    if exist('nRows','var')
+        if isempty(nRows)
+            assert(isequal(size(occupancyMatrix,2),100));
+        else
+            assert(isequal(size(occupancyMatrix,2),nRows));
+        end
+    else
+        assert(isequal(size(occupancyMatrix,2),100));
+    end
+else
+    assert(isequal(size(occupancyMatrix,2),mColumns));
+end
 
 % Check variable values
-assert(all(  ((occupancyMatrix>=0).*(occupancyMatrix<=1)) >0,'all') );
+percentOccupied = fcn_GridMapGen_dilateOccupancyStats(occupancyMatrix, -1);
+if ~exist('occupancyRatio','var') || isempty(occupancyRatio)
+    assert(abs(percentOccupied - 0.2)<0.1);
+else
+    assert(abs(percentOccupied - occupancyRatio)<0.1);
+end
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
 
-%% DEMO case: random 100x100 matrix, 2% occupied, dilation of 2
-fig_num = 10001;
-titleString = sprintf('DEMO case: random 100x100 matrix, 2%% occupied, dilation of 2');
+
+%% DEMO case: occupancyMap from no input arguments (no figure opens)
+fig_num = 10002;
+titleString = sprintf('DEMO case: occupancyMap from no input arguments (no figure opens)');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); close(fig_num);
+
+% Set input arguments
+% nRows = [];
+% mColumns = [];
+% occupancyRatio = [];
+% dilationLevel = [];
+% seedMap = [];
+
+% Call the function
+occupancyMatrix = fcn_GridMapGen_generateRandomOccupancyMap;
+% (...
+%     (nRows), ...
+%     (mColumns), ...
+%     (occupancyRatio), ...
+%     (dilationLevel), ...
+%     (seedMap), ...
+%     (fig_num));
+
+% Check variable types
+assert(islogical(occupancyMatrix));
+
+% Check variable sizes
+if ~exist('nRows','var') || isempty(nRows)
+    assert(isequal(size(occupancyMatrix,1),100));
+else
+    assert(isequal(size(occupancyMatrix,1),nRows));
+end
+if ~exist('mColumns','var') || isempty(mColumns)
+    % Defaults to number of rows
+    if exist('nRows','var')
+        if isempty(nRows)
+            assert(isequal(size(occupancyMatrix,2),100));
+        else
+            assert(isequal(size(occupancyMatrix,2),nRows));
+        end
+    else
+        assert(isequal(size(occupancyMatrix,2),100));
+    end
+else
+    assert(isequal(size(occupancyMatrix,2),mColumns));
+end
+
+% Check variable values
+percentOccupied = fcn_GridMapGen_dilateOccupancyStats(occupancyMatrix, -1);
+if ~exist('occupancyRatio','var') || isempty(occupancyRatio)
+    assert(abs(percentOccupied - 0.2)<0.1);
+else
+    assert(abs(percentOccupied - occupancyRatio)<0.1);
+end
+
+% Make sure plot did NOT open up
+figHandles = get(groot, 'Children');
+assert(~any(figHandles==fig_num));
+
+
+%% DEMO case: huge smoothing (dilationLevel = 40)
+fig_num = 10003;
+titleString = sprintf('DEMO case: huge smoothing (dilationLevel = 40)');
 fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
-occupancyMatrix = rand(100,100)<0.02; % about 2 percent occupied
-% percentOccupied = fcn_GridMapGen_dilateOccupancyStats(occupancyMatrix, (28282));
-dilationLevel = 2;
+% Set input arguments
+nRows = [];
+mColumns = [];
+occupancyRatio = [];
+dilationLevel = 40;
+seedMap = [];
 
 % Call the function
-dilatedMatrix = fcn_GridMapGen_generateRandomOccupancyMap(occupancyMatrix, dilationLevel, (fig_num));
+occupancyMatrix = fcn_GridMapGen_generateRandomOccupancyMap(...
+    (nRows), ...
+    (mColumns), ...
+    (occupancyRatio), ...
+    (dilationLevel), ...
+    (seedMap), ...
+    (fig_num));
 
-sgtitle(titleString, 'Interpreter','none');
+sgtitle(titleString, 'Interpreter','none','Fontsize',10);
 
 % Check variable types
-assert(isnumeric(dilatedMatrix));
+assert(islogical(occupancyMatrix));
 
 % Check variable sizes
-assert(isequal(size(dilatedMatrix),size(occupancyMatrix)));
+if ~exist('nRows','var') || isempty(nRows)
+    assert(isequal(size(occupancyMatrix,1),100));
+else
+    assert(isequal(size(occupancyMatrix,1),nRows));
+end
+if ~exist('mColumns','var') || isempty(mColumns)
+    % Defaults to number of rows
+    if exist('nRows','var')
+        if isempty(nRows)
+            assert(isequal(size(occupancyMatrix,2),100));
+        else
+            assert(isequal(size(occupancyMatrix,2),nRows));
+        end
+    else
+        assert(isequal(size(occupancyMatrix,2),100));
+    end
+else
+    assert(isequal(size(occupancyMatrix,2),mColumns));
+end
 
 % Check variable values
-assert(all(all(dilatedMatrix>=occupancyMatrix)));
+percentOccupied = fcn_GridMapGen_dilateOccupancyStats(occupancyMatrix, -1);
+if ~exist('occupancyRatio','var') || isempty(occupancyRatio)
+    assert(abs(percentOccupied - 0.2)<0.1);
+else
+    assert(abs(percentOccupied - occupancyRatio)<0.1);
+end
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -113,90 +229,439 @@ assert(isequal(get(gcf,'Number'),fig_num));
 close all;
 fprintf(1,'Figure: 2XXXXXX: TEST mode cases\n');
 
-%% TEST case: 10x10 matrix, exactly 50% occupied by column, converted to exactly 60% by 1-step dilation
+%% TEST case: using all inputs specified to defaults
 fig_num = 20001;
-titleString = sprintf('TEST case: 10x10 matrix, exactly 50%% occupied by column, converted to exactly 60%% by 1-step dilation');
+titleString = sprintf('TEST case: occupancyMap using all inputs specified to defaults');
 fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
-occupancyMatrix = [zeros(10,5) ones(10,5)];
-dilationLevel = 1;
-
-% Call the function
-dilatedMatrix = fcn_GridMapGen_generateRandomOccupancyMap(occupancyMatrix, dilationLevel, (fig_num));
-
-sgtitle(titleString, 'Interpreter','none');
-
-% Check variable types
-assert(isnumeric(dilatedMatrix));
-
-% Check variable sizes
-assert(isequal(size(dilatedMatrix),size(occupancyMatrix)));
-
-% Check variable values
-assert(all(all(dilatedMatrix>=occupancyMatrix)));
-percentOccupied = fcn_GridMapGen_dilateOccupancyStats(dilatedMatrix,-1);
-assert(isequal(round(percentOccupied,6),0.6));
-
-% Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
-
-%% TEST case: 10x10 matrix, exactly 50% occupied by column, converted to exactly 70% by 2-step dilation
-fig_num = 20001;
-titleString = sprintf('TEST case: 10x10 matrix, exactly 50%% occupied by column, converted to exactly 70%% by 2-step dilation');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
-
-occupancyMatrix = [zeros(10,5) ones(10,5)];
+% Set input arguments
+nRows = 100;
+mColumns = 100;
+occupancyRatio = 0.2;
 dilationLevel = 2;
+seedMap = 234;
 
 % Call the function
-dilatedMatrix = fcn_GridMapGen_generateRandomOccupancyMap(occupancyMatrix, dilationLevel, (fig_num));
+occupancyMatrix = fcn_GridMapGen_generateRandomOccupancyMap(...
+    (nRows), ...
+    (mColumns), ...
+    (occupancyRatio), ...
+    (dilationLevel), ...
+    (seedMap), ...
+    (fig_num));
 
-sgtitle(titleString, 'Interpreter','none');
+sgtitle(titleString, 'Interpreter','none','Fontsize',10);
 
 % Check variable types
-assert(isnumeric(dilatedMatrix));
+assert(islogical(occupancyMatrix));
 
 % Check variable sizes
-assert(isequal(size(dilatedMatrix),size(occupancyMatrix)));
+if ~exist('nRows','var') || isempty(nRows)
+    assert(isequal(size(occupancyMatrix,1),100));
+else
+    assert(isequal(size(occupancyMatrix,1),nRows));
+end
+if ~exist('mColumns','var') || isempty(mColumns)
+    % Defaults to number of rows
+    if exist('nRows','var')
+        if isempty(nRows)
+            assert(isequal(size(occupancyMatrix,2),100));
+        else
+            assert(isequal(size(occupancyMatrix,2),nRows));
+        end
+    else
+        assert(isequal(size(occupancyMatrix,2),100));
+    end
+else
+    assert(isequal(size(occupancyMatrix,2),mColumns));
+end
 
 % Check variable values
-assert(all(all(dilatedMatrix>=occupancyMatrix)));
-percentOccupied = fcn_GridMapGen_dilateOccupancyStats(dilatedMatrix,-1);
-assert(isequal(round(percentOccupied,6),0.7));
+percentOccupied = fcn_GridMapGen_dilateOccupancyStats(occupancyMatrix, -1);
+if ~exist('occupancyRatio','var') || isempty(occupancyRatio)
+    assert(abs(percentOccupied - 0.2)<0.1);
+else
+    assert(abs(percentOccupied - occupancyRatio)<0.1);
+end
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
 
-
-%% TEST case: 10x10 matrix, exactly 50% occupied by row, converted to exactly 70% by 2-step dilation
-fig_num = 20001;
-titleString = sprintf('TEST case: 10x10 matrix, exactly 50%% occupied by row, converted to exactly 70%% by 2-step dilation');
+%% TEST case: nRows specified, mColumns empty so inherets nRows value producing 50x50 map
+fig_num = 20002;
+titleString = sprintf('TEST case: occupancyMap with nRows specified, mColumns empty so inherets nRows value producing 50x50 map');
 fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
-occupancyMatrix = [zeros(5,10); ones(5,10)];
+% Set input arguments
+nRows = 50;
+mColumns = [];
+occupancyRatio = 0.2;
 dilationLevel = 2;
+seedMap = 234;
 
 % Call the function
-dilatedMatrix = fcn_GridMapGen_generateRandomOccupancyMap(occupancyMatrix, dilationLevel, (fig_num));
+occupancyMatrix = fcn_GridMapGen_generateRandomOccupancyMap(...
+    (nRows), ...
+    (mColumns), ...
+    (occupancyRatio), ...
+    (dilationLevel), ...
+    (seedMap), ...
+    (fig_num));
 
-sgtitle(titleString, 'Interpreter','none');
+sgtitle(titleString, 'Interpreter','none','Fontsize',10);
 
 % Check variable types
-assert(isnumeric(dilatedMatrix));
+assert(islogical(occupancyMatrix));
 
 % Check variable sizes
-assert(isequal(size(dilatedMatrix),size(occupancyMatrix)));
+if ~exist('nRows','var') || isempty(nRows)
+    assert(isequal(size(occupancyMatrix,1),100));
+else
+    assert(isequal(size(occupancyMatrix,1),nRows));
+end
+if ~exist('mColumns','var') || isempty(mColumns)
+    % Defaults to number of rows
+    if exist('nRows','var')
+        if isempty(nRows)
+            assert(isequal(size(occupancyMatrix,2),100));
+        else
+            assert(isequal(size(occupancyMatrix,2),nRows));
+        end
+    else
+        assert(isequal(size(occupancyMatrix,2),100));
+    end
+else
+    assert(isequal(size(occupancyMatrix,2),mColumns));
+end
 
 % Check variable values
-assert(all(all(dilatedMatrix>=occupancyMatrix)));
-percentOccupied = fcn_GridMapGen_dilateOccupancyStats(dilatedMatrix,-1);
-assert(isequal(round(percentOccupied,6),0.7));
+percentOccupied = fcn_GridMapGen_dilateOccupancyStats(occupancyMatrix, -1);
+if ~exist('occupancyRatio','var') || isempty(occupancyRatio)
+    assert(abs(percentOccupied - 0.2)<0.1);
+else
+    assert(abs(percentOccupied - occupancyRatio)<0.1);
+end
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
+
+%% TEST case: nRows and mColumns specified differently, producing 50x100 map
+fig_num = 20003;
+titleString = sprintf('TEST case: nRows and mColumns specified differently, producing 50x100 map');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+% Set input arguments
+nRows = 50;
+mColumns = 100;
+occupancyRatio = 0.2;
+dilationLevel = 2;
+seedMap = 234;
+
+% Call the function
+occupancyMatrix = fcn_GridMapGen_generateRandomOccupancyMap(...
+    (nRows), ...
+    (mColumns), ...
+    (occupancyRatio), ...
+    (dilationLevel), ...
+    (seedMap), ...
+    (fig_num));
+
+sgtitle(titleString, 'Interpreter','none','Fontsize',10);
+
+% Check variable types
+assert(islogical(occupancyMatrix));
+
+% Check variable sizes
+if ~exist('nRows','var') || isempty(nRows)
+    assert(isequal(size(occupancyMatrix,1),100));
+else
+    assert(isequal(size(occupancyMatrix,1),nRows));
+end
+if ~exist('mColumns','var') || isempty(mColumns)
+    % Defaults to number of rows
+    if exist('nRows','var')
+        if isempty(nRows)
+            assert(isequal(size(occupancyMatrix,2),100));
+        else
+            assert(isequal(size(occupancyMatrix,2),nRows));
+        end
+    else
+        assert(isequal(size(occupancyMatrix,2),100));
+    end
+else
+    assert(isequal(size(occupancyMatrix,2),mColumns));
+end
+
+% Check variable values
+percentOccupied = fcn_GridMapGen_dilateOccupancyStats(occupancyMatrix, -1);
+if ~exist('occupancyRatio','var') || isempty(occupancyRatio)
+    assert(abs(percentOccupied - 0.2)<0.1);
+else
+    assert(abs(percentOccupied - occupancyRatio)<0.1);
+end
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+%% TEST case: nRows not specified, but mColumns specified differently, producing 100x50 map
+fig_num = 20004;
+titleString = sprintf('TEST case: nRows and mColumns specified differently, producing 100x50 map');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+% Set input arguments
+nRows = [];
+mColumns = 50;
+occupancyRatio = 0.2;
+dilationLevel = 2;
+seedMap = 234;
+
+% Call the function
+occupancyMatrix = fcn_GridMapGen_generateRandomOccupancyMap(...
+    (nRows), ...
+    (mColumns), ...
+    (occupancyRatio), ...
+    (dilationLevel), ...
+    (seedMap), ...
+    (fig_num));
+
+sgtitle(titleString, 'Interpreter','none','Fontsize',10);
+
+% Check variable types
+assert(islogical(occupancyMatrix));
+
+% Check variable sizes
+if ~exist('nRows','var') || isempty(nRows)
+    assert(isequal(size(occupancyMatrix,1),100));
+else
+    assert(isequal(size(occupancyMatrix,1),nRows));
+end
+if ~exist('mColumns','var') || isempty(mColumns)
+    % Defaults to number of rows
+    if exist('nRows','var')
+        if isempty(nRows)
+            assert(isequal(size(occupancyMatrix,2),100));
+        else
+            assert(isequal(size(occupancyMatrix,2),nRows));
+        end
+    else
+        assert(isequal(size(occupancyMatrix,2),100));
+    end
+else
+    assert(isequal(size(occupancyMatrix,2),mColumns));
+end
+
+% Check variable values
+percentOccupied = fcn_GridMapGen_dilateOccupancyStats(occupancyMatrix, -1);
+if ~exist('occupancyRatio','var') || isempty(occupancyRatio)
+    assert(abs(percentOccupied - 0.2)<0.1);
+else
+    assert(abs(percentOccupied - occupancyRatio)<0.1);
+end
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+%% TEST case: occupancyRatio increased to 0.4
+fig_num = 20005;
+titleString = sprintf('TEST case: occupancyRatio increased to 0.4');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+% Set input arguments
+nRows = [];
+mColumns = [];
+occupancyRatio = 0.4;
+dilationLevel = 2;
+seedMap = 234;
+
+% Call the function
+occupancyMatrix = fcn_GridMapGen_generateRandomOccupancyMap(...
+    (nRows), ...
+    (mColumns), ...
+    (occupancyRatio), ...
+    (dilationLevel), ...
+    (seedMap), ...
+    (fig_num));
+
+sgtitle(titleString, 'Interpreter','none','Fontsize',10);
+
+% Check variable types
+assert(islogical(occupancyMatrix));
+
+% Check variable sizes
+if ~exist('nRows','var') || isempty(nRows)
+    assert(isequal(size(occupancyMatrix,1),100));
+else
+    assert(isequal(size(occupancyMatrix,1),nRows));
+end
+if ~exist('mColumns','var') || isempty(mColumns)
+    % Defaults to number of rows
+    if exist('nRows','var')
+        if isempty(nRows)
+            assert(isequal(size(occupancyMatrix,2),100));
+        else
+            assert(isequal(size(occupancyMatrix,2),nRows));
+        end
+    else
+        assert(isequal(size(occupancyMatrix,2),100));
+    end
+else
+    assert(isequal(size(occupancyMatrix,2),mColumns));
+end
+
+% Check variable values
+percentOccupied = fcn_GridMapGen_dilateOccupancyStats(occupancyMatrix, -1);
+if ~exist('occupancyRatio','var') || isempty(occupancyRatio)
+    assert(abs(percentOccupied - 0.2)<0.1);
+else
+    assert(abs(percentOccupied - occupancyRatio)<0.1);
+end
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+%% TEST case: seedMap given as a seed gives repeatedly same map
+fig_num = 20006;
+titleString = sprintf('TEST case: seedMap given as a seed gives repeatedly same map');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+% Set input arguments
+nRows = [];
+mColumns = [];
+occupancyRatio = [];
+dilationLevel = 2;
+seedMap = 101;
+
+% Call the function
+occupancyMatrix = fcn_GridMapGen_generateRandomOccupancyMap(...
+    (nRows), ...
+    (mColumns), ...
+    (occupancyRatio), ...
+    (dilationLevel), ...
+    (seedMap), ...
+    (fig_num));
+
+% Call the function again
+occupancyMatrix2 = fcn_GridMapGen_generateRandomOccupancyMap(...
+    (nRows), ...
+    (mColumns), ...
+    (occupancyRatio), ...
+    (dilationLevel), ...
+    (seedMap), ...
+    (fig_num));
+
+sgtitle(titleString, 'Interpreter','none','Fontsize',10);
+
+% Check variable types
+assert(islogical(occupancyMatrix));
+
+% Check variable sizes
+if ~exist('nRows','var') || isempty(nRows)
+    assert(isequal(size(occupancyMatrix,1),100));
+else
+    assert(isequal(size(occupancyMatrix,1),nRows));
+end
+if ~exist('mColumns','var') || isempty(mColumns)
+    % Defaults to number of rows
+    if exist('nRows','var')
+        if isempty(nRows)
+            assert(isequal(size(occupancyMatrix,2),100));
+        else
+            assert(isequal(size(occupancyMatrix,2),nRows));
+        end
+    else
+        assert(isequal(size(occupancyMatrix,2),100));
+    end
+else
+    assert(isequal(size(occupancyMatrix,2),mColumns));
+end
+
+% Check variable values
+percentOccupied = fcn_GridMapGen_dilateOccupancyStats(occupancyMatrix, -1);
+if ~exist('occupancyRatio','var') || isempty(occupancyRatio)
+    assert(abs(percentOccupied - 0.2)<0.1);
+else
+    assert(abs(percentOccupied - occupancyRatio)<0.1);
+end
+assert(isequal(occupancyMatrix,occupancyMatrix2));
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+%% TEST case: seedMap given as a matrix gives repeatedly same map
+fig_num = 20006;
+titleString = sprintf('TEST case: seedMap given as a matrix gives repeatedly same map');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+% Set input arguments
+nRows = [];
+mColumns = [];
+occupancyRatio = [];
+dilationLevel = 2;
+seedMap = rand(30,50);
+
+% Call the function
+occupancyMatrix = fcn_GridMapGen_generateRandomOccupancyMap(...
+    (nRows), ...
+    (mColumns), ...
+    (occupancyRatio), ...
+    (dilationLevel), ...
+    (seedMap), ...
+    (fig_num));
+
+% Call the function again
+occupancyMatrix2 = fcn_GridMapGen_generateRandomOccupancyMap(...
+    (nRows), ...
+    (mColumns), ...
+    (occupancyRatio), ...
+    (dilationLevel), ...
+    (seedMap), ...
+    (fig_num));
+
+sgtitle(titleString, 'Interpreter','none','Fontsize',10);
+
+% Check variable types
+assert(islogical(occupancyMatrix));
+
+% Check variable sizes
+if ~exist('nRows','var') || isempty(nRows)
+    assert(isequal(size(occupancyMatrix,1),30));
+else
+    assert(isequal(size(occupancyMatrix,1),nRows));
+end
+if ~exist('mColumns','var') || isempty(mColumns)
+    % Defaults to number of rows
+    if exist('nRows','var')
+        if isempty(nRows)
+            assert(isequal(size(occupancyMatrix,2), 50));
+        else
+            assert(isequal(size(occupancyMatrix,2),nRows));
+        end
+    else
+        assert(isequal(size(occupancyMatrix,2),100));
+    end
+else
+    assert(isequal(size(occupancyMatrix,2),mColumns));
+end
+
+% Check variable values
+percentOccupied = fcn_GridMapGen_dilateOccupancyStats(occupancyMatrix, -1);
+if ~exist('occupancyRatio','var') || isempty(occupancyRatio)
+    assert(abs(percentOccupied - 0.2)<0.1);
+else
+    assert(abs(percentOccupied - occupancyRatio)<0.1);
+end
+assert(isequal(occupancyMatrix,occupancyMatrix2));
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
 
 %% Fast Mode Tests
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -221,21 +686,53 @@ fig_num = 80001;
 fprintf(1,'Figure: %.0f: FAST mode, empty fig_num\n',fig_num);
 figure(fig_num); close(fig_num);
 
-occupancyMatrix = rand(100,100)<0.1; % about 10 percent occupied
-% percentOccupied = fcn_GridMapGen_dilateOccupancyStats(occupancyMatrix, (28282));
-dilationLevel = 1;
+% Set input arguments
+nRows = 100;
+mColumns = 100;
+occupancyRatio = 0.2;
+dilationLevel = 2;
+seedMap = 234;
 
 % Call the function
-dilatedMatrix = fcn_GridMapGen_generateRandomOccupancyMap(occupancyMatrix, dilationLevel, ([]));
+occupancyMatrix = fcn_GridMapGen_generateRandomOccupancyMap(...
+    (nRows), ...
+    (mColumns), ...
+    (occupancyRatio), ...
+    (dilationLevel), ...
+    (seedMap), ...
+    ([]));
 
 % Check variable types
-assert(isnumeric(dilatedMatrix));
+assert(islogical(occupancyMatrix));
 
 % Check variable sizes
-assert(isequal(size(dilatedMatrix),size(occupancyMatrix)));
+if ~exist('nRows','var') || isempty(nRows)
+    assert(isequal(size(occupancyMatrix,1),100));
+else
+    assert(isequal(size(occupancyMatrix,1),nRows));
+end
+if ~exist('mColumns','var') || isempty(mColumns)
+    % Defaults to number of rows
+    if exist('nRows','var')
+        if isempty(nRows)
+            assert(isequal(size(occupancyMatrix,2),100));
+        else
+            assert(isequal(size(occupancyMatrix,2),nRows));
+        end
+    else
+        assert(isequal(size(occupancyMatrix,2),100));
+    end
+else
+    assert(isequal(size(occupancyMatrix,2),mColumns));
+end
 
 % Check variable values
-assert(all(all(dilatedMatrix>=occupancyMatrix)));
+percentOccupied = fcn_GridMapGen_dilateOccupancyStats(occupancyMatrix, -1);
+if ~exist('occupancyRatio','var') || isempty(occupancyRatio)
+    assert(abs(percentOccupied - 0.2)<0.1);
+else
+    assert(abs(percentOccupied - occupancyRatio)<0.1);
+end
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -247,26 +744,57 @@ fig_num = 80002;
 fprintf(1,'Figure: %.0f: FAST mode, fig_num=-1\n',fig_num);
 figure(fig_num); close(fig_num);
 
-occupancyMatrix = rand(100,100)<0.1; % about 10 percent occupied
-% percentOccupied = fcn_GridMapGen_dilateOccupancyStats(occupancyMatrix, (28282));
-dilationLevel = 1;
+% Set input arguments
+nRows = 100;
+mColumns = 100;
+occupancyRatio = 0.2;
+dilationLevel = 2;
+seedMap = 234;
 
 % Call the function
-dilatedMatrix = fcn_GridMapGen_generateRandomOccupancyMap(occupancyMatrix, dilationLevel, (-1));
+occupancyMatrix = fcn_GridMapGen_generateRandomOccupancyMap(...
+    (nRows), ...
+    (mColumns), ...
+    (occupancyRatio), ...
+    (dilationLevel), ...
+    (seedMap), ...
+    (-1));
 
 % Check variable types
-assert(isnumeric(dilatedMatrix));
+assert(islogical(occupancyMatrix));
 
 % Check variable sizes
-assert(isequal(size(dilatedMatrix),size(occupancyMatrix)));
+if ~exist('nRows','var') || isempty(nRows)
+    assert(isequal(size(occupancyMatrix,1),100));
+else
+    assert(isequal(size(occupancyMatrix,1),nRows));
+end
+if ~exist('mColumns','var') || isempty(mColumns)
+    % Defaults to number of rows
+    if exist('nRows','var')
+        if isempty(nRows)
+            assert(isequal(size(occupancyMatrix,2),100));
+        else
+            assert(isequal(size(occupancyMatrix,2),nRows));
+        end
+    else
+        assert(isequal(size(occupancyMatrix,2),100));
+    end
+else
+    assert(isequal(size(occupancyMatrix,2),mColumns));
+end
 
 % Check variable values
-assert(all(all(dilatedMatrix>=occupancyMatrix)));
+percentOccupied = fcn_GridMapGen_dilateOccupancyStats(occupancyMatrix, -1);
+if ~exist('occupancyRatio','var') || isempty(occupancyRatio)
+    assert(abs(percentOccupied - 0.2)<0.1);
+else
+    assert(abs(percentOccupied - occupancyRatio)<0.1);
+end
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
 assert(~any(figHandles==fig_num));
-
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
 fig_num = 80003;
@@ -274,17 +802,26 @@ fprintf(1,'Figure: %.0f: FAST mode comparisons\n',fig_num);
 figure(fig_num);
 close(fig_num);
 
-occupancyMatrix = rand(100,100)<0.1; % about 10 percent occupied
-% percentOccupied = fcn_GridMapGen_dilateOccupancyStats(occupancyMatrix, (28282));
-dilationLevel = 1;
-     
+% Set input arguments
+nRows = 100;
+mColumns = 100;
+occupancyRatio = 0.2;
+dilationLevel = 2;
+seedMap = 234;
+
 Niterations = 100;
 
 % Do calculation without pre-calculation
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    dilatedMatrix = fcn_GridMapGen_generateRandomOccupancyMap(occupancyMatrix, dilationLevel, ([]));
+    occupancyMatrix = fcn_GridMapGen_generateRandomOccupancyMap(...
+        (nRows), ...
+        (mColumns), ...
+        (occupancyRatio), ...
+        (dilationLevel), ...
+        (seedMap), ...
+        ([]));
 end
 slow_method = toc;
 
@@ -292,7 +829,13 @@ slow_method = toc;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    dilatedMatrix = fcn_GridMapGen_generateRandomOccupancyMap(occupancyMatrix, dilationLevel, (-1));
+    occupancyMatrix = fcn_GridMapGen_generateRandomOccupancyMap(...
+        (nRows), ...
+        (mColumns), ...
+        (occupancyRatio), ...
+        (dilationLevel), ...
+        (seedMap), ...
+        (-1));
 end
 fast_method = toc;
 

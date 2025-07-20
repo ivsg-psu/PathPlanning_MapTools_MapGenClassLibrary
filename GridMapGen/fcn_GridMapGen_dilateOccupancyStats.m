@@ -130,8 +130,19 @@ end
 %
 %See: http://patorjk.com/software/taag/#p=display&f=Big&t=Main
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
-[n,m] = size(occupancyMatrix);
-percentOccupied = sum(sum(occupancyMatrix>=1))/(n*m);
+
+% Both methods are about the same, in timing. See notes below
+if 1==0
+    % Takes 0.056462 milliseconds per run, on average of 100 repeats
+    totalElements = numel(occupancyMatrix);
+    occupiedElements = sum(occupancyMatrix>=1,'all');
+    percentOccupied = occupiedElements/totalElements;
+else
+    % Takes 0.056518 milliseconds per run, on average of 100 repeats
+    [n,m] = size(occupancyMatrix);
+    percentOccupied = sum(sum(occupancyMatrix>=1))/(n*m);
+end
+
 
 % If all are 1's and 0's, can use this instead (faster)
 % percentOccupied = sum(sum(matrix))/(n*m);

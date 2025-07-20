@@ -242,22 +242,40 @@ end
 
 % Convert random values or seed input map into occupancyMap, which has only
 % 1's or 0's.
-occupancyMap = seedMap<occupancyRatio;
+initialOccupancyMap = seedMap> (1-occupancyRatio);
 
-% Display map (for debugging)?
+% Display occupancyMap (for debugging)?
 if flag_do_debug
     h_fig = figure(debug_fig_num);
-    set(h_fig,'Name','Original Random','NumberTitle','off', 'Position',[16 149 293 231]);
-    image(occupancyMap+1);
+    set(h_fig,'Name','Original Random','NumberTitle','off', 'Position',[88 326 592 317])
+    image(initialOccupancyMap+1);
     colormap([1 1 1;0 0 0])
-    percentOccupied = fcn_GridMapGen_dilateOccupancyStats(occupancyMap, -1);
+    percentOccupied = fcn_GridMapGen_dilateOccupancyStats(initialOccupancyMap, -1);
     title(sprintf('Percent occupied at dialation %d, r of %.2f: %.4f\n',dilationLevel, occupancyRatio,percentOccupied));
 end
 
 % Dilate on original random image with dialation function
-randomMap_dilated = fcn_GridMapGen_dilateByN(seedMap, dilationLevel, -1);
+randomMap_dilated = fcn_GridMapGen_dilateByN(seedMap, dilationLevel, [], [], -1);
 
-%% Iterate to find the right value of r that preserves ratio
+
+% Display randomMap_dilated (for debugging)?
+if flag_do_debug
+    h_fig = figure(debug_fig_num+1);
+    clf;
+
+    set(h_fig,'Name','randomMap_dilated','NumberTitle','off', 'Position',[684 326 592 317]);
+
+    numColors = 256;
+    cmap = turbo(numColors);
+    colorizedImage = floor(rescale(randomMap_dilated,1,numColors));
+    image(colorizedImage);
+    colormap(cmap);
+
+    percentOccupied = fcn_GridMapGen_dilateOccupancyStats(randomMap_dilated, -1);
+    title(sprintf('Percent occupied at dialation %d, r of %.2f: %.4f\n',dilationLevel, occupancyRatio,percentOccupied));
+end
+
+% Iterate to find the right value of r that preserves ratio
 low = min(min(randomMap_dilated));
 high = max(max(randomMap_dilated));
 
@@ -267,17 +285,31 @@ levels = low:(high-low)/100:high;
 % Loop through levels, saving results into percentages array
 percentages = zeros(length(levels),1);
 for i=1:length(levels)
-    temp_occupancy = randomMap_dilated<levels(i);
+    temp_occupancy = randomMap_dilated>levels(i);
     percentages(i) = fcn_GridMapGen_dilateOccupancyStats(temp_occupancy,-1);
 end
 
 % Find the index that matches the desired occupancy ratio
-indices = find(percentages>=occupancyRatio);
-goodThresholdToUse = levels(indices(1));
+indexMatchingDesiredRatio = find(percentages<=occupancyRatio,1);
+goodThresholdToUse = levels(indexMatchingDesiredRatio);
 
 
 %% Save final result
-occupancyMatrix = randomMap_dilated<goodThresholdToUse;
+occupancyMatrix = randomMap_dilated>goodThresholdToUse;
+
+% Display occupancyMatrix (for debugging)?
+if flag_do_debug
+    h_fig = figure(debug_fig_num+2);
+    clf;
+    set(h_fig,'Name','OccupancyMatrixWithSeeds','NumberTitle','off', 'Position',[88 85 592 317]);
+    
+    colorValues = 1 + 2*(initialOccupancyMap>0) + (occupancyMatrix>0);
+    image(colorValues); % Will call color map's 1st row, 2nd row, and 3rd row respectively
+    colormap([1 1 1;0 0 0; 1 0 0])
+
+    percentOccupied = fcn_GridMapGen_dilateOccupancyStats(occupancyMatrix, -1);
+    title(sprintf('Percent occupied at dialation %d, r of %.2f: %.4f\n',dilationLevel, occupancyRatio,percentOccupied));
+end
 
 %§
 %% Plot the results (for debugging)?
@@ -294,11 +326,17 @@ occupancyMatrix = randomMap_dilated<goodThresholdToUse;
 
 if flag_do_plots
     h_fig = figure(fig_num);
-    set(h_fig,'Name','occupancyMatrix','NumberTitle','off', 'Position',[16 149 293 231]);
+    set(h_fig,'Name','occupancyMatrix','NumberTitle','off', 'Position',[684 85 592 317]);
+
     image(occupancyMatrix+1);
     colormap([1 1 1;0 0 0])
+    
     percentOccupied = fcn_GridMapGen_dilateOccupancyStats(occupancyMatrix, -1);
-    title(sprintf('Percent occupied at dialation %d, occupancyRatio of %.2f: %.4f\n',dilationLevel, occupancyRatio, percentOccupied));
+    text(20,80,sprintf([...
+        'Percent occupied: %.1f %%\n' ...
+        '\t dialation: %.0d,\n' ...
+        '\t target occupancyRatio: of %.0f%%'],percentOccupied*100, dilationLevel, occupancyRatio*100),...
+        'BackgroundColor',[1 1 1],'FontSize',10);
     
 end % Ends the flag_do_plot if statement
 
