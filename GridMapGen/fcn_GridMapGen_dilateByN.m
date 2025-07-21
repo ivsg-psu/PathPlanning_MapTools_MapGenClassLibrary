@@ -210,45 +210,22 @@ end
 % Do the multipliers need to be calculated?
 if 1==flag_calculateMultipliers
     [n,m] = size(occupancyMatrix);
-    if n==m
-        dilationOperator = diag(ones(m,1),0) + diag(ones(m-1,1),1) + diag(ones(m-1,1),-1);
+    if 1==0
+    
+        dilationOperator = fcn_INTERNAL_fillOpeator(m);
+        
         leftDilationMultiplier   = dilationOperator^dilationLevel;
         rightDilationMultiplier = leftDilationMultiplier;
     else
-        leftOperator  = diag(ones(n,1),0) + diag(ones(n-1,1),1) + diag(ones(n-1,1),-1);
-        rightOperator = diag(ones(m,1),0) + diag(ones(m-1,1),1) + diag(ones(m-1,1),-1);
+        leftOperator  = fcn_INTERNAL_fillOpeator(n);
+        rightOperator = fcn_INTERNAL_fillOpeator(m);
 
         leftDilationMultiplier    = leftOperator^dilationLevel;
         rightDilationMultiplier   = rightOperator^dilationLevel;
     end
 end
 
-if 1==1
-    dilatedMatrix=leftDilationMultiplier*occupancyMatrix*rightDilationMultiplier;
-else
-    % This is an older, iterative (slower) method that allows one to force
-    % the "walls" of the occupancy map to automatically create boundaries.
-    % It's not useful - just left here for archival purposes
-    leftMultiplier = diag(ones(n,1),0) + diag(ones(n-1,1),1) + diag(ones(n-1,1),-1);
-    rightMultiplier = diag(ones(m,1),0) + diag(ones(m-1,1),1) + diag(ones(m-1,1),-1);
-
-    % Initialize dilatedMatrix
-    dilatedMatrix = occupancyMatrix;
-
-    % Keep expanding the matrix outward
-    for i=1:dilationLevel
-        dilatedMatrix = leftMultiplier*dilatedMatrix*rightMultiplier;
-
-        % The following code makes the uppper/lower/right/left walls all
-        % "occupied"
-        if 1==0
-            dilatedMatrix(:,1) = max(max(dilatedMatrix));
-            dilatedMatrix(:,end) = max(max(dilatedMatrix));
-            dilatedMatrix(1,:) = max(max(dilatedMatrix));
-            dilatedMatrix(end,:) = max(max(dilatedMatrix));
-        end
-    end
-end
+dilatedMatrix=leftDilationMultiplier*occupancyMatrix*rightDilationMultiplier;
 
 %§
 %% Plot the results (for debugging)?
@@ -293,7 +270,28 @@ end % Ends the function
 %                                               
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
+% 
+% % create the smoothing filters (left and right) generator (just first time)
+% left_filter=diag(0.5*ones(m,1))+diag(0.25*ones(m-1,1),1)+diag(0.25*ones(m-1,1),-1);
+% left_filter(1,1)=0.75;
+% left_filter(m,m)=0.75;
+% right_filter=diag(0.5*ones(n,1))+diag(0.25*ones(n-1,1),1)+diag(0.25*ones(n-1,1),-1);
+% right_filter(1,1)=0.75;
+% right_filter(n,n)=0.75;
 
+%% fcn_INTERNAL_fillOpeator
+function dilationOperator = fcn_INTERNAL_fillOpeator(m)
+if 1==0
+    % The following just expands in integer form. The result, however, is
+    % that repeated multiplications can exponentially enlarge numerical
+    % values. 
+    dilationOperator = diag(ones(m,1),0) + diag(ones(m-1,1),1) + diag(ones(m-1,1),-1);
+else
+    dilationOperator = diag(0.5*ones(m,1))+diag(0.25*ones(m-1,1),1)+diag(0.25*ones(m-1,1),-1);
+    dilationOperator(1,1)=0.75;
+    dilationOperator(m,m)=0.75;
+end
+end % Ends fcn_INTERNAL_fillOpeator
 
 
 

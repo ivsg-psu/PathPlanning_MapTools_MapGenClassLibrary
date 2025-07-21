@@ -62,7 +62,7 @@ assert(isequal(size(leftDilationMultiplier),[nRows nRows]));
 assert(isequal(size(rightDilationMultiplier),[mCols mCols]));
 
 % Check variable values
-assert(all(all(dilatedMatrix>=occupancyMatrix)));
+assert(all(all(dilatedMatrix>=0)));
 assert(all(all(leftDilationMultiplier>=0)));
 assert(all(all(rightDilationMultiplier>=0)));
 
@@ -99,7 +99,7 @@ assert(isequal(size(leftDilationMultiplier),[nRows nRows]));
 assert(isequal(size(rightDilationMultiplier),[mCols mCols]));
 
 % Check variable values
-assert(all(all(dilatedMatrix>=occupancyMatrix)));
+assert(all(all(dilatedMatrix>=0)));
 assert(all(all(leftDilationMultiplier>=0)));
 assert(all(all(rightDilationMultiplier>=0)));
 
@@ -158,10 +158,10 @@ assert(isequal(size(leftDilationMultiplier),[nRows nRows]));
 assert(isequal(size(rightDilationMultiplier),[mCols mCols]));
 
 % Check variable values
-assert(all(all(dilatedMatrix>=occupancyMatrix)));
+assert(all(all(dilatedMatrix>=0)));
 assert(all(all(leftDilationMultiplier>=0)));
 assert(all(all(rightDilationMultiplier>=0)));
-percentOccupied = fcn_GridMapGen_dilateOccupancyStats(dilatedMatrix,-1);
+percentOccupied = fcn_GridMapGen_dilateOccupancyStats(dilatedMatrix>0,-1);
 assert(isequal(round(percentOccupied,6),0.6));
 
 % Make sure plot opened up
@@ -198,10 +198,10 @@ assert(isequal(size(leftDilationMultiplier),[nRows nRows]));
 assert(isequal(size(rightDilationMultiplier),[mCols mCols]));
 
 % Check variable values
-assert(all(all(dilatedMatrix>=occupancyMatrix)));
+assert(all(all(dilatedMatrix>=0)));
 assert(all(all(leftDilationMultiplier>=0)));
 assert(all(all(rightDilationMultiplier>=0)));
-percentOccupied = fcn_GridMapGen_dilateOccupancyStats(dilatedMatrix,-1);
+percentOccupied = fcn_GridMapGen_dilateOccupancyStats(dilatedMatrix>0,-1);
 assert(isequal(round(percentOccupied,6),0.7));
 
 % Make sure plot opened up
@@ -239,10 +239,10 @@ assert(isequal(size(leftDilationMultiplier),[nRows nRows]));
 assert(isequal(size(rightDilationMultiplier),[mCols mCols]));
 
 % Check variable values
-assert(all(all(dilatedMatrix>=occupancyMatrix)));
+assert(all(all(dilatedMatrix>=0)));
 assert(all(all(leftDilationMultiplier>=0)));
 assert(all(all(rightDilationMultiplier>=0)));
-percentOccupied = fcn_GridMapGen_dilateOccupancyStats(dilatedMatrix,-1);
+percentOccupied = fcn_GridMapGen_dilateOccupancyStats(dilatedMatrix>0,-1);
 assert(isequal(round(percentOccupied,6),0.7));
 
 % Make sure plot opened up
@@ -295,7 +295,7 @@ assert(isequal(size(leftDilationMultiplier),[nRows nRows]));
 assert(isequal(size(rightDilationMultiplier),[mCols mCols]));
 
 % Check variable values
-assert(all(all(dilatedMatrix>=occupancyMatrix)));
+assert(all(all(dilatedMatrix>=0)));
 assert(all(all(leftDilationMultiplier>=0)));
 assert(all(all(rightDilationMultiplier>=0)));
 
@@ -332,7 +332,7 @@ assert(isequal(size(leftDilationMultiplier),[nRows nRows]));
 assert(isequal(size(rightDilationMultiplier),[mCols mCols]));
 
 % Check variable values
-assert(all(all(dilatedMatrix>=occupancyMatrix)));
+assert(all(all(dilatedMatrix>=0)));
 assert(all(all(leftDilationMultiplier>=0)));
 assert(all(all(rightDilationMultiplier>=0)));
 
