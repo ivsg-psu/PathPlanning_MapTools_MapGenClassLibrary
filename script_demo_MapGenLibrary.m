@@ -137,8 +137,8 @@
 % -- Added GridMapGen demos including:
 %    % --- script_demo_dilateCompareDilateByNSpeeds - shows the dilation
 %    %     toolsets
-%    % --- script_demo_dilateCompareDilateByNSpeeds - shows the dilation
-%    %     toolsets
+%    % --- script_demo_generateRandomOccupancyAnimated - animates random
+%    %     blobs
 
 clear library_name library_folders library_url
 
