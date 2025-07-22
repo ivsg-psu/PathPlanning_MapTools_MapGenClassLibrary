@@ -9,18 +9,34 @@
 
 
 %% Create random map
+
+flag_saveAnimatedGif = 1;
+filename = 'script_demo_generateRandomOccupancyAnimated.gif';
+delayTime = 0.1; % Delay between frames in seconds
+
+rng(1);
+
 % Set input arguments
 nRows = 100;
-mColumns = 100;
+mColumns = 80;
 mapSize = [nRows mColumns];
-Nsteps = 10;
+
+Nsteps = 50;
+Ncontours = 30;
+movementSideways = 1; % 0.6; %.5; %2.3;
+
+flag_blendEndToStart = 1; % causes the animation to "loop"
+NblendingSteps = 10;
+
 occupancyRatio = 0.2;
-dilationLevel = 200;
+dilationLevel = 400;
 seedMap = rand(nRows,mColumns);
+initialSeedMap = seedMap;
 Nseeds = numel(seedMap);
 leftDilationMultiplier = [];
 rightDilationMultiplier = [];
 optimizedThreshold = [];
+flag_firstDraw = 1;
 
 % Call the function once to initialize settings for upcoming calls
 [occupancyMatrix, randomMatrixDilated, forcedThreshold, leftDilationMultiplier, rightDilationMultiplier] = ...
@@ -47,7 +63,7 @@ colormap(cmap);
 h_fig = figure(fig_num);
 set(h_fig,'Name','animatedRandom','NumberTitle','off'); %, 'Position',[684 85 592 317]);
 
-for ith_step = 1:50 %:Nsteps
+for ith_step = 1:Nsteps
 
     % % Resample top Nrand values
     % % Increasing this number causes objects to "disappear" more as they
@@ -69,7 +85,6 @@ for ith_step = 1:50 %:Nsteps
 
     %%%%%%%%%%%
     % Randomly walk sideways
-    movementSideways = 0.6; %.5; %2.3;
     percentageSideways = mod(movementSideways,1); % A value between 0 and 1
     columnsSideways = floor(movementSideways);
 
@@ -114,166 +129,315 @@ for ith_step = 1:50 %:Nsteps
     colorMin = (keep)*colorMin + (1-keep)*min(randomMatrixDilated,[],"all");
     colorMax = (keep)*colorMax + (1-keep)*max(randomMatrixDilated,[],"all");
 
+
     rescaledToColorIntegers = fcn_INTERNAL_rescaleToColors(randomMatrixDilated, colorMin, colorMax, numColors);
     clf;
     image(rescaledToColorIntegers);
     hold on;
-    [M,c] = contour(randomMatrixDilated,50,'k-','Linewidth',0.2);
+    % contour(randomMatrixDilated,50,'k-','Linewidth',0.2);
+
+    %%%%
+    % Use the gradient to estimate wind direction
+    [px,py] = gradient(randomMatrixDilated);
 
     if 1==0
-        % Extract all the individual contour XY coordinates
-        levels = [];
-        coordinates = cell(1,1);
-        indexM = 1;
-        numContours = 0;
-        longestIndex = 0;
-        longestContourLength = 0;
-        while indexM < size(M,2)
-            numPointsThisContour = M(2,indexM); % Number of points in this contour segment
-            x = M(1,indexM+(1:numPointsThisContour)); % x coordinates
-            y = M(2,indexM+(1:numPointsThisContour)); % y coordinates
+        % Check results
+        xAxisValues = (1:mColumns);
+        yAxisValues = (1:nRows);
+        figure(1234);
+        clf;
 
-            % Save results
-            numContours = numContours+1;
-            levels(numContours,1) = M(1,indexM); %#ok<SAGROW>
-            coordinates{numContours,1} = [x' y'];
+        image(rescaledToColorIntegers);
+        hold on;
 
-            % Save longest
-            if numPointsThisContour>longestContourLength
-                longestContourLength = numPointsThisContour;
-                longestIndex = numContours;
-            end
+        contour(xAxisValues,yAxisValues,randomMatrixDilated);
+        hold on
+        quiver(xAxisValues,yAxisValues,px,py)
+        axis equal;
+    end
 
-            % Move down the columns
-            indexM = indexM + numPointsThisContour + 1; % Move to the next contour segment
-        end
-
-        % For debugging
-        if 1==0
-            % Plot the longest
-            plot(coordinates{longestIndex}(:,1),coordinates{longestIndex}(:,2),'r-','LineWidth',5);
-        end
-
+    % Uncomment to show that there's a bug in the code below. Need to
+    % figure out why derivative function does not match gradient!
+    if 1==0
         [rowDerivative, colDerivative, leftDilationMultiplier, rightDilationMultiplier] = ...
             fcn_GridMapGen_dilateDerivativeByN(randomMatrixDilated, 1, ...
             ([]), ([]), (-1));
-        EastWind  = colDerivative;
-        NorthWind = rowDerivative;
+        figure;
+        contour(xAxisValues,yAxisValues,randomMatrixDilated);
+        hold on;
+        quiver(xAxisValues,yAxisValues,rowDerivative, colDerivative);
+        disp([px(1:10,1:10); nan(1,10); colDerivative(1:10,1:10)])
+    end
 
-        % Set the wind max values
-        maxWind = max(abs([EastWind NorthWind]),[],'all');
-        EastWind = EastWind./maxWind;
-        NorthWind = NorthWind./maxWind;
-        windMagnitude = (EastWind.^2+NorthWind.^2).^0.5;
 
-        % For debugging. This shows that the wind magnitude and wind directions
-        % do not follow the contour lines.
-        if 1==0
-            figure(5757);
-            clf;
+    % Set the wind vectors so they align with the contours. NOTE: this
+    % corresponds to a -90 degree rotation, e.g.
+    % rotated = original*[0 -1; 1 0]. However, the axes are reversed in
+    % image format, so have to add a minus sign.
+    eastWind  = py;
+    northWind = -px;
 
-            subplot(2,2,1);
-            image(rescaledToColorIntegers);
-            hold on;
-            contour(randomMatrixDilated,50,'k-','Linewidth',0.2);
-            colormap(gca,cmap);
+    if 1==0
+        % Check results
+        quiver(xAxisValues,yAxisValues,eastWind,northWind)
+    end
 
-            subplot(2,2,2);
-            EastWindColors = fcn_INTERNAL_rescaleToColors(EastWind, [], [], numColors);
-            image(EastWindColors);
-            title('EastWind','FontSize',10);
-            hold on;
-            contour(randomMatrixDilated,50,'k-','Linewidth',0.2);
-            contour(windMagnitude,50,'w')
+    %%%%
+    % Solve for the wind magnitude
+    windMagnitude = (eastWind.^2+northWind.^2).^0.5;
+    maxWind = max(windMagnitude,[],'all');
+    normalizedWindMagnitude = windMagnitude./maxWind;
+    normalizedEastWind = eastWind./maxWind;
+    normalizedNorthWind = northWind./maxWind;
 
-            subplot(2,2,3);
-            image(NorthWind*256)
-            title('NorthWind','FontSize',10);
-            hold on;
-            contour(randomMatrixDilated,50,'k-','Linewidth',0.2);
-
-            subplot(2,2,4);
-            image(windMagnitude*256)
-            title('windMagnitude','FontSize',10);
-            hold on;
-            contour(randomMatrixDilated,50,'k-','Linewidth',0.2);
-        end
-
-        %%%%
+    if 1==0
+        % Plot the result. This plot shows that the contour lines are tight in
+        % areas where the wind is highest. This is typical of weather.
         figure(4575);
         clf;
-        image(windMagnitude*256);
+        image(normalizedWindMagnitude*256);
         hold on;
-        [M,c] = contour(randomMatrixDilated,50,'k-','Linewidth',0.2);
+        contour(randomMatrixDilated,50,'k-','Linewidth',0.2);
+        axis equal
+        quiver(xAxisValues,yAxisValues,normalizedEastWind,normalizedNorthWind)
+    end
 
+    % For debugging. This shows that the wind magnitude and wind directions
+    % follow the contour lines.
+    if 1==0
+        figure(5757);
+        clf;
 
-        % Add arrows onto the contours
+        subplot(2,2,1);
+        image(rescaledToColorIntegers);
+        title('Pressure regions');
+        hold on;
+        contour(randomMatrixDilated,50,'k-','Linewidth',0.2);
+        colormap(gca,cmap);
 
-        for ith_contour = longestIndex:longestIndex %1:length(levels)
-            thisContourXY = coordinates{ith_contour};
-            thisContourIndices = max(1,floor(thisContourXY));
-            for ith_element = 5:5:length(thisContourXY(:,1))
-                thisX = thisContourXY(ith_element,1);
-                thisY = thisContourXY(ith_element,2);
-                thisXind = thisContourIndices(ith_element,1);
-                thisYind = thisContourIndices(ith_element,2);
+        subplot(2,2,2);
+        EastWindColors = fcn_INTERNAL_rescaleToColors(eastWind, [], [], numColors);
+        image(EastWindColors);
+        title('EastWind','FontSize',10);
+        hold on;
+        contour(randomMatrixDilated,50,'k-','Linewidth',0.2);
+        colormap(gca,cmap);
 
-                % Get the wind velocity
-                windE = EastWind(thisXind, thisYind);
-                windN = NorthWind(thisContourIndices(ith_element,1),thisContourIndices(ith_element,2));
+        subplot(2,2,3);
+        northWindColors = fcn_INTERNAL_rescaleToColors(northWind, [], [], numColors);
+        image(northWindColors);
+        title('NorthWind','FontSize',10);
+        hold on;
+        contour(randomMatrixDilated,50,'k-','Linewidth',0.2);
+        colormap(gca,cmap);
 
-                % plot it
-                rotatedMinus90 = [windE windN]*[0 -1; 1 0];
+        subplot(2,2,4);
+        windMagColors = fcn_INTERNAL_rescaleToColors(windMagnitude, [], [], numColors);
+        image(windMagColors);
+        title('windMagnitude','FontSize',10);
+        hold on;
+        contour(randomMatrixDilated,50,'k-','Linewidth',0.2);
+        colormap(gca,cmap);
 
-                plot(thisXind, thisYind,'w.','MarkerSize',1)
-                quiver(thisX, thisY, rotatedMinus90(1,1)*10, rotatedMinus90(1,2)*10, 1,'Color',[1 1 1],'LineWidth',1);
+    end
 
-            end
+    %%%%%
+    % Extract all the individual contour XY coordinates
+    % [M,c] = contour(randomMatrixDilated,50,'k-','Linewidth',0.2);
+    M = contourc(randomMatrixDilated,Ncontours);
+
+    levels = []; % The level number for each contour
+    coordinates = cell(1,1); % The XY coordinates for each contour
+    cellArrayOfWindMagnitudes = cell(1,1);
+    cellArrayOfEastWind = cell(1,1);
+    cellArrayOfNorthWind = cell(1,1);
+    allPointsXY = []; % The XY coordinates for all coordinates, separated by NaN values
+    allWindMagnitudes = []; % The wind magnitudes for all coordinates, separated by NaN values
+    allEastWind = [];
+    allNorthWind = [];
+
+    indexM = 1;
+    numContours = 0;
+    longestIndex = 0;
+    longestContourLength = 0;
+    while indexM < size(M,2)
+        numPointsThisContour = M(2,indexM); % Number of points in this contour segment
+        xData = M(1,indexM+(1:numPointsThisContour)); % x coordinates
+        yData = M(2,indexM+(1:numPointsThisContour)); % y coordinates
+        pointsXY = [xData' yData'];
+        thisContourIndices = max(1,floor(pointsXY));
+        thisXind = thisContourIndices(:,1);
+        thisYind = thisContourIndices(:,2);
+        indices = sub2ind(mapSize,thisYind,thisXind);
+        thisMagnitude = normalizedWindMagnitude(indices);
+        thisEastWind  = normalizedEastWind(indices);
+        thisNorthWind = normalizedNorthWind(indices);
+
+        % Save results
+        numContours = numContours+1;
+        levels(numContours,1) = M(1,indexM); %#ok<SAGROW>
+        coordinates{numContours,1} = pointsXY;
+        cellArrayOfWindMagnitudes{numContours,1} = thisMagnitude;
+        cellArrayOfEastWind{numContours,1} = thisEastWind;
+        cellArrayOfNorthWind{numContours,1} = thisNorthWind;
+
+        allPointsXY = [allPointsXY; nan nan; pointsXY]; %#ok<AGROW>
+        allWindMagnitudes = [allWindMagnitudes; nan; thisMagnitude]; %#ok<AGROW>
+        allEastWind = [allEastWind; nan; thisEastWind]; %#ok<AGROW>
+        allNorthWind = [allNorthWind; nan; thisNorthWind]; %#ok<AGROW>
+
+        % Save longest
+        if numPointsThisContour>longestContourLength
+            longestContourLength = numPointsThisContour;
+            longestIndex = numContours;
         end
 
+        % Move down the columns
+        indexM = indexM + numPointsThisContour + 1; % Move to the next contour segment
+    end
 
-        if 1==0
-            % Trying to use a different color map for the contours
-            %% See:
-            % https://www.mathworks.com/matlabcentral/answers/194554-how-can-i-use-and-display-two-different-colormaps-on-the-same-figure
-            colorizedImage = floor(rescale(randomMatrixDilated,1,numColors));
-            clf;
-            ax1 = axes;
-            image(colorizedImage);
-            % colormap(ax1, cmap);
+    % For debugging - plot longest contour to show plotting command works
+    if 1==0
+        figure(5858);
+        clf;
 
-            ax2 = axes;
-            [M,c] = contour(randomMatrixDilated,50,'Linewidth',0.2);
+        image(rescaledToColorIntegers);
+        ylabel('Rows');
+        xlabel('Columns');
+        title('Individual contour test');
+        hold on;
+        % contour(randomMatrixDilated,50,'k-','Linewidth',0.2);
+        axis equal
+        colormap(gca,cmap);
+        % quiver(xAxisValues,yAxisValues,normalizedEastWind,normalizedNorthWind)
 
-            %%Link them together
-            linkaxes([ax1,ax2])
+        longestContourXY = coordinates{longestIndex};
 
-            %%Hide the top axes
-            ax2.Visible = 'off';
-            ax2.XTick = [];
-            ax2.YTick = [];
+        % Plot the longest contour
+        % plot(longestContourXY(:,1),longestContourXY(:,2),'w-','LineWidth',1);
 
-            %%Give each one its own colormap
-            colormap(ax1,cmap)
-            colormap(ax2,'pink')
+        % % Quiver on largest contour only
+        % quiver(coordinates{longestIndex}(:,1),coordinates{longestIndex}(:,2), cellArrayOfEastWind{longestIndex,1}, cellArrayOfNorthWind{longestIndex,1},'w-','LineWidth',2);
+
+        % Plot only large winds
+        winds = cellArrayOfWindMagnitudes{longestIndex,1};
+        eastW = cellArrayOfEastWind{longestIndex,1};
+        northW = cellArrayOfNorthWind{longestIndex,1};
+        smallWinds = winds<0.4;
+        limitedContour = longestContourXY;
+        limitedContour(smallWinds,1) = nan;
+        limitedContour(smallWinds,2) = nan;
+        plot(limitedContour(:,1),limitedContour(:,2),'w-','LineWidth',1);
+
+        % Put arrows on one random point that's not nan valued
+        valuesToPlot = fcn_INTERNAL_breakDataByNaNs([limitedContour eastW northW winds]);
+        quiver(valuesToPlot(:,1),valuesToPlot(:,2),valuesToPlot(:,3)*5,valuesToPlot(:,4)*5,0,'LineWidth',1,'Color',[1 1 1],'MaxHeadSize',10);
+
+    end
+
+    % Plot only large winds
+    smallWinds = allWindMagnitudes<0.2;
+    limitedContours = allPointsXY;
+    limitedContours(smallWinds,1) = nan;
+    limitedContours(smallWinds,2) = nan;
+    plot(limitedContours(:,1),limitedContours(:,2),'w-','LineWidth',1);
+
+    % Put arrows on one random point that's not nan valued
+    valuesToPlot = fcn_INTERNAL_breakDataByNaNs([limitedContours allEastWind allNorthWind allWindMagnitudes]);
+    quiver(valuesToPlot(:,1),valuesToPlot(:,2),valuesToPlot(:,3)*5,valuesToPlot(:,4)*5,0,'LineWidth',1,'Color',[1 1 1],'MaxHeadSize',10);
+
+    %%%%
+    % Steer seedmap back to start?
+    if 1==flag_blendEndToStart
+        remainingSteps = (Nsteps-ith_step);
+        if remainingSteps<=NblendingSteps
+            seedMap =  remainingSteps/NblendingSteps*seedMap + (NblendingSteps-remainingSteps)/NblendingSteps*initialSeedMap;
         end
     end
-    pause(0.01);
+
+    drawnow; % Ensure the plot is updated on the screen
+
+    if 1==flag_saveAnimatedGif
+
+        % Capture the frame and save it
+        frame = getframe(gcf);
+        im = frame2im(frame);
+        [imind, cm] = rgb2ind(im, 256);
+
+        if flag_firstDraw == 1
+            imwrite(imind, cm, filename, 'gif', 'Loopcount', inf, 'DelayTime', delayTime);
+            flag_firstDraw = 0;
+        else
+            imwrite(imind, cm, filename, 'gif', 'WriteMode', 'append', 'DelayTime', delayTime);
+        end
+    end
 end
 
 %% fcn_INTERNAL_rescaleToColors
 function rescaledToColorIntegers = fcn_INTERNAL_rescaleToColors(randomMatrixDilated, colorMin, colorMax, numColors)
+flag_useMean = 1;
 
+if 1==flag_useMean
+    meanValue = mean(randomMatrixDilated,'all','omitmissing');
+    stdValue = std(randomMatrixDilated,0,'all','omitmissing');
+end
 if isempty(colorMin)
-    colorMin = min(randomMatrixDilated,[],'all');
+    if 0==flag_useMean
+        colorMin = min(randomMatrixDilated,[],'all');
+    else
+        colorMin = meanValue - 2*stdValue;
+    end
 end
 if isempty(colorMax)
-    colorMax = max(randomMatrixDilated,[],'all');
+    if 0==flag_useMean
+        colorMax = max(randomMatrixDilated,[],'all');
+    else
+        colorMax = meanValue + 2*stdValue;
+    end
 end
 
 colorInterval = (colorMax-colorMin)/(numColors-1); % The interval represents the "jump" between different colors
 offsetRemovedMatrix = randomMatrixDilated - colorMin; % Remove the offset
 countMatrix = floor(offsetRemovedMatrix./colorInterval)+1;
+
+% Make sure output is between 1 and numColors
 rescaledToColorIntegers = min(max(countMatrix,1),numColors);
 
 end % Ends fcn_INTERNAL_rescaleToColors
+
+%% fcn_INTERNAL_breakDataByNaNs
+function valuesToPlot = fcn_INTERNAL_breakDataByNaNs(inputData)
+% Finds "chunks" of data separated by nan values. In each chunk, randomly
+% picks one row, and saves it to plot. This code is used to select where to
+% put "arrowheads" on the contours, since putting them everywhere makes the
+% plot very messy
+
+% [limitedContour winds eastW northW]
+ith_value = 1;
+keepGoing = 1;
+Nfound = 0;
+remainder = inputData;
+while 1==keepGoing
+    nextNan = find(isnan(remainder(:,1)),1,'first');
+    if isempty(nextNan)
+        keepGoing = 0;
+        dataToProcess = remainder(ith_value:end,:);
+    else
+        dataToProcess = remainder(ith_value:(nextNan-1),:);
+    end
+    if nextNan == length(remainder(:,1))
+        keepGoing = 0;
+    else
+        remainder = remainder(nextNan+1:end,:);
+    end
+    if ~isempty(dataToProcess)
+        goodData = dataToProcess(~isnan(dataToProcess(:,1)),1);
+        if length(goodData)>3
+            Nfound = Nfound+1;
+            randomIndex = round(length(goodData)*rand);
+            randomIndex = max(1,min(length(goodData),randomIndex));
+            valuesToPlot(Nfound,:) = dataToProcess(randomIndex,:); %#ok<AGROW>
+        end
+    end
+end
+end
