@@ -139,6 +139,8 @@
 %    %     toolsets
 %    % --- script_demo_generateRandomOccupancyAnimated - animates random
 %    %     blobs
+% 2025_07_26 - S. Brennan
+% -- Added path generation examples from course material
 
 clear library_name library_folders library_url
 
