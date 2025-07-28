@@ -684,6 +684,64 @@ for ith_set = 1:length(allGeneratorTypes)
     assert(isequal(get(gcf,'Number'),fig_num));
 end
 
+%% TEST case: default inputs
+fig_num = 20005;
+titleString = sprintf('TEST case: default inputs');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+
+set_range = [1 100];
+
+rng(1234);
+
+Nsets = 1;
+
+[polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
+    'haltonset',...  % string or cellArrayOf_strings with the name of the seed generator to use
+    set_range...    % vector or cellArrayOf_vectors with the range of points from generator to use
+    );
+
+sgtitle(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(isstruct(polytopes));
+assert(isfield(polytopes,'vertices'));
+assert(isfield(polytopes,'xv'));
+assert(isfield(polytopes,'yv'));
+assert(isfield(polytopes,'distances'));
+assert(isfield(polytopes,'mean'));
+assert(isfield(polytopes,'area'));
+assert(isfield(polytopes,'max_radius'));
+assert(isfield(polytopes,'min_radius'));
+assert(isfield(polytopes,'mean_radius'));
+assert(isfield(polytopes,'radii'));
+assert(isfield(polytopes,'cost'));
+assert(isfield(polytopes,'parent_poly_id'));
+
+% Check variable sizes
+NinSet = set_range(2)-set_range(1)+1;
+assert(length(polytopes)== NinSet * Nsets); 
+
+% Check variable values
+assert(size(polytopes(1).vertices,2) == 2);
+assert(size(polytopes(1).xv,2) >= 2);
+assert(size(polytopes(1).yv,2) >= 2);
+assert(size(polytopes(1).distances,2) == 1);
+assert(isequal(size(polytopes(1).mean), [1 2]));
+assert(isequal(size(polytopes(1).area), [1 1]));
+assert(isequal(size(polytopes(1).max_radius), [1 1]));
+assert(isequal(size(polytopes(1).min_radius), [1 1]));
+assert(isequal(size(polytopes(1).mean_radius), [1 1]));
+assert(size(polytopes(1).radii,2) == 1);
+assert(isequal(size(polytopes(1).cost), [1 1]));
+assert(isempty(polytopes(1).parent_poly_id));
+
+% Check variable values
+% (these change randomly)
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
 
 %% Fast Mode Tests
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

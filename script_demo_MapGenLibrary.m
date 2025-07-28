@@ -99,30 +99,35 @@
 % -- renamed generator functions:
 %    % fcn_MapGen_voronoiTiling to fcn_MapGen_generatePolysFromSeedGeneratorNames
 %    % fcn_MapGen_nameToMap to fcn_MapGen_generatePolysFromName
+%
 % 2025_07_18 - S. Brennan
-% -- Added GridMapGen tools including:
-%    % --- fcn_GridMapGen_dilationOccupancyStats: calcs occupancy stats
-%    % --- fcn_GridMapGen_dilateByN: dilates a matrix by N cells
-%    % --- fcn_GridMapGen_dilateOccupancyByN: dilates occupancy by N cells 
-%    % --- fcn_GridMapGen_generateRandomOccupancyMap: generates a random occupancy map
-% -- Added GridMapGen demos including:
-%    % --- script_demo_dilateCompareDilateByNSpeeds - shows the dilation
+% - Added GridMapGen tools including:
+%    % * fcn_GridMapGen_dilationOccupancyStats: calcs occupancy stats
+%    % * fcn_GridMapGen_dilateByN: dilates a matrix by N cells
+%    % * fcn_GridMapGen_dilateOccupancyByN: dilates occupancy by N cells 
+%    % * fcn_GridMapGen_generateRandomOccupancyMap: generates a random occupancy map
+% - Added GridMapGen demos including:
+%    % * script_demo_dilateCompareDilateByNSpeeds - shows the dilation
 %    %     toolsets
-%    % --- script_demo_generateRandomOccupancyAnimated - animates random
+%    % * script_demo_generateRandomOccupancyAnimated - animates random
 %    %     blobs
+% 
 % 2025_07_26 - S. Brennan
-% -- Added path generation examples from course material
+% - Added path generation examples from course material
+% 
 % 2025_07_26 by Sean Brennan
-% -- fixed fcn_MapGen_polytopeCropEdges
-%    % renamed 
-%    % to fcn_MapGen_polytopesDeleteByAABB, for consistency
-%    % changed input to AABB style, for consistency
-% -- fixed fcn_MapGen_polytopeMapGen 
-%    % renamed inputs to remove underscores
-%    % changed boundingBox input to AABB format, for consistency
+% - fixed fcn_MapGen_polytopeCropEdges
+%    % * renamed to fcn_MapGen_polytopesDeleteByAABB, for consistency
+%    % * changed input to AABB style, for consistency
+% - fixed fcn_MapGen_polytopeMapGen 
+%    % * renamed inputs to remove underscores
+%    % * changed boundingBox input to AABB format, for consistency
+% 
 % 2025_07_28 by Sean Brennan
-% -- added and tested script_test_all_functions to GridMapGen
-
+% - added and tested script_test_all_functions to GridMapGen
+% 
+% 2025_07_28 by Sean Brennan
+% - fcn_MapGen_generatePolysFromSeedGeneratorNames, fixed missing defaults
 
 % TO-DO:
 % -- Modify statPoly code to give core statistics including:

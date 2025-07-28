@@ -247,11 +247,21 @@ max_xy_offset = [-inf -inf];
 
 % Fill in set points
 for ith_generator = 1:Ngenerators
-    ith_seedPointsRaw = fcn_INTERNAL_generateSetPoints(seedGeneratorNames{ith_generator}, seedGeneratorRanges{ith_generator}, AABBs{ith_generator});
-    eachGeneratorSeedPoints{ith_generator} = ith_seedPointsRaw.*mapStretch{ith_generator};
+    thisAABB = AABBs{ith_generator};
+    if isempty(thisAABB)
+        thisAABB = [0 0 1 1];    
+    end
+
+    thisMapStretch = mapStretch{ith_generator};
+    if isempty(thisMapStretch)
+        thisMapStretch = [1 1];
+    end
+
+    ith_seedPointsRaw = fcn_INTERNAL_generateSetPoints(seedGeneratorNames{ith_generator}, seedGeneratorRanges{ith_generator}, thisAABB);
+    eachGeneratorSeedPoints{ith_generator} = ith_seedPointsRaw.*thisMapStretch;
     all_points = [all_points; eachGeneratorSeedPoints{ith_generator}];  %#ok<AGROW>
-    min_xy_offset = min(min_xy_offset,AABBs{ith_generator}(1:2).*[mapStretch{ith_generator}(1) mapStretch{ith_generator}(2)]);
-    max_xy_offset = max(max_xy_offset,AABBs{ith_generator}(3:4).*[mapStretch{ith_generator}(1) mapStretch{ith_generator}(2)]);
+    min_xy_offset = min(min_xy_offset,thisAABB(1:2).*[thisMapStretch(1) thisMapStretch(2)]);
+    max_xy_offset = max(max_xy_offset,thisAABB(3:4).*[thisMapStretch(1) thisMapStretch(2)]);
 end
 
 % Calculate the axis-aligned bounding box for the sets
