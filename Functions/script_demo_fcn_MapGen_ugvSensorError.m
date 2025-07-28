@@ -45,9 +45,9 @@ h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat), (fillFormat), (fig_nu
 
 % remove the edge polytopes that extend past the high and low points
 fig_num = 23;
-bounding_box = [0 0; 200 200];
+bounding_box = [0 0, 200 200];
 trimmed_polytopes = ...
-    fcn_MapGen_polytopeCropEdges(polytopes,bounding_box,fig_num);
+    fcn_MapGen_polytopesDeleteByAABB(polytopes,bounding_box,fig_num);
 
 %shrink polytopes to create space
 fig_num = 24;

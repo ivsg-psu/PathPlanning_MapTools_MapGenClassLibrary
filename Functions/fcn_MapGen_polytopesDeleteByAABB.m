@@ -1,18 +1,19 @@
-function trimmedPolytopes = fcn_MapGen_polytopeCropEdges(polytopes, boundingBox, varargin)
-% fcn_MapGen_polytopeCropEdges removes polytopes that extend
+function trimmedPolytopes = fcn_MapGen_polytopesDeleteByAABB(polytopes, boundingBox, varargin)
+% fcn_MapGen_polytopesDeleteByAABB removes polytopes that extend
 % beyond the boundaries specified
 %
 % FORMAT:
 %
-% trimmedPolytopes = fcn_MapGen_polytopeCropEdges( polytopes, boundingBox, (fig_num))
+% trimmedPolytopes = fcn_MapGen_polytopesDeleteByAABB( polytopes, boundingBox, (fig_num))
 %
 % INPUTS:
 %
 %     polytopes: the original polytopes with the same fields as trimmedPolytopes
 %
-%     boundingBox: a 2 x 2 matrix of [xlow ylow; xhigh yhigh] in which all
-%     the polytopes must exist, e.g. the corner coordinates of the
-%     axis-aligned bounding box.
+%     boundingBox: a 1 x 4 matrix of [xlow ylow xhigh yhigh] (e.g. in AABB
+%     style), in which all the polytopes must exist within these
+%     boundaries. Polytopes outside, on, or crossing any boundary are
+%     deleted.
 %
 %    (OPTIONAL INPUTS)
 %
@@ -39,7 +40,7 @@ function trimmedPolytopes = fcn_MapGen_polytopeCropEdges(polytopes, boundingBox,
 %
 % EXAMPLES:
 %
-% For examples, see: script_test_fcn_MapGen_polytopeCropEdges
+% For examples, see: script_test_fcn_MapGen_polytopesDeleteByAABB
 %
 % This function was written on 2019_06_13 by Seth Tau
 % Questions or comments? sat5340@psu.edu
@@ -58,6 +59,11 @@ function trimmedPolytopes = fcn_MapGen_polytopeCropEdges(polytopes, boundingBox,
 % -- standardized Debugging and Input checks area, Inputs area
 % -- made codes use MAX_NARGIN definition at top of code, narginchk
 % -- made plotting flag_do_plots and code consistent across all functions
+% 2025_07_26 by Sean Brennan
+% -- fixed fcn_MapGen_polytopeCropEdges
+%    % renamed 
+%    % to fcn_MapGen_polytopesDeleteByAABB, for consistency
+%    % changed input to AABB style, for consistency
 
 % TO DO
 % -- vectorize the for loop if possible
@@ -116,8 +122,8 @@ if (0==flag_max_speed)
         % Check the polytopes input
         fcn_DebugTools_checkInputsToFunctions(polytopes, 'polytopes');
 
-        % Check the boundingBox input, is it 2x2?
-        fcn_DebugTools_checkInputsToFunctions(boundingBox, '2column_of_numbers',2);
+        % Check the boundingBox input, is it 1x4?
+        fcn_DebugTools_checkInputsToFunctions(boundingBox, '4column_of_numbers',1);
 
     end
 end
@@ -145,8 +151,8 @@ end
 
 xlow = boundingBox(1,1);
 ylow = boundingBox(1,2);
-xhigh = boundingBox(2,1);
-yhigh = boundingBox(2,2);
+xhigh = boundingBox(1,3);
+yhigh = boundingBox(1,4);
 
 Npolys = length(polytopes);
 
@@ -199,10 +205,11 @@ if flag_do_plots
     set(h_plot,'DisplayName','polytopes');
 
     % Plot the bounding box in black
-    boxVertices = [boundingBox(1,1) boundingBox(1,2);
-        boundingBox(2,1) boundingBox(1,2);
-        boundingBox(2,1) boundingBox(2,2);
-        boundingBox(1,1) boundingBox(2,2);
+    boxVertices = [...
+        boundingBox(1,1) boundingBox(1,2);
+        boundingBox(1,3) boundingBox(1,2);
+        boundingBox(1,3) boundingBox(1,4);
+        boundingBox(1,1) boundingBox(1,4);
         boundingBox(1,1) boundingBox(1,2)];
     plot(boxVertices(:,1),boxVertices(:,2),'k-','LineWidth',3,'DisplayName','boundingBox');
     

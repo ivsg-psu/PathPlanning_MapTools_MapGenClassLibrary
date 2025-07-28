@@ -5,7 +5,7 @@
 % 2025_04_28
 % -- first written by S. Harnett
 fig_num = 1;
-bounding_box = [0,0; 1,1];
+bounding_box = [0,0, 1,1];
 
 seedGeneratorNames = 'haltonset';
 seedGeneratorRanges = [1 20];
@@ -18,7 +18,7 @@ mapStretchs = [1 1];
     (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
     (-1));
 
-polytopes = fcn_MapGen_polytopeCropEdges(polytopes,bounding_box);
+polytopes = fcn_MapGen_polytopesDeleteByAABB(polytopes,bounding_box);
 
 des_cost = 0.1;
 

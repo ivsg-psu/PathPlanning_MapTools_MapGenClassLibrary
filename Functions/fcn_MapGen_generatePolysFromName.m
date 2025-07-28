@@ -101,7 +101,7 @@ function [polytopes,fig]=fcn_MapGen_generatePolysFromName(...
 %
 %      fcn_DebugTools_checkInputsToFunctions
 %      fcn_MapGen_generatePolysFromSeedGeneratorNames
-%      fcn_MapGen_polytopeCropEdges
+%      fcn_MapGen_polytopesDeleteByAABB
 %      fcn_MapGen_polytopesShrinkToRadius
 %      fcn_MapGen_plotPolytopes
 %
@@ -273,10 +273,10 @@ if sum(split_name=="SQT")>0 % check for square triming (SQT)
     
     % trim the base polytopes based on the values following SQT
     bounding_box = ...
-        [str2double(split_name(SQT_index+1)),str2double(split_name(SQT_index+3));
+        [str2double(split_name(SQT_index+1)),str2double(split_name(SQT_index+3)), ...
         str2double(split_name(SQT_index+2)),str2double(split_name(SQT_index+4))];
     
-    trim_polytopes = fcn_MapGen_polytopeCropEdges(...
+    trim_polytopes = fcn_MapGen_polytopesDeleteByAABB(...
         base_polytopes,bounding_box, -1);
 % elseif % check for other trim methods
     % trim polytopes

@@ -1,5 +1,5 @@
-% script_test_fcn_MapGen_polytopeMapGen
-% Tests function: fcn_MapGen_polytopeMapGen
+% script_test_fcn_MapGen_haltonVoronoiTiling
+% Tests function: fcn_MapGen_haltonVoronoiTiling
 
 % REVISION HISTORY:
 % 2021_06_06

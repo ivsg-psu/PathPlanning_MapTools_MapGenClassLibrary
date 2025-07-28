@@ -24,7 +24,7 @@ function onePolytope = fcn_MapGen_polytopeGenerateOneRandomPoly(varargin)
 % DEPENDENCIES:
 % 
 %     fcn_MapGen_generatePolysFromSeedGeneratorNames
-%     fcn_MapGen_polytopeCropEdges
+%     fcn_MapGen_polytopesDeleteByAABB
 %     fcn_MapGen_plotPolytopes
 % 
 % 
@@ -151,7 +151,7 @@ mapStretchs = [1 1];
 % bounded with new revisions. Delete below once confirm that everything
 % works.
 % bounding_box = [0,0; 1,1];
-% trim_polytopes = fcn_MapGen_polytopeCropEdges(polytopes,bounding_box, -1);
+% trim_polytopes = fcn_MapGen_polytopesDeleteByAABB(polytopes,bounding_box, -1);
 trim_polytopes = polytopes;
 
 % Pick a random polytope

@@ -125,8 +125,8 @@ mapStretchs = [1 1];
 
 
 edge_cut_step = 0.005;
-bounding_box = [0,0; 1,1];
-trim_polytopes = fcn_MapGen_polytopeCropEdges(polytopes,bounding_box);
+bounding_box = [0,0, 1,1];
+trim_polytopes = fcn_MapGen_polytopesDeleteByAABB(polytopes,bounding_box);
 
 % Pick a random polytope
 Npolys = length(trim_polytopes);

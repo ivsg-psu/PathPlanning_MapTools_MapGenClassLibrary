@@ -78,6 +78,8 @@ figure(fig_num); clf;
 occupancyMatrix = rand(100,100)<0.02; % about 2 percent occupied
 % percentOccupied = fcn_GridMapGen_dilateOccupancyStats(occupancyMatrix, (28282));
 dilationLevel = 2;
+leftDilationMultiplier = [];
+rightDilationMultiplier = [];
 
 % Call the function
 [dilatedMatrix, leftDilationMultiplier, rightDilationMultiplier] = ...

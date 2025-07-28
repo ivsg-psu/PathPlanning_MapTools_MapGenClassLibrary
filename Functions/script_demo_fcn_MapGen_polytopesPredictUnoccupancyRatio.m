@@ -37,8 +37,8 @@ mapStretchs = [1 1];
 
 
 fig_num = 1;
-bounding_box = [0,0; 1,1];
-trim_polytopes = fcn_MapGen_polytopeCropEdges(polytopes,bounding_box,fig_num);
+bounding_box = [0,0, 1,1];
+trim_polytopes = fcn_MapGen_polytopesDeleteByAABB(polytopes,bounding_box,fig_num);
 pre_shrink_stats = fcn_MapGen_statsPolytopes(trim_polytopes, -1);
 R_bar_initial = pre_shrink_stats.average_max_radius;
 des_gap_size_all = [];

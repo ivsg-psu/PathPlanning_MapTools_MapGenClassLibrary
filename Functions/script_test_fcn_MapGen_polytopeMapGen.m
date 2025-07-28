@@ -35,10 +35,10 @@ fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
 % generate Voronoi tiling from Halton points
-Halton_range = [1 200]; % range of Halton points to use to generate the tiling
+haltonRange = [1 200]; % range of Halton points to use to generate the tiling
 % remove the edge polytope that extend past the high and low points
 xlow = 0; xhigh = 1; ylow = 0; yhigh = 1;
-bounding_box = [xlow ylow; xhigh yhigh];
+boundingBox = [xlow ylow, xhigh yhigh];
 
 % shink the polytopes so that they are no longer tiled
 des_radius = 0.03; % desired average maximum radius
@@ -49,7 +49,7 @@ shrink_seed = 1111; % seed used for randomizing the shrinking process
 % Call the function
 [map_polytopes,all_pts,mu_rad_final,sigma_rad_final] = ...
     fcn_MapGen_polytopeMapGen(...
-    Halton_range,bounding_box,...
+    haltonRange,boundingBox,...
     des_radius,sigma_radius,min_rad,shrink_seed,(fig_num));
 
 sgtitle(titleString, 'Interpreter','none');
@@ -136,10 +136,10 @@ fprintf(1,'Figure: %.0f: FAST mode, empty fig_num\n',fig_num);
 figure(fig_num); close(fig_num);
 
 % generate Voronoi tiling from Halton points
-Halton_range = [1 200]; % range of Halton points to use to generate the tiling
+haltonRange = [1 200]; % range of Halton points to use to generate the tiling
 % remove the edge polytope that extend past the high and low points
 xlow = 0; xhigh = 1; ylow = 0; yhigh = 1;
-bounding_box = [xlow ylow; xhigh yhigh];
+boundingBox = [xlow ylow, xhigh yhigh];
 
 % shink the polytopes so that they are no longer tiled
 des_radius = 0.03; % desired average maximum radius
@@ -150,7 +150,7 @@ shrink_seed = 1111; % seed used for randomizing the shrinking process
 % Call the function
 [map_polytopes,all_pts,mu_rad_final,sigma_rad_final] = ...
     fcn_MapGen_polytopeMapGen(...
-    Halton_range,bounding_box,...
+    haltonRange,boundingBox,...
     des_radius,sigma_radius,min_rad,shrink_seed,([]));
 
 % Check variable types
@@ -193,10 +193,10 @@ fprintf(1,'Figure: %.0f: FAST mode, fig_num=-1\n',fig_num);
 figure(fig_num); close(fig_num);
 
 % generate Voronoi tiling from Halton points
-Halton_range = [1 200]; % range of Halton points to use to generate the tiling
+haltonRange = [1 200]; % range of Halton points to use to generate the tiling
 % remove the edge polytope that extend past the high and low points
 xlow = 0; xhigh = 1; ylow = 0; yhigh = 1;
-bounding_box = [xlow ylow; xhigh yhigh];
+boundingBox = [xlow ylow, xhigh yhigh];
 
 % shink the polytopes so that they are no longer tiled
 des_radius = 0.03; % desired average maximum radius
@@ -207,7 +207,7 @@ shrink_seed = 1111; % seed used for randomizing the shrinking process
 % Call the function
 [map_polytopes,all_pts,mu_rad_final,sigma_rad_final] = ...
     fcn_MapGen_polytopeMapGen(...
-    Halton_range,bounding_box,...
+    haltonRange,boundingBox,...
     des_radius,sigma_radius,min_rad,shrink_seed,(-1));
 
 % Check variable types
@@ -252,10 +252,10 @@ figure(fig_num);
 close(fig_num);
 
 % generate Voronoi tiling from Halton points
-Halton_range = [1 200]; % range of Halton points to use to generate the tiling
+haltonRange = [1 200]; % range of Halton points to use to generate the tiling
 % remove the edge polytope that extend past the high and low points
 xlow = 0; xhigh = 1; ylow = 0; yhigh = 1;
-bounding_box = [xlow ylow; xhigh yhigh];
+boundingBox = [xlow ylow, xhigh yhigh];
 
 % shink the polytopes so that they are no longer tiled
 des_radius = 0.03; % desired average maximum radius
@@ -271,7 +271,7 @@ for ith_test = 1:Niterations
     % Call the function
     [map_polytopes,all_pts,mu_rad_final,sigma_rad_final] = ...
         fcn_MapGen_polytopeMapGen(...
-        Halton_range,bounding_box,...
+        haltonRange,boundingBox,...
         des_radius,sigma_radius,min_rad,shrink_seed,([]));
 end
 slow_method = toc;
@@ -282,7 +282,7 @@ for ith_test = 1:Niterations
    % Call the function
     [map_polytopes,all_pts,mu_rad_final,sigma_rad_final] = ...
         fcn_MapGen_polytopeMapGen(...
-        Halton_range,bounding_box,...
+        haltonRange,boundingBox,...
         des_radius,sigma_radius,min_rad,shrink_seed,(-1));
 end
 fast_method = toc;
@@ -355,9 +355,9 @@ end
 % points_scrambled = scramble(halton_points,'RR2'); % scramble values
 %
 % % pick values from halton set
-% Halton_range = [1801 1901];
-% low_pt = Halton_range(1,1);
-% high_pt = Halton_range(1,2);
+% haltonRange = [1801 1901];
+% low_pt = haltonRange(1,1);
+% high_pt = haltonRange(1,2);
 % seed_points = points_scrambled(low_pt:high_pt,:);
 % [V,C] = voronoin(seed_points);
 % % V = V.*stretch;

@@ -275,7 +275,6 @@ end
 
 %% fcn_INTERNAL_loadExampleData
 function polytopes = fcn_INTERNAL_loadExampleData
-boundingBox = [0,0; 1,1];
 
 seedGeneratorNames = 'haltonset';
 seedGeneratorRanges = [1 20];
@@ -288,6 +287,7 @@ mapStretchs = [1 1];
     (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
     (-1));
 
-polytopes = fcn_MapGen_polytopeCropEdges(polytopes, boundingBox, -1);
+boundingBox = [0,0, 1,1];
+polytopes = fcn_MapGen_polytopesDeleteByAABB(polytopes, boundingBox, -1);
 
 end % Ends fcn_INTERNAL_loadExampleData

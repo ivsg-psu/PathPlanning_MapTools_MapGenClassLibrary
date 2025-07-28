@@ -66,11 +66,9 @@ fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); close(fig_num);
 
 % Set input arguments
-% mapSize = [];
-% mColumns = [];
-% occupancyRatio = [];
-% dilationLevel = [];
-% seedMap = [];
+mapSize = [];
+mColumns = [];
+occupancyRatio = [];
 
 % Call the function
 [occupancyMatrix, randomMatrixDilated, optimizedThreshold]  = fcn_GridMapGen_generateRandomOccupancyMap;
