@@ -139,6 +139,9 @@
 %   % * prior version was mis-named!
 %   % * script_demo_fcn_MapGen_polytopesShrinkToGapSize created from prior
 %   % * added test script: script_test_fcn_MapGen_polytopesShrinkEvenly
+%
+% (new release)
+
 
 % TO-DO:
 % -- Modify statPoly code to give core statistics including:
@@ -169,7 +172,10 @@
 % -- figure out difference between fcn_MapGen_generatePolysFromTiling and
 %    % fcn_MapGen_generatePolysFromVoronoiAABB - they look the same
 % 2025_07_29 - S. Brennan
-% -- Need to add a test script for script_test_fcn_MapGen_polytopesShrinkToGapSize
+% - Need to add a test script for script_test_fcn_MapGen_polytopesShrinkToGapSize
+% 2025_07_29 by Sean Brennan
+% - fcn_MapGen_polytopeFindVertexSkeleton needs to be replaced with VSkel
+%   % library function
 
 clear library_name library_folders library_url
 
