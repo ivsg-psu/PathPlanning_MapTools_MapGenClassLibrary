@@ -1,5 +1,5 @@
-% demo_fcn_MapGen_polytopeShrinkFromEdges
-% Repeatedly runs function: fcn_MapGen_polytopeShrinkFromEdges
+% script_demo_fcn_MapGen_polytopesShrinkToGapSize
+% Repeatedly runs function: fcn_MapGen_polytopesShrinkToGapSize
 % to generate data and compare commanded gap size and observed gap size
 
 % REVISION HISTORY:
@@ -42,7 +42,7 @@ for i = linspace(0.001,0.08,5)
     fig_num = 2;
     des_gap_size = i;
     shrunk_polytopes1=...
-        fcn_MapGen_polytopesShrinkFromEdges(...
+        fcn_MapGen_polytopesShrinkToGapSize(...
         trim_polytopes,des_gap_size, -1);
     field_stats = fcn_MapGen_statsPolytopes(shrunk_polytopes1, -1);
     rho = field_stats.linear_density_mean;

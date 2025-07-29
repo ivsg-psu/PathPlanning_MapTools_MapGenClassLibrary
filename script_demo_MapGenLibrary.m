@@ -124,10 +124,21 @@
 %    % * changed boundingBox input to AABB format, for consistency
 % 
 % 2025_07_28 by Sean Brennan
-% - added and tested script_test_all_functions to GridMapGen
+% - added and tested script_test_all_GridMapGen_functions to GridMapGen
 % 
 % 2025_07_28 by Sean Brennan
 % - fcn_MapGen_generatePolysFromSeedGeneratorNames, fixed missing defaults
+%
+% 2025_07_29 by Sean Brennan
+% - fcn_MapGen_polytopeShrinkEvenly created 
+%   % * copied from fcn_MapGen_polytopesShrinkEvenly, which was misnamed
+%   % * added test script, script_test_fcn_MapGen_polytopeShrinkEvenly
+%   % DEPRECATED: fcn_MapGen_polytopeShrinkFromEdges, which is same fcn
+% - fcn_MapGen_polytopesShrinkEvenly created
+%   % * function fcn_MapGen_polytopesShrinkToGapSize created from prior ver
+%   % * prior version was mis-named!
+%   % * script_demo_fcn_MapGen_polytopesShrinkToGapSize created from prior
+%   % * added test script: script_test_fcn_MapGen_polytopesShrinkEvenly
 
 % TO-DO:
 % -- Modify statPoly code to give core statistics including:
@@ -157,7 +168,8 @@
 % -- need to finish script_test_fcn_MapGen_AABBprojectVectorTo
 % -- figure out difference between fcn_MapGen_generatePolysFromTiling and
 %    % fcn_MapGen_generatePolysFromVoronoiAABB - they look the same
-
+% 2025_07_29 - S. Brennan
+% -- Need to add a test script for script_test_fcn_MapGen_polytopesShrinkToGapSize
 
 clear library_name library_folders library_url
 
@@ -241,7 +253,6 @@ setenv('MATLABFLAG_MAPGEN_FLAG_DO_DEBUG','0');
 %                               |___/                                      
 % See http://patorjk.com/software/taag/#p=display&f=Big&t=Getting%20Started
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 disp('Welcome to the MapGen library!')
 
 %%

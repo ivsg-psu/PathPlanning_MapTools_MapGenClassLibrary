@@ -1,15 +1,15 @@
 function [shrunkPolytopes] = ...
-    fcn_MapGen_polytopesShrinkFromEdges(...
+    fcn_MapGen_polytopesShrinkToGapSize(...
     polytopes,...
     des_gap_size,...
     varargin)
-% fcn_MapGen_polytopesShrinkFromEdges shrinks the polytopes to achieve the
+% fcn_MapGen_polytopesShrinkToGapSize shrinks the polytopes to achieve the
 % desired gap size between polytopes
 %
 % FORMAT:
 %
 % [shrunkPolytopes] = ...
-%     fcn_MapGen_polytopesShrinkFromEdges(...
+%     fcn_MapGen_polytopesShrinkToGapSize(...
 %     polytopes,...
 %     des_gap_size,...
 %     (fig_num))
@@ -51,13 +51,13 @@ function [shrunkPolytopes] = ...
 %
 %     fcn_DebugTools_checkInputsToFunctions
 %     fcn_MapGen_plotPolytopes
-%     fcn_MapGen_polytopeShrinkFromEdges
+%     fcn_MapGen_polytopeShrinkEvenly
 %
 % EXAMPLES:
 %
-% For additional examples, see: script_test_fcn_MapGen_polytopesShrinkFromEdges
+% For additional examples, see: script_test_fcn_MapGen_polytopesShrinkToGapSize
 %
-% This function was written on 2022_01_17 by Steve Harentt using fcn_MapGen_polytopesShrinkToRadius
+% This function was written on 2022_01_17 by Steve Harnett using fcn_MapGen_polytopesShrinkToRadius
 % as a template
 % Questions or comments? sjh6473@psu.edu
 %
@@ -192,7 +192,7 @@ end
 % distance between vertices, below which vertices are merged into one.
 clear shrunkPolytopes
 shrinker = polytopes(1); % obstacle to be shrunk
-temp = fcn_MapGen_polytopeShrinkFromEdges(shrinker,des_gap_size/2, [], [], [], -1);
+temp = fcn_MapGen_polytopeShrinkEvenly(shrinker,des_gap_size/2, [], [], [], -1);
 shrunkPolytopes(length(polytopes)) = temp;
 
 % Loop through each polytope, shrinking it to the reference size
@@ -204,7 +204,7 @@ for ith_poly = 1:length(polytopes)
     else
         % assign to shrunkPolytopes
         % gap_size over 2 is the normal distance to pull edges in
-        shrunkPolytopes(ith_poly) = fcn_MapGen_polytopeShrinkFromEdges(shrinker,des_gap_size/2, [], [], [], -1);
+        shrunkPolytopes(ith_poly) = fcn_MapGen_polytopeShrinkEvenly(shrinker,des_gap_size/2, [], [], [], -1);
     end
 end
 

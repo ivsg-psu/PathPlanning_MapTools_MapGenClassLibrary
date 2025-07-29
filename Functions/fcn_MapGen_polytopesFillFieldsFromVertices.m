@@ -1,7 +1,9 @@
 function [filled_polytopes] = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes, varargin)
 % fcn_MapGen_polytopesFillFieldsFromVertices
 % Given a polytoope structure array where the vertices field is filled,
-% calculates the values for all the other fields.
+% calculates the values for all the other fields. If the polytope is filled
+% "backwards", e.g. with vertices in exactly wrong order, corrects the
+% ordering.
 %
 % FORMAT:
 %
@@ -13,7 +15,8 @@ function [filled_polytopes] = fcn_MapGen_polytopesFillFieldsFromVertices(polytop
 % INPUTS:
 %
 %     polytopes: an individual structure or structure array of 'polytopes'
-%     type that stores the polytopes to be filled
+%     type that stores the polytopes to be filled. See
+%     fcn_MapGen_polytopeFillEmptyPoly for structure details.
 %
 %     (optional inputs)
 %
@@ -24,11 +27,10 @@ function [filled_polytopes] = fcn_MapGen_polytopesFillFieldsFromVertices(polytop
 %      up code to maximize speed. As well, if given, this forces the
 %      variable types to be displayed as output and as well makes the input
 %      check process verbose.
-
+%
 % OUTPUTS:
 %
 %     filled_polytopes: the polytopes array with all fields completed
-%
 %
 % DEPENDENCIES:
 %
@@ -170,11 +172,13 @@ for ith_poly = 1:num_poly
     [angles, ~, ~] = fcn_MapGen_polytopeFindVertexAngles(...
         filled_polytopes(ith_poly).vertices, -1);
 
-    % Confirm that all angles are positive
+    % Confirm that all angles are positive, e.g. that the polytope is
+    % convex
     if ~all(angles>=0)
         if any(isnan(angles)) % This happens when there is a repeating point, which is a degenerate poly
             filled_polytopes(ith_poly).vertices = nan(length(filled_polytopes(ith_poly).vertices),2);
         elseif all(angles<=0)
+            % Correct the ordering by flipping vertices 
             filled_polytopes(ith_poly).vertices = flipud(filled_polytopes(ith_poly).vertices);
         else
             if ~is_nonconvex

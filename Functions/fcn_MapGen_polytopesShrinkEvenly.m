@@ -1,24 +1,25 @@
-function expandedPolytopes  = fcn_MapGen_polytopesExpandEvenly( polytopes, expansionDistance, varargin)
-% fcn_MapGen_polytopesExpandEvenly
-% Expands an obstacle out by expansionDistance on all sides.  This function works as intended
-% with convex polytopes.  
+function shrunkPolytopes  = fcn_MapGen_polytopesShrinkEvenly( unshrunkPolytopes, cutDistance, varargin)
+% fcn_MapGen_polytopesShrinkEvenly shrinks all polytopes in a a polytope array 
+% 
+% Loops through polytopes, shrinking each by the same cutDistance on all sides.
 % 
 % NOTE: There can be counterintuitive behavior with non-convex polytopes
-% that can be avoided by using fcn_MapGen_polytopesExpandEvenlyForConcave
+% that can be avoided by using fcn_MapGen_polytopesShrinkEvenlyForConcave
 % which implements MATLAB's polyshape object and polybuffer method (object
 % function).
 %
 % FORMAT:
 %
-%     expandedPolytopes  = fcn_MapGen_polytopesExpandEvenly( polytopes, expansionDistance,(fig_num))
+%     shrunkPolytopes  = fcn_MapGen_polytopesShrinkEvenly( unshrunkPolytopes, cutDistance,(fig_num))
 %
 % INPUTS:
 %
-%     polytopes: an array 'polytopes' type that stores the
-%     polytopes to be expanded. Each polytope's fields are defined in
+%     unshrunkPolytopes: an array 'polytopes' type that stores the
+%     polytopes to be shrunk. Each polytope's fields are defined in
 %     fcn_MapGen_polytopeFillEmptyPoly 
 %
-%     expansionDistance: distance to expand the obstacle
+%     cutDistance: distance to shrink the polytopes. This is the "cut"
+%     taken from each side of each polytope
 %
 %     (optional inputs)
 %
@@ -30,8 +31,7 @@ function expandedPolytopes  = fcn_MapGen_polytopesExpandEvenly( polytopes, expan
 %
 % OUTPUTS:
 %
-%     expandedPolytopes: an array of expanded polytopes, in same structure
-%     style as input
+%     shrunkPolytopes: structure of shrunk polytopes
 %
 % DEPENDENCIES:
 %
@@ -41,41 +41,18 @@ function expandedPolytopes  = fcn_MapGen_polytopesExpandEvenly( polytopes, expan
 %
 % EXAMPLES:
 %
-% See the script: script_test_fcn_MapGen_polytopesExpandEvenly
+% See the script: script_test_fcn_MapGen_polytopesShrinkEvenly
 % for a full test suite.
 %
-% This function was written on 2018_11_17, Adjusted example code on 2021_04_28 by Seth Tau, Rebased on 2021_06_26 by S. Brennan by Seth Tau
+% This function was written on 2025_07_29
 % Questions or comments? contact sbrennan@psu.edu and sat5340@psu.edu
 
 %
 % REVISION HISTORY:
 %
-% 2018_11_17, Seth Tau
+% 2025_07_29 - S. Brennan
 % -- first write of script
-% 2021_04_28, Seth Tau
-% -- Adjusted example code ,
-% 2021_06_26 S. Brennan
-% -- Rebased code
-% -- Rewrote for clarity
-% 2021_07_06 S. Brennan
-% -- Vectorized plotting into array structure, to better support legends
-% (rather than plotting all polytopes individually)
-% 2024_02_14 S.J. Harnett
-% -- Updated docstring comment to point to fcn_MapGen_polytopesExpandEvenlyForConcave
-%    for non-convex obstacles
-% 2025_04_25 by Sean Brennan
-% -- added global debugging options
-% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-% -- fixed call to fcn_MapGen_polytopesFillFieldsFromVertices
-% 2025_07_16 by Sean Brennan
-% -- cleaned up header comments
-% -- replaced exp_dist with expansionDistance
-% -- changed plotPolytopes to new format
-% -- turned on fast mode on sub-function calls
-% 2025_07_17 by Sean Brennan
-% -- standardized Debugging and Input checks area, Inputs area
-% -- made codes use MAX_NARGIN definition at top of code, narginchk
-% -- made plotting flag_do_plots and code consistent across all functions
+
 
 % TO DO
 % -- none
@@ -132,10 +109,10 @@ if (0==flag_max_speed)
         narginchk(2,MAX_NARGIN);
 
         % Check the polytopes input, make sure it is 'polytopes' type
-        fcn_DebugTools_checkInputsToFunctions(polytopes, 'polytopes');
+        fcn_DebugTools_checkInputsToFunctions(unshrunkPolytopes, 'polytopes');
 
-        % Check the expansionDistance input, make sure it is 'positive_column_of_numbers' type
-        fcn_DebugTools_checkInputsToFunctions(expansionDistance, 'positive_1column_of_numbers',1);
+        % Check the cutDistance input, make sure it is 'positive_column_of_numbers' type
+        fcn_DebugTools_checkInputsToFunctions(cutDistance, 'positive_1column_of_numbers',1);
 
     end
 end
@@ -163,24 +140,15 @@ end
 %See: http://patorjk.com/software/taag/#p=display&f=Big&t=Main
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
-expandedPolytopes = polytopes; % both structures will be the same size
+shrunkPolytopes = unshrunkPolytopes; % both structures will be the same size
 
-for ith_poly = 1:size(polytopes,2) % check each obstacle
-
-    % pull values
-    vertices = polytopes(ith_poly).vertices;
-    centroid = polytopes(ith_poly).mean;
-    rad = polytopes(ith_poly).max_radius;
-
-    % Calculate scale
-    scale = (rad+expansionDistance)/rad;
-
-    % Calculate new vertices
-    expandedPolytopes(ith_poly).vertices = centroid + scale*(vertices-centroid);
+for ith_poly = 1:size(unshrunkPolytopes,2) % check each polytope
 
     % fill in other fields from the vertices field
-    expandedPolytopes(ith_poly) = fcn_MapGen_polytopesFillFieldsFromVertices(expandedPolytopes(ith_poly),[], -1);
-
+    shrunkPolytopes(ith_poly) = fcn_MapGen_polytopeShrinkEvenly(...
+        unshrunkPolytopes(ith_poly),...
+        cutDistance,...
+        (-1));
 end
 
 %§
@@ -202,26 +170,23 @@ if flag_do_plots
     figure(fig_num)
     clf;
 
-    % LineWidth = 2;
-    % fcn_MapGen_OLD_plotPolytopes(polytopes,fig_num,'r-',LineWidth);
     plotFormat.LineWidth = 2;
     plotFormat.MarkerSize = 10;
     plotFormat.LineStyle = '-';
     plotFormat.Color = [1 0 0];
     fillFormat = [];
-    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat), (fillFormat), (fig_num)); 
-    set(h_plot,'DisplayName','polytopes')
+    h_plot = fcn_MapGen_plotPolytopes(unshrunkPolytopes, (plotFormat), (fillFormat), (fig_num)); 
+    set(h_plot,'DisplayName','unshrunkPolytopes')
 
-    % fcn_MapGen_OLD_plotPolytopes(expandedPolytopes,fig_num,'b-',LineWidth,'square');
     plotFormat.LineWidth = 2;
     plotFormat.MarkerSize = 10;
     plotFormat.LineStyle = '-';
     plotFormat.Color = [0 0 1];
     fillFormat = [];
-    h_plot = fcn_MapGen_plotPolytopes(expandedPolytopes, (plotFormat), (fillFormat), (fig_num)); 
-    set(h_plot,'DisplayName','expandedPolytopes')
+    h_plot = fcn_MapGen_plotPolytopes(shrunkPolytopes, (plotFormat), (fillFormat), (fig_num)); 
+    set(h_plot,'DisplayName','shrunkPolytopes')
 
-    legend('Original','Expanded')
+    legend('Interpreter','none','Location','best');
     box on
     xlabel('X Position')
     ylabel('Y Position')
