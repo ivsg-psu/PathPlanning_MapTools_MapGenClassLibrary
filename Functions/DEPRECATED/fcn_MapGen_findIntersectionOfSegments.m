@@ -89,7 +89,9 @@ warning('fcn_MapGen_findIntersectionOfSegments is being deprecated. Use fcn_Path
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
 % -- fixed call to fcn_MapGen_fillPolytopeFieldsFromVertices
-
+% 2025_10_05 by Sean Brennan
+% -- removed call to fcn_MapGen_fillPolytopeFieldsFromVertices 
+%    % replaced with fcn_MapGen_polytopesFillFieldsFromVertices
 
 % TO DO
 % -- none

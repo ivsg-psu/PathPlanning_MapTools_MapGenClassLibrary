@@ -70,8 +70,9 @@ function [shrunkPolytope, newVertices, newProjectionVectors, cutDistance] = ...
 % DEPENDENCIES:
 %
 %     fcn_DebugTools_checkInputsToFunctions
-%     fcn_MapGen_polytopeFindVertexAngles
+%     fcn_MapGen_polytopeFindVertexSkeleton
 %     fcn_MapGen_fillPolytopeFieldsFromVertices
+%     fcn_MapGen_plotPolytopes
 %
 % % EXAMPLES:
 %

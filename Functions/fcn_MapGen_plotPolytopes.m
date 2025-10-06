@@ -23,8 +23,8 @@ function h_plot = fcn_MapGen_plotPolytopes(polytopes, varargin)
 %            handle, for example: h_plot = plot(1:10); get(h_plot)
 %
 %      fillFormat: a 1-by-5 vector to specify wether or not there is fill,
-%      the color of fill, and the opacity of the fill [Y/N, R, G, B,
-%      alpha]. Default is [0 0 0 0 0];
+%      the color of fill, and the opacity of the fill 
+%      in the form: [Y/N, R, G, B, alpha]. Default is [0 0 0 0 0];
 %
 %      fig_num: a figure number to plot results. If set to -1, skips any
 %      input checking or debugging, no figures will be generated, and sets

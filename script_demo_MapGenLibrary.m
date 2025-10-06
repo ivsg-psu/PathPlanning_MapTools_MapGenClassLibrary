@@ -142,6 +142,16 @@
 %
 % (new release)
 
+% 2025_10_02 by Sean Brennan
+% - Updated DebugTools_v2025_09_26b
+% - Updated PathClass_v2025_08_03
+% - In fcn_MapGen_polytopesShrinkEvenly
+%   % Fixed header docstrings to correctly show dependence on 
+%   % fcn_MapGen_polytopeShrinkEvenly
+% - In fcn_MapGen_polytopeShrinkEvenly  
+%   % Fixed header docstrings to correctly show dependence on 
+
+% Search/replace for fcn_MapGen_polytopeFindVertexSkeleton
 
 % TO-DO:
 % -- Modify statPoly code to give core statistics including:
@@ -180,14 +190,14 @@
 clear library_name library_folders library_url
 
 ith_library = 1;
-library_name{ith_library}    = 'DebugTools_v2025_07_15';
+library_name{ith_library}    = 'DebugTools_v2025_09_26b';
 library_folders{ith_library} = {'Functions','Data'};
-library_url{ith_library}     = 'https://github.com/ivsg-psu/Errata_Tutorials_DebugTools/archive/refs/tags/DebugTools_v2025_07_15.zip';
+library_url{ith_library}     = 'https://github.com/ivsg-psu/Errata_Tutorials_DebugTools/archive/refs/tags/DebugTools_v2025_09_26b.zip';
 
 ith_library = ith_library+1;
-library_name{ith_library}    = 'PathClass_v2025_07_06';
+library_name{ith_library}    = 'PathClass_v2025_08_03';
 library_folders{ith_library} = {'Functions'};                                
-library_url{ith_library}     = 'https://github.com/ivsg-psu/PathPlanning_PathTools_PathClassLibrary/archive/refs/tags/PathClass_v2025_07_06.zip?raw=true';
+library_url{ith_library}     = 'https://github.com/ivsg-psu/PathPlanning_PathTools_PathClassLibrary/archive/refs/tags/PathClass_v2025_08_03.zip?raw=true';
 
 % ith_library = ith_library+1;
 % library_name{ith_library}    = 'GPSClass_v2023_04_21';

@@ -36,7 +36,7 @@ function shrunkPolytopes  = fcn_MapGen_polytopesShrinkEvenly( unshrunkPolytopes,
 % DEPENDENCIES:
 %
 %     fcn_DebugTools_checkInputsToFunctions
-%     fcn_MapGen_polytopesFillFieldsFromVertices
+%     fcn_MapGen_polytopeShrinkEvenly
 %     fcn_MapGen_plotPolytopes
 %
 % EXAMPLES:

@@ -73,6 +73,9 @@ function [ ...
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
 % -- fixed call to fcn_MapGen_fillPolytopeFieldsFromVertices
+% 2025_10_05 by Sean Brennan
+% -- removed call to fcn_MapGen_fillPolytopeFieldsFromVertices 
+%    % replaced with fcn_MapGen_polytopesFillFieldsFromVertices
 
 
 % TO DO
@@ -213,7 +216,7 @@ end
 
 % adjust polytopes
 cleanedPolytope.vertices = [new_vert; new_vert(1,:)];
-cleanedPolytope = fcn_MapGen_fillPolytopeFieldsFromVertices(cleanedPolytope);
+cleanedPolytope = fcn_MapGen_polytopesFillFieldsFromVertices(cleanedPolytope);
 
 %§
 %% Plot the results (for debugging)?

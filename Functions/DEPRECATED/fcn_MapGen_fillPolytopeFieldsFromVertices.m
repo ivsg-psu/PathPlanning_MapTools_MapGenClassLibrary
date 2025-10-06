@@ -1,4 +1,7 @@
-function [filled_polytopes] = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes, varargin)
+function [filled_polytopes] = fcn_MapGen_fillPolytopeFieldsFromVertices(polytopes, varargin)
+warning('on','backtrace');
+warning('fcn_MapGen_fillPolytopeFieldsFromVertices is being deprecated.\n Use fcn_MapGen_polytopesFillFieldsFromVertices instead.');
+
 % fcn_MapGen_polytopesFillFieldsFromVertices
 % Given a polytoope structure array where the vertices field is filled,
 % calculates the values for all the other fields. If the polytope is filled

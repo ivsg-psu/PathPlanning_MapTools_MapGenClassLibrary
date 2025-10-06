@@ -23,11 +23,9 @@ orig_radius = shrinker.max_radius;
 ratio = 0.5;
 des_rad = orig_radius*ratio;
 
-tolerance = 1e-5;
-
 % Call the function
 shrunkPolytope = fcn_MapGen_polytopeShrinkToRadius(...
-    shrinker, des_rad,tolerance, (fig_num));
+    shrinker, des_rad, (fig_num));
 
 %% Iterative example of uniform shrinking
 fig_num = 2;
@@ -42,10 +40,9 @@ ratios = (0.99:-0.2:0);
 
 for ith_ratio = 1:length(ratios)
     des_rad = orig_radius*ratios(ith_ratio);
-    tolerance = 1e-5;
     shrunkPolytope =...
         fcn_MapGen_polytopeShrinkToRadius(...
-        shrinker,des_rad,tolerance,fig_num);
+        shrinker,des_rad,fig_num);
     pause(0.01);
 end
 
@@ -67,7 +64,7 @@ for ith_ratio = 1:length(ratios)
     tolerance = 0.02;
     shrunkPolytope =...
         fcn_MapGen_polytopeShrinkToRadius(...
-        shrinker,des_rad,tolerance);
+        shrinker,des_rad,(-1));
     cleaned_polytope = fcn_MapGen_polytopeRemoveTightVerticies(...
         shrunkPolytope, tolerance,fig_num);
     pause(0.01);
