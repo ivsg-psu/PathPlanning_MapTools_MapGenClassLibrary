@@ -5,8 +5,11 @@
 % REVISION HISTORY:
 % 2022_03_09
 % -- first written by S. Harnett
+% 2025_11_06 - S. Brennan
+% - removed command to clear workspace (unnecessary)
 
-close all; clear all;
+
+close all;
 
 N_int_actual_all = [];
 rd_all= [];
@@ -77,7 +80,9 @@ for tiles=25:25:1000
     std_all_rand = [std_all_rand, std];
     sharpness_all_rand = [sharpness_all_rand, sharpness];
 end
-% plot
+
+% plot results
+
 figure(1)
 subplot(2,2,1)
 hold on

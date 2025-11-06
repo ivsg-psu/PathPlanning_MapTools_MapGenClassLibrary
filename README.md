@@ -55,6 +55,7 @@ The class library for functions to generate new maps, started from Seth Tau's or
                 <li><a href="#polytope-field-generation-functions">Polytope Field Generation Functions</li>
                 <ul>
                     <li><a href="#fcn_mapgen_generatepolysfromvoronoiaabb">fcn_MapGen_generatePolysFromVoronoiAABB - a method to generate polytope fields by "manaully" bounding the Voronoi diagram</li>
+                    <li><a href="#fcn_mapgen_generatepolysfromvoronoiaabbwithtiling">fcn_MapGen_generatePolysFromVoronoiAABBWithTiling - produces polytope fields that tile /li>
                     <li><a href="#fcn_mapgen_verticestiling">fcn_MapGen_verticesTiling - a method to tile points</li>
                 </ul>
             </ul>
@@ -305,6 +306,44 @@ And it produces the following plot:
 <figcaption>fcn_MapGen_generatePolysFromVoronoiAABB - an example of calculating a polytope field constrained by an Axis-Aligned Bounding Box.</figcaption>
 <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
 </pre>
+
+<a href="#pathplanning_maptools_mapgenclasslibrary">Back to top</a>
+***
+
+#### fcn_MapGen_generatePolysFromVoronoiAABBWithTiling
+
+The function  **fcn_MapGen_generatePolysFromVoronoiAABBWithTiling** calculates a polytope field given a set of seed points, as in fcn_MapGen_generatePolysFromVoronoiAABB, but modifies the edge properties of the Voronoi diagram so that the map is truly tiled.
+
+<pre align="center">
+    <img src=".\Images\fcn_MapGen_generatePolysFromVoronoiAABBWithTiling.png " alt="example of polytope field tiling" width="960" height="450">
+    <figcaption> Example of polytope field tiling, via fcn_MapGen_generatePolysFromVoronoiAABBWithTiling.</figcaption>
+    <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+The following code illustrates a basic call:
+
+```Matlab
+fig_num = 112;
+
+% Pull halton set
+rng(1111);
+halton_points = haltonset(2);
+points_scrambled = scramble(halton_points,'RR2'); % scramble values
+unit_AABB = [0 0 1 1]; % Define the axis-aligned bounding box
+stretch = [1 1];
+
+% Pick values from halton set
+Npoints = 100;
+Halton_range = [1 Npoints];
+low_pt = Halton_range(1,1);
+high_pt = Halton_range(1,2);
+original_seed_points = points_scrambled(low_pt:high_pt,:);
+
+% Call the function
+polytopes = fcn_MapGen_generatePolysFromVoronoiAABBWithTiling(original_seed_points,unit_AABB, stretch,fig_num);
+assert(isstruct(polytopes));
+
+```
 
 <a href="#pathplanning_maptools_mapgenclasslibrary">Back to top</a>
 ***

@@ -1,7 +1,10 @@
 function [new_vertices, new_projection_vectors, cut_distance] = ...
     fcn_MapGen_polytopeFindVertexSkeleton(vertices, varargin)
-warning('on','backtrace');
-warning('fcn_MapGen_polytopeFindVertexSkeleton is being deprecated. Use the VSkel library instead.');
+
+% NOTE: 2025_11_06 - S. Brennan - commented out deprecation warning since
+% VSkel is not yet released
+% warning('on','backtrace');
+% warning('fcn_MapGen_polytopeFindVertexSkeleton is being deprecated. Use the VSkel library instead.');
 
 % Calculates the VertexSkeleton for a polytope, i.e. where the vertices
 % would land if the polytope were shrunk.

@@ -16,9 +16,13 @@
 % -- first written by S. Harnett
 % 2025_04_28
 % -- comment updated to point to paper by S. Harnett
+% 2025_11_06 - S. Brennan
+% - removed command to clear workspace (unnecessary)
+
 
 %% Set up variables
-close all;clear all;
+close all;
+
 %% Debugging and Input checks
 flag_check_inputs = 1; % Set equal to 1 to check the input arguments
 flag_do_plot = 0;      % Set equal to 1 for plotting

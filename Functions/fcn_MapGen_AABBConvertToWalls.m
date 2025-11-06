@@ -44,7 +44,6 @@ function [walls] = ...
 % This function was written on 2021_07_11 by Sean Brennan
 % Questions or comments? contact sbrennan@psu.edu
 
-% 
 % REVISION HISTORY:
 % 
 % 2021_07_17 by Sean Brennan

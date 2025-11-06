@@ -69,6 +69,9 @@ function h_plot = fcn_MapGen_plotPolytopes(polytopes, varargin)
 % -- standardized Debugging and Input checks area, Inputs area
 % -- made codes use MAX_NARGIN definition at top of code, narginchk
 % -- made plotting flag_do_plots and code consistent across all functions
+% 2025_11_06 by Sean Brennan
+% -- removed duplicate figure() call within Inputs area (not needed)
+
 
 % TO DO
 % -- none
@@ -172,7 +175,6 @@ if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
-        figure(fig_num);
         flag_do_plots = 1;
     end
 end
