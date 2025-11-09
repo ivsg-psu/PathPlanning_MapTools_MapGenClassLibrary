@@ -63,7 +63,9 @@ function [new_vertices, new_projection_vectors, cut_distance] = ...
 % 2025_04_25 by Sean Brennan
 % -- added global debugging options
 % -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-
+% 2025_11_09 - S. Brennan
+% -- Shut off warnings (line 222) as these should go away when
+%    % transitioning vertex skeleton to VSkel library
 
 % TO DO
 % -- none
@@ -217,9 +219,9 @@ while 0 == flag_stop_loop
             % Check that final cut distance is as expected, within tolerance
             if cut_distance(iteration)>(max_cut_depth + eps*1000) || cut_distance(iteration)<(max_cut_depth - eps*1000)
                 st = dbstack;
-                warning('on','backtrace');
-                warning('Within function: %s, in file: %s',st(1).name,st(1).file);
-                warning('The predicted cut distance of %f does not match actual cut distance, %f. The results may be in error.\n',cut_distance(iteration),max_cut_depth);
+                % warning('on','backtrace');
+                % warning('Within function: %s, in file: %s',st(1).name,st(1).file);
+                % warning('The predicted cut distance of %f does not match actual cut distance, %f. The results may be in error.\n',cut_distance(iteration),max_cut_depth);
             end
             new_projection_vectors{iteration} = [0 0; 0 0]; %#ok<AGROW>
 
