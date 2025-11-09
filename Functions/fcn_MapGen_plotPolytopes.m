@@ -71,6 +71,10 @@ function h_plot = fcn_MapGen_plotPolytopes(polytopes, varargin)
 % -- made plotting flag_do_plots and code consistent across all functions
 % 2025_11_06 by Sean Brennan
 % -- removed duplicate figure() call within Inputs area (not needed)
+% 2025_11_08 by Sean Brennan
+% -- removed handle visibility on fill command to avoid "data" generic
+%    % label in legend commands thereafter
+% -- fixed minor warnings
 
 
 % TO DO
@@ -196,9 +200,6 @@ end
 % 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Initialize the output
-h_plot = 0;
-
 % Fill in the x and y data
 polytope_plot_data_x = [];
 polytope_plot_data_y = [];
@@ -247,7 +248,7 @@ if flag_do_plots
 
     % If plotting only one point, make sure point style is filled
     NplotPoints = length(polytope_plot_data_x(:,1));
-    if NplotPoints==1
+    if NplotPoints==1 %#ok<ISCL>
         if ~isfield(plotFormat,'Marker') || strcmp(plotFormat.Marker,'none')
             finalPlotFormat.Marker = '.';
             finalPlotFormat.LineStyle = 'none';
@@ -261,6 +262,7 @@ if flag_do_plots
         for polys = 1:size(polytopes,2)
             filler = fill(polytopes(polys).vertices(:,1)',polytopes(polys).vertices(:,2)',fillFormat(2:4));
             filler.FaceAlpha = polytopes(polys).cost;
+            filler.HandleVisibility = 'off';
         end
     end
 
