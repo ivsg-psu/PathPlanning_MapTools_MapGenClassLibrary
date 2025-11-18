@@ -290,17 +290,17 @@ all_walls_end_no_nan   = all_walls_end(~isnan(all_walls_end(:,1)),:);
 angle_column = reshape(all_angles,Nverticies_per_poly*Npolys,1);
 % angle_column = reshape(all_angles,1,[]); % this line is a useful alternative if the above line fails
 angle_column_no_nan = angle_column(~isnan(angle_column));
-average_vertex_angle = mean(angle_column_no_nan*180/pi,'omitmissing');
-std_vertex_angle = std(angle_column_no_nan*180/pi,'omitmissing');
+average_vertex_angle = mean(angle_column_no_nan*180/pi,'omitnan');
+std_vertex_angle = std(angle_column_no_nan*180/pi,'omitnan');
 
 % Find the mean and std deviations of radii metrics
-max_max_radius = max(all_max_radius,[],'all','omitmissing');
-average_max_radius = mean(all_max_radius,'omitmissing');
-average_min_radius = mean(all_min_radius,'omitmissing');
-average_mean_radius = mean(all_mean_radius,'omitmissing');
-average_radius = mean(all_radii,'omitmissing');
-average_sharpness = mean(all_sharpness_ratios,'omitmissing');
-std_max_radius = std(all_max_radius,'omitmissing');
+max_max_radius = max(all_max_radius,[],'all','omitnan');
+average_max_radius = mean(all_max_radius,'omitnan');
+average_min_radius = mean(all_min_radius,'omitnan');
+average_mean_radius = mean(all_mean_radius,'omitnan');
+average_radius = mean(all_radii,'omitnan');
+average_sharpness = mean(all_sharpness_ratios,'omitnan');
+std_max_radius = std(all_max_radius,'omitnan');
 % all_mean_radii = extractfield(polytopes,'true_mean_radius');
 % average_mean_radius = nanmean(all_mean_radii);
 
@@ -309,8 +309,8 @@ length_column = reshape(all_lengths,Nverticies_per_poly*Npolys,1);
 % length_column = reshape(all_lengths,1,[]); % this line is a useful alternative if the above fails
 length_column_no_nan = length_column(~isnan(length_column));
 total_perimeter = sum(length_column_no_nan);
-average_side_length = mean(length_column_no_nan,'omitmissing');
-std_side_length = std(length_column_no_nan,'omitmissing');
+average_side_length = mean(length_column_no_nan,'omitnan');
+std_side_length = std(length_column_no_nan,'omitnan');
 average_perimeter = total_perimeter/Npolys;
 
 % Determine the area properties of the map
@@ -526,8 +526,8 @@ if flag_do_plots
 
     subplot(2,3,3);
     histogram(all_side_count,10);
-    ave_value = mean(all_side_count,'omitmissing');
-    std_value = std(all_side_count,'omitmissing');
+    ave_value = mean(all_side_count,'omitnan');
+    std_value = std(all_side_count,'omitnan');
     xline(ave_value,'g-')
     xline(ave_value-2*std_value,'r-')
     xline(ave_value+2*std_value,'r-')
