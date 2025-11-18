@@ -522,7 +522,7 @@ for ith_missing = 1:length(missing_vertices(:,1))
     if 1==in_polytope || 1==on_polytope
         interior_point = closestSeedPoint;
     else
-        interior_point = mean(vertices,1,'omitmissing');
+        interior_point = mean(vertices,1,'omitnan');
     end
 
     % BUG: following assumes seedPoints are inside polytopes. They are not
