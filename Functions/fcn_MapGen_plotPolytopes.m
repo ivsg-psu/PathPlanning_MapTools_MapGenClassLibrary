@@ -7,7 +7,9 @@ function h_plot = fcn_MapGen_plotPolytopes(polytopes, varargin)
 %
 % INPUTS:  
 %
-%      polytopes: an array of structures containing polytope information.
+%     polytopes: an individual structure or structure array of 'polytopes'
+%     type that stores the polytopes to be filled. See
+%     fcn_MapGen_polytopeFillEmptyPoly for structure details.
 %      
 %      (OPTIONAL INPUTS)
 %

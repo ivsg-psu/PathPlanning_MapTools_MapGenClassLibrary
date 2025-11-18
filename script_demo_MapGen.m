@@ -4,124 +4,140 @@
 
 % Revision history:
 % 2021_06_07:
-% -- First write of the function, using the "Vis" library demo script as
-% starter
+% - First write of the function, using the "Vis" library demo script as
+%   % starter
+% 
 % 2021_06_09
-% -- Added other types of point generators
+% - Added other types of point generators
+% 
 % 2021_07_06
-% -- Updated to include the newer expansion functions
+% - Updated to include the newer expansion functions
+% 
 % 2021_07_11
-% -- Add ability to extend halton set to right (e.g. "scrolling" map), see
-% the function: fcn_MapGen_mixedSetVoronoiTiling
+% - Add ability to extend halton set to right (e.g. "scrolling" map), see
+%   % the function: fcn_MapGen_mixedSetVoronoiTiling
+% 
 % 2021_07_12
-% -- Added ability to determine generic map statistics via the function:
-% fcn_MapGen_statsPolytopes
+% - Added ability to determine generic map statistics via the function:
+%   % fcn_MapGen_statsPolytopes
+% 
 % 2023_01_15
-% -- Added demo of edge-based shrinking
+% - Added demo of edge-based shrinking
+% 
 % 2023_02_20
-% -- Added code to better support README.md
+% - Added code to better support README.md
+% 
 % 2023_02_21
-% -- Added Debug utility library
+% - Added Debug utility library
+% 
 % 2023_03_13 
-% -- Merged changes allowing for repeated tiling polytope field
+% - Merged changes allowing for repeated tiling polytope field
+% 
 % 2023_04_27
-% -- Updated the installer to latest version of Debug Tools (fixes bug with
-% Git archives of zips).
+% - Updated the installer to latest version of Debug Tools (fixes bug with
+%   % Git archives of zips).
+% 
 % 2023_05_04 - sbrennan@psu.edu
-% -- Cleared the path variable, in case variable of same name shadows
-% command. This was causing errors in some codes.
-% -- functionalized the clear process
+% - Cleared the path variable, in case variable of same name shadows
+%   % command. This was causing errors in some codes.
+% - functionalized the clear process
+% 
 % 2025_04_25 - Sean Brennan
-% -- Updated DebugTools_v2024_12_18 dependency
-% -- Added global flags for setting test conditions and plotting
-% -- Deprecated fcn_MapGen_checkInputsToFunctions, converted to fcn_DebugTools_checkInputsToFunctions
+% - Updated DebugTools_v2024_12_18 dependency
+% - Added global flags for setting test conditions and plotting
+% - Deprecated fcn_MapGen_checkInputsToFunctions, converted to fcn_DebugTools_checkInputsToFunctions
+% 
 % 2025_06_25 - Sean Brennan
-% -- upgraded debug tools to version DebugTools_v2025_06_24
+% - upgraded debug tools to version DebugTools_v2025_06_24
+% 
 % 2025_07_03 - Sean Brennan
-% -- added minor comments in demo script
+% - added minor comments in demo script
+% 
 % 2025_07_07 - Sean Brennan
-% -- started updating headers and test scripts. Only have 
-% fcn_MapGen_generatePolysFromTiling done so far.
+% - started updating headers and test scripts. Only have 
+%   % fcn_MapGen_generatePolysFromTiling done so far.
+% 
 % 2025_07_11 - Sean Brennan
-% -- updated DebugTools library to DebugTools_v2025_07_15
-% -- added PathClass library to use fcn_Path_findSensorHitOnWall function
-%    % rather than
-%    % fcn_MapGen_findIntersectionOfSegments
-%    % the Path library version is FAR better in speed, debugged, support,
-%    % etc. Deprecated fcn_MapGen_findIntersectionOfSegments
-% -- for all the tiling variants, deprecated the following
-%    % fcn_MapGen_sobolVoronoiTiling
-%    % fcn_MapGen_latinVoronoiTiling
-%    % (etc)
-%    % Merged these to use fcn_MapGen_mixedSetVoronoiTiling and renamed
-%    % this to fcn_MapGen_generatePolysFromSeedGeneratorNames. Created output from voronoiTiling
-%    % that preserves the polytopes and seedPoints for each generator
-%    % function
-% -- Fixed a bug where corners of AABBs are not being tiled in voronoiTiling
-% -- Fixed bug in script_test...voronoiTiling. Error was thrown due to how
-%    % corners of AAB were handled, where seedPoint for polytope was assumed
-%    % to always be inside the polytope. Added a catch case to fix - see
-%    % above
-% -- Deprecated fcn_MapGen_checkIfPointInsideConvexPolytope, using
-%    % inpolytope instead
-% -- rewrote plotPolytopes using variable input arguments (see plotRoad
-%    % library) to allow arbitrary formatting. Deprecated old version.
-% -- added option in fcn_MapGen_generatePolysFromSeedGeneratorNames to plot both all Voronoi
-%    cells and then all each individual Voronoi cell for each generator,
-%    with colors matched. 
-% -- fixed bugs in fcn_MapGen_verticesCropToAABB where infinite vertices
-%    % not treated correctly
-% -- fully used DebugTools library utility for input checking
-% -- make sure all function calls internal to functions have -1 speed set
-%    % for figure number
-% -- renamed fcn_MapGen_generateOneRandomPolytope to be:
-%    % fcn_MapGen_polytopeGenerateOneRandomPoly
-% -- renamed polytopes function:
-%    % fcn_MapGen_fillPolytopeFieldsFromVertices to fcn_MapGen_polytopesFillFieldsFromVertices
-%    % fcn_MapGen_increasePolytopeVertexCount to fcn_MapGen_polytopesIncreaseVertexCount
-% -- renamed AABB functions:
-%    % fcn_MapGen_convertAABBtoWalls to fcn_MapGen_AABBConvertToWalls
-%    % fcn_MapGen_snapToAABB to fcn_MapGen_AABBsnapTo
-%    % fcn_MapGen_isWithinABBB to fcn_MapGen_AABBisWithin
-%    % fcn_MapGen_projectVectorToAABB to fcn_MapGen_AABBprojectVectorTo
-% -- renamed vertices functions:
-%    % fcn_MapGen_cropPolytopeToRange to fcn_MapGen_verticesCropToAABB
-%    % fcn_MapGen_cropVerticesByWallIntersections to fcn_MapGen_verticesCropToWallIntersections
-%    % fcn_MapGen_removeInfiniteVertices to fcn_MapGen_verticesRemoveInfinite
+% - updated DebugTools library to DebugTools_v2025_07_15
+% - added PathClass library to use fcn_Path_findSensorHitOnWall function
+%   % rather than
+%   % fcn_MapGen_findIntersectionOfSegments
+%   % the Path library version is FAR better in speed, debugged, support,
+%   % etc. Deprecated fcn_MapGen_findIntersectionOfSegments
+% - for all the tiling variants, deprecated the following
+%   % fcn_MapGen_sobolVoronoiTiling
+%   % fcn_MapGen_latinVoronoiTiling
+%   % (etc)
+%   % Merged these to use fcn_MapGen_mixedSetVoronoiTiling and renamed
+%   % this to fcn_MapGen_generatePolysFromSeedGeneratorNames. Created output from voronoiTiling
+%   % that preserves the polytopes and seedPoints for each generator
+%   % function
+% - Fixed a bug where corners of AABBs are not being tiled in voronoiTiling
+% - Fixed bug in script_test...voronoiTiling. Error was thrown due to how
+%   % corners of AAB were handled, where seedPoint for polytope was assumed
+%   % to always be inside the polytope. Added a catch case to fix - see
+%   % above
+% - Deprecated fcn_MapGen_checkIfPointInsideConvexPolytope, using
+%   % inpolytope instead
+% - rewrote plotPolytopes using variable input arguments (see plotRoad
+%   % library) to allow arbitrary formatting. Deprecated old version.
+% - added option in fcn_MapGen_generatePolysFromSeedGeneratorNames to plot both all Voronoi
+%   % cells and then all each individual Voronoi cell for each generator,
+%   % with colors matched. 
+% - fixed bugs in fcn_MapGen_verticesCropToAABB where infinite vertices
+%   % not treated correctly
+% - fully used DebugTools library utility for input checking
+% - make sure all function calls internal to functions have -1 speed set
+%   % for figure number
+% - renamed fcn_MapGen_generateOneRandomPolytope to be:
+%   % fcn_MapGen_polytopeGenerateOneRandomPoly
+% - renamed polytopes function:
+%   % fcn_MapGen_fillPolytopeFieldsFromVertices to fcn_MapGen_polytopesFillFieldsFromVertices
+%   % fcn_MapGen_increasePolytopeVertexCount to fcn_MapGen_polytopesIncreaseVertexCount
+% - renamed AABB functions:
+%   % fcn_MapGen_convertAABBtoWalls to fcn_MapGen_AABBConvertToWalls
+%   % fcn_MapGen_snapToAABB to fcn_MapGen_AABBsnapTo
+%   % fcn_MapGen_isWithinABBB to fcn_MapGen_AABBisWithin
+%   % fcn_MapGen_projectVectorToAABB to fcn_MapGen_AABBprojectVectorTo
+% - renamed vertices functions:
+%   % fcn_MapGen_cropPolytopeToRange to fcn_MapGen_verticesCropToAABB
+%   % fcn_MapGen_cropVerticesByWallIntersections to fcn_MapGen_verticesCropToWallIntersections
+%   % fcn_MapGen_removeInfiniteVertices to fcn_MapGen_verticesRemoveInfinite
+% 
 % 2025_07_17 by Sean Brennan
-% -- renamed more vertices functions:
-%    % fcn_MapGen_tilePoints to fcn_MapGen_verticesTiling
-% -- renamed stats functions:
-%    % fcn_MapGen_calculateConvexHullOverlapRatio to fcn_MapGen_statsConvexHullOverlapRatio
-%    % fcn_MapGen_polytopesStatistics to fcn_MapGen_statsPolytopes
-% -- renamed polytopes function:
-%    % fcn_MapGen_flattenPolytopeMap to fcn_MapGen_polytopesFlattenMap
-% -- renamed generator functions:
-%    % fcn_MapGen_voronoiTiling to fcn_MapGen_generatePolysFromSeedGeneratorNames
-%    % fcn_MapGen_nameToMap to fcn_MapGen_generatePolysFromName
+% - renamed more vertices functions:
+%   % fcn_MapGen_tilePoints to fcn_MapGen_verticesTiling
+% - renamed stats functions:
+%   % fcn_MapGen_calculateConvexHullOverlapRatio to fcn_MapGen_statsConvexHullOverlapRatio
+%   % fcn_MapGen_polytopesStatistics to fcn_MapGen_statsPolytopes
+% - renamed polytopes function:
+%   % fcn_MapGen_flattenPolytopeMap to fcn_MapGen_polytopesFlattenMap
+% - renamed generator functions:
+%   % fcn_MapGen_voronoiTiling to fcn_MapGen_generatePolysFromSeedGeneratorNames
+%   % fcn_MapGen_nameToMap to fcn_MapGen_generatePolysFromName
 %
 % 2025_07_18 - S. Brennan
 % - Added GridMapGen tools including:
-%    % * fcn_GridMapGen_dilationOccupancyStats: calcs occupancy stats
-%    % * fcn_GridMapGen_dilateByN: dilates a matrix by N cells
-%    % * fcn_GridMapGen_dilateOccupancyByN: dilates occupancy by N cells 
-%    % * fcn_GridMapGen_generateRandomOccupancyMap: generates a random occupancy map
+%   % * fcn_GridMapGen_dilationOccupancyStats: calcs occupancy stats
+%   % * fcn_GridMapGen_dilateByN: dilates a matrix by N cells
+%   % * fcn_GridMapGen_dilateOccupancyByN: dilates occupancy by N cells 
+%   % * fcn_GridMapGen_generateRandomOccupancyMap: generates a random occupancy map
 % - Added GridMapGen demos including:
-%    % * script_demo_dilateCompareDilateByNSpeeds - shows the dilation
-%    %     toolsets
-%    % * script_demo_generateRandomOccupancyAnimated - animates random
-%    %     blobs
+%   % * script_demo_dilateCompareDilateByNSpeeds - shows the dilation
+%   %     toolsets
+%   % * script_demo_generateRandomOccupancyAnimated - animates random
+%   %     blobs
 % 
 % 2025_07_26 - S. Brennan
 % - Added path generation examples from course material
 % 
 % 2025_07_26 by Sean Brennan
 % - fixed fcn_MapGen_polytopeCropEdges
-%    % * renamed to fcn_MapGen_polytopesDeleteByAABB, for consistency
-%    % * changed input to AABB style, for consistency
+%   % * renamed to fcn_MapGen_polytopesDeleteByAABB, for consistency
+%   % * changed input to AABB style, for consistency
 % - fixed fcn_MapGen_polytopeMapGen 
-%    % * renamed inputs to remove underscores
-%    % * changed boundingBox input to AABB format, for consistency
+%   % * renamed inputs to remove underscores
+%   % * changed boundingBox input to AABB format, for consistency
 % 
 % 2025_07_28 by Sean Brennan
 % - added and tested script_test_all_GridMapGen_functions to GridMapGen
@@ -164,50 +180,63 @@
 %   % * Pulled this function out of BoundedAStar
 % - Removed deprecation warnings on fcn_MapGen_polytopeFindVertexSkeleton
 % - Updated script_test_all_functions
+% (new release)
 %
+% 2025_11_18 by Sean Brennan
+% - Updated revision history to be in Markdown format
+% - In fcn_MapGen_plotPolytopes
+%   % * updated docstrings to better explain polytopes structure
 % (new release)
 
+
+
 % TO-DO:
-% -- Modify statPoly code to give core statistics including:
-%    % look out limit, 
-%    % linear density, etc
-%    % basically make function to calculate all the pi-values and 
-%    % interpretations we might need for publications
-% -- add prior work on grid-based map generation
+% - Modify statPoly code to give core statistics including:
+%   % look out limit, 
+%   % linear density, etc
+%   % basically make function to calculate all the pi-values and 
+%   % interpretations we might need for publications
+% - add prior work on grid-based map generation
+% 
 % 2025_07_03 - Sean Brennan
-% -- need codes to generate non-convex obstacles randomly
-%    Possible approach: generate convex polytopes, and then carve
-%    subpolytopes out of these
-% -- need codes to generate 3D obstacles randomly via Halton set
+% - need codes to generate non-convex obstacles randomly
+%   % Possible approach: generate convex polytopes, and then carve
+%   % subpolytopes out of these
+% - need codes to generate 3D obstacles randomly via Halton set
+% 
 % 2025_07_09 - S. Brennan and K. Hayes
-% --  need a tool to check if polytope is convex in 
-%     % fcn_MapGen_polytopesFillFieldsFromVertices. This is causing some of
-%     % the codes in Bounded_AStar to break.
-%     % UPDATE: 2025_11_06 - S. Brennan - there's a new function in Geom
-%     now to do this: See fcn_geometry_findPolytopeOrientations
+% - need a tool to check if polytope is convex in 
+%   % fcn_MapGen_polytopesFillFieldsFromVertices. This is causing some of
+%   % the codes in Bounded_AStar to break.
+%   % UPDATE: 2025_11_06 - S. Brennan - there's a new function in Geom
+%   % now to do this: See fcn_geometry_findPolytopeOrientations
+% 
 % 2025_07_11 - Sean Brennan
-% -- in fcn_MapGen_generatePolysFromTiling, seems all arguments are
-%    optional. Need to fix this
-% -- compare example script out of
-%    % fcn_MapGen_generatePolysFromVoronoiAABBWithTiling to code in this main
-%    % demo. remove the code if not being used anymore.
-% -- rewrite fcn_MapGen_polytopesIncreaseVertexCount to use linspace between
+% - in fcn_MapGen_generatePolysFromTiling, seems all arguments are
+%   % optional. Need to fix this
+% - compare example script out of
+%   % fcn_MapGen_generatePolysFromVoronoiAABBWithTiling to code in this main
+%   % demo. remove the code if not being used anymore.
+% - rewrite fcn_MapGen_polytopesIncreaseVertexCount to use linspace between
 %    % X and Y vertices rather than interpolation. MUCH simpler.
-% -- rework fcn_MapGen_polytopesPredictLengthCostRatio - code is very messy
-% -- need to finish script_test_fcn_MapGen_AABBprojectVectorTo
-% -- figure out difference between fcn_MapGen_generatePolysFromTiling and
-%    % fcn_MapGen_generatePolysFromVoronoiAABB - they look the same
+% - rework fcn_MapGen_polytopesPredictLengthCostRatio - code is very messy
+% - need to finish script_test_fcn_MapGen_AABBprojectVectorTo
+% - figure out difference between fcn_MapGen_generatePolysFromTiling and
+%   % fcn_MapGen_generatePolysFromVoronoiAABB - they look the same
+% 
 % 2025_07_29 - S. Brennan
 % - Need to add a test script for script_test_fcn_MapGen_polytopesShrinkToGapSize
+% 
 % 2025_07_29 by Sean Brennan
 % - fcn_MapGen_polytopeFindVertexSkeleton needs to be replaced with VSkel
 %   % library function
+% 
 % 2025_11_06 - S. 
 % - Need to finish updating README. Note: the load function (see 2025_11_06
 %   % revision notes, needs to be updated.
 % - Need to finish VSkel library and then deprecate
-% fcn_MapGen_polytopeFindVertexSkeleton (it's deprecated now, but warning
-% is shut off), then search/replace for fcn_MapGen_polytopeFindVertexSkeleton
+%   % fcn_MapGen_polytopeFindVertexSkeleton (it's deprecated now, but warning
+%   % is shut off), then search/replace for fcn_MapGen_polytopeFindVertexSkeleton
 
 
 clear library_name library_folders library_url
@@ -1475,13 +1504,13 @@ function fcn_INTERNAL_DebugTools_installDependencies(dependency_name, dependency
 
 % Revision history:
 % 2023_01_23:
-% -- wrote the code originally
+% - wrote the code originally
 % 2023_04_20:
-% -- improved error handling
-% -- fixes nested installs automatically
+% - improved error handling
+% - fixes nested installs automatically
 
 % TO DO
-% -- Add input argument checking
+% - Add input argument checking
 
 flag_do_debug = 0; % Flag to show the results for debugging
 flag_do_plots = 0; % % Flag to plot the final results
