@@ -6,7 +6,7 @@ function [croppedVertices, NwallsHit] = ...
 %
 % FORMAT:
 %
-%     [croppedVertices] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, (fig_num))
+%     [croppedVertices] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, (figNum))
 %
 % INPUTS:
 %
@@ -22,7 +22,7 @@ function [croppedVertices, NwallsHit] = ...
 % 
 %     (optional inputs)
 %
-%     fig_num: a figure number to plot results. If set to -1, skips any
+%     figNum: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
 %     up code to maximize speed. As well, if given, this forces the
 %     variable types to be displayed as output and as well makes the input
@@ -55,26 +55,37 @@ function [croppedVertices, NwallsHit] = ...
 %
 % REVISION HISTORY:
 %
-% 2021_07_15 by Sean Brennan
-% -- first write of function
-% 2025_04_25 by Sean Brennan
-% -- added global debugging options
-% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-% -- remove dependence on test fixture
-% 2025_07_11 - S. Brennan, sbrennan@psu.edu
-% -- deprecated INTERNAL_fcn_geometry_findIntersectionOfSegments
-%    % Using fcn_Path_findSensorHitOnWall instead (more stable)
-% 2025_07_17 by Sean Brennan
-% -- standardized Debugging and Input checks area, Inputs area
-% -- made codes use MAX_NARGIN definition at top of code, narginchk
-% -- made plotting flag_do_plots and code consistent across all functions
+% 2021_07_15 by Sean Brennan, sbrennan@psu.edu
+% - first write of function
+% 
+% 2025_04_25 by Sean Brennan, sbrennan@psu.edu
+% - added global debugging options
+% - switched input checking to fcn_DebugTools_checkInputsToFunctions
+% - remove dependence on test fixture
+% 
+% 2025_07_11 by Sean Brennan, sbrennan@psu.edu
+% - deprecated INTERNAL_fcn_geometry_findIntersectionOfSegments
+%   % Using fcn_Path_findSensorHitOnWall instead (more stable)
+% 
+% 2025_07_17 by Sean Brennan, sbrennan@psu.edu
+% - standardized Debugging and Input checks area, Inputs area
+% - made codes use MAX_NARGIN definition at top of code, narginchk
+% - made plotting flag_do_plots and code consistent across all functions
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
 
-% TO DO
-% -- none
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
+
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 3; % The largest Number of argument inputs to the function
@@ -100,7 +111,7 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 end
 
 
@@ -140,8 +151,8 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 end
@@ -191,7 +202,7 @@ for ith_vertex = 1:Nvertices
             (1), ...                 % (flag_search_return_type) -- 1 means ALL hits of any results,
             (0), ...                 % (flag_search_range_type)  -- 0 means only if overlapping wall/sensor, ...
             ([]),...                 % (tolerance) -- default is eps * 1000,
-            (-1));                   % (fig_num) -- -1 means to use "fast mode")
+            (-1));                   % (figNum) -- -1 means to use "fast mode")
 
         if ~all(isnan(wall_hit_locations))
             croppedVertices = [croppedVertices; wall_hit_locations]; %#ok<AGROW>
@@ -217,7 +228,7 @@ NwallsHit = sum(walls_hit);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if flag_do_plots
-    figure(fig_num);
+    figure(figNum);
     clf;
     hold on;
     axis equal

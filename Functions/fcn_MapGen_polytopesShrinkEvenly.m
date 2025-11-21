@@ -10,7 +10,7 @@ function shrunkPolytopes  = fcn_MapGen_polytopesShrinkEvenly( unshrunkPolytopes,
 %
 % FORMAT:
 %
-%     shrunkPolytopes  = fcn_MapGen_polytopesShrinkEvenly( unshrunkPolytopes, cutDistance,(fig_num))
+%     shrunkPolytopes  = fcn_MapGen_polytopesShrinkEvenly( unshrunkPolytopes, cutDistance,(figNum))
 %
 % INPUTS:
 %
@@ -23,7 +23,7 @@ function shrunkPolytopes  = fcn_MapGen_polytopesShrinkEvenly( unshrunkPolytopes,
 %
 %     (optional inputs)
 %
-%     fig_num: a figure number to plot results. If set to -1, skips any
+%     figNum: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
 %     up code to maximize speed. As well, if given, this forces the
 %     variable types to be displayed as output and as well makes the input
@@ -50,16 +50,23 @@ function shrunkPolytopes  = fcn_MapGen_polytopesShrinkEvenly( unshrunkPolytopes,
 %
 % REVISION HISTORY:
 %
-% 2025_07_29 - S. Brennan
-% -- first write of script
+% 2025_07_29 by Sean Brennan, sbrennan@psu.edu
+% - first write of script
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
+
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
 
 
-% TO DO
-% -- none
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 3; % The largest Number of argument inputs to the function
@@ -85,7 +92,7 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 end
 
 
@@ -122,8 +129,8 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 end
@@ -140,15 +147,18 @@ end
 %See: http://patorjk.com/software/taag/#p=display&f=Big&t=Main
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
-shrunkPolytopes = unshrunkPolytopes; % both structures will be the same size
+Npolytopes = size(unshrunkPolytopes,2);
+shrunkPolytopes(Npolytopes) = unshrunkPolytopes(1); % both structures will be the same size
 
-for ith_poly = 1:size(unshrunkPolytopes,2) % check each polytope
+for ith_poly = 1:Npolytopes % check each polytope
 
     % fill in other fields from the vertices field
-    shrunkPolytopes(ith_poly) = fcn_MapGen_polytopeShrinkEvenly(...
+    temp = fcn_MapGen_polytopeShrinkEvenly(...
         unshrunkPolytopes(ith_poly),...
         cutDistance,...
         (-1));
+
+    shrunkPolytopes(ith_poly) = temp;
 end
 
 %§
@@ -167,7 +177,7 @@ end
 
 
 if flag_do_plots
-    figure(fig_num)
+    figure(figNum)
     clf;
 
     plotFormat.LineWidth = 2;
@@ -175,7 +185,7 @@ if flag_do_plots
     plotFormat.LineStyle = '-';
     plotFormat.Color = [1 0 0];
     fillFormat = [];
-    h_plot = fcn_MapGen_plotPolytopes(unshrunkPolytopes, (plotFormat), (fillFormat), (fig_num)); 
+    h_plot = fcn_MapGen_plotPolytopes(unshrunkPolytopes, (plotFormat), (fillFormat), (figNum)); 
     set(h_plot,'DisplayName','unshrunkPolytopes')
 
     plotFormat.LineWidth = 2;
@@ -183,7 +193,7 @@ if flag_do_plots
     plotFormat.LineStyle = '-';
     plotFormat.Color = [0 0 1];
     fillFormat = [];
-    h_plot = fcn_MapGen_plotPolytopes(shrunkPolytopes, (plotFormat), (fillFormat), (fig_num)); 
+    h_plot = fcn_MapGen_plotPolytopes(shrunkPolytopes, (plotFormat), (fillFormat), (figNum)); 
     set(h_plot,'DisplayName','shrunkPolytopes')
 
     legend('Interpreter','none','Location','best');

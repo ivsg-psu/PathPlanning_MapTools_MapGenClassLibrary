@@ -1,14 +1,25 @@
 % script_test_fcn_MapGen_verticesCropToWallIntersections
 % Tests: fcn_MapGen_verticesCropToWallIntersections
 
-% 
+
 % REVISION HISTORY:
 % 
-% 2021_07_15 by Sean Brennan
-% -- first write of script
-% -- remove dependence on test fixture
-% 2025_07_11 - S. Brennan, sbrennan@psu.edu
-% -- updated script testing to standard form
+% 2021_07_15 by Sean Brennan, sbrennan@psu.edu
+% - first write of script
+% - remove dependence on test fixture
+% 
+% 2025_07_11 by Sean Brennan, sbrennan@psu.edu
+% - updated script testing to standard form
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
+
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
 
 %% Set up the workspace
 close all
@@ -32,16 +43,16 @@ close all;
 fprintf(1,'Figure: 1XXXXXX: DEMO cases\n');
 
 %% DEMO case: basic example with 2 intersections
-fig_num = 10001;
+figNum = 10001;
 titleString = sprintf('DEMO case: basic example with 2 intersections');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 walls = [0 0; 2 0; 1 3; 0 0];
 inputVertices = [1 -1; 1 1; 2 2; 2 2.5; -1 2.5; -1 -1; 1 -1];
 
 % Call the function
-[croppedVertices, NwallsHit] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, (fig_num));
+[croppedVertices, NwallsHit] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -67,7 +78,7 @@ assert(isequal(round(croppedVertices,4),round(...
 assert(isequal(NwallsHit,3));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Test cases start here. These are very simple, usually trivial
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -89,16 +100,16 @@ close all;
 fprintf(1,'Figure: 2XXXXXX: TEST mode cases\n');
 
 %% TEST case: Going from out to in
-fig_num = 20001;
+figNum = 20001;
 titleString = sprintf('TEST case: Going from out to in');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 walls = [0 0; 1 0; 1 1; 0 1; 0 0];
 inputVertices = [-0.3 0.2; 0.3 0.2];
 
 % Call the function
-[croppedVertices, NwallsHit] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, (fig_num));
+[croppedVertices, NwallsHit] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -116,19 +127,19 @@ assert(all(([0 0.2; 0.3 0.2]-eps*[1 1; 1 1])<croppedVertices,'all') && all([0 0.
 assert(isequal(NwallsHit,1))
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% TEST case: Going from in to out
-fig_num = 20002;
+figNum = 20002;
 titleString = sprintf('TEST case: Going from in to out');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 walls = [0 0; 1 0; 1 1; 0 1; 0 0];
 inputVertices = [0.3 0.2; 1.3 0.2];
 
 % Call the function
-[croppedVertices, NwallsHit] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, (fig_num));
+[croppedVertices, NwallsHit] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -146,19 +157,19 @@ assert(all(([0.3 0.2; 1 0.2]-eps*[1 1; 1 1])<croppedVertices,'all') && all([0.3 
 assert(isequal(NwallsHit,1))
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% TEST case: all inside, nothing to crop
-fig_num = 20003;
+figNum = 20003;
 titleString = sprintf('TEST case: all inside, nothing to crop');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 walls = [0 0; 1 0; 1 1; 0 1; 0 0];
 inputVertices = [0.3 0.2; 0.4 0.2];
 
 % Call the function
-[croppedVertices, NwallsHit] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, (fig_num));
+[croppedVertices, NwallsHit] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -176,19 +187,19 @@ assert(all(([0.3 0.2; 0.4 0.2]-eps*[1 1; 1 1])<croppedVertices,'all') && all([0.
 assert(isequal(NwallsHit,0))
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% TEST case: all outside, returns empty
-fig_num = 20004;
+figNum = 20004;
 titleString = sprintf('TEST case: all outside, returns empty');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 walls = [0 0; 1 0; 1 1; 0 1; 0 0];
 inputVertices = [-0.3 0.2; -0.4 0.2];
 
 % Call the function
-[croppedVertices, NwallsHit] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, (fig_num));
+[croppedVertices, NwallsHit] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -205,19 +216,19 @@ assert(isequal([],croppedVertices));
 assert(isequal(NwallsHit,0))
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% TEST case: crossing over, crops both sides keeping inside
-fig_num = 20005;
+figNum = 20005;
 titleString = sprintf('TEST case: crossing over, crops both sides keeping inside');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 walls = [0 0; 1 0; 1 1; 0 1; 0 0];
 inputVertices = [-0.3 0.2; 1.4 0.2];
 
 % Call the function
-[croppedVertices, NwallsHit] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, (fig_num));
+[croppedVertices, NwallsHit] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -236,19 +247,19 @@ assert(all((true_answer-eps*[1 1; 1 1])<croppedVertices,'all') && all(true_answe
 assert(isequal(NwallsHit,2))
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% TEST case: aligned with edge, across, crops both sides keeping inside
-fig_num = 20006;
+figNum = 20006;
 titleString = sprintf('TEST case: aligned with edge, across, crops both sides keeping inside');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 walls = [0 0; 1 0; 1 1; 0 1; 0 0];
 inputVertices = [-0.3 0; 1.4 0];
 
 % Call the function
-[croppedVertices, NwallsHit] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, (fig_num));
+[croppedVertices, NwallsHit] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -267,19 +278,19 @@ assert(all((true_answer-eps*[1 1; 1 1])<croppedVertices,'all') && all(true_answe
 assert(isequal(NwallsHit,3))
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% TEST case: aligned with edge, inside to outside, crops outside but keeps edge
-fig_num = 20007;
+figNum = 20007;
 titleString = sprintf('TEST case: aligned with edge, inside to outside, crops outside but keeps edge');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 walls = [0 0; 1 0; 1 1; 0 1; 0 0];
 inputVertices = [0.5 0; 1.4 0];
 
 % Call the function
-[croppedVertices, NwallsHit] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, (fig_num));
+[croppedVertices, NwallsHit] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -298,19 +309,19 @@ assert(all((true_answer-eps*[1 1; 1 1])<croppedVertices,'all') && all(true_answe
 assert(isequal(NwallsHit,2))
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% TEST case: aligned with edge, on corner to outside, keeps only corner
-fig_num = 20008;
+figNum = 20008;
 titleString = sprintf('TEST case: aligned with edge, on corner to outside, keeps only corner');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 walls = [0 0; 1 0; 1 1; 0 1; 0 0];
 inputVertices = [1 0; 1.4 0];
 
 % Call the function
-[croppedVertices, NwallsHit] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, (fig_num));
+[croppedVertices, NwallsHit] = fcn_MapGen_verticesCropToWallIntersections(inputVertices, walls, (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -329,7 +340,7 @@ assert(all((true_answer-eps*[1 1; 1 1])<croppedVertices,'all') && all(true_answe
 assert(isequal(NwallsHit,2))
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 
@@ -352,9 +363,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: FAST mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: FAST mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: FAST mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 walls = [0 0; 2 0; 1 3; 0 0];
 inputVertices = [1 -1; 1 1; 2 2; 2 2.5; -1 2.5; -1 -1; 1 -1];
@@ -385,13 +396,13 @@ assert(isequal(NwallsHit,3));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: FAST mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: FAST mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 walls = [0 0; 2 0; 1 3; 0 0];
 inputVertices = [1 -1; 1 1; 2 2; 2 2.5; -1 2.5; -1 -1; 1 -1];
@@ -422,14 +433,14 @@ assert(isequal(NwallsHit,3));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: FAST mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: FAST mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 walls = [0 0; 2 0; 1 3; 0 0];
 inputVertices = [1 -1; 1 1; 2 2; 2 2.5; -1 2.5; -1 -1; 1 -1];
@@ -454,7 +465,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -470,7 +481,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases

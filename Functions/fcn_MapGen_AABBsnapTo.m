@@ -18,7 +18,7 @@ function [ snapPoint, wallNumber] = fcn_MapGen_AABBsnapTo( ...
 %    axisAlignedBoundingBox, ...
 %    testPoint, ...
 %    (snapType),...
-%    (fig_num) ...
+%    (figNum) ...
 %    )
 %
 % INPUTS:
@@ -39,7 +39,7 @@ function [ snapPoint, wallNumber] = fcn_MapGen_AABBsnapTo( ...
 %
 %     (optional inputs)
 %
-%      fig_num: a figure number to plot results. If set to -1, skips any
+%      figNum: a figure number to plot results. If set to -1, skips any
 %      input checking or debugging, no figures will be generated, and sets
 %      up code to maximize speed. As well, if given, this forces the
 %      variable types to be displayed as output and as well makes the input
@@ -63,39 +63,54 @@ function [ snapPoint, wallNumber] = fcn_MapGen_AABBsnapTo( ...
 % This function was written on 2021_07_02 by Sean Brennan
 % Questions or comments? contact sbrennan@psu.edu
 
-%
+
 % REVISION HISTORY:
 %
-% 2021_07_02 by Sean Brennan
-% -- first write of function
-% 2021_07_14
-% -- added snap type to allow projections from center
-% 2021_07_17
-% -- added vector projection snap type
-% 2023_02_22
-% -- fixed snapType bug, where 2 was specified but 3 was used. Made all 2.
-% -- better comments
-% -- error check on snap type 2 to force 2 rows
-% -- switched over to fcn_DebugTools_checkInputsToFunctions
-% 2025_04_24
-% -- fixed comments and argument listings
-% 2025_04_25 by Sean Brennan
-% -- added global debugging options
-% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-% 2025_07_14 by Sean Brennan
-% -- removed internal call to geometry function, and replaced with external
-%    % call to path library (this is supported and better tested)
-% 2025_07_17 by Sean Brennan
-% -- standardized Debugging and Input checks area, Inputs area
-% -- made codes use MAX_NARGIN definition at top of code, narginchk
-% -- made plotting flag_do_plots and code consistent across all functions
+% 2021_07_02 by Sean Brennan, sbrennan@psu.edu
+% - first write of function
+% 
+% 2021_07_14 by Sean Brennan, sbrennan@psu.edu
+% - added snap type to allow projections from center
+% 
+% 2021_07_17 by Sean Brennan, sbrennan@psu.edu
+% - added vector projection snap type
+% 
+% 2023_02_22 by Sean Brennan, sbrennan@psu.edu
+% - fixed snapType bug, where 2 was specified but 3 was used. Made all 2.
+% - better comments
+% - error check on snap type 2 to force 2 rows
+% - switched over to fcn_DebugTools_checkInputsToFunctions
+% 
+% 2025_04_24 by Sean Brennan, sbrennan@psu.edu
+% - fixed comments and argument listings
+% 
+% 2025_04_25 by Sean Brennan, sbrennan@psu.edu
+% - added global debugging options
+% - switched input checking to fcn_DebugTools_checkInputsToFunctions
+% 
+% 2025_07_14 by Sean Brennan, sbrennan@psu.edu
+% - removed internal call to geometry function, and replaced with external
+%   % call to path library (this is supported and better tested)
+% 
+% 2025_07_17 by Sean Brennan, sbrennan@psu.edu
+% - standardized Debugging and Input checks area, Inputs area
+% - made codes use MAX_NARGIN definition at top of code, narginchk
+% - made plotting flag_do_plots and code consistent across all functions
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
 
-% TO DO
-% -- none
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
+
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 4; % The largest Number of argument inputs to the function
@@ -121,7 +136,7 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 end
 
 
@@ -175,8 +190,8 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 end
@@ -214,10 +229,10 @@ if fcn_MapGen_AABBisWithin(axisAlignedBoundingBox,testPoint, -1)
         walls(2:end,:),...       % wall end
         center,...               % sensor_vector_start
         testPoint,...            % sensor_vector_end
-        (1), ...                 % (flag_search_return_type) -- 1 means ALL hits of any results,
-        (1), ...                 % (flag_search_range_type)  -- 1 means ANY   projection of the sensor used with GIVEN projection of wall, ...
-        ([]),...                 % (tolerance) -- default is eps * 1000,
-        (-1));                   % (fig_num) -- -1 means to use "fast mode")
+        (1), ...                 % (flag_search_return_type) - 1 means ALL hits of any results,
+        (1), ...                 % (flag_search_range_type)  - 1 means ANY   projection of the sensor used with GIVEN projection of wall, ...
+        ([]),...                 % (tolerance) - default is eps * 1000,
+        (-1));                   % (figNum) - -1 means to use "fast mode")
         
         [sortedDistances, sortedIndices] = sort(rawDistance);
         minIndex = find(sortedDistances>=0,1,'first');
@@ -249,10 +264,10 @@ if fcn_MapGen_AABBisWithin(axisAlignedBoundingBox,testPoint, -1)
             walls(2:end,:),...       % wall end
             testPoint(1,:),...       % sensor_vector_start
             testPoint(2,:),...       % sensor_vector_end
-            (1), ...                 % (flag_search_return_type) -- 1 means ALL hits of any results,
-            (1), ...                 % (flag_search_range_type)  -- 1 means ANY   projection of the sensor used with GIVEN projection of wall, ...
-            ([]),...                 % (tolerance) -- default is eps * 1000,
-            (-1));                   % (fig_num) -- -1 means to use "fast mode")
+            (1), ...                 % (flag_search_return_type) - 1 means ALL hits of any results,
+            (1), ...                 % (flag_search_range_type)  - 1 means ANY   projection of the sensor used with GIVEN projection of wall, ...
+            ([]),...                 % (tolerance) - default is eps * 1000,
+            (-1));                   % (figNum) - -1 means to use "fast mode")
 
         [sortedDistances, sortedIndices] = sort(rawDistance);
         minIndex = find(sortedDistances>=0,1,'first');
@@ -270,10 +285,10 @@ else % Point is outside the box - no need to snap
         walls(2:end,:),...       % wall end
         center,...               % sensor_vector_start
         testPoint,...            % sensor_vector_end
-        (1), ...                 % (flag_search_return_type) -- 1 means ALL hits of any results,
-        (1), ...                 % (flag_search_range_type)  -- 1 means ANY   projection of the sensor used with GIVEN projection of wall, ...
-        ([]),...                 % (tolerance) -- default is eps * 1000,
-        (-1));                   % (fig_num) -- -1 means to use "fast mode")
+        (1), ...                 % (flag_search_return_type) - 1 means ALL hits of any results,
+        (1), ...                 % (flag_search_range_type)  - 1 means ANY   projection of the sensor used with GIVEN projection of wall, ...
+        ([]),...                 % (tolerance) - default is eps * 1000,
+        (-1));                   % (figNum) - -1 means to use "fast mode")
         
         [sortedDistances, sortedIndices] = sort(rawDistance);
         minIndex = find(sortedDistances>=0,1,'first');
@@ -297,7 +312,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if flag_do_plots
-    figure(fig_num);
+    figure(figNum);
     clf;
     hold on;
     axis equal

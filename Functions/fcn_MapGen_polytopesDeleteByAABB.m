@@ -4,7 +4,7 @@ function trimmedPolytopes = fcn_MapGen_polytopesDeleteByAABB(polytopes, bounding
 %
 % FORMAT:
 %
-% trimmedPolytopes = fcn_MapGen_polytopesDeleteByAABB( polytopes, boundingBox, (fig_num))
+% trimmedPolytopes = fcn_MapGen_polytopesDeleteByAABB( polytopes, boundingBox, (figNum))
 %
 % INPUTS:
 %
@@ -17,7 +17,7 @@ function trimmedPolytopes = fcn_MapGen_polytopesDeleteByAABB(polytopes, bounding
 %
 %    (OPTIONAL INPUTS)
 %
-%     fig_num: a figure number to plot results. If set to -1, skips any
+%     figNum: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
 %     up code to maximize speed.
 %
@@ -47,30 +47,42 @@ function trimmedPolytopes = fcn_MapGen_polytopesDeleteByAABB(polytopes, bounding
 %
 
 % REVISIONS
-% 2021-06-06
-% -- rewrote function from fc_polytope_editing_remove_edge_polytopes
-% -- added a test script
-% 2021-06-10
-% -- updated comments
-% 2025_04_25 by Sean Brennan
-% -- added global debugging options
-% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-% 2025_07_17 by Sean Brennan
-% -- standardized Debugging and Input checks area, Inputs area
-% -- made codes use MAX_NARGIN definition at top of code, narginchk
-% -- made plotting flag_do_plots and code consistent across all functions
-% 2025_07_26 by Sean Brennan
-% -- fixed fcn_MapGen_polytopeCropEdges
-%    % renamed 
-%    % to fcn_MapGen_polytopesDeleteByAABB, for consistency
-%    % changed input to AABB style, for consistency
+% 
+% 2021-06-06 by Sean Brennan, sbrennan@psu.edu
+% - rewrote function from fc_polytope_editing_remove_edge_polytopes
+% - added a test script
+% 
+% 2021-06-10 by Sean Brennan, sbrennan@psu.edu
+% - updated comments
+% 
+% 2025_04_25 by Sean Brennan, sbrennan@psu.edu
+% - added global debugging options
+% - switched input checking to fcn_DebugTools_checkInputsToFunctions
+% 
+% 2025_07_17 by Sean Brennan, sbrennan@psu.edu
+% - standardized Debugging and Input checks area, Inputs area
+% - made codes use MAX_NARGIN definition at top of code, narginchk
+% - made plotting flag_do_plots and code consistent across all functions
+% 
+% 2025_07_26 by Sean Brennan, sbrennan@psu.edu
+% - fixed fcn_MapGen_polytopeCropEdges
+%   % renamed 
+%   % to fcn_MapGen_polytopesDeleteByAABB, for consistency
+%   % changed input to AABB style, for consistency
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
 
-% TO DO
-% -- vectorize the for loop if possible
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 3; % The largest Number of argument inputs to the function
@@ -96,7 +108,7 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 end
 
 
@@ -133,8 +145,8 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 end
@@ -191,17 +203,17 @@ trimmedPolytopes = trimmedPolytopes(1:keep); % Save only the ones that were fill
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if flag_do_plots
-    figure(fig_num);
+    figure(figNum);
     hold on
 
     % Plot the input polytopes in red
-    % fcn_MapGen_OLD_plotPolytopes(polytopes,fig_num,'r',2,[xlow xhigh ylow yhigh]);
+    % fcn_MapGen_OLD_plotPolytopes(polytopes,figNum,'r',2,[xlow xhigh ylow yhigh]);
     plotFormat.LineWidth = 2;
     plotFormat.MarkerSize = 10;
     plotFormat.LineStyle = '-';
     plotFormat.Color = [1 0 0];
     fillFormat = [];
-    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(fig_num)); 
+    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(figNum)); 
     set(h_plot,'DisplayName','polytopes');
 
     % Plot the bounding box in black
@@ -214,13 +226,13 @@ if flag_do_plots
     plot(boxVertices(:,1),boxVertices(:,2),'k-','LineWidth',3,'DisplayName','boundingBox');
     
     % plot the tiled_polytopes in blue
-    % fcn_MapGen_OLD_plotPolytopes(trimmedPolytopes,fig_num,'b',2,[xlow xhigh ylow yhigh]);
+    % fcn_MapGen_OLD_plotPolytopes(trimmedPolytopes,figNum,'b',2,[xlow xhigh ylow yhigh]);
     plotFormat.LineWidth = 2;
     plotFormat.MarkerSize = 10;
     plotFormat.LineStyle = '-';
     plotFormat.Color = [0 0 1];
     fillFormat = [];
-    h_plot = fcn_MapGen_plotPolytopes(trimmedPolytopes, (plotFormat), (fillFormat), (fig_num)); 
+    h_plot = fcn_MapGen_plotPolytopes(trimmedPolytopes, (plotFormat), (fillFormat), (figNum)); 
     set(h_plot,'DisplayName','trimmedPolytopes');
 
     legend('Interpreter','none','Location','best');

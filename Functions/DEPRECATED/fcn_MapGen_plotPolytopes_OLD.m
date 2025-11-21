@@ -1,4 +1,9 @@
 function [fig] = fcn_MapGen_plotPolytopes(polytopes,fig_num,line_spec,line_width,varargin)
+
+warning('on','backtrace');
+warning('fcn_MapGen_plotPolytopes_OLD is being deprecated. Use fcn_MapGen_plotPolytopes instead.');
+
+
 % fcn_MapGen_plotPolytopes plots a set of polytopes given user-defined
 % inputs
 %

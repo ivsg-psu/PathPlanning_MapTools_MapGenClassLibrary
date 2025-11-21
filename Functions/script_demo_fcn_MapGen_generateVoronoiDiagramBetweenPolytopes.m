@@ -1,9 +1,21 @@
 %% script_demo_fcn_MapGen_generateVoronoiDiagramBetweenPolytopes
 % demo script of making a Voronoi diagram from points along sides of polytopes
 
+% REVISION HISTORY:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
+
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
+
 %% test convex
-fig_num = 1;
-figure(fig_num);
+figNum = 1;
+figure(figNum);
 clf;
 
 seedGeneratorNames = 'haltonset';
@@ -33,8 +45,8 @@ axis([-0.5 1.5 -0.5 1.5])
 
 
 %% test nonconvex
-fig_num = 2;
-figure(fig_num);
+figNum = 2;
+figure(figNum);
 clf;
 
 load('flood_plain_4.mat'); % Data is in testFixtures subfolder

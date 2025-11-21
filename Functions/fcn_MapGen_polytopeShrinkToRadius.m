@@ -5,7 +5,7 @@ function shrunkPolytope = fcn_MapGen_polytopeShrinkToRadius(shrinker, newRadius,
 % specified maximum radius.
 %
 % FORMAT:
-%     shrunkPolytope = fcn_MapGen_polytopeShrinkToRadius(shrinker, newRadius, (fig_num))
+%     shrunkPolytope = fcn_MapGen_polytopeShrinkToRadius(shrinker, newRadius, (figNum))
 %
 % INPUTS:
 %
@@ -16,7 +16,7 @@ function shrunkPolytope = fcn_MapGen_polytopeShrinkToRadius(shrinker, newRadius,
 %     
 %    (OPTIONAL INPUTS)
 %
-%     fig_num: a figure number to plot results. If set to -1, skips any
+%     figNum: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
 %     up code to maximize speed. As well, if given, this forces the
 %     variable types to be displayed as output and as well makes the input
@@ -41,32 +41,44 @@ function shrunkPolytope = fcn_MapGen_polytopeShrinkToRadius(shrinker, newRadius,
 % Questions or comments? sat5340@psu.edu 
 %
 
-% Revision History:
-% 2021-06-08 - S. Brennan
-% -- revised function to prep for MapGen class 
-% -- added plotting option
-% -- added comments, added debugging option
-% 2025_04_25 by Sean Brennan
-% -- added global debugging options
-% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-% -- fixed call to fcn_MapGen_polytopesFillFieldsFromVertices
-% 2025_07_16 by Sean Brennan
-% -- cleaned up documentation and typos
-% -- removed tolerance input as it wasn't being used
-% -- turned on fast mode for all internal calls to external functions
-% 2025_07_17 by Sean Brennan
-% -- standardized Debugging and Input checks area, Inputs area
-% -- made codes use MAX_NARGIN definition at top of code, narginchk
-% -- made plotting flag_do_plots and code consistent across all functions
+% REVISION HISTORY:
+% 
+% 2021-06-08 by Sean Brennan, sbrennan@psu.edu
+% - revised function to prep for MapGen class 
+% - added plotting option
+% - added comments, added debugging option
+% 
+% 2025_04_25 by Sean Brennan, sbrennan@psu.edu
+% - added global debugging options
+% - switched input checking to fcn_DebugTools_checkInputsToFunctions
+% - fixed call to fcn_MapGen_polytopesFillFieldsFromVertices
+% 
+% 2025_07_16 by Sean Brennan, sbrennan@psu.edu
+% - cleaned up documentation and typos
+% - removed tolerance input as it wasn't being used
+% - turned on fast mode for all internal calls to external functions
+% 
+% 2025_07_17 by Sean Brennan, sbrennan@psu.edu
+% - standardized Debugging and Input checks area, Inputs area
+% - made codes use MAX_NARGIN definition at top of code, narginchk
+% - made plotting flag_do_plots and code consistent across all functions
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
 
-% TO DO
-% -- Vectorize the for loop if possible
-% -- check inputs are positive numbers where appropriate (e.g. make a
+
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Vectorize the for loop if possible
+% - check inputs are positive numbers where appropriate (e.g. make a
 %    % "positive number" chec
+
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 3; % The largest Number of argument inputs to the function
@@ -92,7 +104,7 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 end
 
 
@@ -129,8 +141,8 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 end
@@ -181,29 +193,29 @@ shrunkPolytope = fcn_MapGen_polytopesFillFieldsFromVertices(shrunkPolytope, [], 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if flag_do_plots
-    figure(fig_num);
+    figure(figNum);
     hold on
     
     % Plot the cetroid in black
     plot(centroid(:,1),centroid(:,2),'ko','Markersize',10);
     
     % Plot the input shrinker in red
-    % fcn_MapGen_plotPolytopes(shrinker,fig_num,'r',2);
+    % fcn_MapGen_plotPolytopes(shrinker,figNum,'r',2);
     plotFormat.LineWidth = 2;
     plotFormat.MarkerSize = 10;
     plotFormat.LineStyle = '-';
     plotFormat.Color = [1 0 0];
     fillFormat = [];
-    h_plot = fcn_MapGen_plotPolytopes(shrinker, (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
+    h_plot = fcn_MapGen_plotPolytopes(shrinker, (plotFormat), (fillFormat), (figNum)); %#ok<NASGU>
     
     % plot the output polytope in blue
-    % fcn_MapGen_OLD_plotPolytopes(shrunkPolytope,fig_num,'b',2);
+    % fcn_MapGen_OLD_plotPolytopes(shrunkPolytope,figNum,'b',2);
     plotFormat.LineWidth = 2;
     plotFormat.MarkerSize = 10;
     plotFormat.LineStyle = '-';
     plotFormat.Color = [0 0 1];
     fillFormat = [];
-    h_plot = fcn_MapGen_plotPolytopes(shrunkPolytope, (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
+    h_plot = fcn_MapGen_plotPolytopes(shrunkPolytope, (plotFormat), (fillFormat), (figNum)); %#ok<NASGU>
 
 end
 

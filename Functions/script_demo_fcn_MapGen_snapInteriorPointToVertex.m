@@ -2,13 +2,24 @@
 % compares function: fcn_MapGen_snapInteriorPointToVertex
 % to legacy method
 
-%
 % REVISION HISTORY:
 %
 % 2024_04_19 by S. Harnett
-% -- first write of script
+% - first write of script
+% 
 % 2025_04_28 by S. Harnett
-% -- fix legends
+% - fix legends
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
+
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
+
 %%%%%%%%%%%%%%§
 
 close all

@@ -4,7 +4,7 @@ function polyMapStats = fcn_MapGen_statsPolytopes(polytopes, varargin)
 %
 % FORMAT:
 %
-%     polyMapStats = fcn_MapGen_statsPolytopes( polytopes, (fig_num))
+%     polyMapStats = fcn_MapGen_statsPolytopes( polytopes, (figNum))
 %
 % INPUTS:
 %
@@ -12,7 +12,7 @@ function polyMapStats = fcn_MapGen_statsPolytopes(polytopes, varargin)
 %
 %     (optional inputs)
 %
-%     fig_num: a figure number to plot results. If set to -1, skips any
+%     figNum: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
 %     up code to maximize speed. As well, if given, this forces the
 %     variable types to be displayed as output and as well makes the input
@@ -68,35 +68,48 @@ function polyMapStats = fcn_MapGen_statsPolytopes(polytopes, varargin)
 % Questions or comments? sbrennan@psu.edu
 %
 
-% Revision History:
-% 2021_07_11 - S. Brennan
-% -- first write of function
+% REVISION HISTORY:
+% 
+% 2021_07_11 by Sean Brennan, sbrennan@psu.edu
+% - first write of function
+% 
 % 2022_06_17 - S. Harnett
-% -- numerous features added to support length cost ratio prediction
-% 2025_04_25 by Sean Brennan
-% -- added global debugging options
-% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-% 2025_07_10 by Sean Brennan
-% -- changed fcn_MapGen_findIntersectionOfSegments to use
-% fcn_Path_findSensorHitOnWall instead, as the Path function is much more
-% tested/debugged and regularly updated
-% -- updated some variable naming
-% -- clean-up of comments
-% 2025_07_10 by Sean Brennan
-% -- updated header debugging and input area to fix global flags
-% 2025_07_17 by Sean Brennan
-% -- standardized Debugging and Input checks area, Inputs area
-% -- made codes use MAX_NARGIN definition at top of code, narginchk
-% -- made plotting flag_do_plots and code consistent across all functions
-% -- cleanup of header docstrings
-% -- added debugging visualization to see what is happening
+% - numerous features added to support length cost ratio prediction
+% 
+% 2025_04_25 by Sean Brennan, sbrennan@psu.edu
+% - added global debugging options
+% - switched input checking to fcn_DebugTools_checkInputsToFunctions
+% 
+% 2025_07_10 by Sean Brennan, sbrennan@psu.edu
+% - changed fcn_MapGen_findIntersectionOfSegments to use
+%   % fcn_Path_findSensorHitOnWall instead, as the Path function is better
+%   % tested/debugged and regularly updated
+% - updated some variable naming
+% - clean-up of comments
+% 
+% 2025_07_10 by Sean Brennan, sbrennan@psu.edu
+% - updated header debugging and input area to fix global flags
+% 
+% 2025_07_17 by Sean Brennan, sbrennan@psu.edu
+% - standardized Debugging and Input checks area, Inputs area
+% - made codes use MAX_NARGIN definition at top of code, narginchk
+% - made plotting flag_do_plots and code consistent across all functions
+% - cleanup of header docstrings
+% - added debugging visualization to see what is happening
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
 
-% TO DO
-% -- none
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 2; % The largest Number of argument inputs to the function
@@ -122,7 +135,7 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; 
+    debug_figNum = 999978; 
 end
 
 
@@ -156,8 +169,8 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 end
@@ -173,7 +186,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_debug
     % Prep the figure
-    figure(debug_fig_num);
+    figure(debug_figNum);
     clf;
     hold on;
 
@@ -183,11 +196,11 @@ if flag_do_debug
     plotFormat.LineStyle = '-';
     plotFormat.Color = [0 0 0];
     fillFormat = [];
-    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat), (fillFormat), (debug_fig_num)); 
+    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat), (fillFormat), (debug_figNum)); 
     set(h_plot,'DisplayName','Input: polytopes');    
 
     % Set up to plot individual polytopes
-    h_poly = fcn_MapGen_plotPolytopes(polytopes(1), (plotFormat), (fillFormat), (debug_fig_num));
+    h_poly = fcn_MapGen_plotPolytopes(polytopes(1), (plotFormat), (fillFormat), (debug_figNum));
     set(h_poly,'DisplayName','current poly');    
 
     legend('Interpreter','none','Location','best');
@@ -245,7 +258,7 @@ for ith_poly = 1:Npolys
         plotFormat.Color = [1 0 0];
         plotFormat.DisplayName = 'current poly';
         fillFormat = [];
-        h_poly = fcn_MapGen_plotPolytopes(polytopes(ith_poly), (plotFormat), (fillFormat), (debug_fig_num));
+        h_poly = fcn_MapGen_plotPolytopes(polytopes(ith_poly), (plotFormat), (fillFormat), (debug_figNum));
         pause(0.01);
     end
     
@@ -500,7 +513,7 @@ if flag_do_plots
     fprintf(1,'\t Theoretical Linear density: %.2f\n',polyMapStats.linear_density);
     fprintf(1,'\t Experimental_linear_density mean/2sigma: %.4f +/- %.4f\n',experimental_linear_density_mean,2*experimental_linear_density_std);
 
-    figure(fig_num)
+    figure(figNum)
 
     subplot(2,3,1);
     axis equal
@@ -722,7 +735,7 @@ bisector_end = [AABB(3)+0.1*width,  y_value];
         (1), ...                 % (flag_search_return_type) -- 1 means ALL hits of any results,
         (0), ...                 % (flag_search_range_type)  -- 0 means only if overlapping wall/sensor, ...
         ([]),...                 % (tolerance) -- default is eps * 1000,
-        (-1));                   % (fig_num) -- -1 means to use "fast mode")
+        (-1));                   % (figNum) -- -1 means to use "fast mode")
 
 % Keep only unique values. The polytope ID is saved in the 3rd column of
 % the walls_start array.

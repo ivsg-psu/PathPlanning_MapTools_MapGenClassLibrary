@@ -1,15 +1,27 @@
 % script_test_fcn_MapGen_ugvSensorError
 % Tests: fcn_MapGen_ugvSensorError
 
-% 
 % REVISION HISTORY:
 % 
 % 2021_03_26 - Nick Carder
-% -- First write of the function, 
-% 2021_06_28 - S. Brennan
-% -- Reworked to be compatible with MapGen library
-% 2021_07_07 by Sean Brennan
-% -- additional edits on script
+% - First write of the function, 
+% 
+% 2021_06_28 by Sean Brennan, sbrennan@psu.edu
+% - Reworked to be compatible with MapGen library
+% 
+% 2021_07_07 by Sean Brennan, sbrennan@psu.edu
+% - additional edits on script
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
+
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
+
 %%%%%%%%%%%%%%§
 
 close all
@@ -27,33 +39,33 @@ mapStretchs = [200 200];
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
     (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
-    (fig_num)); 
+    (figNum)); 
 
 % Plot the polytopes
-% fig_num = 22;
+% figNum = 22;
 % line_width = 2;
 % axis_limits = [0 200 0 200];
 % axis_stype = 'square';
-% fcn_MapGen_OLD_plotPolytopes(polytopes,fig_num,'b',line_width,axis_limits,axis_stype);
+% fcn_MapGen_OLD_plotPolytopes(polytopes,figNum,'b',line_width,axis_limits,axis_stype);
 plotFormat.LineWidth = 2;
 plotFormat.MarkerSize = 10;
 plotFormat.LineStyle = '-';
 plotFormat.Color = [0 0 1];
 fillFormat = [];
-h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
+h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat), (fillFormat), (figNum)); %#ok<NASGU>
 
 
 % remove the edge polytopes that extend past the high and low points
-fig_num = 23;
+figNum = 23;
 bounding_box = [0 0, 200 200];
 trimmed_polytopes = ...
-    fcn_MapGen_polytopesDeleteByAABB(polytopes,bounding_box,fig_num);
+    fcn_MapGen_polytopesDeleteByAABB(polytopes,bounding_box,figNum);
 
 %shrink polytopes to create space
-fig_num = 24;
+figNum = 24;
 des_rad = 1; sigma_radius = 0.5; min_rad = 0.25;
 shrunk_polytopes2=fcn_MapGen_polytopesShrinkToRadius(...
-    trimmed_polytopes,des_rad,sigma_radius,min_rad,fig_num);
+    trimmed_polytopes,des_rad,sigma_radius,min_rad,figNum);
 
 
 
@@ -70,7 +82,7 @@ error_polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(error_polytopes);
 
 %verify
 h_fig = figure('name','UGV Positioning Bubbles');
-fig_num = h_fig.Number;
+figNum = h_fig.Number;
 ax.ugv1=gca;
 % hold on
 % for ii=1:length(shrunk_polytopes2)
@@ -79,21 +91,21 @@ ax.ugv1=gca;
 % end
 % hold off
 
-% fcn_MapGen_OLD_plotPolytopes(shrunk_polytopes2,fig_num,'k',line_width,axis_limits,axis_stype);
+% fcn_MapGen_OLD_plotPolytopes(shrunk_polytopes2,figNum,'k',line_width,axis_limits,axis_stype);
 plotFormat.LineWidth = 2;
 plotFormat.MarkerSize = 10;
 plotFormat.LineStyle = '-';
 plotFormat.Color = [0 0 0];
 fillFormat = [];
-h_plot = fcn_MapGen_plotPolytopes(shrunk_polytopes2, (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
+h_plot = fcn_MapGen_plotPolytopes(shrunk_polytopes2, (plotFormat), (fillFormat), (figNum)); %#ok<NASGU>
 
-% fcn_MapGen_OLD_plotPolytopes(error_polytopes,fig_num,'r',line_width,axis_limits,axis_stype);
+% fcn_MapGen_OLD_plotPolytopes(error_polytopes,figNum,'r',line_width,axis_limits,axis_stype);
 plotFormat.LineWidth = 2;
 plotFormat.MarkerSize = 10;
 plotFormat.LineStyle = '-';
 plotFormat.Color = [1 0 0];
 fillFormat = [];
-h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat), (fillFormat), (fig_num)); 
+h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat), (fillFormat), (figNum)); 
 
 xlabel('X Distance [m]')
 ylabel('Y Distance [m]')

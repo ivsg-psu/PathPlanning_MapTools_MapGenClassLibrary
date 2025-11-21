@@ -2,10 +2,22 @@
 % Tests function: fcn_MapGen_polytopeFindVertexAngles
 
 % REVISION HISTORY:
-% 2021_08_01
-% -- first written by S. Brennan 
-% 2025_07_11 - S. Brennan, sbrennan@psu.edu
-% -- updated script testing to standard form
+% 
+% 2021_08_01 by Sean Brennan, sbrennan@psu.edu
+% - first written by S. Brennan 
+% 
+% 2025_07_11 by Sean Brennan, sbrennan@psu.edu
+% - updated script testing to standard form
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
+
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
 
 %% Set up the workspace
 close all
@@ -29,15 +41,15 @@ close all;
 fprintf(1,'Figure: 1XXXXXX: DEMO cases\n');
 
 %% DEMO case: Basic example of vertex calculation - a square
-fig_num = 10001;
+figNum = 10001;
 titleString = sprintf('DEMO case: Basic example of vertex calculation - a square');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 vertices = [0 0; 1 0; 1 1; 0 1; 0 0];
 
 % Call the function
-[angles, unitInVectors, unitOutVectors] = fcn_MapGen_polytopeFindVertexAngles(vertices, (fig_num));
+[angles, unitInVectors, unitOutVectors] = fcn_MapGen_polytopeFindVertexAngles(vertices, (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -56,19 +68,19 @@ assert(isequal(size(unitInVectors),[Nvertices-1 2]));
 assert(1000*eps>abs(360-sum(angles)*180/pi));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% DEMO case: Basic example of vertex calculation - a triange
-fig_num = 10002;
+figNum = 10002;
 titleString = sprintf('DEMO case: Basic example of vertex calculation - a triangle');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 vertices = [0 0; 1 1; 0 1; 0 0];
 
 % Call the function
-[angles, unitInVectors, unitOutVectors] = fcn_MapGen_polytopeFindVertexAngles(vertices, (fig_num));
+[angles, unitInVectors, unitOutVectors] = fcn_MapGen_polytopeFindVertexAngles(vertices, (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -87,13 +99,13 @@ assert(isequal(size(unitInVectors),[Nvertices-1 2]));
 assert(1000*eps>abs(360-sum(angles)*180/pi));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% DEMO case: Random polytope
-fig_num = 10003;
+figNum = 10003;
 titleString = sprintf('DEMO case: Random polytope');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Set up polytopes
 seedGeneratorNames = 'haltonset';
@@ -117,7 +129,7 @@ rand_poly = 1+floor(rand*Npolys);
 shrinker = trim_polytopes(rand_poly);
 
 % Call the function
-[angles, unitInVectors, unitOutVectors] = fcn_MapGen_polytopeFindVertexAngles(shrinker.vertices, (fig_num));
+[angles, unitInVectors, unitOutVectors] = fcn_MapGen_polytopeFindVertexAngles(shrinker.vertices, (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -136,7 +148,7 @@ assert(isequal(size(unitInVectors),[Nvertices-1 2]));
 assert(1000*eps>abs(360-sum(angles)*180/pi));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Test cases start here. These are very simple, usually trivial
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -158,10 +170,10 @@ close all;
 fprintf(1,'Figure: 2XXXXXX: TEST mode cases\n');
 % 
 % %% TEST case: simple crossing at origin
-% fig_num = 20001;
+% figNum = 20001;
 % titleString = sprintf('TEST case: simple crossing at origin');
-% fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-% figure(fig_num); clf;
+% fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+% figure(figNum); clf;
 
 
 %% Fast Mode Tests
@@ -183,9 +195,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: FAST mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: FAST mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: FAST mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 vertices = [0 0; 1 0; 1 1; 0 1; 0 0];
 
@@ -208,13 +220,13 @@ assert(1000*eps>abs(360-sum(angles)*180/pi));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: FAST mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: FAST mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 vertices = [0 0; 1 0; 1 1; 0 1; 0 0];
 
@@ -237,14 +249,14 @@ assert(1000*eps>abs(360-sum(angles)*180/pi));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: FAST mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: FAST mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 vertices = [0 0; 1 0; 1 1; 0 1; 0 0];
 
@@ -268,7 +280,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -284,7 +296,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases

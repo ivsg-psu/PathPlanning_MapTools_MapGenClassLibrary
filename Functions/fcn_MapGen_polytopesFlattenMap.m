@@ -8,7 +8,7 @@ function flattened_polytopes = fcn_MapGen_polytopesFlattenMap(polytopes, varargi
 % convexity
 %
 % FORMAT:
-% flattened_polytopes = fcn_MapGen_polytopesFlattenMap(polytopes, (fig_num))
+% flattened_polytopes = fcn_MapGen_polytopesFlattenMap(polytopes, (figNum))
 %
 % INPUTS:
 %     polytopes - the initial polytope field, potentially containing concave
@@ -16,7 +16,7 @@ function flattened_polytopes = fcn_MapGen_polytopesFlattenMap(polytopes, varargi
 %
 %     (optional inputs)
 %
-%     fig_num: a figure number to plot results. If set to -1, skips any
+%     figNum: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
 %     up code to maximize speed. As well, if given, this forces the
 %     variable types to be displayed as output and as well makes the input
@@ -41,24 +41,34 @@ function flattened_polytopes = fcn_MapGen_polytopesFlattenMap(polytopes, varargi
 % Questions or comments? contact sjh6473@psu.edu
 
 % REVISION HISTORY:
+% 
 % 2021_10_07
-% -- first written by Steve Harnett
-% 2025_04_25 - S. Brennan
-% -- typo fixes in test script name
-% -- added global debugging options
-% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-% -- fixed call to fcn_MapGen_polytopesFillFieldsFromVertices
-% 2025_07_17 by Sean Brennan
-% -- standardized Debugging and Input checks area, Inputs area
-% -- made codes use MAX_NARGIN definition at top of code, narginchk
-% -- made plotting flag_do_plots and code consistent across all functions
+% - first written by Steve Harnett
+% 
+% 2025_04_25 by Sean Brennan, sbrennan@psu.edu
+% - typo fixes in test script name
+% - added global debugging options
+% - switched input checking to fcn_DebugTools_checkInputsToFunctions
+% - fixed call to fcn_MapGen_polytopesFillFieldsFromVertices
+% 
+% 2025_07_17 by Sean Brennan, sbrennan@psu.edu
+% - standardized Debugging and Input checks area, Inputs area
+% - made codes use MAX_NARGIN definition at top of code, narginchk
+% - made plotting flag_do_plots and code consistent across all functions
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
 
-% TO DO
-% -- none
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 2; % The largest Number of argument inputs to the function
@@ -84,7 +94,7 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 end
 
 
@@ -115,8 +125,8 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 end
@@ -132,8 +142,8 @@ end
 %
 %See: http://patorjk.com/software/taag/#p=display&f=Big&t=Main
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
-if ~isempty(fig_num)
-    figure(fig_num);
+if ~isempty(figNum)
+    figure(figNum);
 end
 
 % convert polytopes to polyshapes
@@ -144,7 +154,7 @@ if flag_do_plots
     plotFormat.LineStyle = '-';
     plotFormat.Color = [0 0 0];
     fillFormat = [1 0 0 0 0.5];
-    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(figNum)); %#ok<NASGU>
 
 end
 polyshapes = [];
@@ -237,7 +247,7 @@ if ~isempty(r) && ~isempty(c)
         plotFormat.LineStyle = '-';
         plotFormat.Color = [0 0 0];
         fillFormat = [1 0 0 0 0.5];
-        h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+        h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(figNum)); %#ok<NASGU>
 
         title('original polytopes')
         if p1_new.area > eps
@@ -247,7 +257,7 @@ if ~isempty(r) && ~isempty(c)
             plotFormat.LineStyle = '-';
             plotFormat.Color = [0 0 0];
             fillFormat = [1 0 0 0 0.5];
-            h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+            h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(figNum)); %#ok<NASGU>
             title('triangulated parent 1, less, intersection')
         end
         if p2_new.area > eps
@@ -257,7 +267,7 @@ if ~isempty(r) && ~isempty(c)
             plotFormat.LineStyle = '-';
             plotFormat.Color = [0 0 0];
             fillFormat = [1 0 0 0 0.5];
-            h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+            h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(figNum)); %#ok<NASGU>
 
             title('triangulated parent 2, less intersection')
         end
@@ -267,7 +277,7 @@ if ~isempty(r) && ~isempty(c)
         plotFormat.LineStyle = '-';
         plotFormat.Color = [0 0 0];
         fillFormat = [1 0 0 0 0.5];
-        h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+        h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(figNum)); %#ok<NASGU>
 
         title('triangulated intersection')
     end
@@ -292,7 +302,7 @@ if true
     plotFormat.LineStyle = '-';
     plotFormat.Color = [0 0 0];
     fillFormat = [1 0 0 0 0.5];
-    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(figNum)); %#ok<NASGU>
     title('final obstacle field')
 end
 end

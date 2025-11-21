@@ -2,10 +2,22 @@
 % Tests function: fcn_MapGen_generatePolysFromSeedGeneratorNames
 
 % REVISION HISTORY:
-% 2021_06_06
-% -- first written by S. Brennan for fcn_MapGen_mixedSetVoronoiTiling
-% 2025_07_11 - S. Brennan, sbrennan@psu.edu
-% -- updated script testing to standard form
+% 
+% 2021_06_06 by Sean Brennan, sbrennan@psu.edu
+% - first written by S. Brennan for fcn_MapGen_mixedSetVoronoiTiling
+% 
+% 2025_07_11 by Sean Brennan, sbrennan@psu.edu
+% - updated script testing to standard form
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
+
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
 
 %% Set up the workspace
 close all
@@ -29,10 +41,10 @@ close all;
 fprintf(1,'Figure: 1XXXXXX: DEMO cases\n');
 
 %% DEMO case: basic example of multiple tilings on same map
-fig_num = 10001;
+figNum = 10001;
 titleString = sprintf('DEMO case: basic example of multiple tilings on same map');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 
 mapStretch = [1 1];
@@ -70,7 +82,7 @@ mapStretchs{ith_set,1} = mapStretch;
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
     (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
-    (fig_num));
+    (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -111,13 +123,13 @@ assert(isempty(polytopes(1).parent_poly_id));
 % (these change randomly)
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% DEMO case: Create overlapping sets
-fig_num = 10002;
+figNum = 10002;
 titleString = sprintf('DEMO case: Create overlapping sets');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 
 mapStretch = [1 1];
@@ -149,7 +161,7 @@ mapStretchs{ith_set,1} = mapStretch;
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
     (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
-    (fig_num));
+    (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -190,14 +202,14 @@ assert(isempty(polytopes(1).parent_poly_id));
 % (these change randomly)
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% DEMO case: Animate a set moving sideways
 close all;
-fig_num = 10003;
+figNum = 10003;
 titleString = sprintf('DEMO case: Animate a set moving sideways');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 
 mapStretch = [1 1];
@@ -228,7 +240,7 @@ end
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
     (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
-    (fig_num));
+    (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -269,7 +281,7 @@ assert(isempty(polytopes(1).parent_poly_id));
 % (these change randomly)
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %%
 if 1==1
@@ -303,10 +315,10 @@ close all;
 fprintf(1,'Figure: 2XXXXXX: TEST mode cases\n');
 
 %% TEST case: Show that the mapStretch works with multiple generators
-fig_num = 20001;
+figNum = 20001;
 titleString = sprintf('TEST case: Show that the mapStretch works with multiple generators');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 mapStretch = [100 200];
 set_range = [1 100];
@@ -343,7 +355,7 @@ mapStretchs{ith_set,1} = mapStretch;
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
     (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
-    (fig_num));
+    (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -384,13 +396,13 @@ assert(isempty(polytopes(1).parent_poly_id));
 % (these change randomly)
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% TEST case: Single set test
-fig_num = 20001;
+figNum = 20001;
 titleString = sprintf('TEST case: Single set test');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 mapStretch = [1 1];
 set_range = [1 100];
@@ -415,7 +427,7 @@ mapStretchs{ith_set,1} = mapStretch;
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
     (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
-    (fig_num));
+    (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -456,13 +468,13 @@ assert(isempty(polytopes(1).parent_poly_id));
 % (these change randomly)
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% TEST case: Single set test with sobolset
-fig_num = 20002;
+figNum = 20002;
 titleString = sprintf('TEST case: Single set test with sobolset');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 mapStretch = [1 1];
 set_range = [1 100];
@@ -487,7 +499,7 @@ mapStretchs{ith_set,1} = mapStretch;
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
     (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
-    (fig_num));
+    (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -528,13 +540,13 @@ assert(isempty(polytopes(1).parent_poly_id));
 % (these change randomly)
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% TEST case: Single set test with non cell inputs
-fig_num = 20003;
+figNum = 20003;
 titleString = sprintf('TEST case: Single set test with non cell inputs');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 
 
@@ -557,7 +569,7 @@ mapStretchs = mapStretch;
     seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
     (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
     (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
-    (fig_num));
+    (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -598,13 +610,13 @@ assert(isempty(polytopes(1).parent_poly_id));
 % (these change randomly)
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% TEST case: Test of all generator types
-fig_num = 20004;
+figNum = 20004;
 titleString = sprintf('TEST case: Test of all generator types');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 allGeneratorTypes = {'haltonset', 'sobolset','lhsdesign','rand','randn'};
 
@@ -629,7 +641,7 @@ for ith_set = 1:length(allGeneratorTypes)
     AABBs{1,1} = [0 0 1 1];
     mapStretchs{1,1} = mapStretch;
 
-    figure(fig_num);
+    figure(figNum);
     nexttile;
 
     [polytopes] = fcn_MapGen_generatePolysFromSeedGeneratorNames(...
@@ -637,7 +649,7 @@ for ith_set = 1:length(allGeneratorTypes)
         seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
         (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
         (mapStretchs),...       % vector or cellArrayOf_vectors to specify how to stretch X and Y axis for each set
-        (fig_num));
+        (figNum));
     title(allGeneratorTypes{ith_set})
 
     sgtitle(titleString, 'Interpreter','none');
@@ -681,14 +693,14 @@ for ith_set = 1:length(allGeneratorTypes)
     % (these change randomly)
 
     % Make sure plot opened up
-    assert(isequal(get(gcf,'Number'),fig_num));
+    assert(isequal(get(gcf,'Number'),figNum));
 end
 
 %% TEST case: default inputs
-fig_num = 20005;
+figNum = 20005;
 titleString = sprintf('TEST case: default inputs');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 
 set_range = [1 100];
@@ -741,7 +753,7 @@ assert(isempty(polytopes(1).parent_poly_id));
 % (these change randomly)
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Fast Mode Tests
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -762,9 +774,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: FAST mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: FAST mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: FAST mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 mapStretch = [1 1];
 set_range = [1 100];
@@ -841,13 +853,13 @@ assert(isempty(polytopes(1).parent_poly_id));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: FAST mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: FAST mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 mapStretch = [1 1];
 set_range = [1 100];
@@ -925,14 +937,14 @@ assert(isempty(polytopes(1).parent_poly_id));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: FAST mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: FAST mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 mapStretch = [1 1];
 set_range = [1 100];
@@ -997,7 +1009,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -1013,7 +1025,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases

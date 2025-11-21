@@ -1,12 +1,22 @@
 % script_test_fcn_MapGen_polytopeShrinkEvenly
 % Tests: fcn_MapGen_polytopeShrinkEvenly
 
-% 
+
 % REVISION HISTORY:
 % 
-% 2025_07_29 - S. Brennan, sbrennan@psu.edu
-% -- first write of script 
+% 2025_07_29 by Sean Brennan, sbrennan@psu.edu
+% - first write of script 
 %    % * using fcn_MapGen_polytopeGenerateOneRandomPoly as starter
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
+
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
 
 %% Set up the workspace
 close all
@@ -30,10 +40,10 @@ close all;
 fprintf(1,'Figure: 1XXXXXX: DEMO cases\n');
 
 %% DEMO case: basic demo of fcn_MapGen_polytopeShrinkEvenly
-fig_num = 10001;
+figNum = 10001;
 titleString = sprintf('DEMO case: basic demo of fcn_MapGen_polytopeShrinkEvenly');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Set parameters
 unshrunkPolytopeVerticesOnly = fcn_MapGen_polytopeFillEmptyPoly(-1);
@@ -54,7 +64,7 @@ edgeCut = 0.02;
     fcn_MapGen_polytopeShrinkEvenly(...
     unshrunkPolytope,...
     edgeCut,...
-    (fig_num));
+    (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -88,13 +98,13 @@ assert(all(shrunkPolytope.max_radius<unshrunkPolytope.max_radius));
 assert(all(shrunkPolytope.mean_radius<unshrunkPolytope.mean_radius)); 
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% DEMO case: repeated cutting
-fig_num = 10002;
+figNum = 10002;
 titleString = sprintf('DEMO case: repeated cutting');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Set parameters
 unshrunkPolytopeVerticesOnly = fcn_MapGen_polytopeFillEmptyPoly(-1);
@@ -109,7 +119,7 @@ for edgeCut = step:step:1
         fcn_MapGen_polytopeShrinkEvenly(...
         unshrunkPolytope,...
         edgeCut,...
-        (fig_num));
+        (figNum));
     legend('off');
 end
 
@@ -145,13 +155,13 @@ assert(all(shrunkPolytope.max_radius<unshrunkPolytope.max_radius));
 assert(all(shrunkPolytope.mean_radius<unshrunkPolytope.mean_radius)); 
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% DEMO case: repeated cutting of random poly
-fig_num = 10003;
+figNum = 10003;
 titleString = sprintf('DEMO case: repeated cutting of random poly');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Set up polytopes
 seedGeneratorNames = 'haltonset';
@@ -182,7 +192,7 @@ for edgeCut = edge_cut_step:edge_cut_step:(unshrunkPolytope.max_radius/1.5+edge_
         fcn_MapGen_polytopeShrinkEvenly(...
         unshrunkPolytope,...
         edgeCut,...
-        (fig_num));
+        (figNum));
     legend('off')
 
 end
@@ -217,7 +227,7 @@ assert(Ncuts==length(newProjectionVectors));
 assert(all(isnan(shrunkPolytope.vertices),'all')); 
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Test cases start here. These are very simple, usually trivial
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -239,10 +249,10 @@ close all;
 fprintf(1,'Figure: 2XXXXXX: TEST mode cases\n');
 
 %% TEST case: vertical wall polytope
-fig_num = 20001;
+figNum = 20001;
 titleString = sprintf('TEST case: vertical wall polytope');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Set parameters
 unshrunkPolytopeVerticesOnly = fcn_MapGen_polytopeFillEmptyPoly(-1);
@@ -257,7 +267,7 @@ edgeCut = 0.1;
     fcn_MapGen_polytopeShrinkEvenly(...
     unshrunkPolytope,...
     edgeCut,...
-    (fig_num));
+    (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -302,13 +312,13 @@ assert(vertical_error <= error_tolerance,['Wall should be vertical but x positio
     new_vertices(1,1),new_vertices(4,1),vertical_error,error_tolerance);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% TEST case: make sure not to create concave polytope
-fig_num = 20002;
+figNum = 20002;
 titleString = sprintf('TEST case: make sure not to create concave polytope');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Set parameters
 unshrunkPolytopeVerticesOnly = fcn_MapGen_polytopeFillEmptyPoly(-1);
@@ -323,7 +333,7 @@ edgeCut = 3.6;
     fcn_MapGen_polytopeShrinkEvenly(...
     unshrunkPolytope,...
     edgeCut,...
-    (fig_num));
+    (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -369,13 +379,13 @@ assert(~any(new_interior_angles>180),['All interior angles must be < 180 ',...
     'polytope to be convex']);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% TEST case: NaN produced if overcut
-fig_num = 20003;
+figNum = 20003;
 titleString = sprintf('TEST case: NaN produced if overcut');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Set parameters
 unshrunkPolytopeVerticesOnly = fcn_MapGen_polytopeFillEmptyPoly(-1);
@@ -390,7 +400,7 @@ edgeCut = 4;
     fcn_MapGen_polytopeShrinkEvenly(...
     unshrunkPolytope,...
     edgeCut,...
-    (fig_num));
+    (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -422,13 +432,13 @@ assert(Ncuts==length(newProjectionVectors));
 assert(all(isnan(shrunkPolytope.vertices),'all')); 
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% TEST case: a square
-fig_num = 20004;
+figNum = 20004;
 titleString = sprintf('TEST case: a square');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Set parameters
 unshrunkPolytopeVerticesOnly = fcn_MapGen_polytopeFillEmptyPoly(-1);
@@ -443,7 +453,7 @@ edgeCut = 1;
     fcn_MapGen_polytopeShrinkEvenly(...
     unshrunkPolytope,...
     edgeCut,...
-    (fig_num));
+    (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -489,13 +499,13 @@ assert(~any(new_interior_angles>180),['All interior angles must be < 180 ',...
     'polytope to be convex']);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% TEST case: a triangle
-fig_num = 20005;
+figNum = 20005;
 titleString = sprintf('TEST case: a triangle');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Set parameters
 unshrunkPolytopeVerticesOnly = fcn_MapGen_polytopeFillEmptyPoly(-1);
@@ -510,7 +520,7 @@ edgeCut = 1;
     fcn_MapGen_polytopeShrinkEvenly(...
     unshrunkPolytope,...
     edgeCut,...
-    (fig_num));
+    (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -556,7 +566,7 @@ assert(~any(new_interior_angles>180),['All interior angles must be < 180 ',...
     'polytope to be convex']);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Fast Mode Tests
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -577,9 +587,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: FAST mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: FAST mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: FAST mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 % Set parameters
 unshrunkPolytopeVerticesOnly = fcn_MapGen_polytopeFillEmptyPoly(-1);
@@ -633,13 +643,13 @@ assert(all(shrunkPolytope.mean_radius<unshrunkPolytope.mean_radius));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: FAST mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: FAST mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 % Set parameters
 unshrunkPolytopeVerticesOnly = fcn_MapGen_polytopeFillEmptyPoly(-1);
@@ -693,14 +703,14 @@ assert(all(shrunkPolytope.mean_radius<unshrunkPolytope.mean_radius));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: FAST mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: FAST mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 % Set parameters
 unshrunkPolytopeVerticesOnly = fcn_MapGen_polytopeFillEmptyPoly(-1);
@@ -777,7 +787,7 @@ fast_fast_fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -794,7 +804,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases

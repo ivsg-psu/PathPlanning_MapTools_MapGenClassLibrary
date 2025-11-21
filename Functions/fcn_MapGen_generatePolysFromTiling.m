@@ -26,7 +26,7 @@ varargin...
 %    AABB, ...
 %    stretch, ...
 %    (flag_removeEdgePolytopes),...
-%    (fig_num) ...
+%    (figNum) ...
 %    )
 %
 % INPUTS:
@@ -57,7 +57,7 @@ varargin...
 %     polytopes is less, sometimes significantly so, than the number of
 %     seed points.
 %
-%     fig_num: a figure number to plot results. If set to -1, skips any
+%     figNum: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
 %     up code to maximize speed. As well, if given, this forces the
 %     variable types to be displayed as output and as well makes the input
@@ -89,39 +89,54 @@ varargin...
 
 % REVISION HISTORY:
 %
-% 2021_07_02 by Sean Brennan
-% -- first write of function
-% 2021_07_30 by Sean Brennan
-% -- fixed errors due to corners being omitted
-% 2025_04_25 by Sean Brennan
-% -- added global debugging options
-% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-% -- fixed call to fcn_MapGen_polytopesFillFieldsFromVertices
-% 2025_07_07 by Sean Brennan
-% -- added flag_removeEdgePolytopes option to be compatible with Bounded
+% 2021_07_02 by Sean Brennan, sbrennan@psu.edu
+% - first write of function
+% 
+% 2021_07_30 by Sean Brennan, sbrennan@psu.edu
+% - fixed errors due to corners being omitted
+% 
+% 2025_04_25 by Sean Brennan, sbrennan@psu.edu
+% - added global debugging options
+% - switched input checking to fcn_DebugTools_checkInputsToFunctions
+% - fixed call to fcn_MapGen_polytopesFillFieldsFromVertices
+% 
+% 2025_07_07 by Sean Brennan, sbrennan@psu.edu
+% - added flag_removeEdgePolytopes option to be compatible with Bounded
 %    Astar library usage of old codes
-% 2025_07_07 by Sean Brennan
-% -- updated header debugging and input area to fix global flags,
+% 
+% 2025_07_07 by Sean Brennan, sbrennan@psu.edu
+% - updated header debugging and input area to fix global flags,
 %    streamline plotting and make debugging/editing easier in future
-% 2025_07_10 by Sean Brennan
-% -- changed fcn_MapGen_findIntersectionOfSegments to use
-% fcn_Path_findSensorHitOnWall instead, as the Path function is much more
-% tested/debugged and regularly updated
-% -- updated some variable naming
-% -- clean-up of comments
-% 2025_07_10 by Sean Brennan
-% -- updated header debugging and input area to fix global flags
-% 2025_07_17 by Sean Brennan
-% -- standardized Debugging and Input checks area, Inputs area
-% -- made codes use MAX_NARGIN definition at top of code, narginchk
-% -- made plotting flag_do_plots and code consistent across all functions
+% 
+% 2025_07_10 by Sean Brennan, sbrennan@psu.edu
+% - changed fcn_MapGen_findIntersectionOfSegments to use
+%   % fcn_Path_findSensorHitOnWall instead, as the Path function is better
+%   % tested/debugged and regularly updated
+% - updated some variable naming
+% - clean-up of comments
+% 
+% 2025_07_10 by Sean Brennan, sbrennan@psu.edu
+% - updated header debugging and input area to fix global flags
+% 
+% 2025_07_17 by Sean Brennan, sbrennan@psu.edu
+% - standardized Debugging and Input checks area, Inputs area
+% - made codes use MAX_NARGIN definition at top of code, narginchk
+% - made plotting flag_do_plots and code consistent across all functions
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
 
-% TO DO
-% -- none
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
+
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 7; % The largest Number of argument inputs to the function
@@ -147,7 +162,7 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 end
 
 
@@ -193,8 +208,8 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 end
@@ -355,7 +370,7 @@ polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes, (is_nonconvex)
 
 if flag_do_plots
 
-    figure(fig_num);
+    figure(figNum);
     clf;
     hold on
     scale = max(AABB,[],'all') - min(AABB,[],'all');
@@ -363,13 +378,13 @@ if flag_do_plots
     axis(new_axis);
 
     % plot the polytopes
-    % fcn_MapGen_OLD_plotPolytopes(polytopes,fig_num,'b',2);
+    % fcn_MapGen_OLD_plotPolytopes(polytopes,figNum,'b',2);
     plotFormat.LineWidth = 2;
     plotFormat.MarkerSize = 10;
     plotFormat.LineStyle = '-';
     plotFormat.Color = [0 0 1];
     fillFormat = [];
-    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(figNum)); %#ok<NASGU>
 
 
     % plot all vertices
@@ -460,7 +475,7 @@ if 1==flag_do_debug
     plotFormat.LineStyle = '-';
     plotFormat.Color = [0 0 1];
     fillFormat = [];
-    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(figNum)); %#ok<NASGU>
 
 
 end
@@ -538,7 +553,7 @@ for ith_missing = 1:length(missing_vertices(:,1))
         (0), ...                 % (flag_search_return_type) -- 0 means first hit of any results,
         (0), ...                 % (flag_search_range_type)  -- 0 means only if overlapping wall/sensor, ...
         ([]),...                 % (tolerance) -- default is eps * 1000,
-        (-1));                   % (fig_num) -- -1 means to use "fast mode")
+        (-1));                   % (figNum) -- -1 means to use "fast mode")
 
     % Put the point into the vertices
     shoved_vertices = [...

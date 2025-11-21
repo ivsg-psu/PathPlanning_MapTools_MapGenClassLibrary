@@ -3,13 +3,13 @@ function emptyPolytope = fcn_MapGen_polytopeFillEmptyPoly(varargin)
 % creates a polytope structure and fills fields with empty values
 %
 % FORMAT:
-%     emptyPolytope = fcn_MapGen_polytopeFillEmptyPoly((fig_num))
+%     emptyPolytope = fcn_MapGen_polytopeFillEmptyPoly((figNum))
 %
 % INPUTS:
 %
 %     (optional inputs)
 %
-%     fig_num: any number that acts as a figure number output, causing a
+%     figNum: any number that acts as a figure number output, causing a
 %     figure to be drawn showing results.
 %
 % OUTPUTS:
@@ -43,22 +43,31 @@ function emptyPolytope = fcn_MapGen_polytopeFillEmptyPoly(varargin)
 % This function was written on 2025_07_11 by Sean Brennan
 % Questions or comments? contact sbrennan@psu.edu
 
-%
+
 % REVISION HISTORY:
 %
-% 2025_07_11 by S. Brennan
-% -- created function
-% 2025_07_17 by Sean Brennan
-% -- standardized Debugging and Input checks area, Inputs area
-% -- made codes use MAX_NARGIN definition at top of code, narginchk
-% -- made plotting flag_do_plots and code consistent across all functions
+% 2025_07_11 by Sean Brennan, sbrennan@psu.edu
+% - created function
+% 
+% 2025_07_17 by Sean Brennan, sbrennan@psu.edu
+% - standardized Debugging and Input checks area, Inputs area
+% - made codes use MAX_NARGIN definition at top of code, narginchk
+% - made plotting flag_do_plots and code consistent across all functions
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
 
-% TO DO
-% -- none
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
+
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 1; % The largest Number of argument inputs to the function
@@ -84,7 +93,7 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 end
 
 
@@ -115,8 +124,8 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 end

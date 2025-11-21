@@ -2,7 +2,7 @@ function [polytopes] = ...
     fcn_MapGen_randomNormalVoronoiTiling(rand_range,varargin)
 
 warning('on','backtrace');
-warning('fcn_MapGen_randomNormalVoronoiTiling is being deprecated. Use fcn_MapGen_voronoiTiling instead.');
+warning('fcn_MapGen_randomNormalVoronoiTiling is being deprecated. Use fcn_MapGen_generatePolysFromSeedGeneratorNames instead.');
 
 % fcn_MapGen_randomNormalVoronoiTiling generates a map with
 % obstacles perfectly tiled together using the Voronoi cells generated from

@@ -1,13 +1,23 @@
 % script_test_fcn_MapGen_polytopeCentroidAndArea
 % Tests: fcn_MapGen_polytopeCentroidAndArea
 
-%
 % REVISION HISTORY:
 %
-% 2021_07_02 by Sean Brennan
-% -- first write of script
-% 2025_07_11 - S. Brennan, sbrennan@psu.edu
-% -- updated script testing to standard form
+% 2021_07_02 by Sean Brennan, sbrennan@psu.edu
+% - first write of script
+% 
+% 2025_07_11 by Sean Brennan, sbrennan@psu.edu
+% - updated script testing to standard form
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
+
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
 
 %% Set up the workspace
 close all
@@ -31,16 +41,16 @@ close all;
 fprintf(1,'Figure: 1XXXXXX: DEMO cases\n');
 
 %% DEMO case: basic demo
-fig_num = 10001;
+figNum = 10001;
 titleString = sprintf('DEMO case: basic demo');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 x = [3; 4; 2; -1; -2; -3; -4; -2; 1; 2; 3];
 y = [1; 2; 2; 3; 2; -1; -2; -3; -3; -2; 1];
 
 % Call the function
-[centroid,area] = fcn_MapGen_polytopeCentroidAndArea([x,y],(fig_num));
+[centroid,area] = fcn_MapGen_polytopeCentroidAndArea([x,y],(figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -57,7 +67,7 @@ assert(isequal(round(centroid,4),[-0.1462,-0.2222]));
 assert(isequal(round(area,4),28.5));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Test cases start here. These are very simple, usually trivial
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -79,10 +89,10 @@ close all;
 fprintf(1,'Figure: 2XXXXXX: TEST mode cases\n');
 % 
 % %% TEST case: simple crossing at origin
-% fig_num = 20001;
+% figNum = 20001;
 % titleString = sprintf('TEST case: simple crossing at origin');
-% fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-% figure(fig_num); clf;
+% fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+% figure(figNum); clf;
 
 
 %% Fast Mode Tests
@@ -104,9 +114,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: FAST mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: FAST mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: FAST mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 x = [3; 4; 2; -1; -2; -3; -4; -2; 1; 2; 3];
 y = [1; 2; 2; 3; 2; -1; -2; -3; -3; -2; 1];
@@ -128,13 +138,13 @@ assert(isequal(round(area,4),28.5));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: FAST mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: FAST mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 x = [3; 4; 2; -1; -2; -3; -4; -2; 1; 2; 3];
 y = [1; 2; 2; 3; 2; -1; -2; -3; -3; -2; 1];
@@ -156,14 +166,14 @@ assert(isequal(round(area,4),28.5));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: FAST mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: FAST mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 x = [3; 4; 2; -1; -2; -3; -4; -2; 1; 2; 3];
 y = [1; 2; 2; 3; 2; -1; -2; -3; -3; -2; 1];
@@ -188,7 +198,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -204,7 +214,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases

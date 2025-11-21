@@ -1,11 +1,20 @@
 % script_test_fcn_MapGen_polytopesShrinkEvenly
 % Tests: fcn_MapGen_polytopesShrinkEvenly
 
-%
 % REVISION HISTORY:
-%§
-% 2025_07_29, Sean Brennan
-% -- first write of script
+%
+% 2025_07_29 by Sean Brennan, sbrennan@psu.edu
+% - first write of script
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
+
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
 
 %% Set up the workspace
 close all
@@ -29,10 +38,10 @@ close all;
 fprintf(1,'Figure: 1XXXXXX: DEMO cases\n');
 
 %% DEMO case: shrinkage of a single polytope
-fig_num = 10001;
+figNum = 10001;
 titleString = sprintf('DEMO case: shrinkage of a single polytope');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 unshrunkPolytopeVerticesOnly = fcn_MapGen_polytopeFillEmptyPoly(-1);
 unshrunkPolytopeVerticesOnly.vertices = [
@@ -49,7 +58,7 @@ unshrunkPolytopes = fcn_MapGen_polytopesFillFieldsFromVertices(unshrunkPolytopeV
 cutDistance = 0.01; % Set the shrinkage distance
 
 % Call the function
-shrunkPolytopes = fcn_MapGen_polytopesShrinkEvenly(unshrunkPolytopes, cutDistance, fig_num);
+shrunkPolytopes = fcn_MapGen_polytopesShrinkEvenly(unshrunkPolytopes, cutDistance, figNum);
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -77,20 +86,20 @@ assert(all(shrunkPolytopes.max_radius<unshrunkPolytopes.max_radius));
 assert(all(shrunkPolytopes.mean_radius<unshrunkPolytopes.mean_radius)); 
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% DEMO case: shrinkage of a polytope field
-fig_num = 10002;
+figNum = 10002;
 titleString = sprintf('DEMO case: shrinkage of a polytope field');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 map_name = "HST 30 450 SQT 0 1 0 1 SMV 0.02 0.005 1e-6 1234";
 plot_flag = 1; disp_name = [1, 0.05 -0.05, 0.5 0.5 0.5, 10];
 line_style = '-'; line_width = 2; color = [0 0 1];
 axis_limits = [0 1 -0.1 1]; axis_style = 'square';
 fill_info = [1 1 0 1 0.5];
-fig_num = 7;
+figNum = 7;
 
 [unshrunkPolytopes,~] =fcn_MapGen_generatePolysFromName(...
     map_name,...
@@ -108,7 +117,7 @@ fig_num = 7;
 cutDistance = 0.01; % Set the shrinkage distance
 
 % Call the function
-shrunkPolytopes = fcn_MapGen_polytopesShrinkEvenly(unshrunkPolytopes, cutDistance, fig_num);
+shrunkPolytopes = fcn_MapGen_polytopesShrinkEvenly(unshrunkPolytopes, cutDistance, figNum);
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -134,7 +143,7 @@ assert(isequal(length(unshrunkPolytopes),length(shrunkPolytopes)));
 % Too many values
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Test cases start here. These are very simple, usually trivial
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -156,10 +165,10 @@ close all;
 fprintf(1,'Figure: 2XXXXXX: TEST mode cases\n');
 % 
 % %% TEST case: simple crossing at origin
-% fig_num = 20001;
+% figNum = 20001;
 % titleString = sprintf('TEST case: simple crossing at origin');
-% fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-% figure(fig_num); clf;
+% fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+% figure(figNum); clf;
 
 
 %% Fast Mode Tests
@@ -181,9 +190,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: FAST mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: FAST mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: FAST mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 unshrunkPolytopeVerticesOnly = fcn_MapGen_polytopeFillEmptyPoly(-1);
 
@@ -229,13 +238,13 @@ assert(all(shrunkPolytopes.mean_radius<unshrunkPolytopes.mean_radius));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: FAST mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: FAST mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 unshrunkPolytopeVerticesOnly = fcn_MapGen_polytopeFillEmptyPoly(-1);
 
@@ -282,14 +291,14 @@ assert(all(shrunkPolytopes.mean_radius<unshrunkPolytopes.mean_radius));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: FAST mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: FAST mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 unshrunkPolytopeVerticesOnly = fcn_MapGen_polytopeFillEmptyPoly(-1);
 
@@ -328,7 +337,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -344,7 +353,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases

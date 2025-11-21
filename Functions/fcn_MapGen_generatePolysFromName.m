@@ -13,7 +13,7 @@ function [polytopes,fig]=fcn_MapGen_generatePolysFromName(...
 %     map_name,...
 %     plot_flag,...
 %     disp_name,...
-%     (fig_num),...
+%     (figNum),...
 %     (line_spec),...
 %     (line_width),...
 %     (color),...
@@ -40,14 +40,14 @@ function [polytopes,fig]=fcn_MapGen_generatePolysFromName(...
 %
 %    ( OPTIONAL INPUTS)
 %
-%      fig_num: a figure number to plot results. If set to -1, skips any
+%      figNum: a figure number to plot results. If set to -1, skips any
 %      input checking or debugging, no figures will be generated, and sets
 %      up code to maximize speed. As well, if given, this forces the
 %      variable types to be displayed as output and as well makes the input
 %      check process verbose.
 %
 %     line_spec: a string, line specifications such as color, 'r', and line or
-%     point type, '--'
+%     point type, '-'
 %
 %     line_width: width of the line to be plotted
 %
@@ -109,17 +109,17 @@ function [polytopes,fig]=fcn_MapGen_generatePolysFromName(...
 %
 % Basic Example:
 %   map_name = "HST 1 100 SQT 0 1 0 1 SMV 0.01 0.001 1e-6 1111"; 
-%   plot_flag = 1; disp_name = 0; fig_num = []; line_style = 'r-'; 
+%   plot_flag = 1; disp_name = 0; figNum = []; line_style = 'r-'; 
 %   line_width = 2;
-%   [polytopes,fig]=fcn_MapGen_generatePolysFromName(map_name,plot_flag,disp_name,fig_num,line_style,line_width);
+%   [polytopes,fig]=fcn_MapGen_generatePolysFromName(map_name,plot_flag,disp_name,figNum,line_style,line_width);
 %   
 % Advanced Example
 %   map_name = "HST 30 450 SQT 0 1 0 1 SMV 0.02 0.005 1e-6 1234";
 %   plot_flag = 1; disp_name = [1, 0.05 -0.05, 0.5 0.5 0.5, 10]; 
-%   fig_num = 999; line_style = '-'; line_width = 2; color = [0 0 1]; 
+%   figNum = 999; line_style = '-'; line_width = 2; color = [0 0 1]; 
 %   axis_limits = [0 1 -0.1 1]; axis_style = 'square'; 
 %   fill_info = [1 1 0 1 0.5];
-%   [polytopes,fig]=fcn_MapGen_generatePolysFromName(map_name,plot_flag,disp_name,fig_num,line_style,line_width,color,axis_limits,axis_style,fill_info);
+%   [polytopes,fig]=fcn_MapGen_generatePolysFromName(map_name,plot_flag,disp_name,figNum,line_style,line_width,color,axis_limits,axis_style,fill_info);
 % 
 % 
 % See the script: script_test_fcn_MapGen_generatePolysFromName
@@ -129,23 +129,34 @@ function [polytopes,fig]=fcn_MapGen_generatePolysFromName(...
 % Comments added on 2021_02_23 by Seth Tau
 % Questions or comments? sat5340@psu.edu 
 
-% Revision History:
-% 2021-06-08 - S. Brennan
-% -- revised function to prep for MapGen class 
-% 2025_04_25 by Sean Brennan
-% -- added global debugging options
-% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-% 2025_07_17 by Sean Brennan
-% -- standardized Debugging and Input checks area, Inputs area
-% -- made codes use MAX_NARGIN definition at top of code, narginchk
-% -- made plotting flag_do_plots and code consistent across all functions
+% REVISION HISTORY:
+% 
+% 202106_08 by Sean Brennan, sbrennan@psu.edu
+% - revised function to prep for MapGen class 
+% 
+% 2025_04_25 by Sean Brennan, sbrennan@psu.edu
+% - added global debugging options
+% - swit_ched input checking to fcn_DebugTools_checkInputsToFunctions
+% 
+% 2025_07_17 by Sean Brennan, sbrennan@psu.edu
+% - standardized Debugging and Input checks area, Inputs area
+% - made codes use MAX_NARGIN definition at top of code, narginchk
+% - made plotting flag_do_plots and code consistent across all functions
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
 
-% TO DO
-% -- none
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
+
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 10; % The largest Number of argument inputs to the function
@@ -171,7 +182,7 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 end
 
 
@@ -217,8 +228,8 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (nargin>=4) 
     temp = varargin{1};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 end
@@ -318,8 +329,8 @@ fig = []; % set value empty to return as default. Value is filled below if plott
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if flag_do_plots
-    temp_fig_num = varargin{1};
-    figure(temp_fig_num)
+    temp_figNum = varargin{1};
+    figure(temp_figNum)
 
     clear plotFormat
 
@@ -335,7 +346,7 @@ if flag_do_plots
     end
     
     % [fig] = fcn_MapGen_OLD_plotPolytopes(polytopes,varargin{1},varargin{2},varargin{3},varargin{4:end});
-    fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(temp_fig_num)); 
+    fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(temp_figNum)); 
 
     % Show the name
     if disp_name(1) == 1 % add map_name to plot

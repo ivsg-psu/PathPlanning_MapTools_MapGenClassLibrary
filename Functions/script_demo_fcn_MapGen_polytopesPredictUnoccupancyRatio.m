@@ -11,13 +11,25 @@
 % Occupancy Probability and Occupancy Ratio from Maps of Obstacle Fields for Ground Vehicle Navigation,”
 % In Proceedings of the Ground Vehicle Systems Engineering and Technology Symposium (GVSETS), NDIA,
 % Novi, MI, Aug. 15-17, 2023.
+
 % REVISION HISTORY:
 % 2022_01_17
-% -- first written by S. Harnett
-% 2025_04_28
-% -- comment updated to point to paper by S. Harnett
-% 2025_11_06 - S. Brennan
+% - first written by S. Harnett
+% 
+% 2025_04_28  by Sean Brennan, sbrennan@psu.edu
+% - comment updated to point to paper by S. Harnett
+% 
+% 2025_11_06 by Sean Brennan, sbrennan@psu.edu
 % - removed command to clear workspace (unnecessary)
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
+
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
 
 
 %% Set up variables
@@ -40,9 +52,9 @@ mapStretchs = [1 1];
     (-1));
 
 
-fig_num = 1;
+figNum = 1;
 bounding_box = [0,0, 1,1];
-trim_polytopes = fcn_MapGen_polytopesDeleteByAABB(polytopes,bounding_box,fig_num);
+trim_polytopes = fcn_MapGen_polytopesDeleteByAABB(polytopes,bounding_box,figNum);
 pre_shrink_stats = fcn_MapGen_statsPolytopes(trim_polytopes, -1);
 R_bar_initial = pre_shrink_stats.average_max_radius;
 des_gap_size_all = [];
@@ -62,7 +74,7 @@ P_tot_all = [];
 average_angle_all = [];
 sum_sines_all = [];
 for i = linspace(0.001,0.08,2)
-    fig_num = 2;
+    figNum = 2;
     des_gap_size = i;
     shrunk_polytopes=...
         fcn_MapGen_polytopesShrinkFromEdges(...

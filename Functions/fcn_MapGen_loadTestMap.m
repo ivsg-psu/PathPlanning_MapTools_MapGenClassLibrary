@@ -13,7 +13,7 @@ function [polytopes, starts, finishes, resolution_scale, length_cost_weights, na
 %
 % FORMAT:
 % [polytopes, starts, finishes] = fcn_MapGen_loadTestMap(mapIndex,
-% (add_boundary), (fig_num))
+% (add_boundary), (figNum))
 %
 %
 % INPUTS:
@@ -41,7 +41,7 @@ function [polytopes, starts, finishes, resolution_scale, length_cost_weights, na
 %        more conservative as the boundary polytope overlaps all other
 %        polytopes so will be confusing if its inclusion is not expected.
 %
-%     fig_num: a figure number to plot results. If set to -1, skips any
+%     figNum: a figure number to plot results. If set to -1, skips any
 %       input checking or debugging, no figures will be generated, and sets
 %       up code to maximize speed. As well, if given, this forces the
 %       variable types to be displayed as output and as well makes the
@@ -81,34 +81,47 @@ function [polytopes, starts, finishes, resolution_scale, length_cost_weights, na
 % This function was written on 2024_05_02 by Steve Harnett
 % Questions or comments? contact sjharnett@psu.edu
 
-%
-% REVISION HISTORY:
-% As: fcn_util_load_test_map
-% 2024, May by Steve Harnett
-% -- first write of function
-%
-% As: fcn_MapGen_loadTestMap
-% 2025_07_17 - K. Hayes, kxh1031@psu.edu
-% -- copied to new function from fcn_util_load_test_map to follow library
-%    convention
-% 2025_08_14 - K. Hayes
-% -- updated fcn header and formatting
-% -- moved plotting into fcn
-%
-% As: fcn_MapGen_loadTestMap
-% 2025_10_31 - S. Brennan, sbrennan@psu.edu
-% -- moved code into MapGen library and renamed it accordingly
-% -- cleaned up header docstrings to clearly name cases
-% -- changed map_idx to mapIndex
-% -- changed from if statements to switch statements for clarity
-% -- changed data file names to indicate this one as the source function
-% -- updated the plotting options for clarity
 
-% TO DO:
-% -- fill in to-do items here.
+% REVISION HISTORY:
+% 
+% As: fcn_util_load_test_map
+% 
+% 2024, May by Steve Harnett
+% - first write of function
+%
+% As: fcn_MapGen_loadTestMap
+% 
+% 2025_07_17 - K. Hayes, kxh1031@psu.edu
+% - copied to new function from fcn_util_load_test_map to follow library
+%    convention
+% 
+% 2025_08_14 - K. Hayes
+% - updated fcn header and formatting
+% - moved plotting into fcn
+%
+% As: fcn_MapGen_loadTestMap
+% 
+% 2025_10_31 by Sean Brennan, sbrennan@psu.edu
+% - moved code into MapGen library and renamed it accordingly
+% - cleaned up header docstrings to clearly name cases
+% - changed map_idx to mapIndex
+% - changed from if statements to switch statements for clarity
+% - changed data file names to indicate this one as the source function
+% - updated the plotting options for clarity
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
+
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
+
 
 %% Debugging and Input checks
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 3; % The largest Number of argument inputs to the function
@@ -134,9 +147,9 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 else
-    debug_fig_num = []; %#ok<NASGU>
+    debug_figNum = []; %#ok<NASGU>
 end
 
 %% check input arguments?
@@ -177,8 +190,8 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 end
@@ -624,7 +637,7 @@ end
 
 if flag_do_plots
     % set up plot
-    figure(fig_num);
+    figure(figNum);
     hold on;
     box on;
 
@@ -636,7 +649,7 @@ if flag_do_plots
 
     fillFormat = [1 0 0 0 0.5];
 
-    fcn_MapGen_plotPolytopes(polytopes, (plotFormat), (fillFormat), (fig_num));
+    fcn_MapGen_plotPolytopes(polytopes, (plotFormat), (fillFormat), (figNum));
 
 end
 end % end function

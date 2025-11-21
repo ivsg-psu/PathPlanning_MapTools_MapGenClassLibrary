@@ -12,7 +12,7 @@ function [polytopes, eachGeneratorPolytopes] = fcn_MapGen_generatePolysFromSeedG
 %       seedGeneratorRanges,... % vector or cellArrayOf_vectors with the range of points from generator to use
 %       (AABBs),...             % vector or cellArrayOf_vectors with the axis-aligned bounding box for each generator to use
 %       (mapStretch),...        % vector or cellArrayOf_vectors to specify how to stretch X and Y axis
-%       (fig_num));
+%       (figNum));
 %
 %     INPUTS:
 %
@@ -52,7 +52,7 @@ function [polytopes, eachGeneratorPolytopes] = fcn_MapGen_generatePolysFromSeedG
 %     to fit maps shapes other than square. Default is a unit mapStretch:
 %     [1 1]
 %
-%     fig_num: a figure number to plot results. If set to -1, skips any
+%     figNum: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
 %     up code to maximize speed. As well, if given, this forces the
 %     variable types to be displayed as output and as well makes the input
@@ -79,26 +79,38 @@ function [polytopes, eachGeneratorPolytopes] = fcn_MapGen_generatePolysFromSeedG
 % Questions or comments? sbrennan@psu.edu
 
 % REVISION HISTORY:
-% 2021_07_08
-% -- Created by S. Brennan
-% 2025_04_25 by Sean Brennan
-% -- added global debugging options
-% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-% 2025_07_12 by S. Brennan
-% -- renamed function from fcn_MapGen_mixedSetVoronoiTiling
-% -- changed to cell array input types, rather than structures (easier to
+% 
+% 2021_07_08 by Sean Brennan, sbrennan@psu.edu
+% - Created by S. Brennan
+% 
+% 2025_04_25 by Sean Brennan, sbrennan@psu.edu
+% - added global debugging options
+% - switched input checking to fcn_DebugTools_checkInputsToFunctions
+% 
+% 2025_07_12 by Sean Brennan, sbrennan@psu.edu
+% - renamed function from fcn_MapGen_mixedSetVoronoiTiling
+% - changed to cell array input types, rather than structures (easier to
 %    % use)
-% 2025_07_17 by Sean Brennan
-% -- standardized Debugging and Input checks area, Inputs area
-% -- made codes use MAX_NARGIN definition at top of code, narginchk
-% -- made plotting flag_do_plots and code consistent across all functions
+% 
+% 2025_07_17 by Sean Brennan, sbrennan@psu.edu
+% - standardized Debugging and Input checks area, Inputs area
+% - made codes use MAX_NARGIN definition at top of code, narginchk
+% - made plotting flag_do_plots and code consistent across all functions
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
 
-% TO DO
-% -- none
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
+
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 5; % The largest Number of argument inputs to the function
@@ -124,7 +136,7 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 end
 
 
@@ -209,8 +221,8 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 end
@@ -296,17 +308,17 @@ end
 
 if flag_do_plots
 
-    figure(fig_num);
+    figure(figNum);
     hold on
 
     % plot the polytopes
-    % fcn_MapGen_OLD_plotPolytopes(polytopes,fig_num,'b',2);
+    % fcn_MapGen_OLD_plotPolytopes(polytopes,figNum,'b',2);
     plotFormat.LineWidth = 2;
     plotFormat.MarkerSize = 10;
     plotFormat.LineStyle = '-';
     plotFormat.Color = [0 0 1];
     fillFormat = [];
-    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
+    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat), (fillFormat), (figNum)); %#ok<NASGU>
 
 
     % plot the seed points for each Generator
@@ -320,13 +332,13 @@ if flag_do_plots
         % Plot the polys for each generator?
         % (COMMENTED OUT BECAUSE IT LOOKS MESSY)
         if 1==0
-            % fcn_MapGen_plotPolytopes(eachGeneratorPolytopes{ith_generator,1},fig_num,'b',1,colorEachGenerator(ith_generator,:));
+            % fcn_MapGen_plotPolytopes(eachGeneratorPolytopes{ith_generator,1},figNum,'b',1,colorEachGenerator(ith_generator,:));
             plotFormat.LineWidth = 1;
             plotFormat.MarkerSize = 10;
             plotFormat.LineStyle = '-';
             plotFormat.Color = colorEachGenerator(ith_generator,:);
             fillFormat = [];
-            h_plot = fcn_MapGen_plotPolytopes(eachGeneratorPolytopes{ith_generator,1}, (plotFormat), (fillFormat), (fig_num)); %#ok<NASGU>
+            h_plot = fcn_MapGen_plotPolytopes(eachGeneratorPolytopes{ith_generator,1}, (plotFormat), (fillFormat), (figNum)); %#ok<NASGU>
 
             % plot the means
             % (COMMENTED OUT BECAUSE THE MEANS INCLUDE MESSY POLYTOPES THAT ARE

@@ -9,7 +9,7 @@ function [filled_polytopes] = fcn_MapGen_polytopesFillFieldsFromVertices(polytop
 %
 %    [filled_polytopes] = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes,
 %    (is_nonconvex),...
-%    (fig_num),...
+%    (figNum),...
 %    )
 %
 % INPUTS:
@@ -22,7 +22,7 @@ function [filled_polytopes] = fcn_MapGen_polytopesFillFieldsFromVertices(polytop
 %
 %     is_nonconvex - boolean flag indicating if there are or are not non-convex polytopes
 %
-%      fig_num: a figure number to plot results. If set to -1, skips any
+%      figNum: a figure number to plot results. If set to -1, skips any
 %      input checking or debugging, no figures will be generated, and sets
 %      up code to maximize speed. As well, if given, this forces the
 %      variable types to be displayed as output and as well makes the input
@@ -47,33 +47,44 @@ function [filled_polytopes] = fcn_MapGen_polytopesFillFieldsFromVertices(polytop
 
 %
 % REVISION HISTORY:
-%
-% 2021_07_02 by Sean Brennan
+% 
 % As: fcn_MapGen_fillPolytopeFieldsFromVertices
-% -- first write of function
-% 2023_03_13 by Sean Brennan
-% -- added check and fix for ensuring verticies are counter-clockwise
-% 2025_04_25 by Sean Brennan
-% -- added global debugging options
-% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-% -- fixed argument list to make figure number last to be consistent with
+% 
+% 2021_07_02 by Sean Brennan, sbrennan@psu.edu
+% - first write of function
+% 
+% 2023_03_13 by Sean Brennan, sbrennan@psu.edu
+% - added check and fix for ensuring verticies are counter-clockwise
+% 
+% 2025_04_25 by Sean Brennan, sbrennan@psu.edu
+% - added global debugging options
+% - switched input checking to fcn_DebugTools_checkInputsToFunctions
+% - fixed argument list to make figure number last to be consistent with
 %    % other functions, and changed all functions/scripts that call this
 %    % function to correct this
-% 2025_07_15 by Sean Brennan
-% -- fixed bug where parent_poly_id was not being filled
-% 2025_07_17 by Sean Brennan
-% -- standardized Debugging and Input checks area, Inputs area
-% -- made codes use MAX_NARGIN definition at top of code, narginchk
-% -- made plotting flag_do_plots and code consistent across all functions
+% 
+% 2025_07_15 by Sean Brennan, sbrennan@psu.edu
+% - fixed bug where parent_poly_id was not being filled
+% 
+% 2025_07_17 by Sean Brennan, sbrennan@psu.edu
+% - standardized Debugging and Input checks area, Inputs area
+% - made codes use MAX_NARGIN definition at top of code, narginchk
+% - made plotting flag_do_plots and code consistent across all functions
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
 
-% TO DO
-% 2025_07_09 - S. Brennan and K. Hayes
-% --  need a tool to check if polytope is convex. This is causing some 
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% -  need a tool to check if polytope is convex. This is causing some 
 %     % codes in Bounded_AStar to break
+
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 3; % The largest Number of argument inputs to the function
@@ -99,7 +110,7 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 end
 
 
@@ -144,8 +155,8 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 end
@@ -243,17 +254,17 @@ end
 
 
 if flag_do_plots
-    figure(fig_num);
+    figure(figNum);
     hold on
 
     % plot the polytopes
-    % fcn_MapGen_OLD_plotPolytopes(filled_polytopes,fig_num,'b',2);
+    % fcn_MapGen_OLD_plotPolytopes(filled_polytopes,figNum,'b',2);
     plotFormat.LineWidth = 2;
     plotFormat.MarkerSize = 10;
     plotFormat.LineStyle = '-';
     plotFormat.Color = [0 0 1];
     fillFormat = [];
-    h_plot = fcn_MapGen_plotPolytopes(filled_polytopes, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+    h_plot = fcn_MapGen_plotPolytopes(filled_polytopes, (plotFormat),(fillFormat),(figNum)); %#ok<NASGU>
 
     % plot the means in black
     temp = zeros(length(filled_polytopes),2);

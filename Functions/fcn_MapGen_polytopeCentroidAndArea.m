@@ -4,7 +4,7 @@ function [centroid, area] = fcn_MapGen_polytopeCentroidAndArea( vertices, vararg
 % 
 % FORMAT:
 % 
-%    [centroid, area] = fcn_MapGen_polytopeCentroidAndArea( vertices, (fig_num))
+%    [centroid, area] = fcn_MapGen_polytopeCentroidAndArea( vertices, (figNum))
 % 
 % INPUTS:
 % 
@@ -15,7 +15,7 @@ function [centroid, area] = fcn_MapGen_polytopeCentroidAndArea( vertices, vararg
 % 
 %     (optional inputs)
 %
-%     fig_num: any number that acts as a figure number output, causing a 
+%     figNum: any number that acts as a figure number output, causing a 
 %     figure to be drawn showing results.
 % 
 % 
@@ -39,36 +39,50 @@ function [centroid, area] = fcn_MapGen_polytopeCentroidAndArea( vertices, vararg
 % This function was written on 2021_07_02 by Sean Brennan
 % Questions or comments? contact sbrennan@psu.edu
 
-% 
+ 
 % REVISION HISTORY:
 % 
 % 2021_02_23 by Seth Tau
-% -- Added comments
+% - Added comments
+% 
 % 2021_03_02 by Seth Tau
-% -- Removed old add path stuff on 
-% 2021_07_02
-% -- Cleaned up arguments a bit to compactify x,y coordinate convention
-% -- rebased code to MapGen format
-% 2022_02_17 - S. Brennan
-% -- Fixed bug when someone passes a line segment or repeated point
-% sequence, causing area to be zero. Get a divide-by-zero problem. This is
-% fixed now via an if-statement check which uses the mean of points if A=0.
-% 2025_04_25 by Sean Brennan
-% -- added global debugging options
-% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-% 2025_07_16 by Sean Brennan
-% -- cleaned up header
-% 2025_07_17 by Sean Brennan
-% -- standardized Debugging and Input checks area, Inputs area
-% -- made codes use MAX_NARGIN definition at top of code, narginchk
-% -- made plotting flag_do_plots and code consistent across all functions
+% - Removed old add path stuff on 
+% 
+% 2021_07_02 by Sean Brennan, sbrennan@psu.edu
+% - Cleaned up arguments a bit to compactify x,y coordinate convention
+% - rebased code to MapGen format
+% 
+% 2022_02_17 by Sean Brennan, sbrennan@psu.edu
+% - Fixed bug when someone passes a line segment or repeated point
+%   % sequence, causing area to be zero. Get a divide-by-zero problem. This is
+%   % fixed now via an if-statement check which uses the mean of points if A=0.
+% 
+% 2025_04_25 by Sean Brennan, sbrennan@psu.edu
+% - added global debugging options
+% - switched input checking to fcn_DebugTools_checkInputsToFunctions
+% 
+% 2025_07_16 by Sean Brennan, sbrennan@psu.edu
+% - cleaned up header
+% 
+% 2025_07_17 by Sean Brennan, sbrennan@psu.edun
+% - standardized Debugging and Input checks area, Inputs area
+% - made codes use MAX_NARGIN definition at top of code, narginchk
+% - made plotting flag_do_plots and code consistent across all functions
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
 
-% TO DO
-% -- none
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
+
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 2; % The largest Number of argument inputs to the function
@@ -94,7 +108,7 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 end
 
 
@@ -128,8 +142,8 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 end
@@ -183,7 +197,7 @@ area = abs(A); % unsigned area
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if flag_do_plots
-    figure(fig_num)
+    figure(figNum)
     clf;
     hold on
     

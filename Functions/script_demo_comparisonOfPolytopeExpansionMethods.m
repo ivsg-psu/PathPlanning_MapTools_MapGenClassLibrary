@@ -1,11 +1,20 @@
 % script_test_fcn_MapGen_polytopesExpandEvenlyForConcave
 % Tests: fcn_MapGen_polytopesExpandEvenlyForConcave
 
-%
 % REVISION HISTORY:
-%§
+%
 % 2024_02_05, Steve Harnett
-% -- first write of script
+% - first write of script
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
+
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
 
 % Prep the workspace
 close all;
@@ -14,11 +23,11 @@ close all;
 
 %%%%%
 % Fill in one polytope and plot it
-fig_num = 1;
+figNum = 1;
 
 if 1==1
     rng(1);
-    polytopes = fcn_MapGen_polytopeGenerateOneRandomPoly(fig_num);
+    polytopes = fcn_MapGen_polytopeGenerateOneRandomPoly(figNum);
 
 else
     % concave polytope
@@ -33,7 +42,7 @@ else
         1.0000    0.5217
         ];
 
-    polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes,fig_num);
+    polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes,figNum);
 end
 % fcn_MapGen_plotPolytopes(polytopes,1,'r',2);
 % Set parameters
@@ -64,7 +73,7 @@ for ith_poly = 1:size(polytopes,2) % check each obstacle
     exp_polytopes(ith_poly).vertices = centroid + my_scale*(vertices-centroid);
 
     % fill in other fields from the vertices field
-    exp_polytopes(ith_poly) = fcn_MapGen_polytopesFillFieldsFromVertices(exp_polytopes(ith_poly),1,fig_num);
+    exp_polytopes(ith_poly) = fcn_MapGen_polytopesFillFieldsFromVertices(exp_polytopes(ith_poly),1,figNum);
 
 end
 hold on; box on;
@@ -89,7 +98,7 @@ end
 
 %%%%
 % What if we use a concave expansion function?
-exp_polytopes=fcn_MapGen_polytopesExpandEvenlyForConcave(polytopes,exp_dist, fig_num);
+exp_polytopes=fcn_MapGen_polytopesExpandEvenlyForConcave(polytopes,exp_dist, figNum);
 
 % Notice now how all the walls are pushed out evenly
 

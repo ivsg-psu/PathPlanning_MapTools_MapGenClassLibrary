@@ -1,12 +1,23 @@
 % script_demo_compare_random_normal_to_halton.m
 % looks at various polytope field statistics for maps generated from Halton set
 % compared to maps generated from random normal set
-%
+
 % REVISION HISTORY:
+% 
 % 2022_03_09
-% -- first written by S. Harnett
-% 2025_11_06 - S. Brennan
+% - first written by S. Harnett
+% 
+% 2025_11_06 by Sean Brennan, sbrennan@psu.edu
 % - removed command to clear workspace (unnecessary)
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
+
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
 
 
 close all;

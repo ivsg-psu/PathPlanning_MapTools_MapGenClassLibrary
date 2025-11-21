@@ -6,7 +6,7 @@ function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(...
 %
 % FORMAT:
 %     unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(...
-%     pre_shrink_polytopes,polytopes,des_gap_size, (fig_num))
+%     pre_shrink_polytopes,polytopes,des_gap_size, (figNum))
 %
 % INPUTS:
 %     pre_shrink_polytopes - the fully tiled field
@@ -15,7 +15,7 @@ function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(...
 %
 %     (optional inputs)
 %
-%      fig_num: a figure number to plot results. If set to -1, skips any
+%      figNum: a figure number to plot results. If set to -1, skips any
 %      input checking or debugging, no figures will be generated, and sets
 %      up code to maximize speed. As well, if given, this forces the
 %      variable types to be displayed as output and as well makes the input
@@ -44,22 +44,32 @@ function unocc_ests = fcn_MapGen_polytopesPredictUnoccupancyRatio(...
 % Questions or comments? contact sjh6473@psu.edu
 
 % REVISION HISTORY:
-% 2022_01_17
-% -- first written by Steve Harnett
-% 2025_04_25 by Sean Brennan
-% -- added global debugging options
-% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-% 2025_07_17 by Sean Brennan
-% -- standardized Debugging and Input checks area, Inputs area
-% -- made codes use MAX_NARGIN definition at top of code, narginchk
-% -- made plotting flag_do_plots and code consistent across all functions
+% 
+% 2022_01_17 by Sean Brennan, sbrennan@psu.edu
+% - first written by Steve Harnett
+% 
+% 2025_04_25 by Sean Brennan, sbrennan@psu.edu
+% - added global debugging options
+% - switched input checking to fcn_DebugTools_checkInputsToFunctions
+% 
+% 2025_07_17 by Sean Brennan, sbrennan@psu.edu
+% - standardized Debugging and Input checks area, Inputs area
+% - made codes use MAX_NARGIN definition at top of code, narginchk
+% - made plotting flag_do_plots and code consistent across all functions
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
 
-% TO DO
-% -- none
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 4; % The largest Number of argument inputs to the function
@@ -85,7 +95,7 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 end
 
 
@@ -116,8 +126,8 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 end
@@ -327,7 +337,7 @@ unocc_ests.L_unocc_est_d_eff4 = 1 - N_int/1000*2*poly_size_stats.d_eff_avg_eval_
 
 
 if flag_do_plots
-    figure(fig_num)
+    figure(figNum)
     clf;
 
 end % Ends the flag_do_plot if statement

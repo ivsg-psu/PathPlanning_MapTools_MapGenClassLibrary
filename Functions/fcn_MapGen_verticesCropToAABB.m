@@ -15,7 +15,7 @@ function [croppedVertices] = ...
 %     vertices, ...
 %     interiorPoint,...
 %     AABB,...
-%    (fig_num) ...
+%    (figNum) ...
 %    )
 %
 % INPUTS:
@@ -32,7 +32,7 @@ function [croppedVertices] = ...
 %
 %     (optional inputs)
 %
-%      fig_num: a figure number to plot results. If set to -1, skips any
+%      figNum: a figure number to plot results. If set to -1, skips any
 %      input checking or debugging, no figures will be generated, and sets
 %      up code to maximize speed. As well, if given, this forces the
 %      variable types to be displayed as output and as well makes the input
@@ -63,32 +63,42 @@ function [croppedVertices] = ...
 %
 % REVISION HISTORY:
 %
-% 2021_07_11 by Sean Brennan
-% -- first write of function
-% 2021_07_30 by Sean Brennan
-% -- fixed errors due to corners being omitted
-% 2025_04_25 by Sean Brennan
-% -- added global debugging options
-% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-% 2025_07_10 by Sean Brennan
-% -- changed fcn_MapGen_findIntersectionOfSegments to use
-% fcn_Path_findSensorHitOnWall instead, as the Path function is much more
-% tested/debugged and regularly updated
-% -- renamed variables for clarity
-% -- improved plotting
-% 2025_07_17 by Sean Brennan
-% -- standardized Debugging and Input checks area, Inputs area
-% -- made codes use MAX_NARGIN definition at top of code, narginchk
-% -- made plotting flag_do_plots and code consistent across all functions
+% 2021_07_11 by Sean Brennan, sbrennan@psu.edu
+% - first write of function
+% 
+% 2021_07_30 by Sean Brennan, sbrennan@psu.edu
+% - fixed errors due to corners being omitted
+% 
+% 2025_04_25 by Sean Brennan, sbrennan@psu.edu
+% - added global debugging options
+% - switched input checking to fcn_DebugTools_checkInputsToFunctions
+% 
+% 2025_07_10 by Sean Brennan, sbrennan@psu.edu
+% - changed fcn_MapGen_findIntersectionOfSegments to use
+%   % fcn_Path_findSensorHitOnWall instead, as the Path function is better
+%   % tested/debugged and regularly updated
+% - renamed variables for clarity
+% - improved plotting
+% 
+% 2025_07_17 by Sean Brennan, sbrennan@psu.edu
+% - standardized Debugging and Input checks area, Inputs area
+% - made codes use MAX_NARGIN definition at top of code, narginchk
+% - made plotting flag_do_plots and code consistent across all functions
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
 
-% TO DO:
-%
-% -- allow user to enter the allowable range (hard-coded now to 0 to 1)
-% -- check that interior point is actually inside vertices!
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - allow user to enter the allowable range (hard-coded now to 0 to 1)
+% - check that interior point is actually inside vertices!
+
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 4; % The largest Number of argument inputs to the function
@@ -114,7 +124,7 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; 
+    debug_figNum = 999978; 
 end
 
 
@@ -154,8 +164,8 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 end
@@ -182,7 +192,7 @@ walls = fcn_MapGen_AABBConvertToWalls(AABB, -1);
 
 % Open the figure if doing debugging
 if flag_do_debug
-    figure(debug_fig_num);
+    figure(debug_figNum);
     clf;
     hold on;
 
@@ -210,7 +220,7 @@ interiorPoint = ...
 
 if flag_do_debug
     % Plot the new interior point
-    figure(debug_fig_num);
+    figure(debug_figNum);
     plot(interiorPoint(:,1),interiorPoint(:,2),'ro');
 
 end
@@ -230,7 +240,7 @@ if any(isinf(vertices(:,1)))
 
     if flag_do_debug
         % Plot the snap points
-        figure(debug_fig_num);
+        figure(debug_figNum);
         plot(pointBeforeInf(:,1),pointBeforeInf(:,2),'g.','MarkerSize',30);
         plot(pointAfterInf(:,1),pointAfterInf(:,2),'r.','MarkerSize',30);
     end
@@ -250,7 +260,7 @@ end
 
 if flag_do_debug
     % Plot the vertices_no_infinite as a vertex loop
-    figure(debug_fig_num);
+    figure(debug_figNum);
     verticesLooped = [vertices_no_infinite; vertices_no_infinite(1,:)];
     plot(verticesLooped(:,1),verticesLooped(:,2),'c.-','MarkerSize',10);
 end
@@ -263,7 +273,7 @@ end
     fcn_INTERNAL_findAllPoints(vertices_no_infinite, walls);
 
 if flag_do_debug
-    figure(debug_fig_num);
+    figure(debug_figNum);
     % Plot the all_points locations
     plot(all_points(:,1),all_points(:,2),'r.-','MarkerSize',30);
 end
@@ -294,7 +304,7 @@ else
     projected_points = unique(round(projected_points_raw,6),'rows','stable');
 
     if flag_do_debug
-        figure(debug_fig_num);
+        figure(debug_figNum);
         % Plot the projected_points locations
         plot(projected_points(:,1),projected_points(:,2),'go-');
     end
@@ -338,7 +348,7 @@ end % Ends if statement to check if all points are enclosed
 
 
 if flag_do_plots
-    figure(fig_num);
+    figure(figNum);
     hold on;
 
     % Plot the input interiorPoint
@@ -426,7 +436,7 @@ for ith_point = 1:length(start_vertices(:,1))
         (1), ...                 % (flag_search_return_type) -- 1 means ALL hits of any results,
         (0), ...                 % (flag_search_range_type)  -- 0 means only if overlapping wall/sensor, ...
         ([]),...                 % (tolerance) -- default is eps * 1000,
-        (-1));                   % (fig_num) -- -1 means to use "fast mode")
+        (-1));                   % (figNum) -- -1 means to use "fast mode")
 
     if ~isnan(distance)
         all_points = [all_points; location]; %#ok<AGROW>

@@ -3,12 +3,23 @@
 % to generate data and compare commanded gap size and observed gap size
 
 % REVISION HISTORY:
-% 2022_01_17
-% -- first written by S. Harnett using
-% script_test_fcn_MapGen_polytopesShrinkToRadius as a template
-% 2025_04_28
-% -- renamed from script_test_* by S. Harnett
-% -- see script_test_* for single test case
+% 2022_01_17 by Sean Brennan, sbrennan@psu.edu
+% - first written by S. Harnett using
+%   % script_test_fcn_MapGen_polytopesShrinkToRadius as a template
+% 
+% 2025_04_28 by Sean Brennan, sbrennan@psu.edu
+% - renamed from script_test_* by S. Harnett
+% - see script_test_* for single test case
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
+
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
 
 close all;
 
@@ -26,9 +37,9 @@ mapStretchs = [1 1];
     (-1));
 
 
-fig_num = 1;
+figNum = 1;
 bounding_box = [0,0, 1,1];
-trim_polytopes = fcn_MapGen_polytopesDeleteByAABB(polytopes,bounding_box,fig_num);
+trim_polytopes = fcn_MapGen_polytopesDeleteByAABB(polytopes,bounding_box,figNum);
 pre_shrink_stats = fcn_MapGen_statsPolytopes(trim_polytopes, -1);
 R_bar_initial = pre_shrink_stats.average_max_radius;
 des_gap_size_all = [];
@@ -38,9 +49,9 @@ rho_all = [];
 % loop through gap sizes from rather small to quite large
 % The following code is VERY slow - uncomment to see statistics in error
 % using the shink-from-edges approach.
-for i = linspace(0.001,0.08,5)
-    fig_num = 2;
-    des_gap_size = i;
+for ith_size = linspace(0.001,0.08,5)
+    figNum = 2;
+    des_gap_size = ith_size;
     shrunk_polytopes1=...
         fcn_MapGen_polytopesShrinkToGapSize(...
         trim_polytopes,des_gap_size, -1);

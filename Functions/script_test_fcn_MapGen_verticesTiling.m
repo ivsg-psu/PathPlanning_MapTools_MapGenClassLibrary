@@ -2,10 +2,22 @@
 % Tests function: fcn_MapGen_verticesTiling
 
 % REVISION HISTORY:
-% 2023_02_24
-% -- first written by S. Brennan
-% 2025_07_11 - S. Brennan, sbrennan@psu.edu
-% -- updated script testing to standard form
+% 
+% 2023_02_24 by Sean Brennan, sbrennan@psu.edu
+% - first written by S. Brennan
+% 
+% 2025_07_11 by Sean Brennan, sbrennan@psu.edu
+% - updated script testing to standard form
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
+
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
 
 %% Set up the workspace
 close all
@@ -29,10 +41,10 @@ close all;
 fprintf(1,'Figure: 1XXXXXX: DEMO cases\n');
 
 %% DEMO case: repeating set of numbers with tileDepth of 1
-fig_num = 10001;
+figNum = 10001;
 titleString = sprintf('DEMO case: repeating set of numbers with tileDepth of 1');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 Npoints = 20;
 tileDepth = 1;
@@ -40,7 +52,7 @@ AABB = [0 0 2 2];
 inputPoints = 2*rand(Npoints,2);
 
 % Call the function
-[tiledPoints] = fcn_MapGen_verticesTiling(inputPoints, tileDepth, AABB, (fig_num));
+[tiledPoints] = fcn_MapGen_verticesTiling(inputPoints, tileDepth, AABB, (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -56,13 +68,13 @@ assert(length(tiledPoints(:,1))==Npoints*Multiplier); % Does it have right numbe
 % (do this later)
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
  
 %% DEMO case: points outside AABB - will tile them but they are shifted
-fig_num = 10002;
+figNum = 10002;
 titleString = sprintf('DEMO case: points outside AABB - will tile them but they are shifted');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 Npoints = 200;
 tileDepth = 1;
@@ -70,7 +82,7 @@ AABB = [0 0 2 2];
 inputPoints = 0.5*randn(Npoints,2)+[7,0] + 1;
 
 % Call the function
-[tiledPoints] = fcn_MapGen_verticesTiling(inputPoints, tileDepth, AABB, (fig_num));
+[tiledPoints] = fcn_MapGen_verticesTiling(inputPoints, tileDepth, AABB, (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -86,13 +98,13 @@ assert(length(tiledPoints(:,1))==Npoints*Multiplier); % Does it have right numbe
 % (do this later)
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% DEMO case: AABB bigger than points pads points
-fig_num = 10003;
+figNum = 10003;
 titleString = sprintf('DEMO case: AABB bigger than points pads points');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 Npoints = 200;
 tileDepth = 1;
@@ -100,7 +112,7 @@ AABB = [0 0 5 5];
 inputPoints = 0.5*randn(Npoints,2)+1;
 
 % Call the function
-[tiledPoints] = fcn_MapGen_verticesTiling(inputPoints, tileDepth, AABB, (fig_num));
+[tiledPoints] = fcn_MapGen_verticesTiling(inputPoints, tileDepth, AABB, (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -116,13 +128,13 @@ assert(length(tiledPoints(:,1))==Npoints*Multiplier); % Does it have right numbe
 % (do this later)
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% DEMO case: AABB shifted will still tile points
-fig_num = 10004;
+figNum = 10004;
 titleString = sprintf('DEMO case: AABB shifted will still tile points');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 Npoints = 200;
 tileDepth = 1;
@@ -130,7 +142,7 @@ AABB = [0 0 2 2]- 7;
 inputPoints = 0.5*randn(Npoints,2) + 1;
 
 % Call the function
-[tiledPoints] = fcn_MapGen_verticesTiling(inputPoints, tileDepth, AABB, (fig_num));
+[tiledPoints] = fcn_MapGen_verticesTiling(inputPoints, tileDepth, AABB, (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -146,13 +158,13 @@ assert(length(tiledPoints(:,1))==Npoints*Multiplier); % Does it have right numbe
 % (do this later)
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% DEMO case: repeating set of numbers with tileDepth of 2
-fig_num = 10005;
+figNum = 10005;
 titleString = sprintf('DEMO case: repeating set of numbers with tileDepth of 1');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 Npoints = 20;
 tileDepth = 2;
@@ -160,7 +172,7 @@ AABB = [0 0 2 2];
 inputPoints = 2*rand(Npoints,2);
 
 % Call the function
-[tiledPoints] = fcn_MapGen_verticesTiling(inputPoints, tileDepth, AABB, (fig_num));
+[tiledPoints] = fcn_MapGen_verticesTiling(inputPoints, tileDepth, AABB, (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -176,14 +188,14 @@ assert(length(tiledPoints(:,1))==Npoints*Multiplier); % Does it have right numbe
 % (do this later)
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% DEMO case: repeating set of numbers with tileDepth of 5
-fig_num = 10006;
+figNum = 10006;
 titleString = sprintf('DEMO case: repeating set of numbers with tileDepth of 5');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 Npoints = 20;
 tileDepth = 5;
@@ -191,7 +203,7 @@ AABB = [0 0 2 2];
 inputPoints = 2*rand(Npoints,2);
 
 % Call the function
-[tiledPoints] = fcn_MapGen_verticesTiling(inputPoints, tileDepth, AABB, (fig_num));
+[tiledPoints] = fcn_MapGen_verticesTiling(inputPoints, tileDepth, AABB, (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -207,7 +219,7 @@ assert(length(tiledPoints(:,1))==Npoints*Multiplier); % Does it have right numbe
 % (do this later)
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% Test cases start here. These are very simple, usually trivial
@@ -230,10 +242,10 @@ close all;
 fprintf(1,'Figure: 2XXXXXX: TEST mode cases\n');
 % 
 % %% TEST case: simple crossing at origin
-% fig_num = 20001;
+% figNum = 20001;
 % titleString = sprintf('TEST case: simple crossing at origin');
-% fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-% figure(fig_num); clf;
+% fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+% figure(figNum); clf;
 
 
 %% Fast Mode Tests
@@ -255,9 +267,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: FAST mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: FAST mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: FAST mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 Npoints = 20;
 tileDepth = 1;
@@ -280,13 +292,13 @@ assert(length(tiledPoints(:,1))==Npoints*Multiplier); % Does it have right numbe
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: FAST mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: FAST mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 Npoints = 20;
 tileDepth = 1;
@@ -309,14 +321,14 @@ assert(length(tiledPoints(:,1))==Npoints*Multiplier); % Does it have right numbe
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: FAST mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: FAST mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 Npoints = 20;
 tileDepth = 1;
@@ -343,7 +355,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -359,7 +371,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases

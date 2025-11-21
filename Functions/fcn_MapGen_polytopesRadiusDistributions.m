@@ -13,7 +13,7 @@ function poly_size_stats = fcn_MapGen_polytopesRadiusDistributions(polytopes, va
 % http://gvsets.ndia-mich.org/documents/AAIR/2023/2%2010PM%20Determining%20a%20Direction%20and%20Position%20Agnostic%20Occupancy%20Probability%20and%20Occupancy%20Ration%20from%20Maps.pdf
 %
 % FORMAT:
-% poly_size_stats = fcn_MapGen_polytopesRadiusDistributions(polytopes, (fig_num))
+% poly_size_stats = fcn_MapGen_polytopesRadiusDistributions(polytopes, (figNum))
 %
 % INPUTS:
 %
@@ -21,7 +21,7 @@ function poly_size_stats = fcn_MapGen_polytopesRadiusDistributions(polytopes, va
 %
 %     (optional inputs)
 %
-%      fig_num: a figure number to plot results. If set to -1, skips any
+%      figNum: a figure number to plot results. If set to -1, skips any
 %      input checking or debugging, no figures will be generated, and sets
 %      up code to maximize speed. As well, if given, this forces the
 %      variable types to be displayed as output and as well makes the input
@@ -42,22 +42,32 @@ function poly_size_stats = fcn_MapGen_polytopesRadiusDistributions(polytopes, va
 %
 % This function was written in 07_2022 by Steve Harnett
 % Questions or comments? sjharnett@psu.edu
-%
-% Revision History:
-% 2025_04_25 by Sean Brennan
-% -- added global debugging options
-% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-% 2025_07_17 by Sean Brennan
-% -- standardized Debugging and Input checks area, Inputs area
-% -- made codes use MAX_NARGIN definition at top of code, narginchk
-% -- made plotting flag_do_plots and code consistent across all functions
 
-% TO DO
-% -- plotting needs to be consolodated to one part of the function
+% REVISION HISTORY:
+% 
+% 2025_04_25 by Sean Brennan, sbrennan@psu.edu
+% - added global debugging options
+% - switched input checking to fcn_DebugTools_checkInputsToFunctions
+% 
+% 2025_07_17 by Sean Brennan, sbrennan@psu.edu
+% - standardized Debugging and Input checks area, Inputs area
+% - made codes use MAX_NARGIN definition at top of code, narginchk
+% - made plotting flag_do_plots and code consistent across all functions
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
+
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - plotting needs to be consolodated to one part of the function
+
+
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 2; % The largest Number of argument inputs to the function
@@ -83,7 +93,7 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 end
 
 
@@ -114,8 +124,8 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 end
@@ -451,7 +461,7 @@ end
 
 
 if flag_do_plots
-    figure(fig_num)
+    figure(figNum)
     clf;
 
     

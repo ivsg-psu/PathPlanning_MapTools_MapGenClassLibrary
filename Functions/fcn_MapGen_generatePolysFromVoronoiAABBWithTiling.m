@@ -16,7 +16,7 @@ function [polytopes, allVertices] = fcn_MapGen_generatePolysFromVoronoiAABBWithT
 %    seedPoints, ...
 %    AABB, ...
 %    stretch, ...
-%    (fig_num) ...
+%    (figNum) ...
 %    )
 %
 % INPUTS:
@@ -33,7 +33,7 @@ function [polytopes, allVertices] = fcn_MapGen_generatePolysFromVoronoiAABBWithT
 %
 %     (optional inputs)
 %
-%      fig_num: a figure number to plot results. If set to -1, skips any
+%      figNum: a figure number to plot results. If set to -1, skips any
 %      input checking or debugging, no figures will be generated, and sets
 %      up code to maximize speed. As well, if given, this forces the
 %      variable types to be displayed as output and as well makes the input
@@ -64,31 +64,43 @@ function [polytopes, allVertices] = fcn_MapGen_generatePolysFromVoronoiAABBWithT
 % This function was written on 2021_07_02 by Sean Brennan
 % Questions or comments? contact sbrennan@psu.edu
 
-%
+
 % REVISION HISTORY:
 %
-% 2021_07_02 by Sean Brennan
-% -- first write of function
-% 2021_07_30 by Sean Brennan
-% -- fixed errors due to corners being omitted
-% 2025_04_25 by Sean Brennan
-% -- added global debugging options
-% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-% -- fixed docstrings to correct argument listing
-% 2025_07_15 by Sean Brennan
-% -- cleaned variable naming to remove underscores
-% -- turned on fast mode for subfunctions
-% 2025_07_17 by Sean Brennan
-% -- standardized Debugging and Input checks area, Inputs area
-% -- made codes use MAX_NARGIN definition at top of code, narginchk
-% -- made plotting flag_do_plots and code consistent across all functions
+% 2021_07_02 by Sean Brennan, sbrennan@psu.edu
+% - first write of function
+% 
+% 2021_07_30 by Sean Brennan, sbrennan@psu.edu
+% - fixed errors due to corners being omitted
+% 
+% 2025_04_25 by Sean Brennan, sbrennan@psu.edu
+% - added global debugging options
+% - switched input checking to fcn_DebugTools_checkInputsToFunctions
+% - fixed docstrings to correct argument listing
+% 
+% 2025_07_15 by Sean Brennan, sbrennan@psu.edu
+% - cleaned variable naming to remove underscores
+% - turned on fast mode for subfunctions
+% 
+% 2025_07_17 by Sean Brennan, sbrennan@psu.edu
+% - standardized Debugging and Input checks area, Inputs area
+% - made codes use MAX_NARGIN definition at top of code, narginchk
+% - made plotting flag_do_plots and code consistent across all functions
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
 
-% TO DO
-% -- none
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
+
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 4; % The largest Number of argument inputs to the function
@@ -114,7 +126,7 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 end
 
 
@@ -154,8 +166,8 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 end
@@ -270,7 +282,7 @@ for ith_poly = 1:length(seedPoints)
         plotFormat.LineStyle = '-';
         plotFormat.Color = [1 0 0];
         fillFormat = [];
-        h_plot = fcn_MapGen_plotPolytopes(polytopes(ith_poly), (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+        h_plot = fcn_MapGen_plotPolytopes(polytopes(ith_poly), (plotFormat),(fillFormat),(figNum)); %#ok<NASGU>
         title(sprintf('Polytope: %.0d',ith_poly));
 
         % Is it the last poly? Plot it in blue
@@ -281,7 +293,7 @@ for ith_poly = 1:length(seedPoints)
             plotFormat.LineStyle = '-';
             plotFormat.Color = [0 0 1];
             fillFormat = [];
-            h_plot = fcn_MapGen_plotPolytopes(polytopes(ith_poly), (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+            h_plot = fcn_MapGen_plotPolytopes(polytopes(ith_poly), (plotFormat),(fillFormat),(figNum)); %#ok<NASGU>
 
         end
 
@@ -332,7 +344,7 @@ polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes, [], -1);
 
 if flag_do_plots
 
-    figure(fig_num);
+    figure(figNum);
     clf;
     hold on
     scale = max(AABB,[],'all') - min(AABB,[],'all');
@@ -340,13 +352,13 @@ if flag_do_plots
     axis(new_axis);
 
     % plot the polytopes    
-    % fcn_MapGen_OLD_plotPolytopes(polytopes,fig_num,'b',2);
+    % fcn_MapGen_OLD_plotPolytopes(polytopes,figNum,'b',2);
     plotFormat.LineWidth = 2;
     plotFormat.MarkerSize = 10;
     plotFormat.LineStyle = '-';
     plotFormat.Color = [0 0 1];
     fillFormat = [];
-    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(figNum)); %#ok<NASGU>
 
     % plot all vertices
     plot(allVertices(:,2),allVertices(:,3),'-', 'Color',0.8*[1 1 1],'Linewidth',1, 'MarkerSize',20, 'DisplayName','vertices');
@@ -407,8 +419,8 @@ if flag_do_plots
     %% Show a detailed step-by-step process behind construction of obstacle map
     if 1==0
         % using fcn_MapGen_generatePolysFromVoronoiAABB
-        fig_num = 1010;
-        figure(fig_num);
+        figNum = 1010;
+        figure(figNum);
         clf;
 
         % Calculate the scale
@@ -500,7 +512,7 @@ if flag_do_plots
         plotFormat.LineStyle = '-';
         plotFormat.Color = [0 0 1];
         fillFormat = [];
-        h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+        h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(figNum)); %#ok<NASGU>
 
         hold on;
 
@@ -522,7 +534,7 @@ if flag_do_plots
         plotFormat.LineStyle = '-';
         plotFormat.Color = [0 0 1];
         fillFormat = [];
-        h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+        h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat),(fillFormat),(figNum)); %#ok<NASGU>
 
 
         hold on;
@@ -537,35 +549,35 @@ if flag_do_plots
 
         shifted_left_up = fcn_INTERNAL_shift_polys(polytopes,-xscale,yscale);
         % fcn_MapGen_OLD_plotPolytopes(shifted_left_up,gca,'-',2);
-        h_plot = fcn_MapGen_plotPolytopes(shifted_left_up, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+        h_plot = fcn_MapGen_plotPolytopes(shifted_left_up, (plotFormat),(fillFormat),(figNum)); %#ok<NASGU>
 
         shifted_left = fcn_INTERNAL_shift_polys(polytopes,-xscale,0);
         % fcn_MapGen_OLD_plotPolytopes(shifted_left,gca,'-',2);
-        h_plot = fcn_MapGen_plotPolytopes(shifted_left, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+        h_plot = fcn_MapGen_plotPolytopes(shifted_left, (plotFormat),(fillFormat),(figNum)); %#ok<NASGU>
 
         shifted_left_down = fcn_INTERNAL_shift_polys(polytopes,-xscale,-yscale);
         % fcn_MapGen_OLD_plotPolytopes(shifted_left_down,gca,'-',2);
-        h_plot = fcn_MapGen_plotPolytopes(shifted_left_down, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+        h_plot = fcn_MapGen_plotPolytopes(shifted_left_down, (plotFormat),(fillFormat),(figNum)); %#ok<NASGU>
 
         shifted_up = fcn_INTERNAL_shift_polys(polytopes,0,yscale);
         % fcn_MapGen_OLD_plotPolytopes(shifted_up,gca,'-',2);
-        h_plot = fcn_MapGen_plotPolytopes(shifted_up, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+        h_plot = fcn_MapGen_plotPolytopes(shifted_up, (plotFormat),(fillFormat),(figNum)); %#ok<NASGU>
 
         shifted_down = fcn_INTERNAL_shift_polys(polytopes,0,-yscale);
         % fcn_MapGen_OLD_plotPolytopes(shifted_down,gca,'-',2);
-        h_plot = fcn_MapGen_plotPolytopes(shifted_down, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+        h_plot = fcn_MapGen_plotPolytopes(shifted_down, (plotFormat),(fillFormat),(figNum)); %#ok<NASGU>
 
         shifted_right_up = fcn_INTERNAL_shift_polys(polytopes,xscale,yscale);
         % fcn_MapGen_OLD_plotPolytopes(shifted_right_up,gca,'-',2);
-        h_plot = fcn_MapGen_plotPolytopes(shifted_right_up, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+        h_plot = fcn_MapGen_plotPolytopes(shifted_right_up, (plotFormat),(fillFormat),(figNum)); %#ok<NASGU>
 
         shifted_right = fcn_INTERNAL_shift_polys(polytopes,xscale,0);
         % fcn_MapGen_OLD_plotPolytopes(shifted_right,gca,'-',2);
-        h_plot = fcn_MapGen_plotPolytopes(shifted_right, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+        h_plot = fcn_MapGen_plotPolytopes(shifted_right, (plotFormat),(fillFormat),(figNum)); %#ok<NASGU>
 
         shifted_right_down = fcn_INTERNAL_shift_polys(polytopes,xscale,-yscale);
         % fcn_MapGen_OLD_plotPolytopes(shifted_right_down,gca,'-',2);
-        h_plot = fcn_MapGen_plotPolytopes(shifted_right_down, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+        h_plot = fcn_MapGen_plotPolytopes(shifted_right_down, (plotFormat),(fillFormat),(figNum)); %#ok<NASGU>
 
         axis(new_axis);
         title('Polytopes can tile');
@@ -591,35 +603,35 @@ if flag_do_plots
 
         shifted_left_up = fcn_INTERNAL_shift_polys(shrunk_polytopes,-xscale,yscale);
         % fcn_MapGen_OLD_plotPolytopes(shifted_left_up,gca,'b-',2);
-        h_plot = fcn_MapGen_plotPolytopes(shifted_left_up, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+        h_plot = fcn_MapGen_plotPolytopes(shifted_left_up, (plotFormat),(fillFormat),(figNum)); %#ok<NASGU>
 
         shifted_left = fcn_INTERNAL_shift_polys(shrunk_polytopes,-xscale,0);
         % fcn_MapGen_OLD_plotPolytopes(shifted_left,gca,'b-',2);
-        h_plot = fcn_MapGen_plotPolytopes(shifted_left, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+        h_plot = fcn_MapGen_plotPolytopes(shifted_left, (plotFormat),(fillFormat),(figNum)); %#ok<NASGU>
 
         shifted_left_down = fcn_INTERNAL_shift_polys(shrunk_polytopes,-xscale,-yscale);
         % fcn_MapGen_OLD_plotPolytopes(shifted_left_down,gca,'b-',2);
-        h_plot = fcn_MapGen_plotPolytopes(shifted_left_down, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+        h_plot = fcn_MapGen_plotPolytopes(shifted_left_down, (plotFormat),(fillFormat),(figNum)); %#ok<NASGU>
 
         shifted_up = fcn_INTERNAL_shift_polys(shrunk_polytopes,0,yscale);
         % fcn_MapGen_OLD_plotPolytopes(shifted_up,gca,'b-',2);
-        h_plot = fcn_MapGen_plotPolytopes(shifted_up, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+        h_plot = fcn_MapGen_plotPolytopes(shifted_up, (plotFormat),(fillFormat),(figNum)); %#ok<NASGU>
 
         shifted_down = fcn_INTERNAL_shift_polys(shrunk_polytopes,0,-yscale);
         % fcn_MapGen_OLD_plotPolytopes(shifted_down,gca,'b-',2);
-        h_plot = fcn_MapGen_plotPolytopes(shifted_down, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+        h_plot = fcn_MapGen_plotPolytopes(shifted_down, (plotFormat),(fillFormat),(figNum)); %#ok<NASGU>
 
         shifted_right_up = fcn_INTERNAL_shift_polys(shrunk_polytopes,xscale,yscale);
         % fcn_MapGen_OLD_plotPolytopes(shifted_right_up,gca,'b-',2);
-        h_plot = fcn_MapGen_plotPolytopes(shifted_right_up, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+        h_plot = fcn_MapGen_plotPolytopes(shifted_right_up, (plotFormat),(fillFormat),(figNum)); %#ok<NASGU>
 
         shifted_right = fcn_INTERNAL_shift_polys(shrunk_polytopes,xscale,0);
         % fcn_MapGen_OLD_plotPolytopes(shifted_right,gca,'b-',2);
-        h_plot = fcn_MapGen_plotPolytopes(shifted_right, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+        h_plot = fcn_MapGen_plotPolytopes(shifted_right, (plotFormat),(fillFormat),(figNum)); %#ok<NASGU>
 
         shifted_right_down = fcn_INTERNAL_shift_polys(shrunk_polytopes,xscale,-yscale);
         % fcn_MapGen_OLD_plotPolytopes(shifted_right_down,gca,'b-',2);
-        h_plot = fcn_MapGen_plotPolytopes(shifted_right_down, (plotFormat),(fillFormat),(fig_num)); %#ok<NASGU>
+        h_plot = fcn_MapGen_plotPolytopes(shifted_right_down, (plotFormat),(fillFormat),(figNum)); %#ok<NASGU>
 
         axis(new_axis);
         title('Shrunk from edge polytopes, with tiling');
@@ -647,8 +659,8 @@ if flag_do_plots
         points_inside = all_points(xy_indices_inside,:);
 
         % DEBUG AREA
-        tiling_fig_num = 12312;
-        figure(tiling_fig_num);
+        tiling_figNum = 12312;
+        figure(tiling_figNum);
         clf;
         hold on
 
@@ -657,7 +669,7 @@ if flag_do_plots
         axis(new_axis);
 
         % plot the polytopes
-        % fcn_MapGen_OLD_plotPolytopes(polytopes,tiling_fig_num,'b',2);
+        % fcn_MapGen_OLD_plotPolytopes(polytopes,tiling_figNum,'b',2);
         plotFormat.LineWidth = 2;
         plotFormat.MarkerSize = 10;
         plotFormat.LineStyle = '-';

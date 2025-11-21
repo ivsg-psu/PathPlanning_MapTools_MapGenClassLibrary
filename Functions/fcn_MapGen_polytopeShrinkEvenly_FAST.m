@@ -23,7 +23,7 @@ function [shrunkPolytope, newVertices, newProjectionVectors, cutDistance] = ...
 %     fcn_MapGen_polytopeShrinkEvenly_FAST(...
 %     unshrunkPolytope,...
 %     edgeCut,...
-%     (fig_num))
+%     (figNum))
 %
 % OR:
 %
@@ -32,7 +32,7 @@ function [shrunkPolytope, newVertices, newProjectionVectors, cutDistance] = ...
 %     unshrunkPolytope,...
 %     edgeCut,...
 %     (precalcVertices, precalcProjectionVectors, precalcCutDistance),...
-%     (fig_num))
+%     (figNum))
 %
 % INPUTS:
 %
@@ -45,12 +45,12 @@ function [shrunkPolytope, newVertices, newProjectionVectors, cutDistance] = ...
 %
 %    [precalcVertices, precalcProjectionVectors, precalcCutDistance] :
 %    outputs from the function:
-%    fcn_MapGen_polytopeFindVertexSkeleton(vertices,fig_num) 
+%    fcn_MapGen_polytopeFindVertexSkeleton(vertices,figNum) 
 %    or outputs from previous calls, used to speed up code since this
 %    skeleton calculation is by far the slowest code and only needs to be
 %    calculated once per polytope.
 %
-%      fig_num: a figure number to plot results. If set to -1, skips any
+%      figNum: a figure number to plot results. If set to -1, skips any
 %      input checking or debugging, no figures will be generated, and sets
 %      up code to maximize speed. As well, if given, this forces the
 %      variable types to be displayed as output and as well makes the input
@@ -71,7 +71,7 @@ function [shrunkPolytope, newVertices, newProjectionVectors, cutDistance] = ...
 %       max_radius: distance from the mean to the farthest vertex
 %
 %    [newVertices, newProjectionVectors, cutDistance] : outputs from
-%    the function: fcn_MapGen_polytopeFindVertexSkeleton(vertices,fig_num)
+%    the function: fcn_MapGen_polytopeFindVertexSkeleton(vertices,figNum)
 %    or outputs from previous calls, used to speed up code since this
 %    skeleton calculation is by far the slowest part.
 %
@@ -89,25 +89,38 @@ function [shrunkPolytope, newVertices, newProjectionVectors, cutDistance] = ...
 % Questions or comments? sbrennan@psu.edu
 %
 
-% Revision History:
-% 2021_08_02 - S. Brennan
-% -- first write of code
-% 2022_02_13 - S.Brennan
-% -- supress MATLAB's warning about flags
-% 2023_01_15 - S.Brennan
-% -- clean up comments
-% 2025_04_25 by Sean Brennan
-% -- added global debugging options
-% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-% 2025_07_29 by Sean Brennan
-% -- added test script
+% REVISION HISTORY:
+% 
+% 2021_08_02 by Sean Brennan, sbrennan@psu.edu
+% - first write of code
+% 
+% 2022_02_13 by Sean Brennan, sbrennan@psu.edu
+% - supress MATLAB's warning about flags
+% 
+% 2023_01_15 by Sean Brennan, sbrennan@psu.edu
+% - clean up comments
+% 
+% 2025_04_25 by Sean Brennan, sbrennan@psu.edu
+% - added global debugging options
+% - switched input checking to fcn_DebugTools_checkInputsToFunctions
+% 
+% 2025_07_29 by Sean Brennan, sbrennan@psu.edu
+% - added test script
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
 
-% TO DO
-% -- none
+
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 6; % The largest Number of argument inputs to the function
@@ -133,7 +146,7 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 end
 
 
@@ -193,7 +206,7 @@ flag_do_plot = 0; % Default is no plotting
 if  (0==flag_max_speed) && ((MAX_NARGIN == nargin) || (3==nargin)) % Only create a figure if NOT maximizing speed
     temp = varargin{end}; % Last argument is always figure number
     if ~isempty(temp) % Make sure the user is not giving empty input
-        fig_num = temp;
+        figNum = temp;
         flag_do_plot = 1; % Set flag to do plotting
     end
 end
@@ -260,29 +273,29 @@ shrunkPolytope.vertices = final_vertices;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if flag_do_plot
-    figure(fig_num);
+    figure(figNum);
     grid on
     hold on
     axis equal
 
     % Plot the input unshrunkPolytope in red
-    % fcn_MapGen_plotPolytopes(unshrunkPolytope,fig_num,'r',2);
+    % fcn_MapGen_plotPolytopes(unshrunkPolytope,figNum,'r',2);
     plotFormat.LineWidth = 2;
     plotFormat.MarkerSize = 10;
     plotFormat.LineStyle = '-';
     plotFormat.Color = [1 0 0];
     fillFormat = [];
-    h_plot = fcn_MapGen_plotPolytopes(unshrunkPolytope, (plotFormat), (fillFormat), (fig_num)); 
+    h_plot = fcn_MapGen_plotPolytopes(unshrunkPolytope, (plotFormat), (fillFormat), (figNum)); 
     set(h_plot,'DisplayName','Input: unshrunkPolytope');
 
     % plot the output polytope in blue
-    % fcn_MapGen_OLD_plotPolytopes(shrunkPolytope,fig_num,'b',2);
+    % fcn_MapGen_OLD_plotPolytopes(shrunkPolytope,figNum,'b',2);
     plotFormat.LineWidth = 2;
     plotFormat.MarkerSize = 10;
     plotFormat.LineStyle = '-';
     plotFormat.Color = [0 0 1];
     fillFormat = [];
-    h_plot = fcn_MapGen_plotPolytopes(shrunkPolytope, (plotFormat), (fillFormat), (fig_num)); 
+    h_plot = fcn_MapGen_plotPolytopes(shrunkPolytope, (plotFormat), (fillFormat), (figNum)); 
     set(h_plot,'DisplayName','Output: shrunkPolytope');
 
     legend('Interpreter','none','Location','best');

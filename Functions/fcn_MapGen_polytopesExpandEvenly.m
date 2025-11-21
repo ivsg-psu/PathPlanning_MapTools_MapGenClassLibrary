@@ -10,7 +10,7 @@ function expandedPolytopes  = fcn_MapGen_polytopesExpandEvenly( polytopes, expan
 %
 % FORMAT:
 %
-%     expandedPolytopes  = fcn_MapGen_polytopesExpandEvenly( polytopes, expansionDistance,(fig_num))
+%     expandedPolytopes  = fcn_MapGen_polytopesExpandEvenly( polytopes, expansionDistance,(figNum))
 %
 % INPUTS:
 %
@@ -20,9 +20,8 @@ function expandedPolytopes  = fcn_MapGen_polytopesExpandEvenly( polytopes, expan
 %
 %     expansionDistance: distance to expand the obstacle
 %
-%     (optional inputs)
-%
-%     fig_num: a figure number to plot results. If set to -1, skips any
+%     (optional inpu
+%     figNum: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
 %     up code to maximize speed. As well, if given, this forces the
 %     variable types to be displayed as output and as well makes the input
@@ -47,42 +46,58 @@ function expandedPolytopes  = fcn_MapGen_polytopesExpandEvenly( polytopes, expan
 % This function was written on 2018_11_17, Adjusted example code on 2021_04_28 by Seth Tau, Rebased on 2021_06_26 by S. Brennan by Seth Tau
 % Questions or comments? contact sbrennan@psu.edu and sat5340@psu.edu
 
+%ts)
 %
 % REVISION HISTORY:
 %
 % 2018_11_17, Seth Tau
-% -- first write of script
+% - first write of script
+% 
 % 2021_04_28, Seth Tau
-% -- Adjusted example code ,
-% 2021_06_26 S. Brennan
-% -- Rebased code
-% -- Rewrote for clarity
-% 2021_07_06 S. Brennan
-% -- Vectorized plotting into array structure, to better support legends
-% (rather than plotting all polytopes individually)
+% - Adjusted example code ,
+% 
+% 2021_06_26 by Sean Brennan, sbrennan@psu.edu
+% - Rebased code
+% - Rewrote for clarity
+% 
+% 2021_07_06 by Sean Brennan, sbrennan@psu.edu
+% - Vectorized plotting into array structure, to better support legends
+%   % (rather than plotting all polytopes individually)
+% 
 % 2024_02_14 S.J. Harnett
-% -- Updated docstring comment to point to fcn_MapGen_polytopesExpandEvenlyForConcave
+% - Updated docstring comment to point to fcn_MapGen_polytopesExpandEvenlyForConcave
 %    for non-convex obstacles
-% 2025_04_25 by Sean Brennan
-% -- added global debugging options
-% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-% -- fixed call to fcn_MapGen_polytopesFillFieldsFromVertices
-% 2025_07_16 by Sean Brennan
-% -- cleaned up header comments
-% -- replaced exp_dist with expansionDistance
-% -- changed plotPolytopes to new format
-% -- turned on fast mode on sub-function calls
-% 2025_07_17 by Sean Brennan
-% -- standardized Debugging and Input checks area, Inputs area
-% -- made codes use MAX_NARGIN definition at top of code, narginchk
-% -- made plotting flag_do_plots and code consistent across all functions
+% 
+% 2025_04_25 by Sean Brennan, sbrennan@psu.edu
+% - added global debugging options
+% - switched input checking to fcn_DebugTools_checkInputsToFunctions
+% - fixed call to fcn_MapGen_polytopesFillFieldsFromVertices
+% 
+% 2025_07_16 by Sean Brennan, sbrennan@psu.edu
+% - cleaned up header comments
+% - replaced exp_dist with expansionDistance
+% - changed plotPolytopes to new format
+% - turned on fast mode on sub-function calls
+% 
+% 2025_07_17 by Sean Brennan, sbrennan@psu.edu
+% - standardized Debugging and Input checks area, Inputs area
+% - made codes use MAX_NARGIN definition at top of code, narginchk
+% - made plotting flag_do_plots and code consistent across all functions
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
 
-% TO DO
-% -- none
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
+
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 3; % The largest Number of argument inputs to the function
@@ -108,7 +123,7 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 end
 
 
@@ -145,8 +160,8 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 end
@@ -199,26 +214,26 @@ end
 
 
 if flag_do_plots
-    figure(fig_num)
+    figure(figNum)
     clf;
 
     % LineWidth = 2;
-    % fcn_MapGen_OLD_plotPolytopes(polytopes,fig_num,'r-',LineWidth);
+    % fcn_MapGen_OLD_plotPolytopes(polytopes,figNum,'r-',LineWidth);
     plotFormat.LineWidth = 2;
     plotFormat.MarkerSize = 10;
     plotFormat.LineStyle = '-';
     plotFormat.Color = [1 0 0];
     fillFormat = [];
-    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat), (fillFormat), (fig_num)); 
+    h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat), (fillFormat), (figNum)); 
     set(h_plot,'DisplayName','polytopes')
 
-    % fcn_MapGen_OLD_plotPolytopes(expandedPolytopes,fig_num,'b-',LineWidth,'square');
+    % fcn_MapGen_OLD_plotPolytopes(expandedPolytopes,figNum,'b-',LineWidth,'square');
     plotFormat.LineWidth = 2;
     plotFormat.MarkerSize = 10;
     plotFormat.LineStyle = '-';
     plotFormat.Color = [0 0 1];
     fillFormat = [];
-    h_plot = fcn_MapGen_plotPolytopes(expandedPolytopes, (plotFormat), (fillFormat), (fig_num)); 
+    h_plot = fcn_MapGen_plotPolytopes(expandedPolytopes, (plotFormat), (fillFormat), (figNum)); 
     set(h_plot,'DisplayName','expandedPolytopes')
 
     legend('Original','Expanded')

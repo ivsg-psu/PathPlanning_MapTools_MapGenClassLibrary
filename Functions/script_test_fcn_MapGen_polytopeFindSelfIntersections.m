@@ -2,10 +2,22 @@
 % Tests function: fcn_MapGen_polytopeFindSelfIntersections
 
 % REVISION HISTORY:
-% 2021_08_02
-% -- first written by S. Brennan
-% 2025_07_11 - S. Brennan, sbrennan@psu.edu
-% -- updated script testing to standard form
+% 
+% 2021_08_02 by Sean Brennan, sbrennan@psu.edu
+% - first written by S. Brennan
+% 
+% 2025_07_11 by Sean Brennan, sbrennan@psu.edu
+% - updated script testing to standard form
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
+
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
 
 %% Set up the workspace
 close all
@@ -29,15 +41,15 @@ close all;
 fprintf(1,'Figure: 1XXXXXX: DEMO cases\n');
 
 %% DEMO case: self-intersection
-fig_num = 10001;
+figNum = 10001;
 titleString = sprintf('DEMO case: self-intersection');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
 
 [verticesIncludingSelfIntersections, flag_wasIntersection] = ...
-    fcn_MapGen_polytopeFindSelfIntersections(vertices, (fig_num));
+    fcn_MapGen_polytopeFindSelfIntersections(vertices, (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -67,7 +79,7 @@ assert(isequal(round(verticesIncludingSelfIntersections,4),round(...
 assert(isequal(flag_wasIntersection,1));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Test cases start here. These are very simple, usually trivial
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -89,15 +101,15 @@ close all;
 fprintf(1,'Figure: 2XXXXXX: TEST mode cases\n');
 
 %% TEST case: simple crossing at origin
-fig_num = 20001;
+figNum = 20001;
 titleString = sprintf('TEST case: simple crossing at origin');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 vertices = [-1 0; 1 0; 0 -1; 0 1; -1 0];
 
 [verticesIncludingSelfIntersections, flag_wasIntersection] = ...
-    fcn_MapGen_polytopeFindSelfIntersections(vertices, (fig_num));
+    fcn_MapGen_polytopeFindSelfIntersections(vertices, (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -127,18 +139,18 @@ assert(isequal(round(verticesIncludingSelfIntersections,4),round(...
 assert(isequal(flag_wasIntersection,1));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% TEST case: no crossings
-fig_num = 20002;
+figNum = 20002;
 titleString = sprintf('TEST case: no crossings');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 vertices = [-1 0; 0 -1; 1 0; 0 1; -1 0];
 
 [verticesIncludingSelfIntersections, flag_wasIntersection] = ...
-    fcn_MapGen_polytopeFindSelfIntersections(vertices, (fig_num));
+    fcn_MapGen_polytopeFindSelfIntersections(vertices, (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -158,18 +170,18 @@ assert(isequal(verticesIncludingSelfIntersections,vertices));
 assert(isequal(flag_wasIntersection,0));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% TEST case: touch crossing at start/end
-fig_num = 20003;
+figNum = 20003;
 titleString = sprintf('TEST case: touch crossing at start/end');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 vertices = [0 0; 1 0; 0 -1; 0 1; -1 0; 0 0];
 
 [verticesIncludingSelfIntersections, flag_wasIntersection] = ...
-    fcn_MapGen_polytopeFindSelfIntersections(vertices, (fig_num));
+    fcn_MapGen_polytopeFindSelfIntersections(vertices, (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -199,18 +211,18 @@ assert(isequal(round(verticesIncludingSelfIntersections,4),round(...
 assert(isequal(flag_wasIntersection,1));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% TEST case: Double crossing at origin
-fig_num = 20003;
+figNum = 20003;
 titleString = sprintf('TEST case: Double crossing at origin');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 vertices = [-1 0; 1 0; 1 -1; -2 2; -2 -2; 2 2; -1 0];
 
 [verticesIncludingSelfIntersections, flag_wasIntersection] = ...
-    fcn_MapGen_polytopeFindSelfIntersections(vertices, (fig_num));
+    fcn_MapGen_polytopeFindSelfIntersections(vertices, (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -245,7 +257,7 @@ assert(isequal(round(verticesIncludingSelfIntersections,4),round(...
 assert(isequal(flag_wasIntersection,1));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Fast Mode Tests
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -266,9 +278,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: FAST mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: FAST mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: FAST mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
 
@@ -302,13 +314,13 @@ assert(isequal(flag_wasIntersection,1));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: FAST mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: FAST mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
 
@@ -342,14 +354,14 @@ assert(isequal(flag_wasIntersection,1));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: FAST mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: FAST mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
 
@@ -375,7 +387,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -391,7 +403,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases

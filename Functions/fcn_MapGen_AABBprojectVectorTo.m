@@ -22,7 +22,7 @@ function [ ...
 %    fcn_MapGen_AABBprojectVectorTo( ...
 %    axisAlignedBoundingBox, ...
 %    projectionVector, ...
-%    (fig_num) ...
+%    (figNum) ...
 %    )
 %
 % INPUTS:
@@ -37,7 +37,7 @@ function [ ...
 %     snap_type: 1 - snap to closest wall, 0 (default) snap to projection
 %     from middle of AABB.
 %
-%      fig_num: a figure number to plot results. If set to -1, skips any
+%      figNum: a figure number to plot results. If set to -1, skips any
 %      input checking or debugging, no figures will be generated, and sets
 %      up code to maximize speed. As well, if given, this forces the
 %      variable types to be displayed as output and as well makes the input
@@ -62,29 +62,41 @@ function [ ...
 % This function was written on 2021_07_02 by Sean Brennan
 % Questions or comments? contact sbrennan@psu.edu
 
-%
+
 % REVISION HISTORY:
 %
-% 2021_07_02 by Sean Brennan
-% -- first write of function
-% 2021_07_14
-% -- added snap type to allow projections from center
-% 2025_04_25 by Sean Brennan
-% -- added global debugging options
-% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-% 2025_07_17 by Sean Brennan
-% -- standardized Debugging and Input checks area, Inputs area
-% -- made codes use MAX_NARGIN definition at top of code, narginchk
-% -- made plotting flag_do_plots and code consistent across all functions
-% -- changed function names to fcn_MapGen_AABBprojectVectorTo
+% 2021_07_02 by Sean Brennan, sbrennan@psu.edu
+% - first write of function
+% 
+% 2021_07_14 by Sean Brennan, sbrennan@psu.edu
+% - added snap type to allow projections from center
+% 
+% 2025_04_25 by Sean Brennan, sbrennan@psu.edu
+% - added global debugging options
+% - switched input checking to fcn_DebugTools_checkInputsToFunctions
+% 
+% 2025_07_17 by Sean Brennan, sbrennan@psu.edu
+% - standardized Debugging and Input checks area, Inputs area
+% - made codes use MAX_NARGIN definition at top of code, narginchk
+% - made plotting flag_do_plots and code consistent across all functions
+% - changed function names to fcn_MapGen_AABBprojectVectorTo
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
 
-% TO DO
-% -- need to add a test script for this specific function.
-% -- perhaps deprecate this function to fcn_MapGen_AABBsnapTo
+
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - need to add a test script for this specific function.
+% - perhaps deprecate this function to fcn_MapGen_AABBsnapTo
+% - need to deprecate internal function call
+
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 4; % The largest Number of argument inputs to the function
@@ -110,7 +122,7 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 end
 
 
@@ -156,8 +168,8 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 end
@@ -236,7 +248,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if flag_do_plots
-    figure(fig_num);
+    figure(figNum);
     clf;
     hold on;
     axis equal
@@ -311,7 +323,7 @@ function [distance,location,wall_that_was_hit] = ...
 %         wall_end,...
 %         sensor_vector_start,...
 %         sensor_vector_end,...
-%         (flag_search_type),(fig_num))
+%         (flag_search_type),(figNum))
 %
 % INPUTS:
 %
@@ -345,7 +357,7 @@ function [distance,location,wall_that_was_hit] = ...
 %            respectively, where the M rows represent all the detected
 %            intersections.
 %
-%      fig_num: a figure number to plot results. Turns debugging on.
+%      figNum: a figure number to plot results. Turns debugging on.
 %
 % OUTPUTS:
 %
@@ -367,8 +379,9 @@ function [distance,location,wall_that_was_hit] = ...
 % This function was written on 2021_06_05 by S. Brennan
 % Questions or comments? sbrennan@psu.edu
 
-% Revision history:
-%      2021_06_05
+% REVISION HISTORY:
+%      
+% 2021_06_05
 %      - wrote the code, templated from fcn_geometry_findIntersectionOfSegments
 
 
@@ -427,13 +440,13 @@ end
 
 % Does user want to show the plots?
 if 6 == nargin
-    fig_num = varargin{end};
-    figure(fig_num);
+    figNum = varargin{end};
+    figure(figNum);
     flag_do_plot = 1;
 else
     if flag_do_debug
         fig = figure;
-        fig_num = fig.Number;
+        figNum = fig.Number;
         flag_do_plot = 1;
     end
 end
@@ -612,7 +625,7 @@ end
 if flag_do_plot
     
     % Set up the figure
-    figure(fig_num);
+    figure(figNum);
     clf;
     hold on;
     axis equal;

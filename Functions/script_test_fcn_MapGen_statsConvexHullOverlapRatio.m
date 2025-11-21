@@ -1,15 +1,27 @@
 % script_test_fcn_MapGen_statsConvexHullOverlapRatio
 % Tests: fcn_MapGen_statsConvexHullOverlapRatio
 
-%
+
 % REVISION HISTORY:
 %
 % 2024_02_28 by Steve Harnett
-% -- first write of script
+% - first write of script
+% 
 % 2025_04_16 by Steve Harnett
-% -- remove dependence on test fixture
-% 2025_07_11 - S. Brennan, sbrennan@psu.edu
-% -- updated script testing to standard form
+% - remove dependence on test fixture
+% 
+% 2025_07_11 by Sean Brennan, sbrennan@psu.edu
+% - updated script testing to standard form
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
+
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
 
 %% Set up the workspace
 close all
@@ -33,10 +45,10 @@ close all;
 fprintf(1,'Figure: 1XXXXXX: DEMO cases\n');
 
 %% DEMO case: basic polytope case, convex obstacles
-fig_num = 10001;
+figNum = 10001;
 titleString = sprintf('DEMO case: basic polytope case, convex obstacles');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 polytopes(1).vertices = [0 0; 10 0; 10 1; 0 1; 0 0];
 polytopes(2).vertices = polytopes(1).vertices+[8,0];
@@ -45,7 +57,7 @@ polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes,(is_nonconvex),
 
 % Call the function
 [convexHullOverlapRatio, areaOverlap, areaOccupied] = ...
-    fcn_MapGen_statsConvexHullOverlapRatio( polytopes, (fig_num));
+    fcn_MapGen_statsConvexHullOverlapRatio( polytopes, (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -65,13 +77,13 @@ assert(isequal(2                 ,round(areaOverlap,4)))
 assert(isequal(20                ,round(areaOccupied,4)))
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% DEMO case: more complicated demo, non-convex obstacles
-fig_num = 10002;
+figNum = 10002;
 titleString = sprintf('DEMO case: more complicated demo, non-convex obstacles');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 polytopes(1).vertices = [0 0; 5 0; 7, 0.5; 5 1; 0 1; 0 0];
 polytopes(2).vertices = [6 0; 10 0; 10 1; 6 1; 8 0.5; 6 0];
@@ -80,7 +92,7 @@ polytopes = fcn_MapGen_polytopesFillFieldsFromVertices(polytopes,(is_nonconvex),
 
 % Call the function
 [convexHullOverlapRatio, areaOverlap, areaOccupied] = ...
-    fcn_MapGen_statsConvexHullOverlapRatio( polytopes, (fig_num));
+    fcn_MapGen_statsConvexHullOverlapRatio( polytopes, (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -100,7 +112,7 @@ assert(isequal(0.25              ,round(areaOverlap,4)))
 assert(isequal(9                 ,round(areaOccupied,4)))
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Test cases start here. These are very simple, usually trivial
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -122,10 +134,10 @@ close all;
 fprintf(1,'Figure: 2XXXXXX: TEST mode cases\n');
 % 
 % %% TEST case: simple crossing at origin
-% fig_num = 20001;
+% figNum = 20001;
 % titleString = sprintf('TEST case: simple crossing at origin');
-% fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-% figure(fig_num); clf;
+% fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+% figure(figNum); clf;
 
 
 %% Fast Mode Tests
@@ -147,9 +159,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: FAST mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: FAST mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: FAST mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 polytopes(1).vertices = [0 0; 5 0; 7, 0.5; 5 1; 0 1; 0 0];
 polytopes(2).vertices = [6 0; 10 0; 10 1; 6 1; 8 0.5; 6 0];
@@ -177,13 +189,13 @@ assert(isequal(9                 ,round(areaOccupied,4)))
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: FAST mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: FAST mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 polytopes(1).vertices = [0 0; 5 0; 7, 0.5; 5 1; 0 1; 0 0];
 polytopes(2).vertices = [6 0; 10 0; 10 1; 6 1; 8 0.5; 6 0];
@@ -211,14 +223,14 @@ assert(isequal(9                 ,round(areaOccupied,4)))
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: FAST mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: FAST mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 vertices = [0 0; 1 0; 0.5 1.5; 1 1; 0 1; 0 0];
 verticesIncludingSelfIntersections = fcn_MapGen_polytopeFindSelfIntersections(...
@@ -258,7 +270,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -274,7 +286,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases

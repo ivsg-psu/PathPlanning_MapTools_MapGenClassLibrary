@@ -2,11 +2,23 @@
 % Tests function: fcn_MapGen_polytopesShrinkToRadius
 
 % REVISION HISTORY:
-% 2021_06_09
-% -- first written by S. Brennan using
+% 
+% 2021_06_09 by Sean Brennan, sbrennan@psu.edu
+% - first written by S. Brennan using
 %    % script_test_fcn_MapGen_polytopesDeleteByAABB as a template
-% 2025_07_11 - S. Brennan, sbrennan@psu.edu
-% -- updated script testing to standard form
+% 
+% 2025_07_11 by Sean Brennan, sbrennan@psu.edu
+% - updated script testing to standard form
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
+
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
 
 %% Set up the workspace
 close all
@@ -30,10 +42,10 @@ close all;
 fprintf(1,'Figure: 1XXXXXX: DEMO cases\n');
 
 %% DEMO case: Basic example of radius-specified shrinking
-fig_num = 10001;
+figNum = 10001;
 titleString = sprintf('DEMO case: Basic example of radius-specified shrinking');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 shrinker = fcn_INTERNAL_loadExampleData;
 
@@ -42,7 +54,7 @@ ratio = 0.5;
 newRadius = orig_radius*ratio;
 
 % Call the function
-shrunkPolytope = fcn_MapGen_polytopeShrinkToRadius(shrinker, newRadius, (fig_num));
+shrunkPolytope = fcn_MapGen_polytopeShrinkToRadius(shrinker, newRadius, (figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -68,13 +80,13 @@ assert(isequal(length(shrinker),length(shrunkPolytope)));
 assert(isequal(round(shrunkPolytope.max_radius,4),round(newRadius,4)));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% DEMO case: Iterative example of radius-specified shrinking
-fig_num = 10002;
+figNum = 10002;
 titleString = sprintf('DEMO case: Iterative example of radius-specified shrinking');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 shrinker = fcn_INTERNAL_loadExampleData;
 
@@ -85,7 +97,7 @@ for ith_ratio = 1:length(ratios)
     newRadius = orig_radius*ratios(ith_ratio);
 
     % Call the function
-    shrunkPolytope = fcn_MapGen_polytopeShrinkToRadius(shrinker, newRadius, (fig_num));
+    shrunkPolytope = fcn_MapGen_polytopeShrinkToRadius(shrinker, newRadius, (figNum));
 
     sgtitle(titleString, 'Interpreter','none');
 
@@ -114,7 +126,7 @@ for ith_ratio = 1:length(ratios)
 end
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Test cases start here. These are very simple, usually trivial
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -136,10 +148,10 @@ close all;
 fprintf(1,'Figure: 2XXXXXX: TEST mode cases\n');
 %
 % %% TEST case: simple crossing at origin
-% fig_num = 20001;
+% figNum = 20001;
 % titleString = sprintf('TEST case: simple crossing at origin');
-% fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-% figure(fig_num); clf;
+% fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+% figure(figNum); clf;
 
 
 %% Fast Mode Tests
@@ -161,9 +173,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: FAST mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: FAST mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: FAST mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 shrinker = fcn_INTERNAL_loadExampleData;
 
@@ -197,13 +209,13 @@ assert(isequal(round(shrunkPolytope.max_radius,4),round(newRadius,4)));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: FAST mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: FAST mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 shrinker = fcn_INTERNAL_loadExampleData;
 
@@ -236,14 +248,14 @@ assert(isequal(length(shrinker),length(shrunkPolytope)));
 assert(isequal(round(shrunkPolytope.max_radius,4),round(newRadius,4)));
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: FAST mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: FAST mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 shrinker = fcn_INTERNAL_loadExampleData;
 
@@ -271,7 +283,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -287,7 +299,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases

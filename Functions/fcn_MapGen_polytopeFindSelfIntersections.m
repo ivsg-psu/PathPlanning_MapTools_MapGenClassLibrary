@@ -11,7 +11,7 @@ function [verticesIncludingSelfIntersections, flag_wasIntersection] = ...
 % FORMAT:
 % 
 %    [verticesIncludingSelfIntersections, flag_wasIntersection] = ...
-%    fcn_MapGen_polytopeFindSelfIntersections(vertices, (fig_num))
+%    fcn_MapGen_polytopeFindSelfIntersections(vertices, (figNum))
 %
 % INPUTS:
 %
@@ -19,7 +19,7 @@ function [verticesIncludingSelfIntersections, flag_wasIntersection] = ...
 %
 %    (OPTIONAL INPUTS)
 %
-%    fig_num: a figure number to plot results. If set to -1, skips any
+%    figNum: a figure number to plot results. If set to -1, skips any
 %    input checking or debugging, no figures will be generated, and sets
 %    up code to maximize speed. As well, if given, this forces the
 %    variable types to be displayed as output and as well makes the input
@@ -48,29 +48,41 @@ function [verticesIncludingSelfIntersections, flag_wasIntersection] = ...
 % Questions or comments? sbrennan@psu.edu 
 %
 
-% Revision History:
-% 2021_08_02 - S. Brennan
-% -- first write of code
-% 2025_04_25 by Sean Brennan
-% -- added global debugging options
-% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-% 2025_07_10 by Sean Brennan
-% -- updated variable names for clarity
-% -- changed fcn_MapGen_findIntersectionOfSegments to use
+% REVISION HISTORY:
+% 
+% 2021_08_02 by Sean Brennan, sbrennan@psu.edu
+% - first write of code
+% 
+% 2025_04_25 by Sean Brennan, sbrennan@psu.edu
+% - added global debugging options
+% - switched input checking to fcn_DebugTools_checkInputsToFunctions
+% 
+% 2025_07_10 by Sean Brennan, sbrennan@psu.edu
+% - updated variable names for clarity
+% - changed fcn_MapGen_findIntersectionOfSegments to use
 %    % fcn_Path_findSensorHitOnWall instead, as the Path function is far more
 %    % tested/debugged and regularly updated
-% -- fixed bug with flag_wasIntersection
-% 2025_07_17 by Sean Brennan
-% -- standardized Debugging and Input checks area, Inputs area
-% -- made codes use MAX_NARGIN definition at top of code, narginchk
-% -- made plotting flag_do_plots and code consistent across all functions
+% - fixed bug with flag_wasIntersection
+% 
+% 2025_07_17 by Sean Brennan, sbrennan@psu.edu
+% - standardized Debugging and Input checks area, Inputs area
+% - made codes use MAX_NARGIN definition at top of code, narginchk
+% - made plotting flag_do_plots and code consistent across all functions
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
 
-% TO DO
-% -- none
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
+
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 2; % The largest Number of argument inputs to the function
@@ -96,7 +108,7 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 end
 
 
@@ -130,8 +142,8 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 end
@@ -214,7 +226,7 @@ for ith_point = 1:length(start_vertices(:,1))
         (1), ...                 % (flag_search_return_type) -- 1 means ALL hit of any results,
         (0), ...                 % (flag_search_range_type)  -- 0 means only if overlapping wall/sensor, ...
         ([]),...                 % (tolerance) -- default is eps * 1000,
-        (-1));                   % (fig_num) -- -1 means to use "fast mode")
+        (-1));                   % (figNum) -- -1 means to use "fast mode")
     
     % Sort by distances
     sorting_data = [distance location];
@@ -252,7 +264,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if flag_do_plots
-    figure(fig_num);
+    figure(figNum);
     grid on
     grid minor
     hold on

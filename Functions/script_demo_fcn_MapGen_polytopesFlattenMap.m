@@ -5,12 +5,25 @@
 % REVISION HISTORY:
 %
 % 2022_10_19 by Steve Harnett
-% -- first write of script
+% - first write of script
+% 
 % 2022_10_21 by Steve Harnett
-% -- test fixtures and assertions added
-% 2025_04_25 by Sean Brennan
-% -- added test fixtures to global path during main code, removed relative
+% - test fixtures and assertions added
+% 
+% 2025_04_25 by Sean Brennan, sbrennan@psu.edu
+% - added test fixtures to global path during main code, removed relative
 % dependencies here which was breaking the code on different OS versions
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - Updated rev history to be in Markdown format
+% - Replaced fig_+num with figNum
+
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
+
+
 %%%%%%%%%%%%%%§
 
 close all; 

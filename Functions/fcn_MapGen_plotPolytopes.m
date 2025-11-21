@@ -3,7 +3,7 @@ function h_plot = fcn_MapGen_plotPolytopes(polytopes, varargin)
 % 
 % FORMAT:
 %
-%      h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat), (fillFormat), (fig_num))
+%      h_plot = fcn_MapGen_plotPolytopes(polytopes, (plotFormat), (fillFormat), (figNum))
 %
 % INPUTS:  
 %
@@ -28,7 +28,7 @@ function h_plot = fcn_MapGen_plotPolytopes(polytopes, varargin)
 %      the color of fill, and the opacity of the fill 
 %      in the form: [Y/N, R, G, B, alpha]. Default is [0 0 0 0 0];
 %
-%      fig_num: a figure number to plot results. If set to -1, skips any
+%      figNum: a figure number to plot results. If set to -1, skips any
 %      input checking or debugging, no figures will be generated, and sets
 %      up code to maximize speed.
 %
@@ -51,40 +51,62 @@ function h_plot = fcn_MapGen_plotPolytopes(polytopes, varargin)
 % This function was written on 2021_06_06 by Sean Brennan
 % Questions or comments? sbrennan@psu.edu
 
-% Revision history
-% 2021_06_06 - S.Brennan
-% -- revised from fcn_plot_polytopes
-% -- added revisions to prep for MapGen library
-% 2021_06_07 - S.Brennan
-% -- updated examples in header
-% -- added test script for function
-% 2023_01_15 - S.Brennan
-% -- uses narginchk now
-% 2023_02_20 - S.Brennan
-% -- checks if figure exists
-% 2025_04_25 by Sean Brennan
-% -- added global debugging options
-% -- switched input checking to fcn_DebugTools_checkInputsToFunctions
-% 2025_07_16 - Sean Brennan
-% -- imported plot structure into format from fcn_plotRoad_plotXY
-% 2025_07_17 by Sean Brennan
-% -- standardized Debugging and Input checks area, Inputs area
-% -- made codes use MAX_NARGIN definition at top of code, narginchk
-% -- made plotting flag_do_plots and code consistent across all functions
-% 2025_11_06 by Sean Brennan
-% -- removed duplicate figure() call within Inputs area (not needed)
-% 2025_11_08 by Sean Brennan
-% -- removed handle visibility on fill command to avoid "data" generic
-%    % label in legend commands thereafter
-% -- fixed minor warnings
+% REVISION HISTORY:
+% 
+% 2021_06_06 by Sean Brennan, sbrennan@psu.edu
+% - revised from fcn_plot_polytopes
+% - added revisions to prep for MapGen library
+% 
+% 2021_06_07 by Sean Brennan, sbrennan@psu.edu
+% - updated examples in header
+% - added test script for function
+% 
+% 2023_01_15 by Sean Brennan, sbrennan@psu.edu
+% - uses narginchk now
+% 
+% 2023_02_20 by Sean Brennan, sbrennan@psu.edu
+% - checks if figure exists
+% 
+% 2025_04_25 by Sean Brennan, sbrennan@psu.edu
+% - added global debugging options
+% - switched input checking to fcn_DebugTools_checkInputsToFunctions
+% 
+% 2025_07_16 by Sean Brennan, sbrennan@psu.edu
+% - imported plot structure into format from fcn_plotRoad_plotXY
+% 
+% 2025_07_17 by Sean Brennan, sbrennan@psu.edu
+% - standardized Debugging and Input checks area, Inputs area
+% - made codes use MAX_NARGIN definition at top of code, narginchk
+% - made plotting flag_do_plots and code consistent across all functions
+% 
+% 2025_11_06 by Sean Brennan, sbrennan@psu.edu
+% - removed duplicate figure() call within Inputs area (not needed)
+% 
+% 2025_11_08 by Sean Brennan, sbrennan@psu.edu
+% - removed handle visibility on fill command to avoid "data" generic
+%   % label in legend commands thereafter
+% - fixed minor warnings
+%
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - In fcn_MapGen_plotPolytopes
+%   % * fixed bug where polytope plotting not plotting closed form in case
+%   %   % where input polytopes are not closed off
+%   % * Updated rev history to be in Markdown format
+%   % * Updated rescaling on plotting to use userdata rather than children
+%   % * Updated auto axes to use padding methods from MATLAB
+%   % * Replaced fig_+num with figNum
+% 
+
+% TO-DO:
+% 
+% 2025_11_20 by Sean Brennan, sbrennan@psu.edu
+% - fill in to-do items here.
 
 
-% TO DO
-% -- none
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 4; % The largest Number of argument inputs to the function
@@ -110,7 +132,7 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 end
 
 
@@ -176,18 +198,18 @@ end
 
 % Does user want to show the plots?
 flag_do_plots = 1; % Default is to show plots
-fig_num = []; % Empty by default
+figNum = []; % Empty by default
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
+        figNum = temp;
         flag_do_plots = 1;
     end
 end
 
-if isempty(fig_num)
+if isempty(figNum)
     temp = gcf;
-    fig_num = temp.Number;
+    figNum = temp.Number;
 end
 
 
@@ -205,9 +227,30 @@ end
 % Fill in the x and y data
 polytope_plot_data_x = [];
 polytope_plot_data_y = [];
+
+
 for polys = 1:size(polytopes,2) % plot each polytope
-    polytope_plot_data_x = [polytope_plot_data_x; polytopes(polys).vertices(:,1); nan]; %#ok<AGROW>
-    polytope_plot_data_y = [polytope_plot_data_y; polytopes(polys).vertices(:,2); nan]; %#ok<AGROW>
+    thisPolyXs = polytopes(polys).vertices(:,1);
+    thisPolyYs = polytopes(polys).vertices(:,2);
+
+    startPoint = [thisPolyXs(1) thisPolyYs(1)];
+    endPoint   = [thisPolyXs(end) thisPolyYs(end)];
+
+    diffDistance = sum((startPoint - endPoint).^2,2);
+
+    % If distance between start/end are too large, repeat start at end to
+    % "close off" the polytope
+    if diffDistance>1000*eps
+        thisPolyXsClosed = [thisPolyXs; thisPolyXs(1)];
+        thisPolyYsClosed = [thisPolyYs; thisPolyYs(1)];
+
+    else
+        thisPolyXsClosed = thisPolyXs;
+        thisPolyYsClosed = thisPolyYs; 
+    end
+
+    polytope_plot_data_x = [polytope_plot_data_x; thisPolyXsClosed; nan]; %#ok<AGROW>
+    polytope_plot_data_y = [polytope_plot_data_y; thisPolyYsClosed; nan]; %#ok<AGROW>
 end
 
 %% Plot the results (for debugging)?
@@ -222,12 +265,25 @@ end
 %                           |___/ 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
+
+    % % check whether the figure already has data
+    % temp_h = figure(figNum);
+    % flag_rescale_axis = 0; 
+    % if isempty(get(temp_h,'Children'))
+    %     flag_rescale_axis = 0; % Set to 1 to force rescaling
+    % end        
+
+
     % check whether the figure already has data
-    temp_h = figure(fig_num);
-    flag_rescale_axis = 0; 
-    if isempty(get(temp_h,'Children'))
-        flag_rescale_axis = 0; % Set to 1 to force rescaling
-    end        
+    temp_h = figure(figNum); %#ok<NASGU>
+    flag_rescale_axis = 0;
+    if isempty(get(gca,'UserData'))
+        axis equal
+        flag_rescale_axis = 1; % Set to 1 to force rescaling
+        plotFlags = struct;
+        plotFlags.flagAlreadyPlotted = 1;
+        set(gca,'UserData',plotFlags)
+    end
 
     hold on;
     axis equal
@@ -279,8 +335,11 @@ if flag_do_plots
 
     % Make axis slightly larger?
     if flag_rescale_axis
+        drawnow;
+        set(gca,'XLimitMethod','padded')
+        set(gca,'YLimitMethod','padded')
+
         temp = axis;
-        %     temp = [min(points(:,1)) max(points(:,1)) min(points(:,2)) max(points(:,2))];
         axis_range_x = temp(2)-temp(1);
         axis_range_y = temp(4)-temp(3);
         percent_larger = 0.3;
