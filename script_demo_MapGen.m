@@ -301,8 +301,14 @@ cd(filepath);
 if 1==1
     clear flag_MapGen_Folders_Initialized
 end
+
 if 1==0
     fcn_INTERNAL_clearUtilitiesFromPathAndFolders;
+end
+
+if 1==0
+    % Resets all paths to factory default
+    restoredefaultpath;
 end
 
 %% Install dependencies
